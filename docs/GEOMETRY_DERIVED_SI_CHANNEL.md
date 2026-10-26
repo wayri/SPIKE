@@ -27,6 +27,17 @@ The result always declares `model_status: experimental`,
 
 ## Admitted geometry
 
+An optional `reference_zone_id` selects an exact canonical retained zone on the
+declared reference net and layer when multiple zones exist. Without it,
+ambiguity still fails. The selected zone must pass all existing polygon, hole
+and complete-footprint coverage checks. Other candidate IDs are reported as
+`omitted_reference_zone_ids` with an approximation warning. This does not union
+zones, recover absent copper or solve general multi-zone return currents.
+
+Missing conductivity is not defaulted. Use an explicitly source/revision-bound
+[material scenario](SI_MATERIAL_SCENARIOS.md) before extraction. Actual physical
+properties and declared scenario context enter the extraction identity.
+
 The single-line extractor accepts a SpiDeR v2 path only when all of these
 conditions are explicitly satisfied:
 

@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SigHarmonic
 import unittest
 
-from python.spike_core.openfoam_refinement_study import RefinementStudyError, evaluate_refinement_study
+from python.spike_core.solvers.external_engines.openfoam.openfoam_refinement_study import RefinementStudyError, evaluate_refinement_study
 
 
 def request(axis='mesh', steps=(.4,.2,.1), order=2):

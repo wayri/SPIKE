@@ -1,0 +1,9 @@
+.title Original ESC teaching example - shunt sensing and filter
+* Supplied ideal current pulses; ideal gain stage, no ADC quantization/noise.
+Iphase 0 shunt PULSE(0 20 500u 10u 10u 1m 3m)
+Rshunt shunt 0 1m
+Eamp amplified 0 shunt 0 50
+Rfilter amplified adc 1k
+Cfilter adc 0 1n
+.tran 2u 6m uic
+.end

@@ -8,11 +8,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 
 from tests.python import test_reference_plane_antipad_mesh_v2 as fixtures
-from python.spike_core.generalized_reference_plane_mesh_quality import (
-    GeneralizedReferencePlaneMeshQualityError,
-    build_generalized_reference_plane_mesh_quality,
-    validate_generalized_reference_plane_mesh_quality,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.generalized_reference_plane_mesh_quality import GeneralizedReferencePlaneMeshQualityError, build_generalized_reference_plane_mesh_quality, validate_generalized_reference_plane_mesh_quality
 
 
 class GeneralizedReferencePlaneMeshQualityTests(unittest.TestCase):

@@ -7,7 +7,7 @@ def handle_cosimulation_request(method, params):
     if method not in {"cosimulation_catalog", "run_cosimulation", "compare_digital_twin"}:
         return None
     try:
-        from .cosimulation import bounded_digest, run_cosimulation
+        from .solvers.execution.coupling.cosimulation import bounded_digest, run_cosimulation
         bounded_digest(params)
         if method == "cosimulation_catalog":
             if params != {}:
@@ -22,7 +22,7 @@ def handle_cosimulation_request(method, params):
             if method == "run_cosimulation":
                 result = run_cosimulation(params["request"])
             else:
-                from .digital_twin import compare_digital_twin
+                from .solvers.execution.coupling.digital_twin import compare_digital_twin
                 result = compare_digital_twin(params["request"])
         bounded_digest(result)
         return {"ok": True, "result": result}

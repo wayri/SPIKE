@@ -217,8 +217,8 @@ code or new execution capability is implemented by this feasibility study.
 - `python/spikes/waveform_store.py`: recoverable bounded waveform chunks.
 - `python/spike_core/project_package.py`: temporary ZIP/final replacement.
 - `python/spike_core/worker_progress.py`: bounded correlated stderr frames.
-- `python/spike_core/pwm_volume_electrothermal.py`: committed window iteration.
-- `python/spike_core/retained_thermal_step.py`: conservative solid energy mapping.
+- `python/spike_core/solvers/thermal_fluid/electrothermal/pwm_volume_electrothermal.py`: committed window iteration.
+- `python/spike_core/solvers/thermal_fluid/heat/retained_thermal_step.py`: conservative solid energy mapping.
 - [PWM volume coupling](PWM_VOLUME_ELECTROTHERMAL.md).
 - [thermal time-refinement checks](THERMAL_ACCURACY_CHECKS.md).
 - [parallel worker manager and limits](PARALLEL_WORKER_MANAGER.md).

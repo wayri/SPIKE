@@ -162,8 +162,8 @@ def main():
             "50 ohm / DC-64 MHz SI grid is a diagnostic request, not board requirements."],
         "boards": evidence, "cases": cases,
         "source_sha256": {p: digest(ROOT / p) for p in ("scripts/check_board_pisi_readiness.py",
-            "python/spike_core/cli.py", "python/spike_core/si_channel.py", "python/spike_core/dc_solver.py")}}
-    from python.spike_core.peec_plugin import native
+            "python/spike_core/cli.py", "python/spike_core/solvers/signal_integrity/channels/si_channel.py", "python/spike_core/solvers/power_integrity/dc/dc_solver.py")}}
+    from python.spike_core.solvers.power_integrity.peec.peec_plugin import native
     report["native_sha256"] = digest(native.__file__) if native else None
     (folder / "readiness.json").write_text(json.dumps(report, indent=2, allow_nan=False) + "\n", encoding="utf-8")
     return 0 if report["audit_execution_completed"] else 2

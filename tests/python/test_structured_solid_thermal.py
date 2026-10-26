@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.structured_solid_thermal import REQUEST_CONTRACT, solve_structured_solid_thermal
+from python.spike_core.solvers.thermal_fluid.heat.structured_solid_thermal import REQUEST_CONTRACT, solve_structured_solid_thermal
 
 
 def _boundaries(left, right):
@@ -79,7 +79,7 @@ class StructuredSolidThermalTests(unittest.TestCase):
     def test_bad_early_step_is_rejected_even_when_not_saved(self):
         request = _request(1)
         request["study"] = {"type": "transient", "initial_temperature_k": 300.0, "time_step_s": 1.0, "steps": 3, "output_stride": 3}
-        with patch("python.spike_core.structured_solid_thermal._energy", return_value={"passed": False}) as energy:
+        with patch("python.spike_core.solvers.thermal_fluid.heat.structured_solid_thermal._energy", return_value={"passed": False}) as energy:
             result = solve_structured_solid_thermal(request)
         self.assertEqual(energy.call_count, 1)
         self.assertEqual(result["status"], "blocked")

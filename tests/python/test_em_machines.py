@@ -8,7 +8,7 @@ import unittest
 import numpy as np
 from scipy.linalg import expm
 
-from python.spike_core.em_machines import MAX_STEPS, run_machine
+from python.spike_core.solvers.electromagnetics.machines.em_machines import MAX_STEPS, run_machine
 
 
 def motor(**updates):

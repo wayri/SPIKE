@@ -48,7 +48,7 @@ min/typ/max corners. Pin mappings are caller declarations, not CAD equivalence.
 
 ## Thermal transient with electrical feedback
 
-`python.spike_core.transient_resistive_electrothermal.run_transient_resistive_electrothermal`
+`python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.run_transient_resistive_electrothermal`
 accepts `spike/transient-resistive-electrothermal-request/v1`. Supply exactly:
 `circuit`, `thermal`, `loss_mappings`, `loss_ledger`, `time`, `iteration` and
 `contract`. See the companion tests for a complete reproducible request.
@@ -222,7 +222,7 @@ Knowledgeable human numerical review and wider release checks remain required.
 
 ## Actual native PWM with winding thermal feedback (2026-10-09)
 
-`python/spike_core/pwm_electrothermal.py` adds `validate_pwm_electrothermal`
+`python/spike_core/solvers/thermal_fluid/electrothermal/pwm_electrothermal.py` adds `validate_pwm_electrothermal`
 (strict preflight only) and `run_pwm_electrothermal` (actual native execution).
 The request/result schemas are `schemas/pwm-electrothermal-*-v1.schema.json`.
 PI and Thermal consumers can share this worker-callable API without owning a

@@ -1,3 +1,4 @@
+import SpiceModelLibraryImport from "./SpiceModelLibraryImport";
 import type { StudioFeedbackFrame } from "./studioFeedback";
 import StudioFeedbackPanel from "./StudioFeedbackPanel";
 import StudioBoardCircuitView from "./BoardCircuitStudioPanel";
@@ -16,7 +17,7 @@ import {
   componentPads, createSpiceAssignment, parasiticsFromResult, SpiceAssignment,
   SpiceModel, SpiceNetlistPreview, SpiceParasitic, SpiceWorkspace,
 } from "./spiceWorkspace";
-import { openNativeTextFile, runLocalWorker, saveNativeTextFile } from "./workerBridge";
+import { runLocalWorker, saveNativeTextFile } from "./workerBridge";
 import type { AssemblyAnalysisScope, AssemblyWorkload } from "./assemblyAdmission";
 import DataTable from "./DataTable";
 
@@ -57,6 +58,7 @@ export default function SpiceWorkbench({
 }) {
   const [page, setPage] = useState<Page>(board ? "board" : "setup");
   const [query, setQuery] = useState("");
+  const [modelImportOpen, setModelImportOpen] = useState(false);
   const [selectedModelId, setSelectedModelId] = useState(workspace.models[0]?.id ?? "");
   const [selectedComponentRef, setSelectedComponentRef] = useState(selection?.ref ?? board?.components[0]?.ref ?? "");
   const [selectedAssignmentId, setSelectedAssignmentId] = useState(workspace.assignments[0]?.id ?? "");
@@ -100,23 +102,18 @@ export default function SpiceWorkbench({
   const patchParasitic = (id: string, patch: Partial<SpiceParasitic>) =>
     set({ parasitics: workspace.parasitics.map(item => item.id === id ? { ...item, ...patch } : item) });
 
-  const importSubcircuit = async () => {
-    const file = await openNativeTextFile("netlist");
-    if (!file) return;
-    const declaration = file.contents.match(/^\s*\.subckt\s+([^\s]+)\s+(.+)$/im);
-    if (!declaration) { setDiagnostic("The selected file does not contain a .subckt declaration."); return; }
-    const name = declaration[1];
-    const model: SpiceModel = {
-      id: `model_${crypto.randomUUID().replace(/-/g, "_")}`,
-      name: file.fileName,
-      kind: "subcircuit",
-      subcircuit_name: name,
-      pins: declaration[2].trim().split(/\s+/),
-      source: file.contents,
-      origin: "imported",
-    };
-    set({ models: [...workspace.models, model] });
-    setSelectedModelId(model.id); setPage("models"); setDiagnostic(`Imported inline subcircuit ${name}; compose to run security and pin checks.`);
+  const importSubcircuit = () => {
+    if (activeRunId.current || feedbackBusy || studioBusy) return;
+    setPage("models"); setModelImportOpen(true);
+  };
+  const addImportedModel = (model: SpiceModel) => {
+    if (activeRunId.current || feedbackBusy || studioBusy) throw new Error("Wait for the current operation before adding a model.");
+    const current = workspaceRef.current;
+    if (current.models.length >= 1024) throw new Error("The project already contains the maximum 1024 models.");
+    if (current.models.some(row => row.id === model.id)) throw new Error("This exact model is already in the project. Select it in the library instead.");
+    setWorkspace({ ...current, models: [...current.models, model] });
+    setSelectedModelId(model.id); setPage("models"); setPreview(null); setOwnedResult(null); setModelImportOpen(false);
+    setDiagnostic(`Added ${model.name}. Review pin mappings and use the required external ngspice route; no simulation has run.`);
   };
   const addProjectModel = () => {
     const model: SpiceModel = { id: `model_${crypto.randomUUID().replace(/-/g, "_")}`, name: "New subcircuit", kind: "subcircuit", subcircuit_name: "new_model", pins: ["in", "out", "gnd"], source: ".subckt new_model in out gnd\n* Add reviewed elements here\n.ends new_model", origin: "project" };
@@ -376,9 +373,11 @@ export default function SpiceWorkbench({
         <div className="spice-flow-summary"><div><b>{workspace.models.length}</b><span>models</span></div><i /><div><b>{workspace.assignments.length}</b><span>assigned parts</span></div><i /><div><b>{workspace.parasitics.length}</b><span>RLC blocks</span></div><i /><div><b>{humanize(analysis.mode)}</b><span>analysis</span></div></div>
       </section>}
 
-      {page === "models" && <section className="spice-split-page">
+      {page === "models" && modelImportOpen && <SpiceModelLibraryImport disabled={running || feedbackBusy || studioBusy} onAdd={addImportedModel} onClose={() => setModelImportOpen(false)} />}
+      {page === "models" && !modelImportOpen && <section className="spice-split-page">
         <aside><div className="spice-list-heading"><b>MODEL LIBRARY</b><button onClick={addProjectModel} title="Add project subcircuit"><Plus size={13} /></button></div>{workspace.models.map(model => <button key={model.id} className={selectedModel?.id === model.id ? "selected" : ""} onClick={() => setSelectedModelId(model.id)}><b>{model.name}</b><small>{modelLabel(model)} | {humanize(model.origin)}</small></button>)}</aside>
         <main>{selectedModel ? <><div className="spice-section-heading"><div><b>{selectedModel.name}</b><small>{selectedModel.id}</small></div>{selectedModel.origin !== "built_in" && <button className="danger-text" onClick={() => { set({ models: workspace.models.filter(model => model.id !== selectedModel.id), assignments: workspace.assignments.filter(item => item.model_id !== selectedModel.id) }); setSelectedModelId(workspace.models[0]?.id ?? ""); }}><Trash2 size={13} /> Delete</button>}</div><div className="spice-form-grid">
+          {selectedModel.import_provenance && <p className="spice-wide">Imported from {selectedModel.import_provenance.source_name}. Required route: {selectedModel.import_provenance.required_engine}. Original SHA-256: <code style={{ overflowWrap: "anywhere" }}>{selectedModel.import_provenance.source_sha256}</code>. Source edits require renewed review.</p>}
           <label>Name<input value={selectedModel.name} onChange={event => patchModel({ name: event.target.value })} /></label>
           <label>Type<select value={selectedModel.kind} disabled={selectedModel.origin === "built_in"} onChange={event => patchModel({ kind: event.target.value as SpiceModel["kind"] })}><option value="primitive">Primitive</option><option value="subcircuit">Subcircuit</option></select></label>
           <label>Pins<input value={selectedModel.pins.join(", ")} onChange={event => patchModel({ pins: event.target.value.split(",").map(value => value.trim()).filter(Boolean) })} /></label>

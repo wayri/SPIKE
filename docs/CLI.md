@@ -1,5 +1,23 @@
 # SPIKE Command-Line Interface
 
+The offline [coupled multiport fixture example](MULTIPORT_DEEMBEDDING.md) accepts
+`--request REQUEST.json --output NEW_RESULT.json` through
+`examples/multiport_deembedding/run_fixture.py`; omit `--request` to run the
+original three-port demonstration. It preserves source datasets and rejects
+overwriting outputs. This experimental example is not a worker/desktop route.
+
+`em-cosim spice REQUEST.json` and `em-cosim body-heating REQUEST.json` execute
+experimental typed linear sampled-network/native SPICE composition and
+state-bound supplied-field volume heating. Use global `--output` for a retained
+result. They do not accept arbitrary netlists or infer field heat from an
+S-parameter power deficit. See [SPICE contracts](validation/EM_SPICE_COUPLING_20261023.md)
+and [calibration limits](validation/EM_BODY_HEATING_20261023.md).
+
+Experimental EMerge/network/circuit-resistor thermal composition is available
+under `em-cosim prepare|ac|resistor-thermal`. Use `--output <new.json>` before
+the subcommand and supply the inner request JSON file. See
+[complete inputs, limits and desktop handoff](EMERGE_COSIMULATION.md#desktop-and-cli-workflow).
+
 For verified SI/PI commands and desktop task paths, see
 [Run SI and PI now](RUN_SI_PI_NOW.md). `pdn-network request.json` executes the
 same explicit lumped AC/load-transient PDN worker used by the desktop;

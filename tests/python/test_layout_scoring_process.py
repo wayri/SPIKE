@@ -10,17 +10,8 @@ import unittest
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.layout_scoring_process import (
-    JOB_CONTRACT,
-    RESULT_CONTRACT,
-    _admit_paths,
-    capability_manifest,
-    execute_job,
-)
-from python.spike_core.spikes_layout_adapter import (
-    LAYOUT_EVALUATION_CONTRACT,
-    design_ir_artifact_identity,
-)
+from python.spike_core.layout_scoring_process import JOB_CONTRACT, RESULT_CONTRACT, _admit_paths, capability_manifest, execute_job
+from python.spike_core.spikes_layout_adapter import LAYOUT_EVALUATION_CONTRACT, design_ir_artifact_identity
 
 
 class LayoutScoringProcessTests(unittest.TestCase):

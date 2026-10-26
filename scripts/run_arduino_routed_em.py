@@ -163,7 +163,7 @@ def main():
     write(args.output/'study.json',{'contract':'spike/assembly-em-study/v1','request':request,'result':None})
     print(json.dumps({'request_path':str((args.output/'request.json').resolve()),'bytes':(args.output/'request.json').stat().st_size,'build_seconds':time.monotonic()-started}),flush=True)
     if args.run:
-        from python.spike_core.assembly_em import run_assembly_em
+        from python.spike_core.solvers.electromagnetics.fields.assembly_em import run_assembly_em
         result=run_assembly_em(request,args.output/'run')
         write(args.output/'study.json',{'contract':'spike/assembly-em-study/v1','request':request,'result':result})
         print(json.dumps({'status':result.get('status'),'solver_executed':result.get('solver_executed')}),flush=True)

@@ -77,7 +77,7 @@ Probe `internal_mesh_capabilities` with empty parameters. Execute
 ```
 
 The same request goes to
-`python.spike_core.internal_meshing_engine.run_internal_meshing(request)`.
+`python.spike_core.solvers.geometry_meshing.preparation.internal_meshing_engine.run_internal_meshing(request)`.
 The request schema is
 [`internal-mesh-request-v1`](../schemas/internal-mesh-request-v1.schema.json).
 The result includes the candidate mesh, boundary triangles, quality, request

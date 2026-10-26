@@ -111,6 +111,14 @@ Knowledgeable numerical review remains required before release.
 
 ## Conservative geometry-to-CHT source admission (October 18, 2026)
 
+The [26 October conforming subdivision record](validation/ASSEMBLY_AIRFLOW_SUBDIVISION_20261026.md)
+adds volume-only Gmsh optimization with exact surface-invariance checks and
+four hexahedral CFD cells per admitted tetrahedron. Set `max_cells` and
+`max_vertices` for the final CFD mesh; insufficient budgets reject preparation.
+Original CAD surface triangles are partitioned into coplanar quads without
+moving the represented boundary. Strict native mesh gates still apply, and
+retained STEP rotation/feature-meshing failures remain explicitly unsupported.
+
 Before writing an OpenFOAM case, `assembly_airflow_admission.py` now checks the
 mesher's explicit millimetre units, complete `solid_N` to retained-source mapping,
 requested cell/vertex limits and positive tetrahedron orientation. Missing solid

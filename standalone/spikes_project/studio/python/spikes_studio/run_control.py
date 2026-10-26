@@ -51,7 +51,7 @@ def ngspice_batch(source):
     currents, power and thermal quantities are never inferred from them.
     """
     from python.spike_core.contracts import AnalysisSpec, DesignIR
-    from python.spike_core.ngspice_plugin import NgspicePlugin
+    from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin
     from python.spike_core.spice_netlist_safety import validate_netlist
     import hashlib
 

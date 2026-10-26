@@ -24,7 +24,7 @@ does not automatically qualify the electrical previews or a field solve.
 
 `spike/mesh/v3` is the renderer- and solver-plugin-neutral mesh contract.
 It is generated from `SpiDeR` and `AnalysisSpec.mesh` by
-`python.spike_core.meshing.MeshingEngine`.
+`python.spike_core.solvers.geometry_meshing.preparation.meshing.MeshingEngine`.
 
 Supported preview dimensions:
 

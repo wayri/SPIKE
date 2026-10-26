@@ -10,9 +10,9 @@ import sys
 import unittest
 
 import numpy as np
-from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal, verify_assembly_field_result
-from python.spike_core.assembly_field_study import export_assembly_field_study, import_assembly_field_study
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal, verify_assembly_field_result
+from python.spike_core.solvers.execution.coupling.assembly_field_study import export_assembly_field_study, import_assembly_field_study
 from python.spike_core.service_assembly_field import handle_assembly_field_request
 from tests.python.test_assembly_tetra_thermal import cube, exterior
 

@@ -18,7 +18,7 @@ import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.assembly_em_board_geometry import prepare_routed_board_volume
+from python.spike_core.solvers.electromagnetics.fields.assembly_em_board_geometry import prepare_routed_board_volume
 
 
 def write(path, value):
@@ -152,11 +152,11 @@ def main():
             prepared=prepare_routed_board_volume(snapshot,stack)
             write(directory/'prepared-volume.json',prepared)
             if args.planar_mesh:
-                from python.spike_core.assembly_em_planar_mesher import mesh_material_prisms
+                from python.spike_core.solvers.electromagnetics.fields.assembly_em_planar_mesher import mesh_material_prisms
                 generated=mesh_material_prisms(prepared['job'],max_cells=600000,max_vertices=200000)
                 write(directory/'planar-volume-mesh.json',generated)
             if args.mesh:
-                from python.spike_core.gmsh_occ_runtime import run_occ_case
+                from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import run_occ_case
                 generated=run_occ_case(prepared['job'],directory/'occ-mesh',timeout_s=180,memory_limit_mb=2048)
                 write(directory/'volume-mesh.json',generated)
         except (ValueError,RuntimeError,subprocess.TimeoutExpired) as error:

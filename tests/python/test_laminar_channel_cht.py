@@ -5,7 +5,7 @@ import json
 import math
 import unittest
 import numpy as np
-from python.spike_core.laminar_channel_cht import CONTRACT,solve_laminar_channel_cht
+from python.spike_core.solvers.thermal_fluid.flow.laminar_channel_cht import CONTRACT, solve_laminar_channel_cht
 
 
 def fixture(nf=8,nx=8):

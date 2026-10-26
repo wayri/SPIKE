@@ -1,0 +1,12 @@
+{
+  "contract": "spike/emerge-gallery-probes/v1",
+  "example_id": "multilayer-two-port",
+  "result_path": null,
+  "model_status": "unvalidated",
+  "interpolation_performed_by_gallery": false,
+  "samples": [],
+  "recipes": [
+    "After an explicitly requested admitted two-port run, inspect S11/S21/S12/S22 at saved frequencies."
+  ],
+  "status": "setup_only"
+}

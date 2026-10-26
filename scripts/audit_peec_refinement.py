@@ -13,12 +13,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import numpy as np
 from python.spike_core.contracts import AnalysisSpec
-from python.spike_core.hybrid_mesh import build_hybrid_mesh, nearest_mesh_node, TOPOLOGY_ONLY_BRANCH_KINDS
-from python.spike_core.peec_plugin import _connected_component
-from python.spike_core.peec_network import solve_port
-from python.spike_core.peec_volume_resistance import assemble_overlap_resistance
-from python.spike_core.peec_volume_support import zone_basis_support_report
-from python.spike_core.quasistatic_capacitance import estimate_branch_capacitance
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh, nearest_mesh_node, TOPOLOGY_ONLY_BRANCH_KINDS
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import _connected_component
+from python.spike_core.solvers.power_integrity.peec.peec_network import solve_port
+from python.spike_core.solvers.power_integrity.peec.peec_volume_resistance import assemble_overlap_resistance
+from python.spike_core.solvers.power_integrity.peec.peec_volume_support import zone_basis_support_report
+from python.spike_core.solvers.power_integrity.pdn.quasistatic_capacitance import estimate_branch_capacitance
 from python.spike_core.service import _design_from_kicad
 
 
@@ -90,7 +90,7 @@ def audit(board: Path, sizes: list[float], *, conforming: bool = False, area_sur
             "memory_budget_mb": 2048 if conforming else 512},
             options={"peec_volume_extraction": "enabled"} if conforming else {})
         if conforming:
-            from python.spike_core.peec_conforming_mesh import build_conforming_mesh
+            from python.spike_core.solvers.power_integrity.peec.peec_conforming_mesh import build_conforming_mesh
             mesh = build_conforming_mesh(design, spec)
         else:
             mesh = build_hybrid_mesh(design, spec)
@@ -142,7 +142,7 @@ def audit(board: Path, sizes: list[float], *, conforming: bool = False, area_sur
             maximum_balance = max(abs(v) for v in balance.values())
         estimator = estimate_branch_capacitance
         if area_surrogate:
-            from python.spike_core.quasistatic_copper_area import estimate_branch_capacitance as estimator
+            from python.spike_core.solvers.power_integrity.pdn.quasistatic_copper_area import estimate_branch_capacitance as estimator
         _, _, capacitance = estimator(design, spec, [branches[i] for i in physical])
         row.update(status="completed", resistance_ohm=float(impedance.real),
                    capacitance_f=capacitance["total_capacitance_f"],
@@ -171,11 +171,11 @@ def audit(board: Path, sizes: list[float], *, conforming: bool = False, area_sur
             "board_sha256": hashlib.sha256(board.read_bytes()).hexdigest(),
             "conforming_requested": conforming, "area_surrogate_requested": area_surrogate,
             "source_sha256": {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
-                              for path in [Path(__file__), ROOT / "python/spike_core/hybrid_mesh.py",
-                                           ROOT / "python/spike_core/peec_volume_resistance.py",
-                                           ROOT / "python/spike_core/quasistatic_capacitance.py",
-                                           ROOT / "python/spike_core/quasistatic_copper_area.py",
-                                           ROOT / "python/spike_core/peec_conforming_mesh.py"]},
+                              for path in [Path(__file__), ROOT / "python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py",
+                                           ROOT / "python/spike_core/solvers/power_integrity/peec/peec_volume_resistance.py",
+                                           ROOT / "python/spike_core/solvers/power_integrity/pdn/quasistatic_capacitance.py",
+                                           ROOT / "python/spike_core/solvers/power_integrity/pdn/quasistatic_copper_area.py",
+                                           ROOT / "python/spike_core/solvers/power_integrity/peec/peec_conforming_mesh.py"]},
             "rows": rows, "relative_changes": changes}
 
 

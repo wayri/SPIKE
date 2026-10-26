@@ -4,8 +4,8 @@ import copy
 import unittest
 
 from examples.assembly_field.run_examples import setup
-from python.spike_core.assembly_thermal_autolink import discover_assembly_thermal_links, autolink_assembly_thermal_contacts
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_autolink import discover_assembly_thermal_links, autolink_assembly_thermal_contacts
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
 from python.spike_core.service_volume_electrothermal import handle_volume_electrothermal_request
 
 

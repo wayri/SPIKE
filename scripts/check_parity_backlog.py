@@ -21,11 +21,32 @@ COUPLED_EXPANSION_SCOPE = frozenset({
     'VF01', 'VF02', 'AX01', 'LB01', 'LB02',
 })
 RESTRICTED_EXPANSION_SCOPES = {'GP05': 'vehicle_aerodynamics'}
+PRIVATE_CAPABILITY_ID = re.compile(r'^OP\d{2}(?:-S\d+[A-Z0-9]*)?$')
+PRIVATE_EVIDENCE_NAMES = {'GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md'}
+
+
+def reject_private_research(value: object) -> None:
+    """Reject private research identifiers and evidence from the public backlog."""
+
+    if isinstance(value, dict):
+        for key, child in value.items():
+            if key in {'id', 'capability_id'} and isinstance(child, str) and PRIVATE_CAPABILITY_ID.fullmatch(child):
+                raise ValueError('private research capability is not publishable')
+            reject_private_research(child)
+    elif isinstance(value, list):
+        for child in value:
+            reject_private_research(child)
+    elif isinstance(value, str):
+        if PRIVATE_CAPABILITY_ID.fullmatch(value):
+            raise ValueError('private research capability is not publishable')
+        if any(name in value for name in PRIVATE_EVIDENCE_NAMES):
+            raise ValueError('private research evidence is not publishable')
 
 
 def validate_backlog(payload: dict, roadmap: str, root: Path = ROOT) -> dict:
     if not isinstance(payload, dict) or payload.get('contract') != 'spike/parity-development-backlog/v1':
         raise ValueError('unsupported development backlog')
+    reject_private_research(payload)
     items = payload.get('items')
     if not isinstance(items, list) or not items:
         raise ValueError('backlog requires items')
@@ -119,6 +140,16 @@ def validate_backlog(payload: dict, roadmap: str, root: Path = ROOT) -> dict:
                 or any(stage.get('status') != 'planned' for stage in payload.get('stages', [])
                        if stage.get('capability_id') in post_ids - allowed)):
             raise ValueError('post-parity work must remain deferred during parity')
+    checklists = payload.get('family_checklists')
+    if checklists != {'SI08': 'docs/si08-closure-checklist-v1.json'}:
+        raise ValueError('Finite SI08 family checklist registration is required')
+    if __package__:
+        from .check_si08_closure import validate_checklist
+    else:
+        from check_si08_closure import validate_checklist
+    closure = validate_checklist(json.loads((root / checklists['SI08']).read_text(encoding='utf-8')), root)
+    if by_id['SI08']['status'] == 'complete' and not closure['full_family_complete']:
+        raise ValueError('SI08 full family cannot close with incomplete implementation/external gates')
     done_stages = validate_stages(payload.get('stages', []), ids, root)
     return {'items': len(ids), 'benchmark_definitions_pending': benchmark_definitions_pending,
             'done_stages': done_stages,

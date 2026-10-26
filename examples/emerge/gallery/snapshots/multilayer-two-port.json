@@ -1,0 +1,947 @@
+{
+  "format": "spike-project-package/v2",
+  "contract": "spike/project/v2",
+  "saved_at": "1970-01-01T00:00:00.000Z",
+  "project": {
+    "id": "emerge-gallery-multilayer-two-port",
+    "name": "Four-layer two-port setup"
+  },
+  "design": {
+    "source_file": "multilayer-two-port.spike-design.json",
+    "source_format": "spike-normalized",
+    "source_board": "{\n  \"contract\": \"spike/design-snapshot/v1\",\n  \"canonical_design\": {\n    \"design_id\": \"9b9ad80e-d993-5277-b292-922b0e3be0f8\",\n    \"name\": \"Untitled design\",\n    \"source\": {\n      \"source_format\": \"unknown\",\n      \"source_digest\": \"e5f795496e255272b2dd11acc1f283813e8748ab2fce9daf676bc2d1d41de2f9\",\n      \"native_id\": \"board-a\",\n      \"artifact_path\": \"\"\n    },\n    \"frame\": {\n      \"frame_id\": \"board\",\n      \"parent_frame_id\": \"\",\n      \"units\": \"mm\",\n      \"handedness\": \"right\",\n      \"transform\": [\n        1.0,\n        0.0,\n        0.0,\n        0.0,\n        0.0,\n        1.0,\n        0.0,\n        0.0,\n        0.0,\n        0.0,\n        1.0,\n        0.0,\n        0.0,\n        0.0,\n        0.0,\n        1.0\n      ]\n    },\n    \"contract\": \"spike/design-ir/v2\",\n    \"materials\": [\n      {\n        \"id\": \"4adc3723-8ca6-540b-99a3-b5c8c1342122\",\n        \"source_id\": \"material:copper:4e3c290712aabb51\",\n        \"name\": \"copper\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"name\": \"F.Cu\",\n            \"type\": \"copper\"\n          }\n        },\n        \"material_class\": \"copper\",\n        \"conductivity_s_per_m\": null,\n        \"relative_permittivity\": null,\n        \"loss_tangent\": null,\n        \"thermal_conductivity_w_per_mk\": null,\n        \"density_kg_per_m3\": null,\n        \"heat_capacity_j_per_kgk\": null\n      },\n      {\n        \"id\": \"f9ae35a6-f0ce-52b3-9cd5-f5984432defa\",\n        \"source_id\": \"material:core:a5a033285bb2d60a\",\n        \"name\": \"core\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"name\": \"D1\",\n            \"type\": \"core\",\n            \"thickness\": 0.2,\n            \"epsilon_r\": 3.2\n          }\n        },\n        \"material_class\": \"core\",\n        \"conductivity_s_per_m\": null,\n        \"relative_permittivity\": 3.2,\n        \"loss_tangent\": null,\n        \"thermal_conductivity_w_per_mk\": null,\n        \"density_kg_per_m3\": null,\n        \"heat_capacity_j_per_kgk\": null\n      },\n      {\n        \"id\": \"eef0d072-92bf-58de-94df-8cb15be45e5f\",\n        \"source_id\": \"material:core:8ae4560f9217dcff\",\n        \"name\": \"core\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"name\": \"D2\",\n            \"type\": \"core\",\n            \"thickness\": 0.5,\n            \"epsilon_r\": 4.1\n          }\n        },\n        \"material_class\": \"core\",\n        \"conductivity_s_per_m\": null,\n        \"relative_permittivity\": 4.1,\n        \"loss_tangent\": null,\n        \"thermal_conductivity_w_per_mk\": null,\n        \"density_kg_per_m3\": null,\n        \"heat_capacity_j_per_kgk\": null\n      },\n      {\n        \"id\": \"11948192-2536-5f69-9cf2-c0986bbf753c\",\n        \"source_id\": \"material:core:e8544a9ca7f3a55a\",\n        \"name\": \"core\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"name\": \"D3\",\n            \"type\": \"core\",\n            \"thickness\": 0.3,\n            \"epsilon_r\": 3.8\n          }\n        },\n        \"material_class\": \"core\",\n        \"conductivity_s_per_m\": null,\n        \"relative_permittivity\": 3.8,\n        \"loss_tangent\": null,\n        \"thermal_conductivity_w_per_mk\": null,\n        \"density_kg_per_m3\": null,\n        \"heat_capacity_j_per_kgk\": null\n      }\n    ],\n    \"layers\": [\n      {\n        \"id\": \"4aadcd75-c07f-5fe5-bb1d-ec83259aa309\",\n        \"source_id\": \"source:f880fbeaa496384ca3dbf84aba134184407869dbf1e1356e7b35ab5dfbdd9c03\",\n        \"name\": \"F.Cu\",\n        \"extensions\": {\n          \"spike.v1.stackup\": {\n            \"name\": \"F.Cu\",\n            \"type\": \"copper\"\n          }\n        },\n        \"layer_type\": \"copper\",\n        \"order\": 0,\n        \"z_mm\": 0.0,\n        \"thickness_mm\": null,\n        \"material_id\": \"4adc3723-8ca6-540b-99a3-b5c8c1342122\",\n        \"region_ids\": []\n      },\n      {\n        \"id\": \"678b4419-6e6f-55a0-a4d6-883e530ac667\",\n        \"source_id\": \"source:b22caed0b945f05b11e49964a3193da747850da880c63c12b51bf6d3d2916a6b\",\n        \"name\": \"D1\",\n        \"extensions\": {\n          \"spike.v1.stackup\": {\n            \"name\": \"D1\",\n            \"type\": \"core\",\n            \"thickness\": 0.2,\n            \"epsilon_r\": 3.2\n          }\n        },\n        \"layer_type\": \"core\",\n        \"order\": 1,\n        \"z_mm\": 0.0,\n        \"thickness_mm\": 0.2,\n        \"material_id\": \"f9ae35a6-f0ce-52b3-9cd5-f5984432defa\",\n        \"region_ids\": []\n      },\n      {\n        \"id\": \"8e56b6e7-9d5f-5f28-a111-8508e6c92dab\",\n        \"source_id\": \"source:be7aadedc7823a8163b5b4f52b88902d2bb2e8a6c1376c710ad99838a6fec08a\",\n        \"name\": \"In1.Cu\",\n        \"extensions\": {\n          \"spike.v1.stackup\": {\n            \"name\": \"In1.Cu\",\n            \"type\": \"copper\"\n          }\n        },\n        \"layer_type\": \"copper\",\n        \"order\": 2,\n        \"z_mm\": 0.2,\n        \"thickness_mm\": null,\n        \"material_id\": \"4adc3723-8ca6-540b-99a3-b5c8c1342122\",\n        \"region_ids\": []\n      },\n      {\n        \"id\": \"b54a9943-bab7-5e30-9453-03ededde8643\",\n        \"source_id\": \"source:8551373452ada21073e440f7d0ed12776a207e63b04695bb719c7b0e5c805ec4\",\n        \"name\": \"D2\",\n        \"extensions\": {\n          \"spike.v1.stackup\": {\n            \"name\": \"D2\",\n            \"type\": \"core\",\n            \"thickness\": 0.5,\n            \"epsilon_r\": 4.1\n          }\n        },\n        \"layer_type\": \"core\",\n        \"order\": 3,\n        \"z_mm\": 0.2,\n        \"thickness_mm\": 0.5,\n        \"material_id\": \"eef0d072-92bf-58de-94df-8cb15be45e5f\",\n        \"region_ids\": []\n      },\n      {\n        \"id\": \"e8c08f24-c3a2-53fe-a7d7-302c08661e0a\",\n        \"source_id\": \"source:9985b9aab69e684e4ff721943a7c30ad670ffa7a4064d58b792e24d3dd6fd9ea\",\n        \"name\": \"In2.Cu\",\n        \"extensions\": {\n          \"spike.v1.stackup\": {\n            \"name\": \"In2.Cu\",\n            \"type\": \"copper\"\n          }\n        },\n        \"layer_type\": \"copper\",\n        \"order\": 4,\n        \"z_mm\": 0.7,\n        \"thickness_mm\": null,\n        \"material_id\": \"4adc3723-8ca6-540b-99a3-b5c8c1342122\",\n        \"region_ids\": []\n      },\n      {\n        \"id\": \"ae6102cd-0d83-5828-8828-e4087193375b\",\n        \"source_id\": \"source:d31a95424ad2f988a3ea936646db99dfd98132a248ddfe7058ece672672e7a0a\",\n        \"name\": \"D3\",\n        \"extensions\": {\n          \"spike.v1.stackup\": {\n            \"name\": \"D3\",\n            \"type\": \"core\",\n            \"thickness\": 0.3,\n            \"epsilon_r\": 3.8\n          }\n        },\n        \"layer_type\": \"core\",\n        \"order\": 5,\n        \"z_mm\": 0.7,\n        \"thickness_mm\": 0.3,\n        \"material_id\": \"11948192-2536-5f69-9cf2-c0986bbf753c\",\n        \"region_ids\": []\n      },\n      {\n        \"id\": \"afce94ea-c7be-5267-afb8-4be682052e3e\",\n        \"source_id\": \"source:2f22a787701ab5dcbdcfdcd8677a5ace184227bf9b4d0b88440f7375e71b291a\",\n        \"name\": \"B.Cu\",\n        \"extensions\": {\n          \"spike.v1.stackup\": {\n            \"name\": \"B.Cu\",\n            \"type\": \"copper\"\n          }\n        },\n        \"layer_type\": \"copper\",\n        \"order\": 6,\n        \"z_mm\": 1.0,\n        \"thickness_mm\": null,\n        \"material_id\": \"4adc3723-8ca6-540b-99a3-b5c8c1342122\",\n        \"region_ids\": []\n      }\n    ],\n    \"nets\": [],\n    \"tracks\": [\n      {\n        \"id\": \"54c79654-96ce-5ce5-b914-a425ddfd1cf4\",\n        \"source_id\": \"T1\",\n        \"name\": \"\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"id\": \"T1\",\n            \"net_name\": \"RF\",\n            \"layer\": \"F.Cu\",\n            \"start\": [\n              0,\n              0\n            ],\n            \"end\": [\n              10,\n              0\n            ],\n            \"width\": 0.4\n          }\n        },\n        \"net_id\": \"RF\",\n        \"layer_id\": \"4aadcd75-c07f-5fe5-bb1d-ec83259aa309\",\n        \"start_mm\": [\n          0.0,\n          0.0\n        ],\n        \"end_mm\": [\n          10.0,\n          0.0\n        ],\n        \"width_mm\": 0.4\n      }\n    ],\n    \"arcs\": [],\n    \"zones\": [\n      {\n        \"id\": \"b60b4c63-0763-5e93-9234-39b70ca950f0\",\n        \"source_id\": \"Z1\",\n        \"name\": \"\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"id\": \"Z1\",\n            \"net_name\": \"GND\",\n            \"layer\": \"In1.Cu\",\n            \"source_kind\": \"filled_zone\",\n            \"points\": [\n              [\n                -2,\n                -2\n              ],\n              [\n                12,\n                -2\n              ],\n              [\n                12,\n                2\n              ],\n              [\n                -2,\n                2\n              ]\n            ]\n          }\n        },\n        \"net_id\": \"GND\",\n        \"layer_ids\": [\n          \"8e56b6e7-9d5f-5f28-a111-8508e6c92dab\"\n        ],\n        \"outlines_mm\": [\n          [\n            [\n              -2.0,\n              -2.0\n            ],\n            [\n              12.0,\n              -2.0\n            ],\n            [\n              12.0,\n              2.0\n            ],\n            [\n              -2.0,\n              2.0\n            ]\n          ]\n        ],\n        \"holes_mm\": [],\n        \"source_zone_id\": \"\",\n        \"filled_copper_id\": \"\",\n        \"source_zone_outline_id\": \"\",\n        \"source_zone_outline_sha256\": \"\",\n        \"source_zone_outline_paths_mm\": [],\n        \"source_zone_outline_path_count\": 0,\n        \"source_zone_outline_vertex_count\": 0,\n        \"source_zone_outline_representation\": \"none\",\n        \"source_zone_outline_provenance_complete\": false,\n        \"parametric_refill_eligible\": false,\n        \"source_fill_group_id\": \"\",\n        \"source_fill_group_sha256\": \"\",\n        \"source_fill_component_ordinal\": 0,\n        \"source_fill_component_count\": 0,\n        \"source_fill_component_sha256\": \"\",\n        \"source_fill_representation\": \"none\",\n        \"source_fill_provenance_complete\": false,\n        \"thermal_topology_eligible\": false,\n        \"zone_kind\": \"copper\",\n        \"filled_copper_state\": \"unknown\",\n        \"zone_connection_default\": \"unknown\",\n        \"zone_connection_declared\": false,\n        \"clearance_mm\": null,\n        \"thermal_gap_mm\": null,\n        \"thermal_spoke_width_mm\": null,\n        \"fill_mode\": \"unknown\",\n        \"thermal_settings_valid\": false\n      }\n    ],\n    \"pads\": [\n      {\n        \"id\": \"bbbbd233-de71-5bf2-97a8-e2b550acd6ac\",\n        \"source_id\": \"P1\",\n        \"name\": \"\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"id\": \"P1\",\n            \"net_name\": \"RF\",\n            \"layer\": \"F.Cu\",\n            \"shape\": \"rect\",\n            \"at\": [\n              0,\n              0\n            ],\n            \"size\": [\n              1,\n              1\n            ],\n            \"rotation\": 0\n          }\n        },\n        \"net_id\": \"RF\",\n        \"component_id\": \"\",\n        \"pin_id\": \"\",\n        \"layer_ids\": [\n          \"4aadcd75-c07f-5fe5-bb1d-ec83259aa309\"\n        ],\n        \"center_mm\": [\n          0.0,\n          0.0\n        ],\n        \"size_mm\": [\n          1.0,\n          1.0\n        ],\n        \"shape\": \"rect\",\n        \"drill_size_mm\": [\n          0.0,\n          0.0\n        ],\n        \"drill_shape\": \"none\",\n        \"plated\": false,\n        \"pad_kind\": \"unknown\",\n        \"zone_connection_override\": \"inherit\",\n        \"zone_connection_declared\": false,\n        \"zone_connection_layer_overrides\": {},\n        \"thermal_gap_override_mm\": null,\n        \"thermal_spoke_width_override_mm\": null,\n        \"thermal_spoke_angle_deg\": null,\n        \"thermal_settings_valid\": false\n      },\n      {\n        \"id\": \"de5d40f7-3d25-5582-b867-c0ee47b191d5\",\n        \"source_id\": \"G1\",\n        \"name\": \"\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"id\": \"G1\",\n            \"net_name\": \"GND\",\n            \"layer\": \"In1.Cu\",\n            \"shape\": \"rect\",\n            \"at\": [\n              0,\n              0\n            ],\n            \"size\": [\n              1,\n              1\n            ],\n            \"rotation\": 0\n          }\n        },\n        \"net_id\": \"GND\",\n        \"component_id\": \"\",\n        \"pin_id\": \"\",\n        \"layer_ids\": [\n          \"8e56b6e7-9d5f-5f28-a111-8508e6c92dab\"\n        ],\n        \"center_mm\": [\n          0.0,\n          0.0\n        ],\n        \"size_mm\": [\n          1.0,\n          1.0\n        ],\n        \"shape\": \"rect\",\n        \"drill_size_mm\": [\n          0.0,\n          0.0\n        ],\n        \"drill_shape\": \"none\",\n        \"plated\": false,\n        \"pad_kind\": \"unknown\",\n        \"zone_connection_override\": \"inherit\",\n        \"zone_connection_declared\": false,\n        \"zone_connection_layer_overrides\": {},\n        \"thermal_gap_override_mm\": null,\n        \"thermal_spoke_width_override_mm\": null,\n        \"thermal_spoke_angle_deg\": null,\n        \"thermal_settings_valid\": false\n      },\n      {\n        \"id\": \"394ee150-8251-5e2e-bd5e-8af3ca454084\",\n        \"source_id\": \"P2\",\n        \"name\": \"\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"id\": \"P2\",\n            \"net_name\": \"RF\",\n            \"layer\": \"F.Cu\",\n            \"shape\": \"rect\",\n            \"at\": [\n              10,\n              0\n            ],\n            \"size\": [\n              1,\n              1\n            ],\n            \"rotation\": 0\n          }\n        },\n        \"net_id\": \"RF\",\n        \"component_id\": \"\",\n        \"pin_id\": \"\",\n        \"layer_ids\": [\n          \"4aadcd75-c07f-5fe5-bb1d-ec83259aa309\"\n        ],\n        \"center_mm\": [\n          10.0,\n          0.0\n        ],\n        \"size_mm\": [\n          1.0,\n          1.0\n        ],\n        \"shape\": \"rect\",\n        \"drill_size_mm\": [\n          0.0,\n          0.0\n        ],\n        \"drill_shape\": \"none\",\n        \"plated\": false,\n        \"pad_kind\": \"unknown\",\n        \"zone_connection_override\": \"inherit\",\n        \"zone_connection_declared\": false,\n        \"zone_connection_layer_overrides\": {},\n        \"thermal_gap_override_mm\": null,\n        \"thermal_spoke_width_override_mm\": null,\n        \"thermal_spoke_angle_deg\": null,\n        \"thermal_settings_valid\": false\n      },\n      {\n        \"id\": \"ad211a1d-8d23-55a2-b6c2-97d01b228fcd\",\n        \"source_id\": \"G2\",\n        \"name\": \"\",\n        \"extensions\": {\n          \"spike.v1\": {\n            \"id\": \"G2\",\n            \"net_name\": \"GND\",\n            \"layer\": \"In1.Cu\",\n            \"shape\": \"rect\",\n            \"at\": [\n              10,\n              0\n            ],\n            \"size\": [\n              1,\n              1\n            ],\n            \"rotation\": 0\n          }\n        },\n        \"net_id\": \"GND\",\n        \"component_id\": \"\",\n        \"pin_id\": \"\",\n        \"layer_ids\": [\n          \"8e56b6e7-9d5f-5f28-a111-8508e6c92dab\"\n        ],\n        \"center_mm\": [\n          10.0,\n          0.0\n        ],\n        \"size_mm\": [\n          1.0,\n          1.0\n        ],\n        \"shape\": \"rect\",\n        \"drill_size_mm\": [\n          0.0,\n          0.0\n        ],\n        \"drill_shape\": \"none\",\n        \"plated\": false,\n        \"pad_kind\": \"unknown\",\n        \"zone_connection_override\": \"inherit\",\n        \"zone_connection_declared\": false,\n        \"zone_connection_layer_overrides\": {},\n        \"thermal_gap_override_mm\": null,\n        \"thermal_spoke_width_override_mm\": null,\n        \"thermal_spoke_angle_deg\": null,\n        \"thermal_settings_valid\": false\n      }\n    ],\n    \"vias\": [],\n    \"drills\": [],\n    \"castellations\": [],\n    \"pins\": [],\n    \"components\": [],\n    \"component_bonds\": [],\n    \"connectors\": [],\n    \"regions\": [],\n    \"bends\": [],\n    \"models\": [],\n    \"constraints\": [],\n    \"variants\": [],\n    \"simulation_models\": [],\n    \"issues\": [],\n    \"vendor_extensions\": {},\n    \"metadata\": {\n      \"board_bounds_mm\": [\n        -2,\n        -2,\n        12,\n        2\n      ],\n      \"legacy_design_id\": \"board-a\",\n      \"technology\": \"rigid\",\n      \"spike.v1.stackup\": [\n        {\n          \"name\": \"F.Cu\",\n          \"type\": \"copper\"\n        },\n        {\n          \"name\": \"D1\",\n          \"type\": \"core\",\n          \"thickness\": 0.2,\n          \"epsilon_r\": 3.2\n        },\n        {\n          \"name\": \"In1.Cu\",\n          \"type\": \"copper\"\n        },\n        {\n          \"name\": \"D2\",\n          \"type\": \"core\",\n          \"thickness\": 0.5,\n          \"epsilon_r\": 4.1\n        },\n        {\n          \"name\": \"In2.Cu\",\n          \"type\": \"copper\"\n        },\n        {\n          \"name\": \"D3\",\n          \"type\": \"core\",\n          \"thickness\": 0.3,\n          \"epsilon_r\": 3.8\n        },\n        {\n          \"name\": \"B.Cu\",\n          \"type\": \"copper\"\n        }\n      ]\n    }\n  },\n  \"design\": {\n    \"contract\": \"spike/v1\",\n    \"design_id\": \"board-a\",\n    \"units\": \"mm\",\n    \"stackup\": [\n      {\n        \"name\": \"F.Cu\",\n        \"type\": \"copper\"\n      },\n      {\n        \"name\": \"D1\",\n        \"type\": \"core\",\n        \"thickness\": 0.2,\n        \"epsilon_r\": 3.2\n      },\n      {\n        \"name\": \"In1.Cu\",\n        \"type\": \"copper\"\n      },\n      {\n        \"name\": \"D2\",\n        \"type\": \"core\",\n        \"thickness\": 0.5,\n        \"epsilon_r\": 4.1\n      },\n      {\n        \"name\": \"In2.Cu\",\n        \"type\": \"copper\"\n      },\n      {\n        \"name\": \"D3\",\n        \"type\": \"core\",\n        \"thickness\": 0.3,\n        \"epsilon_r\": 3.8\n      },\n      {\n        \"name\": \"B.Cu\",\n        \"type\": \"copper\"\n      }\n    ],\n    \"tracks\": [\n      {\n        \"id\": \"T1\",\n        \"net_name\": \"RF\",\n        \"layer\": \"F.Cu\",\n        \"start\": [\n          0,\n          0\n        ],\n        \"end\": [\n          10,\n          0\n        ],\n        \"width\": 0.4\n      }\n    ],\n    \"pads\": [\n      {\n        \"id\": \"P1\",\n        \"net_name\": \"RF\",\n        \"layer\": \"F.Cu\",\n        \"shape\": \"rect\",\n        \"at\": [\n          0,\n          0\n        ],\n        \"size\": [\n          1,\n          1\n        ],\n        \"rotation\": 0\n      },\n      {\n        \"id\": \"G1\",\n        \"net_name\": \"GND\",\n        \"layer\": \"In1.Cu\",\n        \"shape\": \"rect\",\n        \"at\": [\n          0,\n          0\n        ],\n        \"size\": [\n          1,\n          1\n        ],\n        \"rotation\": 0\n      },\n      {\n        \"id\": \"P2\",\n        \"net_name\": \"RF\",\n        \"layer\": \"F.Cu\",\n        \"shape\": \"rect\",\n        \"at\": [\n          10,\n          0\n        ],\n        \"size\": [\n          1,\n          1\n        ],\n        \"rotation\": 0\n      },\n      {\n        \"id\": \"G2\",\n        \"net_name\": \"GND\",\n        \"layer\": \"In1.Cu\",\n        \"shape\": \"rect\",\n        \"at\": [\n          10,\n          0\n        ],\n        \"size\": [\n          1,\n          1\n        ],\n        \"rotation\": 0\n      }\n    ],\n    \"vias\": [],\n    \"zones\": [\n      {\n        \"id\": \"Z1\",\n        \"net_name\": \"GND\",\n        \"layer\": \"In1.Cu\",\n        \"source_kind\": \"filled_zone\",\n        \"points\": [\n          [\n            -2,\n            -2\n          ],\n          [\n            12,\n            -2\n          ],\n          [\n            12,\n            2\n          ],\n          [\n            -2,\n            2\n          ]\n        ]\n      }\n    ],\n    \"metadata\": {\n      \"board_bounds_mm\": [\n        -2,\n        -2,\n        12,\n        2\n      ]\n    }\n  }\n}\n",
+    "canonical_design": {
+      "design_id": "9b9ad80e-d993-5277-b292-922b0e3be0f8",
+      "name": "Untitled design",
+      "source": {
+        "source_format": "unknown",
+        "source_digest": "e5f795496e255272b2dd11acc1f283813e8748ab2fce9daf676bc2d1d41de2f9",
+        "native_id": "board-a",
+        "artifact_path": ""
+      },
+      "frame": {
+        "frame_id": "board",
+        "parent_frame_id": "",
+        "units": "mm",
+        "handedness": "right",
+        "transform": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      },
+      "contract": "spike/design-ir/v2",
+      "materials": [
+        {
+          "id": "4adc3723-8ca6-540b-99a3-b5c8c1342122",
+          "source_id": "material:copper:4e3c290712aabb51",
+          "name": "copper",
+          "extensions": {
+            "spike.v1": {
+              "name": "F.Cu",
+              "type": "copper"
+            }
+          },
+          "material_class": "copper",
+          "conductivity_s_per_m": null,
+          "relative_permittivity": null,
+          "loss_tangent": null,
+          "thermal_conductivity_w_per_mk": null,
+          "density_kg_per_m3": null,
+          "heat_capacity_j_per_kgk": null
+        },
+        {
+          "id": "f9ae35a6-f0ce-52b3-9cd5-f5984432defa",
+          "source_id": "material:core:a5a033285bb2d60a",
+          "name": "core",
+          "extensions": {
+            "spike.v1": {
+              "name": "D1",
+              "type": "core",
+              "thickness": 0.2,
+              "epsilon_r": 3.2
+            }
+          },
+          "material_class": "core",
+          "conductivity_s_per_m": null,
+          "relative_permittivity": 3.2,
+          "loss_tangent": null,
+          "thermal_conductivity_w_per_mk": null,
+          "density_kg_per_m3": null,
+          "heat_capacity_j_per_kgk": null
+        },
+        {
+          "id": "eef0d072-92bf-58de-94df-8cb15be45e5f",
+          "source_id": "material:core:8ae4560f9217dcff",
+          "name": "core",
+          "extensions": {
+            "spike.v1": {
+              "name": "D2",
+              "type": "core",
+              "thickness": 0.5,
+              "epsilon_r": 4.1
+            }
+          },
+          "material_class": "core",
+          "conductivity_s_per_m": null,
+          "relative_permittivity": 4.1,
+          "loss_tangent": null,
+          "thermal_conductivity_w_per_mk": null,
+          "density_kg_per_m3": null,
+          "heat_capacity_j_per_kgk": null
+        },
+        {
+          "id": "11948192-2536-5f69-9cf2-c0986bbf753c",
+          "source_id": "material:core:e8544a9ca7f3a55a",
+          "name": "core",
+          "extensions": {
+            "spike.v1": {
+              "name": "D3",
+              "type": "core",
+              "thickness": 0.3,
+              "epsilon_r": 3.8
+            }
+          },
+          "material_class": "core",
+          "conductivity_s_per_m": null,
+          "relative_permittivity": 3.8,
+          "loss_tangent": null,
+          "thermal_conductivity_w_per_mk": null,
+          "density_kg_per_m3": null,
+          "heat_capacity_j_per_kgk": null
+        }
+      ],
+      "layers": [
+        {
+          "id": "4aadcd75-c07f-5fe5-bb1d-ec83259aa309",
+          "source_id": "source:f880fbeaa496384ca3dbf84aba134184407869dbf1e1356e7b35ab5dfbdd9c03",
+          "name": "F.Cu",
+          "extensions": {
+            "spike.v1.stackup": {
+              "name": "F.Cu",
+              "type": "copper"
+            }
+          },
+          "layer_type": "copper",
+          "order": 0,
+          "z_mm": 0.0,
+          "thickness_mm": null,
+          "material_id": "4adc3723-8ca6-540b-99a3-b5c8c1342122",
+          "region_ids": []
+        },
+        {
+          "id": "678b4419-6e6f-55a0-a4d6-883e530ac667",
+          "source_id": "source:b22caed0b945f05b11e49964a3193da747850da880c63c12b51bf6d3d2916a6b",
+          "name": "D1",
+          "extensions": {
+            "spike.v1.stackup": {
+              "name": "D1",
+              "type": "core",
+              "thickness": 0.2,
+              "epsilon_r": 3.2
+            }
+          },
+          "layer_type": "core",
+          "order": 1,
+          "z_mm": 0.0,
+          "thickness_mm": 0.2,
+          "material_id": "f9ae35a6-f0ce-52b3-9cd5-f5984432defa",
+          "region_ids": []
+        },
+        {
+          "id": "8e56b6e7-9d5f-5f28-a111-8508e6c92dab",
+          "source_id": "source:be7aadedc7823a8163b5b4f52b88902d2bb2e8a6c1376c710ad99838a6fec08a",
+          "name": "In1.Cu",
+          "extensions": {
+            "spike.v1.stackup": {
+              "name": "In1.Cu",
+              "type": "copper"
+            }
+          },
+          "layer_type": "copper",
+          "order": 2,
+          "z_mm": 0.2,
+          "thickness_mm": null,
+          "material_id": "4adc3723-8ca6-540b-99a3-b5c8c1342122",
+          "region_ids": []
+        },
+        {
+          "id": "b54a9943-bab7-5e30-9453-03ededde8643",
+          "source_id": "source:8551373452ada21073e440f7d0ed12776a207e63b04695bb719c7b0e5c805ec4",
+          "name": "D2",
+          "extensions": {
+            "spike.v1.stackup": {
+              "name": "D2",
+              "type": "core",
+              "thickness": 0.5,
+              "epsilon_r": 4.1
+            }
+          },
+          "layer_type": "core",
+          "order": 3,
+          "z_mm": 0.2,
+          "thickness_mm": 0.5,
+          "material_id": "eef0d072-92bf-58de-94df-8cb15be45e5f",
+          "region_ids": []
+        },
+        {
+          "id": "e8c08f24-c3a2-53fe-a7d7-302c08661e0a",
+          "source_id": "source:9985b9aab69e684e4ff721943a7c30ad670ffa7a4064d58b792e24d3dd6fd9ea",
+          "name": "In2.Cu",
+          "extensions": {
+            "spike.v1.stackup": {
+              "name": "In2.Cu",
+              "type": "copper"
+            }
+          },
+          "layer_type": "copper",
+          "order": 4,
+          "z_mm": 0.7,
+          "thickness_mm": null,
+          "material_id": "4adc3723-8ca6-540b-99a3-b5c8c1342122",
+          "region_ids": []
+        },
+        {
+          "id": "ae6102cd-0d83-5828-8828-e4087193375b",
+          "source_id": "source:d31a95424ad2f988a3ea936646db99dfd98132a248ddfe7058ece672672e7a0a",
+          "name": "D3",
+          "extensions": {
+            "spike.v1.stackup": {
+              "name": "D3",
+              "type": "core",
+              "thickness": 0.3,
+              "epsilon_r": 3.8
+            }
+          },
+          "layer_type": "core",
+          "order": 5,
+          "z_mm": 0.7,
+          "thickness_mm": 0.3,
+          "material_id": "11948192-2536-5f69-9cf2-c0986bbf753c",
+          "region_ids": []
+        },
+        {
+          "id": "afce94ea-c7be-5267-afb8-4be682052e3e",
+          "source_id": "source:2f22a787701ab5dcbdcfdcd8677a5ace184227bf9b4d0b88440f7375e71b291a",
+          "name": "B.Cu",
+          "extensions": {
+            "spike.v1.stackup": {
+              "name": "B.Cu",
+              "type": "copper"
+            }
+          },
+          "layer_type": "copper",
+          "order": 6,
+          "z_mm": 1.0,
+          "thickness_mm": null,
+          "material_id": "4adc3723-8ca6-540b-99a3-b5c8c1342122",
+          "region_ids": []
+        }
+      ],
+      "nets": [],
+      "tracks": [
+        {
+          "id": "54c79654-96ce-5ce5-b914-a425ddfd1cf4",
+          "source_id": "T1",
+          "name": "",
+          "extensions": {
+            "spike.v1": {
+              "id": "T1",
+              "net_name": "RF",
+              "layer": "F.Cu",
+              "start": [
+                0,
+                0
+              ],
+              "end": [
+                10,
+                0
+              ],
+              "width": 0.4
+            }
+          },
+          "net_id": "RF",
+          "layer_id": "4aadcd75-c07f-5fe5-bb1d-ec83259aa309",
+          "start_mm": [
+            0.0,
+            0.0
+          ],
+          "end_mm": [
+            10.0,
+            0.0
+          ],
+          "width_mm": 0.4
+        }
+      ],
+      "arcs": [],
+      "zones": [
+        {
+          "id": "b60b4c63-0763-5e93-9234-39b70ca950f0",
+          "source_id": "Z1",
+          "name": "",
+          "extensions": {
+            "spike.v1": {
+              "id": "Z1",
+              "net_name": "GND",
+              "layer": "In1.Cu",
+              "source_kind": "filled_zone",
+              "points": [
+                [
+                  -2,
+                  -2
+                ],
+                [
+                  12,
+                  -2
+                ],
+                [
+                  12,
+                  2
+                ],
+                [
+                  -2,
+                  2
+                ]
+              ]
+            }
+          },
+          "net_id": "GND",
+          "layer_ids": [
+            "8e56b6e7-9d5f-5f28-a111-8508e6c92dab"
+          ],
+          "outlines_mm": [
+            [
+              [
+                -2.0,
+                -2.0
+              ],
+              [
+                12.0,
+                -2.0
+              ],
+              [
+                12.0,
+                2.0
+              ],
+              [
+                -2.0,
+                2.0
+              ]
+            ]
+          ],
+          "holes_mm": [],
+          "source_zone_id": "",
+          "filled_copper_id": "",
+          "source_zone_outline_id": "",
+          "source_zone_outline_sha256": "",
+          "source_zone_outline_paths_mm": [],
+          "source_zone_outline_path_count": 0,
+          "source_zone_outline_vertex_count": 0,
+          "source_zone_outline_representation": "none",
+          "source_zone_outline_provenance_complete": false,
+          "parametric_refill_eligible": false,
+          "source_fill_group_id": "",
+          "source_fill_group_sha256": "",
+          "source_fill_component_ordinal": 0,
+          "source_fill_component_count": 0,
+          "source_fill_component_sha256": "",
+          "source_fill_representation": "none",
+          "source_fill_provenance_complete": false,
+          "thermal_topology_eligible": false,
+          "zone_kind": "copper",
+          "filled_copper_state": "unknown",
+          "zone_connection_default": "unknown",
+          "zone_connection_declared": false,
+          "clearance_mm": null,
+          "thermal_gap_mm": null,
+          "thermal_spoke_width_mm": null,
+          "fill_mode": "unknown",
+          "thermal_settings_valid": false
+        }
+      ],
+      "pads": [
+        {
+          "id": "bbbbd233-de71-5bf2-97a8-e2b550acd6ac",
+          "source_id": "P1",
+          "name": "",
+          "extensions": {
+            "spike.v1": {
+              "id": "P1",
+              "net_name": "RF",
+              "layer": "F.Cu",
+              "shape": "rect",
+              "at": [
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1
+              ],
+              "rotation": 0
+            }
+          },
+          "net_id": "RF",
+          "component_id": "",
+          "pin_id": "",
+          "layer_ids": [
+            "4aadcd75-c07f-5fe5-bb1d-ec83259aa309"
+          ],
+          "center_mm": [
+            0.0,
+            0.0
+          ],
+          "size_mm": [
+            1.0,
+            1.0
+          ],
+          "shape": "rect",
+          "drill_size_mm": [
+            0.0,
+            0.0
+          ],
+          "drill_shape": "none",
+          "plated": false,
+          "pad_kind": "unknown",
+          "zone_connection_override": "inherit",
+          "zone_connection_declared": false,
+          "zone_connection_layer_overrides": {},
+          "thermal_gap_override_mm": null,
+          "thermal_spoke_width_override_mm": null,
+          "thermal_spoke_angle_deg": null,
+          "thermal_settings_valid": false
+        },
+        {
+          "id": "de5d40f7-3d25-5582-b867-c0ee47b191d5",
+          "source_id": "G1",
+          "name": "",
+          "extensions": {
+            "spike.v1": {
+              "id": "G1",
+              "net_name": "GND",
+              "layer": "In1.Cu",
+              "shape": "rect",
+              "at": [
+                0,
+                0
+              ],
+              "size": [
+                1,
+                1
+              ],
+              "rotation": 0
+            }
+          },
+          "net_id": "GND",
+          "component_id": "",
+          "pin_id": "",
+          "layer_ids": [
+            "8e56b6e7-9d5f-5f28-a111-8508e6c92dab"
+          ],
+          "center_mm": [
+            0.0,
+            0.0
+          ],
+          "size_mm": [
+            1.0,
+            1.0
+          ],
+          "shape": "rect",
+          "drill_size_mm": [
+            0.0,
+            0.0
+          ],
+          "drill_shape": "none",
+          "plated": false,
+          "pad_kind": "unknown",
+          "zone_connection_override": "inherit",
+          "zone_connection_declared": false,
+          "zone_connection_layer_overrides": {},
+          "thermal_gap_override_mm": null,
+          "thermal_spoke_width_override_mm": null,
+          "thermal_spoke_angle_deg": null,
+          "thermal_settings_valid": false
+        },
+        {
+          "id": "394ee150-8251-5e2e-bd5e-8af3ca454084",
+          "source_id": "P2",
+          "name": "",
+          "extensions": {
+            "spike.v1": {
+              "id": "P2",
+              "net_name": "RF",
+              "layer": "F.Cu",
+              "shape": "rect",
+              "at": [
+                10,
+                0
+              ],
+              "size": [
+                1,
+                1
+              ],
+              "rotation": 0
+            }
+          },
+          "net_id": "RF",
+          "component_id": "",
+          "pin_id": "",
+          "layer_ids": [
+            "4aadcd75-c07f-5fe5-bb1d-ec83259aa309"
+          ],
+          "center_mm": [
+            10.0,
+            0.0
+          ],
+          "size_mm": [
+            1.0,
+            1.0
+          ],
+          "shape": "rect",
+          "drill_size_mm": [
+            0.0,
+            0.0
+          ],
+          "drill_shape": "none",
+          "plated": false,
+          "pad_kind": "unknown",
+          "zone_connection_override": "inherit",
+          "zone_connection_declared": false,
+          "zone_connection_layer_overrides": {},
+          "thermal_gap_override_mm": null,
+          "thermal_spoke_width_override_mm": null,
+          "thermal_spoke_angle_deg": null,
+          "thermal_settings_valid": false
+        },
+        {
+          "id": "ad211a1d-8d23-55a2-b6c2-97d01b228fcd",
+          "source_id": "G2",
+          "name": "",
+          "extensions": {
+            "spike.v1": {
+              "id": "G2",
+              "net_name": "GND",
+              "layer": "In1.Cu",
+              "shape": "rect",
+              "at": [
+                10,
+                0
+              ],
+              "size": [
+                1,
+                1
+              ],
+              "rotation": 0
+            }
+          },
+          "net_id": "GND",
+          "component_id": "",
+          "pin_id": "",
+          "layer_ids": [
+            "8e56b6e7-9d5f-5f28-a111-8508e6c92dab"
+          ],
+          "center_mm": [
+            10.0,
+            0.0
+          ],
+          "size_mm": [
+            1.0,
+            1.0
+          ],
+          "shape": "rect",
+          "drill_size_mm": [
+            0.0,
+            0.0
+          ],
+          "drill_shape": "none",
+          "plated": false,
+          "pad_kind": "unknown",
+          "zone_connection_override": "inherit",
+          "zone_connection_declared": false,
+          "zone_connection_layer_overrides": {},
+          "thermal_gap_override_mm": null,
+          "thermal_spoke_width_override_mm": null,
+          "thermal_spoke_angle_deg": null,
+          "thermal_settings_valid": false
+        }
+      ],
+      "vias": [],
+      "drills": [],
+      "castellations": [],
+      "pins": [],
+      "components": [],
+      "component_bonds": [],
+      "connectors": [],
+      "regions": [],
+      "bends": [],
+      "models": [],
+      "constraints": [],
+      "variants": [],
+      "simulation_models": [],
+      "issues": [],
+      "vendor_extensions": {},
+      "metadata": {
+        "board_bounds_mm": [
+          -2,
+          -2,
+          12,
+          2
+        ],
+        "legacy_design_id": "board-a",
+        "technology": "rigid",
+        "spike.v1.stackup": [
+          {
+            "name": "F.Cu",
+            "type": "copper"
+          },
+          {
+            "name": "D1",
+            "type": "core",
+            "thickness": 0.2,
+            "epsilon_r": 3.2
+          },
+          {
+            "name": "In1.Cu",
+            "type": "copper"
+          },
+          {
+            "name": "D2",
+            "type": "core",
+            "thickness": 0.5,
+            "epsilon_r": 4.1
+          },
+          {
+            "name": "In2.Cu",
+            "type": "copper"
+          },
+          {
+            "name": "D3",
+            "type": "core",
+            "thickness": 0.3,
+            "epsilon_r": 3.8
+          },
+          {
+            "name": "B.Cu",
+            "type": "copper"
+          }
+        ]
+      }
+    }
+  },
+  "gallery": {
+    "contract": "spike/emerge-gallery-example/v1",
+    "id": "multilayer-two-port",
+    "status": "setup_only",
+    "guide": "examples/emerge/multilayer/README.md",
+    "attribution": {
+      "author": "SPIKE contributors",
+      "license": "Apache-2.0"
+    },
+    "binding_evidence": {
+      "result_binding": "none_setup_only",
+      "exact_historical_design_snapshot_available": false
+    },
+    "retained_parameters": {
+      "signal_net": "RF",
+      "return_net": "GND",
+      "signal_pad_id": "P1",
+      "return_pad_id": "G1",
+      "receive_signal_pad_id": "P2",
+      "receive_return_pad_id": "G2",
+      "frequency_start_hz": 1000000000.0,
+      "frequency_stop_hz": 2000000000.0,
+      "frequency_points": 2,
+      "mesh_resolution_mm": 0.7,
+      "geometry_backend": "emcad"
+    },
+    "retained_case": {
+      "contract": "spike/emerge-board-case/v1",
+      "bounds_mm": [
+        -2.0,
+        -2.0,
+        12.0,
+        2.0
+      ],
+      "dielectric_thickness_mm": 1.0,
+      "epsilon_r": 3.2,
+      "copper_layers": [
+        {
+          "name": "F.Cu",
+          "z_mm": -0.0
+        },
+        {
+          "name": "In1.Cu",
+          "z_mm": -0.2
+        },
+        {
+          "name": "In2.Cu",
+          "z_mm": -0.7
+        },
+        {
+          "name": "B.Cu",
+          "z_mm": -1.0
+        }
+      ],
+      "dielectric_layers": [
+        {
+          "name": "D1",
+          "thickness_mm": 0.2,
+          "epsilon_r": 3.2,
+          "loss_tangent": 0.0,
+          "z_top_mm": -0.0,
+          "z_bottom_mm": -0.2
+        },
+        {
+          "name": "D2",
+          "thickness_mm": 0.5,
+          "epsilon_r": 4.1,
+          "loss_tangent": 0.0,
+          "z_top_mm": -0.2,
+          "z_bottom_mm": -0.7
+        },
+        {
+          "name": "D3",
+          "thickness_mm": 0.3,
+          "epsilon_r": 3.8,
+          "loss_tangent": 0.0,
+          "z_top_mm": -0.7,
+          "z_bottom_mm": -1.0
+        }
+      ],
+      "geometry_backend": "emcad",
+      "loss_tangent_omitted": 0.0,
+      "polygons": [
+        {
+          "id": "T1",
+          "net": "RF",
+          "layer": "F.Cu",
+          "xs_mm": [
+            0.0,
+            10.0,
+            10.0,
+            0.0
+          ],
+          "ys_mm": [
+            0.2,
+            0.2,
+            -0.2,
+            -0.2
+          ]
+        },
+        {
+          "id": "P1",
+          "net": "RF",
+          "layer": "F.Cu",
+          "xs_mm": [
+            -0.5,
+            0.5,
+            0.5,
+            -0.5
+          ],
+          "ys_mm": [
+            -0.5,
+            -0.5,
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "id": "G1",
+          "net": "GND",
+          "layer": "In1.Cu",
+          "xs_mm": [
+            -0.5,
+            0.5,
+            0.5,
+            -0.5
+          ],
+          "ys_mm": [
+            -0.5,
+            -0.5,
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "id": "P2",
+          "net": "RF",
+          "layer": "F.Cu",
+          "xs_mm": [
+            9.5,
+            10.5,
+            10.5,
+            9.5
+          ],
+          "ys_mm": [
+            -0.5,
+            -0.5,
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "id": "G2",
+          "net": "GND",
+          "layer": "In1.Cu",
+          "xs_mm": [
+            9.5,
+            10.5,
+            10.5,
+            9.5
+          ],
+          "ys_mm": [
+            -0.5,
+            -0.5,
+            0.5,
+            0.5
+          ]
+        },
+        {
+          "id": "Z1",
+          "net": "GND",
+          "layer": "In1.Cu",
+          "xs_mm": [
+            -2.0,
+            12.0,
+            12.0,
+            -2.0
+          ],
+          "ys_mm": [
+            -2.0,
+            -2.0,
+            2.0,
+            2.0
+          ]
+        }
+      ],
+      "ports": [
+        {
+          "signal_pad_id": "P1",
+          "return_pad_id": "G1",
+          "x_mm": 0.0,
+          "y_mm": 0.0,
+          "width_mm": 1.0,
+          "height_mm": 0.2,
+          "z_bottom_mm": -0.2,
+          "signal_layer": "F.Cu",
+          "return_layer": "In1.Cu",
+          "reference_impedance_ohm": 50.0
+        },
+        {
+          "signal_pad_id": "P2",
+          "return_pad_id": "G2",
+          "x_mm": 10.0,
+          "y_mm": 0.0,
+          "width_mm": 1.0,
+          "height_mm": 0.2,
+          "z_bottom_mm": -0.2,
+          "signal_layer": "F.Cu",
+          "return_layer": "In1.Cu",
+          "reference_impedance_ohm": 50.0
+        }
+      ],
+      "frequency_start_hz": 1000000000.0,
+      "frequency_stop_hz": 2000000000.0,
+      "frequency_points": 2,
+      "mesh_resolution_mm": 0.7,
+      "planar_cell_estimate": 115,
+      "shorting_vias": [],
+      "attributed_graphic_polygon_ids": [],
+      "idealized_reference_plane_ids": [],
+      "fragment_copper": true,
+      "modeled_nets": [
+        "RF",
+        "GND"
+      ],
+      "geometry_status": "approximate_rectangular_surface_pec"
+    },
+    "execution_requested": false,
+    "production_qualified": false,
+    "package_epoch_note": "Fixed reproducibility epoch; not a solver execution date."
+  },
+  "analysis": {
+    "mode": "EMI / EMC",
+    "solver_id": "spike.emerge-suite",
+    "view_mode": "3D",
+    "show_axes": true,
+    "extension_workflows": {
+      "emerge_setup": {
+        "signal_net": "RF",
+        "return_net": "GND",
+        "signal_pad_id": "P1",
+        "return_pad_id": "G1",
+        "receive_signal_pad_id": "P2",
+        "receive_return_pad_id": "G2",
+        "frequency_start_hz": "1000000000.0",
+        "frequency_stop_hz": "2000000000.0",
+        "frequency_points": "2",
+        "mesh_resolution_mm": "0.7",
+        "reference_impedance_ohm": "50",
+        "radiation_theta_step_deg": "15",
+        "radiation_phi_step_deg": "15",
+        "radiation_cut_phi_deg": "0",
+        "n_workers": "2",
+        "nearfield_z_mm": "2",
+        "nearfield_grid_points": "11",
+        "shorting_via_ids": "",
+        "fragment_copper": true,
+        "geometry_source": "board",
+        "geometry_backend": "emcad",
+        "python_executable": "",
+        "sparse_solver": "auto",
+        "field_excited_port": "1",
+        "air_margin_mm": "",
+        "radome_enabled": false,
+        "include_dielectric_loss": false,
+        "parallel": false,
+        "nearfield_enabled": false
+      }
+    },
+    "latest_result": null,
+    "result_history": [],
+    "result_display": "none",
+    "em_chamber_open": false,
+    "em_viewport_settings": {
+      "visible": true,
+      "frequencyIndex": 0,
+      "quantity": "far_e",
+      "component": "norm",
+      "projection": "magnitude",
+      "style": "surface",
+      "opacity": 0.45,
+      "showStructure": true,
+      "displayRadiusMm": 40,
+      "selectedSample": 0
+    }
+  },
+  "workspace": {
+    "contract": "spike/workspace-state/v1",
+    "viewMode": "3D",
+    "docks": {
+      "leftOpen": true,
+      "rightOpen": true,
+      "bottomOpen": true,
+      "sidePanelsPinned": false,
+      "bottomPinned": false,
+      "leftWidthPx": 240,
+      "rightWidthPx": 360,
+      "bottomHeightPx": 180,
+      "activeBottomDock": "Probe table"
+    },
+    "viewports": {}
+  },
+  "probes": []
+}

@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SigHarmonic
 """Independent broad-phase regression checks on generated conforming cubes."""
 import unittest
-from python.spike_core.assembly_field_geometry import assert_disjoint_occurrences
+from python.spike_core.solvers.execution.coupling.assembly_field_geometry import assert_disjoint_occurrences
 from tests.python.test_assembly_tetra_thermal import cube
 
 

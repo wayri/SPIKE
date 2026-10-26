@@ -2,8 +2,8 @@
 """Independent analytical priority-volume and bounded tetrahedral oracles."""
 import unittest
 
-from python.spike_core.assembly_em_board_geometry import prepare_routed_board_volume
-from python.spike_core.assembly_em_planar_mesher import mesh_material_prisms, partition_material_prisms
+from python.spike_core.solvers.electromagnetics.fields.assembly_em_board_geometry import prepare_routed_board_volume
+from python.spike_core.solvers.electromagnetics.fields.assembly_em_planar_mesher import mesh_material_prisms, partition_material_prisms
 from tests.python.test_assembly_em_board_geometry import fixture
 
 

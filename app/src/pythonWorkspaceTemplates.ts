@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+import { emResistorChtStudyRunner } from "./emResistorChtStudy";
 
 export interface PythonTemplate {
   id: string;
@@ -13,13 +14,14 @@ const entry = (id: string, title: string, category: string, description: string,
   requirements: string[], code: string): PythonTemplate => ({ id, title, category, description, requirements, code });
 
 const requestRunner = (method: string, options: {
-  attachDesign?: boolean; requiredKey: "spec" | "request" | "setup"; expectedMode?: string;
+  attachDesign?: boolean; requiredKey: "spec" | "request" | "setup"; expectedMode?: string; exportResult?: boolean;
 }): string => `# Execute ${method} from a reviewed worker-parameter JSON object.
 # Relative paths resolve from the saved script's folder, or the selected workspace folder for an unsaved tab.
 import json
 from pathlib import Path
 
 REQUEST_FILE = None  # Set to Path(r"C:\\path\\to\\reviewed-request.json")
+${options.exportResult ? 'RESULT_FILE = None  # Optional NEW JSON path for the complete returned record; existing files are refused.\n' : ""}
 PUBLISH_RESULT = False  # Publishes only a matching spike/v1 AnalysisResult.
 MAX_REQUEST_BYTES = 4 * 1024 * 1024
 
@@ -85,7 +87,138 @@ ${options.expectedMode ? `    mode = params["spec"].get("mode")
 ` : ""}    result = spike.call("${method}", params)
     print_evidence(result)
     publish_if_requested(result)
+${options.exportResult ? `    if RESULT_FILE is not None:
+        output = Path(RESULT_FILE).expanduser().resolve()
+        payload = json.dumps(result, indent=2, allow_nan=False) + "\\n"
+        if len(payload.encode("utf-8")) > 16 * 1024 * 1024:
+            raise ValueError("Result exceeds the 16 MiB export limit.")
+        with output.open("x", encoding="utf-8") as stream:
+            stream.write(payload)
+        print("Complete result exported:", output)
+` : ""}
 `;
+
+const CO_SOLVER_TEMPLATES: PythonTemplate[] = [
+  entry("run-coupled-propulsion-pod", "Run controller / FEM / propeller loop", "Co-simulation and twins",
+    "Execute the compiled SPIKES C controller, reciprocal linear P1 motor and geometry-derived hover BEM reaction in one accepted-step loop. Synthetic benchmark; not VESC firmware or blade CFD.",
+    ["Reviewed spike/propulsion-pod-request/v1 worker parameters", "Source SPIKES Studio runtime and C compiler", "Explicit synthetic motor, blade/polar and drive assumptions"],
+    requestRunner("run_propulsion_pod", { requiredKey: "request", exportResult: true }) + `
+if params is not None:
+    if result.get("contract") != "spike/propulsion-pod-result/v1" or result.get("status") != "completed":
+        raise ValueError("No completed coupled benchmark returned.")
+    history = result["history"]
+    times = [row["time_s"] for row in history]
+    provenance = "Computed C/FEM/BEM reference: " + result["request_sha256"]
+    spike.publish_plot("Coupled rotor speed", times,
+        [{"name": "speed", "values": [row["speed_rad_s"] for row in history]}],
+        x_unit="s", y_unit="rad/s", provenance=provenance)
+    spike.publish_plot("Coupled field and propeller torque", times,
+        [{"name": "FEM", "values": [row["torque_n_m"] for row in history]},
+         {"name": "BEM reaction", "values": [row["propeller_torque_n_m"] for row in history]}],
+        x_unit="s", y_unit="N m", provenance=provenance)
+    spike.publish_plot("Coupled thrust", times,
+        [{"name": "thrust", "values": [row["thrust_n"] for row in history]}],
+        x_unit="s", y_unit="N", provenance=provenance)
+    print("Accepted steps:", result["accepted_steps"], "compiled controller ticks:", result["controller_ticks"])
+    print("Energy ledger:", result["energy"])
+    print("Validity:", result["limitations"])
+`),
+  entry("review-coupled-propulsion-frame", "Review saved coupled motor field frame", "Result review",
+    "Display an actual saved P1 field and computed BEM disk inflow at one accepted time. Does not run a solver or infer fields from PCB geometry.",
+    ["Completed spike/propulsion-pod-result/v1 JSON", "Review FRAME_INDEX; coordinates refer to the synthetic benchmark"], `import json
+import math
+from pathlib import Path
+
+RESULT_FILE = None  # Path to the saved complete coupled result JSON.
+FRAME_INDEX = 0
+if RESULT_FILE is None:
+    print("Set RESULT_FILE and FRAME_INDEX; no data was loaded.")
+else:
+    data = Path(RESULT_FILE).read_bytes()
+    if len(data) > 14 * 1024 * 1024:
+        raise ValueError("Result exceeds the coupled transport limit.")
+    result = json.loads(data)
+    if result.get("contract") != "spike/propulsion-pod-result/v1" or result.get("status") != "completed":
+        raise ValueError("Expected a completed coupled benchmark record.")
+    if type(FRAME_INDEX) is not int or not 0 <= FRAME_INDEX < len(result["frames"]):
+        raise ValueError("FRAME_INDEX is outside the saved history.")
+    mesh, frame = result["field_mesh"], result["frames"][FRAME_INDEX]
+    provenance = "Saved computed reference frame, request " + result["request_sha256"]
+    samples = []
+    for tri, field in zip(mesh["triangles"], frame["element_b_t"], strict=True):
+        y = sum(mesh["nodes_m"][node][0] for node in tri) / 3
+        z = sum(mesh["nodes_m"][node][1] for node in tri) / 3 + 0.2
+        samples.append({"x": 0., "y": y, "z": z, "vector": [0., field[0], field[1]]})
+    spike.publish_spatial("Saved motor B field", samples, quantity="magnetic flux density", unit="T", provenance=provenance)
+    flow = []
+    for annulus in frame["radial_airflow"]:
+        for j in range(16):
+            angle = 2 * math.pi * j / 16
+            flow.append({"x": .085, "y": annulus["radius_m"] * math.cos(angle),
+                "z": .2 + annulus["radius_m"] * math.sin(angle),
+                "vector": [annulus["disk_axial_velocity_m_s"], 0., 0.]})
+    spike.publish_spatial("Saved BEM disk inflow - not CFD wake", flow,
+        quantity="disk axial velocity", unit="m/s", provenance=provenance)
+    print("Saved time [s]:", frame["time_s"], "rotor angle [rad]:", frame["angle_rad"])
+    print("Validity:", result["limitations"])
+`),
+  entry("prepare-emerge-cosimulation", "Prepare EMerge co-simulation source", "Co-simulation and twins",
+    "Admit a reviewed EMerge draft with explicit terminal mapping and RMS power-wave declaration; retain source warnings and identity.",
+    ["Reviewed EMerge export draft with request object", "Explicit terminal pairs/reference planes", "Verified expected source hashes and RMS wave convention"],
+    requestRunner("prepare_emerge_cosimulation_source", { requiredKey: "request", exportResult: true })),
+  entry("run-em-network-ac", "Run sampled EM network AC", "Co-simulation and twins",
+    "Solve explicit Thevenin circuit boundaries on exact EM network samples; experimental, not a live SPICE or EM field solve.",
+    ["Reviewed worker parameters with request object", "Exact port boundaries and declared RMS convention"],
+    requestRunner("solve_em_network_ac", { requiredKey: "request", exportResult: true })),
+  entry("run-em-resistor-thermal", "Run EM circuit-resistor thermal coupling", "Co-simulation and twins",
+    "Conservatively transfer known external series-resistor heat to explicit retained tetrahedral cells; never infer heat from radiation.",
+    ["Reviewed worker parameters with request object", "Thermal materials/boundaries and explicit resistor cell weights"],
+    requestRunner("run_em_network_resistor_thermal", { requiredKey: "request", exportResult: true })),
+  entry("run-dielectric-thermomechanical", "Run dielectric AC / thermal / mechanical chain", "Co-simulation and twins",
+    "Execute the experimental same-mesh AC-loss, steady thermal and elastic owners without geometry inference or production qualification.",
+    ["Reviewed worker parameters with request object", "Identical retained meshes and supplied constitutive/boundary inputs"],
+    requestRunner("run_pdn_dielectric_thermomechanical", { requiredKey: "request", exportResult: true })),
+  entry("run-em-resistor-cht", "Run AC resistor / solid / fluid heat coupling", "Co-simulation and twins",
+    "Map explicit external resistor heat into retained creeping-flow CHT while preserving network power ownership and child diagnostics.",
+    ["Reviewed worker parameters with request object", "Explicit resistor cell weights and admitted solid/fluid meshes", "Experimental creeping flow; no turbulence or production cooling qualification"],
+    emResistorChtStudyRunner()),
+  entry("run-em-spice-coupling", "Run linear SPICE / sampled EM coupling", "Co-simulation and twins",
+    "Execute bounded linear AC circuit coupling to an explicitly supplied EM network through the admitted owned SPICE runtime.",
+    ["Reviewed worker parameters with request object", "Admitted native runtime and explicit sampled-network port bindings", "No nonlinear switching or field calibration claim"],
+    requestRunner("run_em_spice_coupling", { requiredKey: "request", exportResult: true })),
+  entry("run-em-body-heating", "Run supplied EM body heating", "Co-simulation and twins",
+    "Transfer state-bound supplied E/H volume losses to the retained thermal owner after raw Poynting closure admission.",
+    ["Reviewed worker parameters with request object", "Bound field samples, materials and shared retained thermal mesh", "Experimental; supplied fields do not establish board accuracy"],
+    requestRunner("run_em_body_heating", { requiredKey: "request", exportResult: true })),
+  entry("run-si-pam3", "Run generic sampled-FIR PAM3", "SI - channels",
+    "Compute two eyes and symbol errors from explicit PAM3 symbols, voltage levels and a supplied channel impulse response.",
+    ["Reviewed worker parameters with spike/si-pam3-request/v1 request", "Explicit symbols, levels_v, channel_impulse, symbol_rate_hz and samples_per_ui", "Generic experimental signal model; no USB4 encoding or compliance claim"],
+    requestRunner("simulate_si_pam3", { requiredKey: "request", exportResult: true })),
+  entry("run-cfd-tetra-cht", "Run retained tetrahedral creeping CHT", "Thermal - assembly",
+    "Execute the existing creeping-flow and conservative solid/fluid energy composition on explicit retained tetrahedral meshes.",
+    ["Reviewed worker parameters with request object", "Admitted flow and energy materials, meshes and boundaries", "Computed conservative flux only; no turbulence or production qualification"],
+    requestRunner("run_cfd_tetra_cht", { requiredKey: "request", exportResult: true })),
+  entry("run-pdn-electrostatic", "Extract retained dielectric capacitance", "PI - AC",
+    "Run finite-domain electrostatics with explicit electrodes and return capacitance, field-energy evidence and supplied PDN elements.",
+    ["Reviewed worker parameters with request object", "Retained dielectric mesh, materials, electrodes and context identity", "Experimental finite-domain model; no arbitrary board extraction qualification"],
+    requestRunner("extract_pdn_electrostatic", { requiredKey: "request", exportResult: true })),
+  entry("run-pdn-dielectric-ac", "Extract retained dielectric AC admittance", "PI - AC",
+    "Compute sampled complex electrode currents and field-power evidence from explicit dielectric and conductivity inputs.",
+    ["Reviewed worker parameters with request object", "Admitted retained mesh, electrodes and positive frequency samples", "Experimental sampled response; no causal transient model claim"],
+    requestRunner("extract_pdn_dielectric_ac", { requiredKey: "request", exportResult: true })),
+  entry("run-pdn-admittance", "Reduce supplied sampled admittance ports", "PI - AC",
+    "Retain selected ports with explicit passive or floating auxiliary loads and preserve sampled power-accounting evidence.",
+    ["Reviewed worker parameters with request object", "Explicit port identities, sampled admittance and auxiliary terminations", "Sample passivity does not establish a causal broadband model"],
+    requestRunner("reduce_pdn_admittance", { requiredKey: "request", exportResult: true })),
+  entry("run-assembly-structural", "Run retained tetrahedral static mechanics", "Thermal - assembly",
+    "Compute bounded isotropic P1 displacement, stress, reactions and elastic energy from supplied retained mesh and loads.",
+    ["Reviewed worker parameters with request object", "Admitted mesh, isotropic materials and explicit constraints/loads", "Experimental small-strain statics; no contact, fatigue or failure qualification"],
+    requestRunner("run_assembly_tetra_structural", { requiredKey: "request", exportResult: true })),
+  entry("run-assembly-thermomechanical", "Run retained thermal / mechanical coupling", "Co-simulation and twins",
+    "Execute steady thermal and static thermoelastic owners on the same admitted retained mesh with temperature provenance.",
+    ["Reviewed worker parameters with request object", "Identical retained meshes and supplied thermal/structural inputs", "One-way experimental coupling; no deformation feedback or lifetime qualification"],
+    requestRunner("run_assembly_thermomechanical", { requiredKey: "request", exportResult: true })),
+];
 
 export const PYTHON_TEMPLATES: PythonTemplate[] = [
   entry("hello-context", "Workspace context", "Basics", "Show which SPIKE contexts are attached and query worker health.", [], `# Inspect the Python workspace context without changing the project.
@@ -641,6 +774,7 @@ spike.ui.select_net(board["id"], net["id"])
 spike.ui.open_panel("nets")
 # Requests apply after successful completion, only while the board context matches.
 `),
+  ...CO_SOLVER_TEMPLATES,
 ];
 
 export const PYTHON_STARTER = PYTHON_TEMPLATES[0].code;

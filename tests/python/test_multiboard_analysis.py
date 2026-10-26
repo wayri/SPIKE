@@ -6,20 +6,10 @@ from unittest.mock import patch
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.multiboard_analysis import (
-    MultiboardAnalysisError,
-    plan_multiboard_analysis,
-)
-from python.spike_core.multiboard_execution import (
-    COUPLED_BIND_REQUEST_CONTRACT,
-    HARNESS_COMPILE_REQUEST_CONTRACT,
-    SI_BATCH_REQUEST_CONTRACT,
-    MultiboardExecutionError,
-    bind_coupled_reduced_network,
-    compile_harness_electrical_network,
-    run_independent_si_batch,
-)
+from python.spike_core.multiboard_analysis import MultiboardAnalysisError, plan_multiboard_analysis
+from python.spike_core.multiboard_execution import COUPLED_BIND_REQUEST_CONTRACT, HARNESS_COMPILE_REQUEST_CONTRACT, SI_BATCH_REQUEST_CONTRACT, MultiboardExecutionError, bind_coupled_reduced_network, compile_harness_electrical_network, run_independent_si_batch
 from python.spike_core.service import handle
+from python.spike_core.spider_v2 import SpiDeRV2
 from tests.python.test_si_channel import SiUniformChannelTests
 from tests.python.test_si_protocol_test_runner import fixture_suite
 
@@ -206,6 +196,36 @@ class MultiboardAnalysisTests(unittest.TestCase):
         self.assertEqual(result["graph"]["harnesses"][0]["pin_map"], {"1": "1", "2": "2"})
         self.assertFalse(result["coupled_physics"])
 
+    def test_repeated_design_summary_is_computed_once_without_merging_board_identity(self):
+        value = request(count=12)
+        shared = value["designs"]["design-00"]
+        for board in value["assembly"]["boards"]:
+            board["design_id"] = "shared-layout"
+        value["designs"] = {"shared-layout": shared}
+        from python.spike_core import multiboard_analysis as module
+        original = module._design_summary
+        calls = []
+
+        def counted_summary(raw):
+            calls.append(raw)
+            return original(raw)
+
+        with patch("python.spike_core.multiboard_analysis._design_summary", side_effect=counted_summary):
+            result = plan_multiboard_analysis(value)
+
+        self.assertEqual(len(calls), 1)
+        self.assertEqual(len(result["graph"]["boards"]), 12)
+        self.assertEqual(len({board["board_id"] for board in result["graph"]["boards"]}), 12)
+        self.assertEqual(len({board["namespace"] for board in result["graph"]["boards"]}), 12)
+        self.assertTrue(all(board["design_id"] == "shared-layout" for board in result["graph"]["boards"]))
+        first, second = result["graph"]["boards"][:2]
+        original_dimensions = list(second["dimensions_mm"])
+        original_bounds = list(second["bounds_mm"])
+        first["dimensions_mm"][0] += 1
+        first["bounds_mm"][0] += 1
+        self.assertEqual(second["dimensions_mm"], original_dimensions)
+        self.assertEqual(second["bounds_mm"], original_bounds)
+
     def test_graph_digest_is_independent_of_retained_board_order(self):
         forward = plan_multiboard_analysis(request())
         reverse = plan_multiboard_analysis(request(reverse=True))
@@ -339,6 +359,118 @@ class MultiboardAnalysisTests(unittest.TestCase):
         value["jobs"].append({"board_id": "board-00", "suite_request": suite})
         with self.assertRaisesRegex(MultiboardExecutionError, "1 through 30"):
             run_independent_si_batch(value)
+
+    def test_independent_si_batch_parses_each_retained_design_once_without_merging_occurrences(self):
+        value = self._si_batch_request()
+        value["multiboard_request"] = request(count=6)
+        value["multiboard_request"]["domain"] = "si"
+        shared = json.loads(json.dumps(SiUniformChannelTests().design().to_dict()))
+        for board in value["multiboard_request"]["assembly"]["boards"]:
+            board["design_id"] = "shared-layout"
+        value["multiboard_request"]["designs"] = {"shared-layout": shared}
+        suite = value["jobs"][0]["suite_request"]
+        value["jobs"] = [{"board_id": f"board-{index:02d}", "suite_request": suite} for index in range(6)]
+        stub_result = {"resource_admission": {"actual_lanes": 1, "actual_frequency_points": 1, "estimated_numeric_bytes": 1}}
+        original = SpiDeRV2.from_dict
+        parse_calls = []
+
+        def counted_parse(raw):
+            parse_calls.append(raw)
+            return original(raw)
+
+        with patch("python.spike_core.multiboard_execution.SpiDeRV2.from_dict", side_effect=counted_parse), \
+                patch("python.spike_core.multiboard_execution.run_si_protocol_test_suite", return_value=stub_result):
+            result = run_independent_si_batch(value)
+
+        self.assertEqual(len(parse_calls), 1)
+        self.assertEqual([job["board_id"] for job in result["jobs"]], [f"board-{index:02d}" for index in range(6)])
+        self.assertEqual(len({job["namespace"] for job in result["jobs"]}), 6)
+        self.assertTrue(all(job["design_id"] == "shared-layout" for job in result["jobs"]))
+
+    def test_independent_si_batch_revalidates_shared_source_mutated_between_jobs(self):
+        value = self._si_batch_request()
+        shared_id = value["multiboard_request"]["assembly"]["boards"][0]["design_id"]
+        value["multiboard_request"]["assembly"]["boards"][1]["design_id"] = shared_id
+        value["multiboard_request"]["designs"] = {
+            shared_id: value["multiboard_request"]["designs"][shared_id],
+        }
+        runs = []
+        stub_result = {"resource_admission": {"actual_lanes": 1, "actual_frequency_points": 1, "estimated_numeric_bytes": 1}}
+
+        def runner(parsed, *_args, **_kwargs):
+            runs.append(parsed.contract)
+            return stub_result
+
+        mutated = False
+
+        def cancel_check():
+            nonlocal mutated
+            if len(runs) == 1 and not mutated:
+                value["multiboard_request"]["designs"][shared_id]["contract"] = "INVALID"
+                mutated = True
+            return False
+
+        with patch("python.spike_core.multiboard_execution.run_si_protocol_test_suite", side_effect=runner):
+            with self.assertRaisesRegex(MultiboardExecutionError, "could not run"):
+                run_independent_si_batch(value, cancel_check=cancel_check)
+        self.assertEqual(runs, ["spike/design-ir/v2"])
+        self.assertTrue(mutated)
+
+    def test_independent_si_batch_binding_distinguishes_parser_significant_container_types(self):
+        value = self._si_batch_request()
+        shared_id = value["multiboard_request"]["assembly"]["boards"][0]["design_id"]
+        value["multiboard_request"]["assembly"]["boards"][1]["design_id"] = shared_id
+        shared = value["multiboard_request"]["designs"][shared_id]
+        value["multiboard_request"]["designs"] = {shared_id: shared}
+        polygon = [[0, 0], [2, 0], [2, 1], [0, 1]]
+        shared["pads"].append({
+            "id": "review-custom", "shape": "custom",
+            "custom_geometry": {"status": "supported", "coordinate_space": "pad_local_mm",
+                                "mirror_x": False, "positive_filled_polygon": polygon},
+        })
+        runs = []
+        stub_result = {"resource_admission": {"actual_lanes": 1, "actual_frequency_points": 1, "estimated_numeric_bytes": 1}}
+
+        def runner(parsed, *_args, **_kwargs):
+            runs.append(parsed.contract)
+            return stub_result
+
+        mutated = False
+
+        def cancel_check():
+            nonlocal mutated
+            if len(runs) == 1 and not mutated:
+                shared["pads"][-1]["custom_geometry"]["positive_filled_polygon"] = tuple(polygon)
+                mutated = True
+            return False
+
+        with patch("python.spike_core.multiboard_execution.run_si_protocol_test_suite", side_effect=runner):
+            with self.assertRaisesRegex(MultiboardExecutionError, "could not run"):
+                run_independent_si_batch(value, cancel_check=cancel_check)
+        self.assertEqual(runs, ["spike/design-ir/v2"])
+        self.assertTrue(mutated)
+
+    def test_independent_si_batch_preserves_accepted_python_container_payloads(self):
+        value = self._si_batch_request()
+        shared_id = value["multiboard_request"]["assembly"]["boards"][0]["design_id"]
+        value["multiboard_request"]["assembly"]["boards"][1]["design_id"] = shared_id
+        shared = value["multiboard_request"]["designs"][shared_id]
+        value["multiboard_request"]["designs"] = {shared_id: shared}
+        shared["tracks"][0]["start_mm"] = tuple(shared["tracks"][0]["start_mm"])
+        original = SpiDeRV2.from_dict
+        parse_calls = []
+        stub_result = {"resource_admission": {"actual_lanes": 1, "actual_frequency_points": 1, "estimated_numeric_bytes": 1}}
+
+        def counted_parse(raw):
+            parse_calls.append(raw)
+            return original(raw)
+
+        with patch("python.spike_core.multiboard_execution.SpiDeRV2.from_dict", side_effect=counted_parse), \
+                patch("python.spike_core.multiboard_execution.run_si_protocol_test_suite", return_value=stub_result):
+            result = run_independent_si_batch(value)
+
+        self.assertEqual(len(result["jobs"]), 2)
+        self.assertEqual(len(parse_calls), 2)
 
     def test_harness_compilation_requires_explicit_per_conductor_electrical_values(self):
         raw = request(count=2, mode="coupled_harness_network")

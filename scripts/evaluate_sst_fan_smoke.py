@@ -10,7 +10,7 @@ import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.openfoam_multiregion_execution import _latest_time, _parse_internal_field, load_verified_runnable_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import _latest_time, _parse_internal_field, load_verified_runnable_case
 
 
 def main():

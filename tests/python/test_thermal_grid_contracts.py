@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
-from python.spike_core.board_thermal import run_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.board_thermal import run_board_thermal
 from tests.python.test_layered_thermal_surface_boundaries import design, request
 
 ROOT = Path(__file__).resolve().parents[2]

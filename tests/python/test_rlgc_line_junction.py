@@ -9,8 +9,8 @@ from scipy.integrate import quad
 from scipy.linalg import expm
 
 from examples.rlgc_line_junction.run_line import request
-from python.spike_core import rlgc_line_junction as solver
-from python.spike_core.rlgc_line_cascade import run_rlgc_line_cascade
+from python.spike_core.solvers.signal_integrity.lines import rlgc_line_junction as solver
+from python.spike_core.solvers.signal_integrity.lines.rlgc_line_cascade import run_rlgc_line_cascade
 
 
 def value(p):

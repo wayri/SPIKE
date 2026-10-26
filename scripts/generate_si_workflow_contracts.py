@@ -7,8 +7,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.si_workflow import SOURCE, RECEIVER, workflow_catalog
-from python.spike_core.si_passives import passive_defaults, CAPACITOR_GRADES, RESISTOR_GRADES
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import SOURCE, RECEIVER, workflow_catalog
+from python.spike_core.solvers.signal_integrity.receivers.si_passives import passive_defaults, CAPACITOR_GRADES, RESISTOR_GRADES
 
 
 def obj(properties, required=()):

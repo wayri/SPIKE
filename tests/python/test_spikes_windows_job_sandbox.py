@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 
 
 @unittest.skipUnless(os.name == "nt", "Windows Job containment test")

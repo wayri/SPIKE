@@ -4,11 +4,11 @@ from copy import deepcopy
 import math
 import unittest
 import numpy as np
-from python.spike_core.dc_annular_land import solve_annular_land
-from python.spike_core.dc_annular_land_input import prepare
-from python.spike_core.dc_port_circuit import solve_port_circuit
-from python.spike_core.dc_annular_stack import solve_annular_stack
-from python.spike_core.dc_annular_evidence import validate_annular_result, validate_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_land import solve_annular_land
+from python.spike_core.solvers.power_integrity.dc.dc_annular_land_input import prepare
+from python.spike_core.solvers.power_integrity.dc.dc_port_circuit import solve_port_circuit
+from python.spike_core.solvers.power_integrity.dc.dc_annular_stack import solve_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_evidence import validate_annular_result, validate_annular_stack
 from tests.python.test_dc_annular_land import request, spreading_request
 from tests.python.test_dc_annular_stack import explicit_annular_stack
 
@@ -62,7 +62,7 @@ class AnnularEvidenceTests(unittest.TestCase):
     def test_gate_rejects_authenticated_source_fixture_with_zero_drive(self):
         from scripts.parity_annular_contact_gate import validate_report
         from tests.python.test_dc_annular_source import source_stack
-        from python.spike_core.dc_annular_source import solve_source_annular_stack
+        from python.spike_core.solvers.power_integrity.dc.dc_annular_source import solve_source_annular_stack
         source = source_stack()
         for currents in source["external_currents"].values():
             for name in currents:

@@ -7,10 +7,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from extension_sdk.python.spike_extension_sdk import read_request, write_result
-from python.spike_core.su2_airflow import (
-    su2_airflow_capabilities, validate_su2_request, cavity_config,
-    cavity_mesh, run_su2_airflow,
-)
+from python.spike_core.solvers.external_engines.su2.su2_airflow import su2_airflow_capabilities, validate_su2_request, cavity_config, cavity_mesh, run_su2_airflow
 from python.spike_core.extensions import user_extension_root
 
 
@@ -23,7 +20,7 @@ def execute(request):
     if contribution == 'su2-probe':
         if parameters:
             raise ValueError('SU2 runtime check accepts no parameters.')
-        from python.spike_core.su2_cht import su2_cht_capabilities
+        from python.spike_core.solvers.external_engines.su2.su2_cht import su2_cht_capabilities
         data = {'cfd': su2_airflow_capabilities(), 'cht': su2_cht_capabilities()}
     elif contribution in ('su2-cfd', 'su2-cfd-preview'):
         admitted = validate_su2_request(parameters)
@@ -38,7 +35,7 @@ def execute(request):
         else:
             data = {'result': run_su2_airflow(admitted, output_root=user_extension_root().parent / 'solver-runs' / 'su2')}
     elif contribution in ('su2-cht', 'su2-cht-preview'):
-        from python.spike_core.su2_cht import run_su2_cht, prepare_su2_cht, su2_cht_capabilities
+        from python.spike_core.solvers.external_engines.su2.su2_cht import run_su2_cht, prepare_su2_cht, su2_cht_capabilities
         data = prepare_su2_cht(parameters) if contribution.endswith('-preview') else {'result': run_su2_cht(parameters, output_root=user_extension_root().parent / 'solver-runs' / 'su2')}
         if contribution.endswith('-preview'):
             data['runtime'] = su2_cht_capabilities()

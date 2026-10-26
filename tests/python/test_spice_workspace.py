@@ -2,11 +2,7 @@ import unittest
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.service import handle
-from python.spike_core.spice_workspace import (
-    SPICE_WORKSPACE_CONTRACT,
-    compose_spice_workspace,
-    validate_spice_workspace,
-)
+from python.spike_core.spice_workspace import SPICE_WORKSPACE_CONTRACT, compose_spice_workspace, validate_spice_workspace
 
 
 def fixture_design() -> SpiDeR:

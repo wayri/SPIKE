@@ -28,7 +28,7 @@ def digest(path):
 
 
 def sources():
-    paths = list((ROOT / "python/spike_core").glob("enclosure*.py"))
+    paths = list((ROOT / "python/spike_core").rglob("enclosure*.py"))
     paths += list((ROOT / "tests/python").glob("test_enclosure*.py"))
     paths.append(Path(__file__))
     return {path.relative_to(ROOT).as_posix(): digest(path)
@@ -52,8 +52,8 @@ def retain(output, name, value):
 
 
 def coupled_and_trace(output):
-    from python.spike_core.enclosure_flow_analysis import analyze_enclosure_flow
-    from python.spike_core.enclosure_rans_research import solve_enclosure_rans_research
+    from python.spike_core.solvers.thermal_fluid.flow.enclosure_flow_analysis import analyze_enclosure_flow
+    from python.spike_core.solvers.thermal_fluid.flow.enclosure_rans_research import solve_enclosure_rans_research
     from tests.python.test_enclosure_rans_research import fixture, velocity_error
 
     request, exact_q = fixture(12)

@@ -20,11 +20,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from python.spike_core.contracts import AnalysisSpec  # noqa: E402
-from python.spike_core.peec_conforming_dc import (  # noqa: E402
-    assemble_conforming_dc, solve_conforming_dc,
-)
-from python.spike_core.peec_conforming_mesh import build_conforming_mesh  # noqa: E402
-from python.spike_core.peec_rt0_iterative import solve_iterative_conforming_dc  # noqa: E402
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import assemble_conforming_dc, solve_conforming_dc
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_mesh import build_conforming_mesh  # noqa: E402
+from python.spike_core.solvers.power_integrity.peec.peec_rt0_iterative import solve_iterative_conforming_dc  # noqa: E402
 from python.spike_core.service import _design_from_kicad  # noqa: E402
 
 

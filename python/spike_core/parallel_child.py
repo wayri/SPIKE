@@ -70,31 +70,31 @@ def _one_field(params: dict[str, Any], field: str) -> Any:
 
 def _dispatch(method: str, params: dict[str, Any]) -> Any:
     if method == "run_harness_pi":
-        from .harness_pi import run_harness_pi
+        from .solvers.signal_integrity.lines.harness_pi import run_harness_pi
         return run_harness_pi(_one_field(params, "request"))
     if method == "run_harness_si":
-        from .harness_signal import run_harness_si
+        from .solvers.signal_integrity.lines.harness_signal import run_harness_si
         return run_harness_si(_one_field(params, "request"))
     if method == "run_harness_mtl":
-        from .harness_mtl import run_harness_mtl
+        from .solvers.signal_integrity.lines.harness_mtl import run_harness_mtl
         return run_harness_mtl(_one_field(params, "request"))
     if method == "extract_harness_round_wire_rlgc":
-        from .harness_rlgc_geometry import extract_parallel_round_rlgc
+        from .solvers.signal_integrity.lines.harness_rlgc_geometry import extract_parallel_round_rlgc
         return extract_parallel_round_rlgc(_one_field(params, "request"))
     if method == "run_internal_airflow":
-        from .internal_airflow import run_internal_airflow
+        from .solvers.thermal_fluid.flow.internal_airflow import run_internal_airflow
         return run_internal_airflow(_one_field(params, "request"))
     if method == "estimate_thermal":
-        from .thermal import ThermalScenario, estimate_compact_thermal
+        from .solvers.thermal_fluid.heat.thermal import ThermalScenario, estimate_compact_thermal
         return estimate_compact_thermal(ThermalScenario(**_one_field(params, "scenario")))
     if method == "analyze_ac_power_integrity":
-        from .ac_power_integrity import analyze_ac_power_integrity
+        from .solvers.power_integrity.peec.ac_power_integrity import analyze_ac_power_integrity
         return analyze_ac_power_integrity(_one_field(params, "request"))
     if method == "evaluate_capacitor_placement":
-        from .capacitor_placement import evaluate_capacitor_placement
+        from .solvers.power_integrity.pdn.capacitor_placement import evaluate_capacitor_placement
         return evaluate_capacitor_placement(_one_field(params, "request"))
     if method == "run_smps_converter":
-        from .smps_converter import evaluate_smps_converter
+        from .solvers.circuits.models.smps_converter import evaluate_smps_converter
         return evaluate_smps_converter(_one_field(params, "request"))
     raise ValueError("Method is not allowed in the parallel child.")
 

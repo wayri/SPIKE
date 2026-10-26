@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 """Neutral board identity and worker progress boundary for Studio feedback."""
 from .contracts import SpiDeR
-from .cosimulation import bounded_digest, identity
+from .solvers.execution.coupling.cosimulation import bounded_digest, identity
 from .service_helpers import error_response, operation_id
 from .spice_workspace import _safe_instance_name
 from .studio_board_coupling import validate_studio_board_cosimulation, run_studio_board_cosimulation

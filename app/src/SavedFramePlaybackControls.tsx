@@ -94,6 +94,7 @@ export default function SavedFramePlaybackControls({
         ? `Saved frame ${boundedFrame + 1}/${timesS.length} · ${Number(timesS[boundedFrame]).toPrecision(6)} s`
         : "Static result"}</span>
       <label>Playback speed<select value={playbackSpeed} disabled={!canPlay} onChange={event => onPlaybackSpeed(Number(event.target.value))}>
+        {!SPEEDS.some(speed => speed === playbackSpeed) && <option value={playbackSpeed}>{playbackSpeed.toPrecision(3)}x simulated time (review)</option>}
         {SPEEDS.map(speed => <option key={speed} value={speed}>{speed}x simulated time</option>)}
       </select></label>
       {!managedPlayback && <label><input type="checkbox" checked={loop} disabled={!canPlay} onChange={event => setLoop(event.target.checked)} /> Loop saved frames</label>}

@@ -9,10 +9,10 @@ from unittest.mock import patch
 
 from examples.assembly_field.run_examples import setup
 from examples.assembly_field.run_multiboard_volume import request
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
-from python.spike_core.assembly_thermal_contact_model import prepare_assembly_thermal_contact_model
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_contact_model import prepare_assembly_thermal_contact_model
 from python.spike_core.multiboard_identity import canonical_json_digest
-from python.spike_core.multiboard_volume_electrothermal import run_multiboard_volume_electrothermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal import run_multiboard_volume_electrothermal
 from python.spike_core.project_package import read_project, write_spike_package
 from python.spike_core.service_project_volume_electrothermal import handle_volume_electrothermal_project_request
 from python.spike_core.service_volume_electrothermal import handle_volume_electrothermal_request
@@ -69,9 +69,9 @@ class VolumeElectrothermalProjectTests(unittest.TestCase):
             saved = _call('save_volume_electrothermal_in_project', path, manifest, record=self.record)
             self.assertTrue(saved['ok'], saved)
             opened = read_project(path, include_members=True)
-            with patch('python.spike_core.multiboard_volume_electrothermal.run_native_mna',
+            with patch('python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal.run_native_mna',
                        side_effect=AssertionError('offline reopen invoked electrical solver')):
-                with patch('python.spike_core.multiboard_volume_electrothermal.run_assembly_field_thermal',
+                with patch('python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal.run_assembly_field_thermal',
                            side_effect=AssertionError('offline reopen invoked thermal solver')):
                     loaded = _call('read_volume_electrothermal_in_project', path, opened.manifest)
             self.assertTrue(loaded['ok'], loaded)

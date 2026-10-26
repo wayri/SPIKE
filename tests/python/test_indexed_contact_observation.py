@@ -5,11 +5,9 @@ from math import cos, inf, nextafter, sin
 import random
 import unittest
 
-from python.spike_core.hybrid_mesh import _pad_boundary_polygon
-from python.spike_core.source_filled_boundary import (
-    SourceFilledBoundary, prepare_source_filled_boundary,
-)
-from python.spike_core.zone_pad_connection_evidence import _observes_contact
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _pad_boundary_polygon
+from python.spike_core.solvers.power_integrity.dc.source_filled_boundary import SourceFilledBoundary, prepare_source_filled_boundary
+from python.spike_core.solvers.power_integrity.dc.zone_pad_connection_evidence import _observes_contact
 
 
 class FullScanBoundary(SourceFilledBoundary):

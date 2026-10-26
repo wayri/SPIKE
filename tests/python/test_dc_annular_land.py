@@ -12,8 +12,8 @@ from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import spsolve
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]/"python"))
-from spike_core.dc_annular_land import radial_mass, solve_annular_land
-from spike_core.dc_annular_land_input import prepare
+from python.spike_core.solvers.power_integrity.dc.dc_annular_land import radial_mass, solve_annular_land
+from python.spike_core.solvers.power_integrity.dc.dc_annular_land_input import prepare
 
 
 def contact(name, face, interval, current):

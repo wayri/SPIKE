@@ -6,7 +6,7 @@ import math
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.component_thermal import run_component_thermal
+from python.spike_core.solvers.thermal_fluid.heat.component_thermal import run_component_thermal
 from python.spike_core.service_simulation_handlers import handle_simulation_request
 
 
@@ -182,7 +182,7 @@ class ComponentThermalTests(unittest.TestCase):
         data = request("transient", step=1, end=2000)
         data["components"] = [dict(data["components"][0], component_ref=f"U{i}") for i in range(32)]
         data["surfaces"] = [{"id": "contact", "kind": "conduction", "object_ref": "U0", "target_ref": "U1", "resistance_c_per_w": 5}]
-        with patch("python.spike_core.thermal_network._solve_linear", side_effect=AssertionError("oversized coupled run must fail before solving")):
+        with patch("python.spike_core.solvers.thermal_fluid.heat.thermal_network._solve_linear", side_effect=AssertionError("oversized coupled run must fail before solving")):
             result = run_component_thermal(data)
         self.assertEqual(result["status"], "blocked")
         self.assertIn("dense work-unit limit", result["issues"][0]["message"])
@@ -200,15 +200,15 @@ class ComponentThermalTests(unittest.TestCase):
         ]
         # Two nodes cost 8 units per dense factorization. Permit the first
         # iteration; the genuinely nonlinear problem requires additional work.
-        with patch("python.spike_core.thermal_network.MAX_SURFACE_DENSE_WORK", 8):
+        with patch("python.spike_core.solvers.thermal_fluid.heat.thermal_network.MAX_SURFACE_DENSE_WORK", 8):
             result = run_component_thermal(data)
         self.assertEqual(result["status"], "blocked")
         self.assertIn("dense work-unit limit", result["issues"][0]["message"])
         self.assertEqual(run_component_thermal(data)["status"], "completed")
 
     def test_legacy_uncoupled_route_ignores_dense_surface_budget(self):
-        with patch("python.spike_core.thermal_network.MAX_SURFACE_DENSE_WORK", 0), patch(
-            "python.spike_core.component_thermal.estimate_surface_thermal_network", side_effect=AssertionError("legacy path must remain independent")
+        with patch("python.spike_core.solvers.thermal_fluid.heat.thermal_network.MAX_SURFACE_DENSE_WORK", 0), patch(
+            "python.spike_core.solvers.thermal_fluid.heat.component_thermal.estimate_surface_thermal_network", side_effect=AssertionError("legacy path must remain independent")
         ):
             result = run_component_thermal(request("transient"))
         self.assertEqual(result["status"], "completed")

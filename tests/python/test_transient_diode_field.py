@@ -12,7 +12,7 @@ from unittest.mock import patch
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from python.spike_core.transient_diode_field import CONTRACT, solve_transient_diode_field
+from python.spike_core.solvers.circuits.models.transient_diode_field import CONTRACT, solve_transient_diode_field
 
 
 def fixture(steps=10, duration=10.):
@@ -130,7 +130,7 @@ class TransientDiodeFieldTests(unittest.TestCase):
         self.assertEqual(result["frames"], [])
 
     def test_unsaved_step_energy_failure_cannot_be_hidden(self):
-        with patch("python.spike_core.transient_diode_field._energy", return_value={"passed": False}):
+        with patch("python.spike_core.solvers.circuits.models.transient_diode_field._energy", return_value={"passed": False}):
             result = solve_transient_diode_field(fixture())
         self.assertEqual(result["status"], "blocked", result)
         self.assertEqual(result["history"], [])
@@ -162,7 +162,7 @@ class TransientDiodeFieldTests(unittest.TestCase):
         # Exercise publication guard independently of the thermal solver:
         # finite accepted per-step powers can overflow when integrated.
         request["thermal"]["study"]["time_step_s"] = 1e308
-        with patch("python.spike_core.transient_diode_field._energy", return_value={"passed": True,
+        with patch("python.spike_core.solvers.circuits.models.transient_diode_field._energy", return_value={"passed": True,
                    "outward_boundary_power_w": 10., "storage_rate_w": 0.}):
             result = solve_transient_diode_field(request)
         self.assertEqual(result["status"], "blocked", result)

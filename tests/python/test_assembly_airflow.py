@@ -7,7 +7,7 @@ import threading
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from python.spike_core.assembly_airflow import validate_request, run_assembly_airflow, prepare_airflow_case
+from python.spike_core.solvers.thermal_fluid.flow.assembly_airflow import validate_request, run_assembly_airflow, prepare_airflow_case, streamline_seed_line
 
 
 def request():
@@ -25,9 +25,29 @@ def request():
 
 
 class AssemblyAirflowTest(unittest.TestCase):
+    def test_streamline_seed_line_supports_both_faces_of_every_axis(self):
+        geometry = request()['geometry']
+        domain = geometry['air_domain']
+        bounds = [[-1, -1, -1], [2, 2, 2]]
+        for axis in range(3):
+            for upper_face in (False, True):
+                coordinate = bounds[upper_face][axis]
+                with self.subTest(axis=axis, upper=upper_face):
+                    line = streamline_seed_line(geometry, {'axis': axis, 'coordinate_mm': coordinate})
+                    expected = 1.94 if upper_face else -.94
+                    self.assertAlmostEqual(line[0][axis], expected)
+                    self.assertEqual(line[0][axis], line[1][axis])
+                    transverse = [index for index in range(3) if index != axis]
+                    self.assertNotEqual(line[0][transverse[0]], line[1][transverse[0]])
+                    self.assertEqual(line[0][transverse[1]], line[1][transverse[1]])
+
+    def test_streamline_seed_line_rejects_nonboundary_plane(self):
+        with self.assertRaisesRegex(ValueError, 'not one exterior'):
+            streamline_seed_line(request()['geometry'], {'axis': 0, 'coordinate_mm': 0})
+
     def test_compact_region_points_and_explicit_heatsink_mount(self):
         from tests.python.test_assembly_tetra_thermal import cube
-        from python.spike_core.openfoam_polymesh import write_polymesh
+        from python.spike_core.solvers.external_engines.openfoam.openfoam_polymesh import write_polymesh
         r = request()
         r['geometry']['solids'].append({**copy.deepcopy(r['geometry']['solids'][0]), 'id': 'sink'})
         r['region_properties']['sink'] = {'role': 'heatsink', 'power_w': 0}
@@ -42,13 +62,15 @@ class AssemblyAirflowTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'acknowledge perfect'):
                 prepare_airflow_case(r, mesh, folder)
             r['perfect_solid_contact_acknowledged'] = True
-            with patch('python.spike_core.assembly_airflow.write_polymesh', wraps=write_polymesh) as write:
+            with patch('python.spike_core.solvers.thermal_fluid.flow.assembly_airflow.write_polymesh', wraps=write_polymesh) as write:
                 result = prepare_airflow_case(r, mesh, folder)
             self.assertEqual(result['status'], 'prepared_runnable_case')
             for call in write.call_args_list:
                 job = call.args[0]
                 points = job['mesh']['vertices']
-                self.assertLess(len(points), len(mesh['vertices']))
+                from python.spike_core.solvers.thermal_fluid.flow.assembly_airflow_subdivision import subdivide_airflow_mesh
+                refined = subdivide_airflow_mesh(mesh, r['geometry']['mesh'])
+                self.assertLess(len(points), len(refined['vertices']))
                 self.assertEqual({v for c in job['mesh']['cells'] for v in c['vertices']}, set(range(len(points))))
                 self.assertTrue(all(0 <= v < len(points) for p in job['boundary_patches'] for f in p['faces'] for v in f))
             translated = json.loads((Path(folder)/'translated-request.json').read_text())

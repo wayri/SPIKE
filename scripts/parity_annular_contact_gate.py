@@ -12,21 +12,21 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
 from scripts.parity_pisi_gate import bound, digest, names
 from scripts.parity_pi01_blockers_gate import validate_receipt as validate_previous
-from python.spike_core.dc_annular_evidence import validate_annular_result, validate_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_evidence import validate_annular_result, validate_annular_stack
 
 MODULES = ("tests.python.test_dc_annular_land", "tests.python.test_dc_port_circuit",
            "tests.python.test_dc_annular_stack", "tests.python.test_dc_annular_source",
            "tests.python.test_dc_annular_evidence")
-SOURCES = ("scripts/parity_annular_contact_gate.py", "python/spike_core/dc_annular_land.py",
-    "python/spike_core/dc_annular_land_input.py", "python/spike_core/dc_annular_stack.py",
-    "python/spike_core/dc_annular_stack_input.py", "python/spike_core/dc_port_circuit.py",
-    "python/spike_core/dc_annular_source.py", "python/spike_core/kicad_source_evidence.py",
-    "python/spike_core/dc_annular_evidence.py", "python/spike_core/kicad_importer.py",
+SOURCES = ("scripts/parity_annular_contact_gate.py", "python/spike_core/solvers/power_integrity/dc/dc_annular_land.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_annular_land_input.py", "python/spike_core/solvers/power_integrity/dc/dc_annular_stack.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_annular_stack_input.py", "python/spike_core/solvers/power_integrity/dc/dc_port_circuit.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_annular_source.py", "python/spike_core/kicad_source_evidence.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_annular_evidence.py", "python/spike_core/kicad_importer.py",
     "python/core/board_parser.py", "python/spike_core/contracts.py",
     "python/core/kicad_model_sources.py", "python/core/filled_polygon_offset.py", "python/core/simple_polygon_union.py",
-    "python/spike_core/board_outline_geometry.py", "python/spike_core/planar_polygon_topology.py",
-    "python/spike_core/dc_axial_ownership.py", "python/spike_core/dc_land_transition.py",
-    "python/spike_core/dc_land_transition_input.py", "python/spike_core/dc_land_transition_evidence.py",
+    "python/spike_core/board_outline_geometry.py", "python/spike_core/solvers/geometry_meshing/preparation/planar_polygon_topology.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_axial_ownership.py", "python/spike_core/solvers/power_integrity/dc/dc_land_transition.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_land_transition_input.py", "python/spike_core/solvers/power_integrity/dc/dc_land_transition_evidence.py",
     "scripts/check_architecture.py", "tests/python/test_dc_annular_land.py",
     "tests/python/test_dc_port_circuit.py", "tests/python/test_dc_annular_stack.py",
     "tests/python/test_dc_annular_source.py", "tests/python/test_dc_annular_evidence.py",
@@ -63,7 +63,7 @@ def validate_report(report):
             and wrapper["source_files_revalidated"] is True and wrapper["production_qualified"] is False,
             "Native source wrapper scope differs")
     validate_annular_stack(wrapper["result"])
-    from python.spike_core.dc_annular_source import verify_annular_pad_binding
+    from python.spike_core.solvers.power_integrity.dc.dc_annular_source import verify_annular_pad_binding
     from tests.python.test_dc_annular_source import source_stack
     require(wrapper["result"]["source_request"] == source_stack(), "Source-backed acceptance input differs")
     for land in wrapper["result"]["source_request"]["lands"]:
@@ -98,12 +98,20 @@ def validate_receipt(receipt, root=ROOT):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     for name in ("output", "log", "report"): parser.add_argument("--"+name, type=Path, required=True)
+    parser.add_argument("--previous-evidence", type=Path,
+                        help="Validated earlier PI01 partial receipt; defaults to the current ledger base evidence")
     args = parser.parse_args(); paths = (args.output, args.log, args.report)
     if len({p.resolve() for p in paths}) != 3: parser.error("Outputs must differ")
     for path in paths:
         if path.exists() or not path.resolve().is_relative_to(ROOT): parser.error("Choose fresh repository outputs")
         path.parent.mkdir(parents=True, exist_ok=True)
-    validate_previous(json.loads((ROOT/PREVIOUS).read_text(encoding="utf-8")))
+    previous = args.previous_evidence
+    if previous is None:
+        ledger = json.loads((ROOT/"docs/parity-capability-backlog-v1.json").read_text(encoding="utf-8"))
+        previous = ROOT/next(s for s in ledger["stages"] if s["id"] == "PI01-S02")["evidence"]
+    previous_path = previous.resolve()
+    if not previous_path.is_relative_to(ROOT): parser.error("Previous evidence must stay in this repository")
+    validate_previous(json.loads(previous_path.read_text(encoding="utf-8")))
     before = {n: digest(ROOT/n) for n in SOURCES}
     tests = suite(); expected = names(tests); stream = io.StringIO()
     run = unittest.TextTestRunner(stream=stream, verbosity=2).run(tests)
@@ -112,9 +120,9 @@ def main():
     from tests.python.test_dc_annular_land import spreading_request
     from tests.python.test_dc_annular_stack import explicit_annular_stack
     from tests.python.test_dc_annular_source import source_stack
-    from python.spike_core.dc_annular_land import solve_annular_land
-    from python.spike_core.dc_annular_stack import solve_annular_stack
-    from python.spike_core.dc_annular_source import solve_source_annular_stack
+    from python.spike_core.solvers.power_integrity.dc.dc_annular_land import solve_annular_land
+    from python.spike_core.solvers.power_integrity.dc.dc_annular_stack import solve_annular_stack
+    from python.spike_core.solvers.power_integrity.dc.dc_annular_source import solve_source_annular_stack
     report = {"annular_refinement": [solve_annular_land(spreading_request(n)) for n in (4, 8, 16)],
         "series_stack": solve_annular_stack(explicit_annular_stack()),
         "spreading_stack": solve_annular_stack(explicit_annular_stack(spreading=True)),
@@ -126,7 +134,7 @@ def main():
         "sources_before": before, "sources_after": after,
         "tests": {"names": expected, "run": run.testsRun, "failures": [], "errors": [], "skipped": [],
                   "expected_failures": [], "unexpected_successes": []},
-        "previous_evidence": PREVIOUS, "previous_sha256": digest(ROOT/PREVIOUS),
+        "previous_evidence": previous_path.relative_to(ROOT).as_posix(), "previous_sha256": digest(previous_path),
         "log": args.log.resolve().relative_to(ROOT).as_posix(), "log_sha256": digest(args.log),
         "report": args.report.resolve().relative_to(ROOT).as_posix(), "report_sha256": digest(args.report)}
     args.output.write_text(json.dumps(receipt, indent=2)+"\n", encoding="utf-8")

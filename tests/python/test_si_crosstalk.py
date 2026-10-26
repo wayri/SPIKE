@@ -3,8 +3,8 @@
 """Independent DC nodal circuit and analytic constant-transfer checks."""
 import unittest
 import numpy as np
-from python.spike_core.si_crosstalk import analyze_crosstalk, validate_model
-from python.spike_core.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.receivers.si_crosstalk import analyze_crosstalk, validate_model
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
 
 MAP = {"aggressor_near": 0, "aggressor_far": 2, "victim_near": 1, "victim_far": 3}
 

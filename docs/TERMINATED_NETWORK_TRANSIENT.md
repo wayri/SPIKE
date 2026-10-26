@@ -10,7 +10,7 @@ and measured qualification remain open.
 ## Workflow and boundary convention
 
 Call `run_terminated_network_transient(request)` from
-`python.spike_core.sparameter_terminated`, or invoke the worker method of that
+`python.spike_core.solvers.signal_integrity.networks.sparameter_terminated`, or invoke the worker method of that
 name with `params: {request: ...}`. The desktop script workspace can use the
 API; no dedicated desktop termination editor is introduced.
 

@@ -5,11 +5,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.worker_progress import (
-    MAX_PROGRESS_LINE_BYTES,
-    PROGRESS_PREFIX,
-    emit_worker_progress,
-)
+from python.spike_core.worker_progress import MAX_PROGRESS_LINE_BYTES, PROGRESS_PREFIX, emit_worker_progress
 
 
 class _FlushTrackingText(io.StringIO):

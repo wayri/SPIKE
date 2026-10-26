@@ -20,7 +20,7 @@ const original = backend("import json; from tests.python.test_harness_signal imp
 const setup = { selection: original.selection, source: original.provenance.source, model_input: Object.fromEntries(Object.keys(model.HARNESS_SI_FIELDS).map(key=>[key,String(original.model[key])])) };
 const value = { ...original.harness, extensions: { [model.HARNESS_SI_KEY]: setup } };
 const request = model.harnessSignalRequest(value, setup);
-const result = backend("import json,sys; from python.spike_core.harness_signal import run_harness_si; print(json.dumps(run_harness_si(json.load(sys.stdin))))", request);
+const result = backend("import json,sys; from python.spike_core.solvers.signal_integrity.lines.harness_signal import run_harness_si; print(json.dumps(run_harness_si(json.load(sys.stdin))))", request);
 assert(model.validHarnessSiResult(result, request));
 const saved = structuredClone(value); saved.extensions[model.HARNESS_SI_KEY].latest_result = result;
 assert(model.validHarnessSiResult(result, model.harnessSignalRequest(saved, saved.extensions[model.HARNESS_SI_KEY])), "saved result is nonrecursive and reopens against exact inputs");

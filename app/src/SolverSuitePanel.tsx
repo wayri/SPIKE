@@ -1,3 +1,4 @@
+import SectionHelpButton from "./SectionHelpButton";
 // SPDX-License-Identifier: Apache-2.0
 import { useMemo, useState } from "react";
 import { Search, X } from "./icons";
@@ -14,9 +15,9 @@ type Props = {
   runtimeProbed?: boolean;
   onManageEngines?: () => void;
   onClose: () => void;
-  onOpenWorkflow: (action: SolverSuiteAction, extensionId?: string, capabilityId?: string) => void;
+  onOpenWorkflow: (action: SolverSuiteAction, extensionId?: string, capabilityId?: string, templateId?: string) => void;
 };
-export default function SolverSuitePanel({ onClose, onOpenWorkflow, onManageEngines, initialQuery = "", initialView = "blocks", runtimeSolvers = [], runtimeProbed = false }: Props) {
+export default function SolverSuitePanel({ onClose, onOpenWorkflow, onManageEngines, initialQuery = "", initialView = "capabilities", runtimeSolvers = [], runtimeProbed = false }: Props) {
   const [view, setView] = useState(initialView);
   const [query, setQuery] = useState(initialQuery);
   const [group, setGroup] = useState<SolverSuiteGroup | "all">("all");
@@ -48,8 +49,8 @@ export default function SolverSuitePanel({ onClose, onOpenWorkflow, onManageEngi
         <header><h4>{solverDisplayName(item)}</h4><span className={`solver-suite-badge ${item.status}`}>{solverSuiteStatusLabels[item.status]}</span></header>
         <p className="solver-manager-role">{solverOriginLabels[solverOrigin(item)]} · {item.title}</p>
         <p>{item.summary}</p><p className="solver-suite-limits"><strong>Scope limit: </strong>{item.limits}</p>
-        <details><summary>Evidence reference</summary><p>{item.reference}</p><p>Source: {item.source}</p><p>Capability ID: <code>{item.id}</code></p>{capabilitySolverIds[item.id] && <p>Registry IDs: {capabilitySolverIds[item.id].join(", ")}</p>}</details>
-        <footer>{item.action ? <button type="button" className="spike-control--compact" onClick={() => onOpenWorkflow(item.action!, item.extensionId, item.id)} aria-label={`${item.entryLabel ?? "Open setup workflow"}: ${solverDisplayName(item)}`}>{item.entryLabel ?? "Open setup workflow"}</button> : <button type="button" className="spike-control--compact" disabled>Unavailable</button>}<small>{item.extensionId ?? (item.status === "planned" ? "No executable route" : "Availability checked in workflow")}</small></footer>
+        <details><summary>Evidence reference</summary><SectionHelpButton topic={`doc:${item.reference}`} label={item.title}/><p>{item.reference}</p><p>Source: {item.source}</p><p>Capability ID: <code>{item.id}</code></p>{capabilitySolverIds[item.id] && <p>Registry IDs: {capabilitySolverIds[item.id].join(", ")}</p>}</details>
+        <footer>{item.action ? <button type="button" className="spike-control--compact" onClick={() => onOpenWorkflow(item.action!, item.extensionId, item.id, item.templateId)} aria-label={`${item.entryLabel ?? "Open setup workflow"}: ${solverDisplayName(item)}`}>{item.entryLabel ?? "Open setup workflow"}</button> : item.sourceOnly ? <span className="solver-suite-source-only">Source/API evidence only</span> : <button type="button" className="spike-control--compact" disabled>Unavailable</button>}<small>{item.extensionId ?? (item.sourceOnly ? "See evidence reference above" : item.status === "planned" ? "No executable route" : "Availability checked in workflow")}</small></footer>
       </article>)}</div></section> : null;
     }))}</div>
     </>}

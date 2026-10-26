@@ -13,8 +13,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.si_impedance import analyze_impedance
-from python.spike_core.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.channels.si_impedance import analyze_impedance
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
 
 
 def main():
@@ -23,7 +23,7 @@ def main():
     args = parser.parse_args()
     if args.output.exists():
         parser.error("Output must be new")
-    source = ROOT / "python/spike_core/si_impedance.py"
+    source = ROOT / "python/spike_core/solvers/signal_integrity/channels/si_impedance.py"
     before = hashlib.sha256(source.read_bytes()).hexdigest()
     f = np.linspace(0, 8e9, 1025)
     matrix = np.array([[0,.05,.6,.02],[.05,0,.02,.6],[.6,.02,0,.05],[.02,.6,.05,0]])

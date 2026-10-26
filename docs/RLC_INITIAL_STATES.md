@@ -13,7 +13,7 @@ checkpoint, arbitrary circuit/DAE solver or thermal coupling implementation.
 ## API and workflow
 
 Call `run_initialized_rlc_network_transient(request)` from
-`python.spike_core.sparameter_rlc_initial`, or invoke that worker method with
+`python.spike_core.solvers.signal_integrity.networks.sparameter_rlc_initial`, or invoke that worker method with
 exactly `params: {request: ...}`. Run the original free-decay example:
 
 ```powershell

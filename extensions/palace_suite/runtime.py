@@ -12,7 +12,7 @@ from pathlib import Path
 import re
 import shutil
 import uuid
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 from python.spike_core.solver_state import _state_root
 
 PROBLEM_TYPES = ('Eigenmode','Driven','Transient','Electrostatic','Magnetostatic','BoundaryMode')

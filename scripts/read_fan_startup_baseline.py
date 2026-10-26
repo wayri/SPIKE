@@ -10,9 +10,9 @@ import sys
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.openfoam_multiregion_execution import load_verified_runnable_case,_bounded_command
-from python.spike_core.openfoam_runtime import detect_openfoam_runtime
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import load_verified_runnable_case, _bounded_command
+from python.spike_core.solvers.external_engines.openfoam.openfoam_runtime import detect_openfoam_runtime
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 from scripts.fan_wsl_scratch import ScratchRunner
 
 

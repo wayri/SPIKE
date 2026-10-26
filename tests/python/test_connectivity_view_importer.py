@@ -7,9 +7,7 @@ import zipfile
 import xml.etree.ElementTree as ET
 from pathlib import Path
 
-from python.spike_core.connectivity_view_importer import (
-    ConnectivityViewError, _generated_svg, import_connectivity_view,
-)
+from python.spike_core.connectivity_view_importer import ConnectivityViewError, _generated_svg, import_connectivity_view
 
 
 XML = '''<?xml version="1.0"?><export><components>

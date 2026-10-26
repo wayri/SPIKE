@@ -8,16 +8,13 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 import unittest
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 from python.spike_core import script_debug
-from python.spike_core.script_debug import (
-    python_debug_command,
-    python_debug_status,
-    start_python_debug,
-)
+from python.spike_core.script_debug import python_debug_command, python_debug_status, start_python_debug
 
 
 DESIGN = {
@@ -338,6 +335,38 @@ class PythonDebugTest(unittest.TestCase):
         rejected = self.await_status(str(nonfinite["session_id"]), {"failed"})
         self.assertIn("non-finite", rejected["stderr"])
         self.assertIsNone(rejected.get("published_result"))
+
+    def test_exception_reporting_does_not_trace_debugger_bookkeeping(self):
+        child = script_debug._script_debug_child
+        directory = self.root / "reporting-session"
+        directory.mkdir()
+        (directory / "commands").mkdir()
+        session = child.DebugSession(directory, {
+            "session_id": "reporting-session", "token": "test-token",
+            "filename": str(self.root / "exception.py"),
+            "working_directory": str(self.root), "deadline": time.time() + 10,
+            "code": "raise ValueError('reporting regression')\n",
+        })
+        original_directory = Path.cwd()
+        real_print_exc = traceback.print_exc
+        traces = []
+
+        def report_exception(*args, **kwargs):
+            traces.append(sys.gettrace())
+            real_print_exc(*args, **kwargs)
+
+        try:
+            with patch.object(child.threading, "Thread"), \
+                    patch.object(child.traceback, "print_exc", side_effect=report_exception):
+                self.assertEqual(session.run(), 1)
+        finally:
+            sys.settrace(None)
+            os.chdir(original_directory)
+        self.assertEqual(traces, [None])
+        state = script_debug._read_json(directory / "state.json")
+        self.assertEqual(state["status"], "failed")
+        self.assertIn("ValueError: reporting regression",
+                      (directory / "stderr.txt").read_text(encoding="utf-8"))
 
     def test_parent_rejects_result_for_another_board(self):
         code = """spike.publish_result({

@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import assembly_tetra_structural as structural
+from python.spike_core.solvers.mechanics.elasticity import assembly_tetra_structural as structural
 from tests.python.test_assembly_tetra_thermal import cube, faces_at
 
 

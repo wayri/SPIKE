@@ -10,7 +10,7 @@ import time
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from python.spike_core.acceleration import assemble_graph_laplacian
+from python.spike_core.solvers.execution.resources.acceleration import assemble_graph_laplacian
 from python.spike_core.compute_policy import cpu_thread_budget
 
 parser = argparse.ArgumentParser()

@@ -13,6 +13,7 @@ export type AppSettings = {
   interfaceMode: InterfaceMode;
   viewportBackground: "dark" | "light" | "amoled";
   viewportGrid: boolean;
+  viewportOriginAxes: boolean;
   renderQuality: "balanced" | "quality" | "performance";
   maximumFps: 30 | 60 | 120;
   antialiasing: boolean;
@@ -25,7 +26,10 @@ export type AppSettings = {
   solverMemoryFraction: number;
   solverMemoryLimitGb: number;
   restoreWorkspace: boolean;
+  /** Legacy preference retained for migration. Project recovery uses autoBackup*. */
   autosaveMinutes: 0 | 1 | 5 | 10 | 30;
+  autoBackupEnabled: boolean;
+  autoBackupMinutes: 1 | 5 | 10 | 15 | 30 | 60;
   telemetry: "off" | "crash-only";
   profile: { displayName: string; initials: string };
 };
@@ -41,6 +45,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   interfaceMode: "clean",
   viewportBackground: "dark",
   viewportGrid: true,
+  viewportOriginAxes: true,
   renderQuality: "balanced",
   maximumFps: 60,
   antialiasing: true,
@@ -54,6 +59,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   solverMemoryLimitGb: 2,
   restoreWorkspace: true,
   autosaveMinutes: 5,
+  autoBackupEnabled: true,
+  autoBackupMinutes: 5,
   telemetry: "off",
   profile: { displayName: "SPIKE User", initials: "USR" },
 };
@@ -86,7 +93,10 @@ export function loadAppSettings(): AppSettings {
       ribbonVisible: saved.interfaceMode === "classic" && saved.ribbonVisible === true,
       uiScale: typeof saved.uiScale === "number" && Number.isFinite(saved.uiScale) ? Math.max(.65, Math.min(1.5, saved.uiScale)) : 1,
       viewportBackground: saved.viewportBackground === "amoled" ? "amoled" : saved.viewportBackground === "light" ? "light" : "dark",
+      viewportOriginAxes: typeof saved.viewportOriginAxes === "boolean" ? saved.viewportOriginAxes : true,
       viewportGrid: typeof saved.viewportGrid === "boolean" ? saved.viewportGrid : true,
+      autoBackupEnabled: typeof saved.autoBackupEnabled === "boolean" ? saved.autoBackupEnabled : saved.autosaveMinutes === 0 ? false : DEFAULT_SETTINGS.autoBackupEnabled,
+      autoBackupMinutes: ([1,5,10,15,30,60].includes(Number(saved.autoBackupMinutes)) ? Number(saved.autoBackupMinutes) : [1,5,10,30].includes(Number(saved.autosaveMinutes)) ? Number(saved.autosaveMinutes) : DEFAULT_SETTINGS.autoBackupMinutes) as AppSettings["autoBackupMinutes"],
       solverMemoryLimitGb,
       profile: {
         displayName: typeof saved.profile?.displayName === "string" ? saved.profile.displayName : DEFAULT_SETTINGS.profile.displayName,

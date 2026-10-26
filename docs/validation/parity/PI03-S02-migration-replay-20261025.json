@@ -1,0 +1,45 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "PI03-S02",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "d5ca375c71a9987dab8bcf13419973a487dbcc2ba9257a5009777ceb80f15e05",
+    "python/spike_core/solvers/power_integrity/pdn/pdn_decap_corners.py": "275b1af87c38157ae854502ac07343ba0a606d4c333345fb784cc5032c600a17",
+    "python/spike_core/solvers/power_integrity/pdn/pdn_network.py": "bef8c2d2f460e4b39227604b67565fd8473ab50438ee368e7c7873bd94520bcb",
+    "python/spike_core/service_pdn_network.py": "26650a0935b8e78e594239a2fd3e7e333e901ea8167b22dbaf098f2ea43b0f43",
+    "tests/python/test_pdn_decap_corners.py": "fffed618b664c83aade51ae5552da6b9d7e8505a9f8787aae4adddb60c58b8de",
+    "tests/python/test_pdn_decap_corners_contract.py": "9a6f797e9bf1204e0cb25094f57d58638054aef335ac3408abd87097fd6be7ee",
+    "examples/pdn_decap_corners/run_corners.py": "1a66d0f19797846581106ec6f1d0dfccd65259522903cf29ccc1f9306e8a1a8b",
+    "schemas/pdn-network-request-v1.schema.json": "89fc9091507d0d04500a64358c1621754e8e1de67ae35985da14ff11012e28cf",
+    "schemas/pdn-decap-corners-request-v1.schema.json": "5da61873067460fbee862ecc0232507158810f7e9edb64bbb9ac59b037a01d9d",
+    "schemas/pdn-decap-corners-result-v1.schema.json": "a015a5a17b848a9a9856bd19b3bd6b07b80fc569facba23a36ef11f64d2f8905",
+    "python/spike_core/solvers/power_integrity/pdn/pdn_decap_selection.py": "ce8d0b779f3eb59426a263973ab0586c4e33679e58bbf6c9a9f29c397cbe85de",
+    "tests/python/test_pdn_decap_selection.py": "2c77266004cd8ec34cbc8954fabc0dd4466ea1258e580f5d39c9d08f153d125a",
+    "tests/python/test_pdn_decap_selection_contract.py": "fafa90f697e27d5d7c85ee515d7d21cf039206d56cd495e25e2bed683352870c",
+    "schemas/pdn-decap-selection-request-v1.schema.json": "cc927c01c4067a1511390abb34130d89162ab6938fed22a71b331d69df57e9cf",
+    "schemas/pdn-decap-selection-result-v1.schema.json": "9928eef282793fee1e540544eef1e4752d68bc15651e0cd46957b39f368ba4b9"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_all_constraint_reasons_and_zero_admissible_failure",
+      "tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_cancel_or_later_numerical_failure_discards_earlier_winner",
+      "tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_excluded_invalid_options_and_strict_money_count_domain",
+      "tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_location_dependent_twoport_nodal_oracle",
+      "tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_manual_enumeration_scalar_oracle_and_lexicographic_winner",
+      "tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_part_identity_order_invariance_and_collision_safe_mapping",
+      "tests.python.test_pdn_decap_selection.PdnDecapSelectionTests.test_resource_preflight_and_aggregate_work_before_solving",
+      "tests.python.test_pdn_decap_selection_contract.DecapSelectionContractTests.test_actual_worker_complete_search_schema_and_independent_ranking",
+      "tests.python.test_pdn_decap_selection_contract.DecapSelectionContractTests.test_schema_and_worker_reject_unknown_boolean_inconsistent_and_missing_part",
+      "tests.python.test_pdn_decap_selection_contract.DecapSelectionContractTests.test_unsatisfied_targets_retained_and_no_constraint_feasible_error"
+    ],
+    "run": 10,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/PI03-S02-migration-replay-20261025.log",
+  "log_sha256": "85d5fe7dfa4b1612115e9439c71b3a6c37dabd3595cbcef823a868f696f9f5ac"
+}

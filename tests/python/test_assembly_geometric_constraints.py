@@ -4,10 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from python.spike_core.assembly_geometric_constraints import (
-    AssemblyGeometricConstraintError,
-    apply_single_geometric_constraint,
-)
+from python.spike_core.assembly_geometric_constraints import AssemblyGeometricConstraintError, apply_single_geometric_constraint
 from python.spike_core.spider_v2 import AssemblyIRV1
 
 

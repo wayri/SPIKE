@@ -107,7 +107,7 @@ location and inherited ACLs.
 
 `engine-input/run_openems.py` is an inspectable export for review and
 reproduction. It is not the executed program. At run time SPIKE reads the
-trusted payload from `python/spike_core/openems_adapter_source.py`, verifies that
+trusted payload from `python/spike_core/solvers/external_engines/openems/openems_adapter_source.py`, verifies that
 the prepared job names the same adapter-source revision, authenticates the job
 and geometry, and embeds those verified in-memory snapshots into the trusted
 source sent to an isolated Python interpreter over stdin. The child does not
@@ -284,7 +284,7 @@ resident-memory controls. The 16 GiB limit is an output quota, not a RAM limit.
 - The HMAC protects against case-directory edits and accidental corruption. It
   is not a defense against compromise of the same user account or SPIKE state.
 - SPIKE executes the trusted source from
-  `python/spike_core/openems_adapter_source.py` over isolated stdin. The exported
+  `python/spike_core/solvers/external_engines/openems/openems_adapter_source.py` over isolated stdin. The exported
   `run_openems.py` is never an execution authority.
 - Engine logs are artifacts and must not be interpreted as trusted HTML.
 - SPIKE does not bundle openEMS. The [openEMS solver](https://github.com/thliebig/openEMS)

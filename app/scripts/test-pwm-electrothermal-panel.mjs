@@ -60,7 +60,7 @@ assert.throws(() => panelModule.buildPwmElectrothermalRequest({ ...defaultDraft,
 
 const backendScript = [
   "import importlib.util, json, sys",
-  "spec = importlib.util.spec_from_file_location('spike_pwm', 'python/spike_core/pwm_electrothermal.py')",
+  "spec = importlib.util.spec_from_file_location('spike_pwm', 'python/spike_core/solvers/thermal_fluid/electrothermal/pwm_electrothermal.py')",
   "module = importlib.util.module_from_spec(spec)",
   "spec.loader.exec_module(module)",
   "print(json.dumps(module.validate_pwm_electrothermal(json.load(sys.stdin)), allow_nan=False))",

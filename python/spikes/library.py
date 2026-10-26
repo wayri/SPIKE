@@ -6,13 +6,13 @@ import re
 from typing import Any, Iterable, Mapping
 
 try:
-    from python.spike_core.native_mna import REQUEST_CONTRACT as NATIVE_REQUEST_CONTRACT
-    from python.spike_core.native_mna import validate_native_mna_request
+    from python.spike_core.solvers.circuits.models.native_mna import REQUEST_CONTRACT as NATIVE_REQUEST_CONTRACT
+    from python.spike_core.solvers.circuits.models.native_mna import validate_native_mna_request
 except ModuleNotFoundError as exc:
     if exc.name != "python":
         raise
-    from spike_core.native_mna import REQUEST_CONTRACT as NATIVE_REQUEST_CONTRACT
-    from spike_core.native_mna import validate_native_mna_request
+    from spike_core.solvers.circuits.models.native_mna import REQUEST_CONTRACT as NATIVE_REQUEST_CONTRACT
+    from spike_core.solvers.circuits.models.native_mna import validate_native_mna_request
 
 from .library_contracts import (
     ELABORATION_CONTRACT,

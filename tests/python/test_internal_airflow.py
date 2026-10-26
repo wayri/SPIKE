@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 from scipy.linalg import expm
 
-from python.spike_core.internal_airflow import run_internal_airflow
+from python.spike_core.solvers.thermal_fluid.flow.internal_airflow import run_internal_airflow
 from python.spike_core.multiboard_identity import canonical_json_digest
 
 

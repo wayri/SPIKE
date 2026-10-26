@@ -10,7 +10,7 @@ import sys
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
-from python.spike_core.multi_excitation_network import solve_multi_excitation
+from python.spike_core.solvers.electromagnetics.fields.multi_excitation_network import solve_multi_excitation
 
 
 def run(case):

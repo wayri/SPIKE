@@ -2,8 +2,8 @@
 import copy
 import unittest
 
-from python.spike_core.assembly_tetra_transient import run_assembly_tetra_transient
-from python.spike_core.thermal_accuracy import run_time_refinement
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient import run_assembly_tetra_transient
+from python.spike_core.solvers.thermal_fluid.heat.thermal_accuracy import run_time_refinement
 from tests.python.test_assembly_tetra_transient import one_dof, insulated, settings
 from tests.python.test_assembly_field_handoff import fixture
 
@@ -54,7 +54,7 @@ class ThermalAccuracyTests(unittest.TestCase):
 
     def test_worker_occurrence_binding_and_mcp_registry(self):
         from python.spike_core.service_assembly_field import handle_assembly_field_request
-        from python.spike_core.assembly_field_transient import verify_assembly_field_transient_result
+        from python.spike_core.solvers.execution.coupling.assembly_field_transient import verify_assembly_field_transient_result
         from python.spike_core.mcp_server import TOOLS
         raw, problem = fixture()
         setup = settings(material='slab', initial=300.)

@@ -5,7 +5,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.openfoam_multiregion_fixture import build_board_package_air_contact_fixture, build_solid_vacuum_fixture, build_two_region_slab_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_fixture import build_board_package_air_contact_fixture, build_solid_vacuum_fixture, build_two_region_slab_fixture
 
 
 ROOT = Path(__file__).resolve().parents[2]

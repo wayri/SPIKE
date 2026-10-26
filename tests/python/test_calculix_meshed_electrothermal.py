@@ -15,15 +15,13 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_thermal_components import promote_thermal_components
-from python.spike_core.assembly_thermal_meshing import run_assembly_thermal_mesh
-from python.spike_core.assembly_thermal_autolink import autolink_assembly_thermal_contacts
-from python.spike_core.calculix_runtime import probe_calculix_runtime
-from python.spike_core.calculix_thermal import run_calculix_thermal
-from python.spike_core.multiboard_circuit import compile_multiboard_circuit
-from python.spike_core.multiboard_volume_electrothermal import (
-    prepare_multiboard_volume_electrothermal, run_multiboard_volume_electrothermal,
-    verify_multiboard_volume_electrothermal_result)
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_components import promote_thermal_components
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import run_assembly_thermal_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_autolink import autolink_assembly_thermal_contacts
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
+from python.spike_core.solvers.external_engines.calculix.calculix_thermal import run_calculix_thermal
+from python.spike_core.solvers.circuits.models.multiboard_circuit import compile_multiboard_circuit
+from python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal import prepare_multiboard_volume_electrothermal, run_multiboard_volume_electrothermal, verify_multiboard_volume_electrothermal_result
 from tests.python import test_assembly_joint_thermal_mesh as joint_fixture
 from tests.python.test_assembly_thermal_meshing import has_runtime
 from tests.python.test_thermal_component_promotion import pure_fixture
@@ -108,7 +106,7 @@ class CalculixMeshedElectrothermalTests(unittest.TestCase):
         original = copy.deepcopy(request)
         prepared = prepare_multiboard_volume_electrothermal(request)
         # Wrap the real solver to prove every feedback phase invokes CalculiX.
-        with patch('python.spike_core.calculix_thermal.run_calculix_thermal', wraps=run_calculix_thermal) as actual_ccx:
+        with patch('python.spike_core.solvers.external_engines.calculix.calculix_thermal.run_calculix_thermal', wraps=run_calculix_thermal) as actual_ccx:
             result = run_multiboard_volume_electrothermal(request)
         self.assertEqual(request, original)
         self.assertGreater(len(result['history']), 1)
@@ -150,8 +148,8 @@ class CalculixMeshedElectrothermalTests(unittest.TestCase):
         self.assertAlmostEqual(math.fsum(result['cell_deposited_power_w'][cid] for cid in owner_cells[package]), device['average_power_w'], places=12)
         self.assertTrue(all(result['cell_deposited_power_w'][cid] == 0 for cid in owner_cells['board-a']))
         saved = json.loads(json.dumps({'request': request, 'result': result}, allow_nan=False))
-        with (patch('python.spike_core.calculix_thermal.run_calculix_thermal', side_effect=AssertionError('offline: no CCX')),
-              patch('python.spike_core.multiboard_volume_electrothermal.run_native_mna', side_effect=AssertionError('offline: no MNA'))):
+        with (patch('python.spike_core.solvers.external_engines.calculix.calculix_thermal.run_calculix_thermal', side_effect=AssertionError('offline: no CCX')),
+              patch('python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal.run_native_mna', side_effect=AssertionError('offline: no MNA'))):
             admitted = verify_multiboard_volume_electrothermal_result(saved['request'], saved['result'])
         self.assertEqual(admitted, saved['result'])
 

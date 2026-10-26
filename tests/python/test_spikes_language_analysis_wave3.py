@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from python.spike_core.native_mna import run_native_mna
+from python.spike_core.solvers.circuits.models.native_mna import run_native_mna
 from python.spikes.advanced_analyses import (
     NOISE_RESULT_CONTRACT,
     POLE_ZERO_RESULT_CONTRACT,

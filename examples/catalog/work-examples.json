@@ -1,0 +1,897 @@
+{
+  "contract": "spike/work-example-catalog/v1",
+  "license": "Apache-2.0 for this index. Each source fixture retains its own license.",
+  "statusMeaning": {
+    "runnable": "Executable source workflow with listed dependencies; availability is not checked by this catalog.",
+    "setup-only": "Input or stageable draft; runtime, binding or explicit preparation is still required.",
+    "saved-evidence": "Retained source/results for inspection; no new run or qualification is inferred.",
+    "guide": "Opens an existing workflow library with its own entry-level status and prerequisites."
+  },
+  "examples": [
+      {
+        "id": "promo-ebrake",
+        "title": "EBrake PCB: 600 s saved thermal history",
+        "category": "PCB temperature",
+        "status": "saved-evidence",
+        "summary": "Authentic owner-authorized board, complete thermal inputs and 16 saved frames; no new execution.",
+        "engine": "Approximate layered board thermal",
+        "dependencies": "Matching SPIKE project/worker contracts for review; explicit reruns require the listed engine and runtime",
+        "primaryAction": "project",
+        "projectAsset": "examples/promo_release/projects/ebrake-transient.spike.json",
+        "assets": [
+          "examples/promo_release/projects/ebrake-transient.spike.json",
+          "examples/promo_release/DEMO_BOARD_PROVENANCE.md",
+          "examples/promo_release/ORIGINAL_START_HERE.md",
+          "examples/promo_release/original-integration-verification.json",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Open this project and resolve any unsaved-changes prompt.",
+          "Choose Thermal and the layered board thermal panel; inspect the retained setup.",
+          "Scrub 0-600 s saved board frames, or explicitly rerun after reviewing materials and cooling."
+        ],
+        "limits": "Loads, material properties and cooling are illustrative. Part case/junction values are steady estimates; package model binaries and convergence/hardware validation are not supplied.",
+        "license": "Apache-2.0; original SPIKE-owned setup and generated results; source/package hashes and notices retained"
+      },
+      {
+        "id": "promo-case-contact",
+        "title": "Hollow case: finite thermal contact",
+        "category": "Case cooling",
+        "status": "saved-evidence",
+        "summary": "Complete original PCB/case thermal mesh and 25 saved frames over 120 s; peak board 303.413 K.",
+        "engine": "Experimental tetrahedral transient solid thermal",
+        "dependencies": "Matching SPIKE project/worker contracts for review; explicit reruns require the listed engine and runtime",
+        "primaryAction": "project",
+        "projectAsset": "examples/promo_release/projects/case-contact.spike.json",
+        "assets": [
+          "examples/promo_release/projects/case-contact.spike.json",
+          "examples/promo_release/original-case.step",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Open this project; choose Multi-board / Assembly volume field study.",
+          "Inspect h=500 W/(m2 K) contact, 0.2 W heat and prescribed external cooling.",
+          "Scrub the saved solid temperatures; compare the separate poor-contact project."
+        ],
+        "limits": "Empty cavity has no solved air. Exact STEP is a companion requiring explicit CAD relinking; saved thermal mesh/results open independently. Unmeasured illustrative inputs; no convergence or hardware qualification.",
+        "license": "Apache-2.0; original SPIKE-owned setup and generated results; source/package hashes and notices retained"
+      },
+      {
+        "id": "promo-poor-contact",
+        "title": "Hollow case: poor contact comparison",
+        "category": "Case cooling",
+        "status": "saved-evidence",
+        "summary": "Same original thermal geometry and power, h=5 W/(m2 K) contact; saved peak board 318.876 K.",
+        "engine": "Experimental tetrahedral transient solid thermal",
+        "dependencies": "Matching SPIKE project/worker contracts for review; explicit reruns require the listed engine and runtime",
+        "primaryAction": "project",
+        "projectAsset": "examples/promo_release/projects/poor-contact.spike.json",
+        "assets": [
+          "examples/promo_release/projects/poor-contact.spike.json",
+          "examples/promo_release/original-case.step",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Open this project; choose Multi-board / Assembly volume field study.",
+          "Review the weaker finite contact with unchanged power and external cooling.",
+          "Scrub the complete 120 s saved history and compare the good-contact case."
+        ],
+        "limits": "Solid thermal with a convection boundary, not enclosure CFD/CHT. STEP companion needs explicit relinking for CAD display; all thermal arrays remain. Illustrative, unqualified inputs.",
+        "license": "Apache-2.0; original SPIKE-owned setup and generated results; source/package hashes and notices retained"
+      },
+      {
+        "id": "promo-planar-pm",
+        "title": "Planar PM machine: saved field and motion history",
+        "category": "Magnetic machines",
+        "status": "saved-evidence",
+        "summary": "Original prescribed-current planar magnetic study with complete final fields and retained angle/torque histories.",
+        "engine": "Experimental planar PM FEM",
+        "dependencies": "Matching SPIKE project/worker contracts for review; explicit reruns require the listed engine and runtime",
+        "primaryAction": "project",
+        "projectAsset": "examples/promo_release/projects/planar-pm.spike.json",
+        "assets": [
+          "examples/promo_release/projects/planar-pm.spike.json",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Open this project; choose EM / Machines.",
+          "Expand Geometry field study and inspect the supplied currents and geometry.",
+          "Review B/H/A, final fields and retained histories; explicitly run only after setup review."
+        ],
+        "limits": "Planar study, not a solved 3D magnetic volume. No field-frame playback, controller coupling or voltage-driven spatial motor is inferred. Materials and operating assumptions are illustrative.",
+        "license": "Apache-2.0; original SPIKE-owned setup and generated results; source/package hashes and notices retained"
+      },
+      {
+        "id": "promo-motor",
+        "title": "PM DC motor: reduced dynamics and energy",
+        "category": "Magnetic machines",
+        "status": "saved-evidence",
+        "summary": "Original voltage-driven reduced PM DC motor, retained speed/current response and energy ledger.",
+        "engine": "Reduced PM DC motor reference",
+        "dependencies": "Matching SPIKE project/worker contracts for review; explicit reruns require the listed engine and runtime",
+        "primaryAction": "project",
+        "projectAsset": "examples/promo_release/projects/motor.spike.json",
+        "assets": [
+          "examples/promo_release/projects/motor.spike.json",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Open this project; choose EM / Machines.",
+          "Expand Parameter reference models and review the saved PM DC inputs.",
+          "Inspect current, speed, torque and energy histories before an explicit rerun."
+        ],
+        "limits": "Reduced parameter model independent of planar FEM and Studio controllers. No three-phase BLDC/FOC, field extraction or physical qualification.",
+        "license": "Apache-2.0; original SPIKE-owned setup and generated results; source/package hashes and notices retained"
+      },
+      {
+        "id": "promo-electromagnet",
+        "title": "Electromagnet: supplied core permeability",
+        "category": "Magnetic machines",
+        "status": "saved-evidence",
+        "summary": "Original linear reluctance reference with supplied relative permeability 2000 and retained result.",
+        "engine": "Linear reluctance reference",
+        "dependencies": "Matching SPIKE project/worker contracts for review; explicit reruns require the listed engine and runtime",
+        "primaryAction": "project",
+        "projectAsset": "examples/promo_release/projects/electromagnet.spike.json",
+        "assets": [
+          "examples/promo_release/projects/electromagnet.spike.json",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Open this project; choose EM / Machines / Parameter reference models.",
+          "Review geometry parameters, current and supplied permeability 2000.",
+          "Compare the saved quantities with the separate air-permeability project."
+        ],
+        "limits": "Reduced linear model; no saturation, actual B-H evidence, PCB spiral/core geometry extraction or transient spatial field claim.",
+        "license": "Apache-2.0; original SPIKE-owned setup and generated results; source/package hashes and notices retained"
+      },
+      {
+        "id": "promo-electromagnet-air",
+        "title": "Electromagnet: air permeability comparison",
+        "category": "Magnetic machines",
+        "status": "saved-evidence",
+        "summary": "Same original reduced reference with relative permeability 1, retaining its own inputs and result.",
+        "engine": "Linear reluctance reference",
+        "dependencies": "Matching SPIKE project/worker contracts for review; explicit reruns require the listed engine and runtime",
+        "primaryAction": "project",
+        "projectAsset": "examples/promo_release/projects/electromagnet-air.spike.json",
+        "assets": [
+          "examples/promo_release/projects/electromagnet-air.spike.json",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Open this project; choose EM / Machines / Parameter reference models.",
+          "Review the explicitly supplied air-like permeability 1.",
+          "Compare with the core-permeability reference without treating either as a 3D PCB inductor."
+        ],
+        "limits": "Linear reluctance comparison only; no geometry-resolved inductor extraction, material qualification or invented field samples.",
+        "license": "Apache-2.0; original SPIKE-owned setup and generated results; source/package hashes and notices retained"
+      },
+      {
+        "id": "promo-solenoid-setup",
+        "title": "Planar solenoid: original setup request",
+        "category": "Magnetic machines",
+        "status": "setup-only",
+        "summary": "Original stationary nonlinear planar solenoid request; the large full result is available only in the source promo collection.",
+        "engine": "Experimental stationary planar magnetic/eddy/thermal",
+        "dependencies": "Source checkout, matching SPIKE magnetic study API and numerical runtime; explicit preparation and run",
+        "primaryAction": "download",
+        "assets": [
+          "examples/promo_release/solenoid-request.json",
+          "examples/promo_release/original-electrical-provenance.json",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "steps": [
+          "Save and inspect the original request and source provenance.",
+          "Review supplied B-H, stationary geometry and transient assumptions in the source workflow.",
+          "Prepare the matching magnetic study explicitly; this bundle includes no completed solenoid result."
+        ],
+        "limits": "Full saved projection exceeds 14 MiB and is omitted, not trimmed or replaced with a fake fixture. No bundled execution, physical qualification or moving spatial motor/controller coupling is claimed.",
+        "license": "Apache-2.0; original SPIKE request; no solver binaries"
+      },
+      {
+        "id": "promo-electric-capture",
+        "title": "Computed E field lines: preview capture",
+        "category": "Viewport capture guides",
+        "status": "guide",
+        "summary": "Original two-substrate box field study shown in a retained browser viewport capture; separate from the PCB and machine projects.",
+        "engine": "Existing openEMS samples / VTK presentation curves",
+        "dependencies": "Picture and provenance inspection is offline; full original source artifact pack is needed for field-data replay",
+        "primaryAction": "download",
+        "assets": [
+          "examples/promo_release/capture-verification.json",
+          "examples/promo_release/field-line-execution.json",
+          "examples/promo_release/FIELD_LINE_METHOD_REVIEW.md",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "preview": {
+          "asset": "examples/promo_release/pictures/electric-field-lines.png",
+          "alt": "Computed electric E field lines around original box geometry in the beta viewport browser preview",
+          "caption": "25 Oct 2026 browser preview of BoardViewport; not installed desktop capture. Frozen phase, independently normalized relative amplitude."
+        },
+        "steps": [
+          "Inspect the picture and original capture receipt.",
+          "Read the field-line method review, exact source hash and raw DFT limitations.",
+          "Use the source artifact pack for actual field arrays; this guide only bundles captures and provenance."
+        ],
+        "limits": "Presentation curves through existing 1.5 GHz samples, not wave propagation, solver-returned paths or new execution. Absolute field amplitudes remain unresolved; this guide contains no full field arrays or installed-app acceptance.",
+        "license": "Apache-2.0; original SPIKE two-substrate geometry, generated visualization and UI capture; no third-party CAD"
+      },
+      {
+        "id": "promo-magnetic-capture",
+        "title": "Computed H field lines: preview capture",
+        "category": "Viewport capture guides",
+        "status": "guide",
+        "summary": "Original two-substrate box field study shown in a retained browser viewport capture; separate from the PCB and machine projects.",
+        "engine": "Existing openEMS samples / VTK presentation curves",
+        "dependencies": "Picture and provenance inspection is offline; full original source artifact pack is needed for field-data replay",
+        "primaryAction": "download",
+        "assets": [
+          "examples/promo_release/capture-verification.json",
+          "examples/promo_release/field-line-execution.json",
+          "examples/promo_release/FIELD_LINE_METHOD_REVIEW.md",
+          "examples/promo_release/README.md",
+          "examples/promo_release/provenance.json",
+          "examples/promo_release/LICENSE",
+          "examples/promo_release/NOTICE"
+        ],
+        "preview": {
+          "asset": "examples/promo_release/pictures/magnetic-field-lines.png",
+          "alt": "Computed magnetic H field lines around original box geometry in the beta viewport browser preview",
+          "caption": "25 Oct 2026 browser preview of BoardViewport; not installed desktop capture. Frozen phase, independently normalized relative amplitude."
+        },
+        "steps": [
+          "Inspect the picture and original capture receipt.",
+          "Read the field-line method review, exact source hash and raw DFT limitations.",
+          "Use the source artifact pack for actual field arrays; this guide only bundles captures and provenance."
+        ],
+        "limits": "Presentation curves through existing 1.5 GHz samples, not wave propagation, solver-returned paths or new execution. Absolute field amplitudes remain unresolved; this guide contains no full field arrays or installed-app acceptance.",
+        "license": "Apache-2.0; original SPIKE two-substrate geometry, generated visualization and UI capture; no third-party CAD"
+      },
+    {
+      "id": "pi-dc",
+      "title": "DC voltage drop on a copper trace",
+      "category": "Power integrity",
+      "status": "runnable",
+      "summary": "A 10 mm synthetic copper trace, 5 V source and 1 A load, with an independent resistance check.",
+      "engine": "Routed-copper DC",
+      "dependencies": "Python 3.11+ source checkout with development dependencies and a matching built SPIKE native module",
+      "primaryAction": "download",
+      "assets": [
+        "examples/tutorial_pi_si/straight_trace.design.json"
+      ],
+      "steps": [
+        "Save the canonical trace and import it through the canonical source importer.",
+        "Review VCC, source (0,0,F.Cu) and load (10,0,F.Cu), then explicitly run DC.",
+        "Compare the load drop with 4.926108 mV and inspect conservation and model status."
+      ],
+      "limits": "Supply-path approximation only; no return conductor, contact model or manufactured-board validation.",
+      "command": "python -m python.spike_core.cli --output build/example-result.json analyze-dc examples/tutorial_pi_si/straight_trace.design.json --net VCC --source 0,0,F.Cu,5 --load 10,0,F.Cu,1 --mesh-size-mm 2",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "pi-ac",
+      "title": "AC R/L impedance sweep",
+      "category": "Power integrity",
+      "status": "runnable",
+      "summary": "Use the same original trace for a bounded five-point driving-point impedance sweep.",
+      "engine": "PEEC AC",
+      "dependencies": "Python 3.11+ source checkout with development dependencies and a matching built SPIKE native module",
+      "primaryAction": "download",
+      "assets": [
+        "examples/tutorial_pi_si/straight_trace.design.json"
+      ],
+      "steps": [
+        "Import the canonical trace and review explicit source and load endpoints.",
+        "Set 1 MHz to 1 GHz, five points and capacitance model none.",
+        "Inspect complex R/L impedance, rejected modes and blocked uses."
+      ],
+      "limits": "No qualified C or G, characteristic impedance, propagation delay or transmission-line S-parameters.",
+      "command": "python -m python.spike_core.cli --output build/example-result.json analyze-ac examples/tutorial_pi_si/straight_trace.design.json --net VCC --source 0,0,F.Cu,source --load 10,0,F.Cu,load --start-hz 1000000 --stop-hz 1000000000 --points 5 --mesh-size-mm 2 --capacitance-model none",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "pi-transient",
+      "title": "Copper load-step transient",
+      "category": "Power integrity",
+      "status": "runnable",
+      "summary": "Apply a finite-rise current step and inspect the returned load-voltage frames.",
+      "engine": "PEEC transient",
+      "dependencies": "Python 3.11+ source checkout with development dependencies and a matching built SPIKE native module",
+      "primaryAction": "download",
+      "assets": [
+        "examples/tutorial_pi_si/straight_trace.design.json"
+      ],
+      "steps": [
+        "Review the trace, 5 V source and 1 A final load.",
+        "Run the declared 8 us observation window and inspect solver timestep advice.",
+        "Refine timestep before interpreting transient peak; compare final voltage with 4.995074 V."
+      ],
+      "limits": "The historical 0.2 us step exceeds the solver recommendation; execution is not timestep convergence.",
+      "command": "python -m python.spike_core.cli --output build/example-result.json analyze-transient examples/tutorial_pi_si/straight_trace.design.json --net VCC --source 0,0,F.Cu,5 --load 10,0,F.Cu,1 --source-waveform constant --load-waveform step,0,2e-6,1e-6 --stop-time-s 8e-6 --time-step-s 2e-7 --capacitance-model none --mesh-size-mm 2",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "pi-rc",
+      "title": "RC PDN frequency and ramp reference",
+      "category": "Power integrity",
+      "status": "runnable",
+      "summary": "A supplied RC network with a closed-form reference, named return and load port.",
+      "engine": "Owned PDN network",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/tutorial_pi_si/rc-pdn.request.json"
+      ],
+      "steps": [
+        "Review named nodes, GND reference and supplied component values.",
+        "Open Power Tree > AC PDN / CM-DM filters and author the supplied network, or run the CLI.",
+        "Inspect frequency impedance and transient voltage deviation against the declared RC assumptions."
+      ],
+      "limits": "Small-signal supplied network, not regulator operating-point extraction or measured PDN.",
+      "command": "python -m python.spike_core.cli --output build/example-result.json pdn-network examples/tutorial_pi_si/rc-pdn.request.json",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "pi-rlc",
+      "title": "RLC PDN pulse and decap ringing",
+      "category": "Power integrity",
+      "status": "runnable",
+      "summary": "Explicit source R/L, two decaps with ESR/ESL and a finite-rise 2 A pulse.",
+      "engine": "Owned PDN network",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/tutorial_pi_si/rlc-pdn.request.json"
+      ],
+      "steps": [
+        "Review the source impedance, two decaps and 4 us observation window.",
+        "Run the supplied request; retain the result separately from the setup.",
+        "Inspect driving impedance, pulse voltage deviation, energy and a timestep-halved rerun."
+      ],
+      "limits": "Original assumed parts; no automatic bias model, physical placement or settled-state claim.",
+      "command": "python -m python.spike_core.cli --output build/example-result.json pdn-network examples/tutorial_pi_si/rlc-pdn.request.json",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "si-cdr",
+      "title": "Simple 10.3125 GBd NRZ and CDR",
+      "category": "Signal integrity",
+      "status": "runnable",
+      "summary": "A matched ideal 1 cm line with finite transmitter edges and a loaded receiver.",
+      "engine": "Source-to-receiver SI",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/si/10g-nrz-cdr.json",
+        "examples/si/README.md"
+      ],
+      "steps": [
+        "Open HF / SI > S-parameters > Source-to-receiver workflow.",
+        "Review port order, reference impedance, transmitter and 0.25 V receiver threshold.",
+        "Run explicitly and inspect waveform, eye and returned timing-recovery state."
+      ],
+      "limits": "Ideal numerical fixture; an open eye or tracking CDR does not establish Ethernet compliance.",
+      "command": "python -m python.spike_core.cli --output build/example-result.json si-workflow examples/si/10g-nrz-cdr.json",
+      "license": "MIT; original SigHarmonic fixture; companion guide Apache-2.0"
+    },
+    {
+      "id": "si-coupled",
+      "title": "Four-port channel, NEXT, FEXT and TDR",
+      "category": "Signal integrity",
+      "status": "runnable",
+      "summary": "A supplied analytical coupled-RLGC channel for crosstalk, loaded receiver and eye review.",
+      "engine": "Source-to-receiver SI",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/si/analytical-coupled-rlgc.json"
+      ],
+      "steps": [
+        "Review aggressor-near, victim-near, aggressor-far, victim-far physical ordering.",
+        "Run the channel and export the unloaded four-port Touchstone network.",
+        "Inspect S31 through, S21 NEXT, S41 FEXT, returned TDR and eye stages."
+      ],
+      "limits": "RLGC values are illustrative inputs, not extracted PCB geometry; no spatial E/H or protocol qualification.",
+      "command": "python -m python.spike_core.cli --output build/example-result.json si-workflow examples/si/analytical-coupled-rlgc.json --touchstone-output build/example-channel.s4p",
+      "license": "MIT; original SigHarmonic fixture"
+    },
+    {
+      "id": "si-pam3",
+      "title": "PAM3 threshold and two-eye reference",
+      "category": "Signal integrity",
+      "status": "runnable",
+      "summary": "Original three-level 20 GBd sampled-channel worker input with declared noise.",
+      "engine": "SI worker / PAM3",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/si/pam3-generic-worker.json",
+        "examples/si/README.md"
+      ],
+      "steps": [
+        "Review the worker envelope, FIR taps, thresholds and decision noise.",
+        "Pipe the JSON to the source worker using the documented PowerShell command.",
+        "Inspect both noisy eye openings and reported error statistics with their assumptions."
+      ],
+      "limits": "Not USB4 traffic, measured channel or AMI continuous-time impulse data; production_qualified remains false.",
+      "command": "Get-Content examples/si/pam3-generic-worker.json -Raw | python -m python.spike_core.service",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "si-cascade",
+      "title": "Complex physically loaded coupled cascade",
+      "category": "Signal integrity",
+      "status": "runnable",
+      "summary": "Two supplied coupled sections with physical series R/L and shunt-C endpoints.",
+      "engine": "Loaded coupled RLGC cascade",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/rlgc_loaded_cascade/physical.request.json",
+        "examples/rlgc_loaded_cascade/run_loaded.py",
+        "examples/rlgc_coupled_cascade/run_cascade.py",
+        "examples/rlgc_coupled_pair/run_pair.py",
+        "examples/rlgc_reactive_pair/run_pair.py"
+      ],
+      "steps": [
+        "Inspect the request and distinct section RLGC/lengths.",
+        "Run the original runner from its repository location.",
+        "Review terminal V/I, section fields, source work and separately owned heat."
+      ],
+      "limits": "No geometry-derived discontinuity, nonlinear endpoint, transient or thermal mapping qualification.",
+      "command": "python examples/rlgc_loaded_cascade/run_loaded.py",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "si-branches",
+      "title": "Loaded multi-branch coupled network",
+      "category": "Signal integrity",
+      "status": "runnable",
+      "summary": "A supplied ideal coupled star with explicit physical endpoint loads.",
+      "engine": "Loaded coupled RLGC star",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/rlgc_loaded_star/physical.request.json",
+        "examples/rlgc_loaded_star/run_loaded.py",
+        "examples/rlgc_coupled_star/run_star.py",
+        "examples/rlgc_coupled_pair/run_pair.py",
+        "examples/rlgc_reactive_pair/run_pair.py",
+        "examples/rlgc_coupled_cascade/run_cascade.py"
+      ],
+      "steps": [
+        "Inspect leg identity and the physical endpoint RLC assignments.",
+        "Run the original fixture runner from the repository.",
+        "Review node KCL, interface residuals, physical fields and separate terminal/branch heat."
+      ],
+      "limits": "Ideal junctions and symmetric supplied media; general graph, geometry, nonlinear and measured-board gates remain open.",
+      "command": "python examples/rlgc_loaded_star/run_loaded.py",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "si-ibis",
+      "title": "Classic IBIS driver and receiver",
+      "category": "Signal integrity",
+      "status": "setup-only",
+      "summary": "Stage an original 1 V / 50 ohm CMOS compiler oracle with a capacitive input receiver.",
+      "engine": "Experimental classic IBIS compiler; optional ngspice",
+      "dependencies": "Desktop worker for inert compile; separately admitted trusted ngspice for explicit execution",
+      "primaryAction": "ibis",
+      "assets": [
+        "examples/si/ibis_driver_receiver/request.json",
+        "examples/si/ibis_driver_receiver/original_cmos.ibs",
+        "examples/si/ibis_driver_receiver/README.md",
+        "examples/si/ibis_driver_receiver/execution_evidence.json"
+      ],
+      "steps": [
+        "Stage the inline-source request in the IBIS behavioral workbench.",
+        "Inspect compiler diagnostics and generated circuit before any trusted run.",
+        "Review runtime identity and consent; compare the recorded 20 ps and 10 ps runs."
+      ],
+      "limits": "Synthetic oracle, not a qualified vendor model. Strict 0.5 mV refinement gate remains unmet; staging never executes.",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "si-spatial",
+      "title": "Spatial victim-voltage crosstalk samples",
+      "category": "Signal integrity",
+      "status": "saved-evidence",
+      "summary": "An original 80 mm straight pair with actual returned phasors at 32 victim positions.",
+      "engine": "Supplied coupled-line solver and sampled SI viewport",
+      "dependencies": "Canonical design import; desktop SI spatial workbench; exact design/occurrence binding",
+      "primaryAction": "spatial",
+      "assets": [
+        "examples/si/spatial_crosstalk/board.spike-design.json",
+        "examples/si/spatial_crosstalk/design.json",
+        "examples/si/spatial_crosstalk/solver.json",
+        "examples/si/spatial_crosstalk/samples.json",
+        "examples/si/spatial_crosstalk/README.md"
+      ],
+      "steps": [
+        "Stage the canonical design and supplied solver/sample texts.",
+        "In Spatial crosstalk samples review aggressor/victim identities and the exact design binding; run supplied pair if normalization changed it.",
+        "Use the 3D main viewport to inspect frequency, phase/component and actual sample probes."
+      ],
+      "limits": "Supplied RLGC was not extracted from this board. Samples are RMS voltage, not surrounding electric field, radiated EMI or compliance.",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "em-antenna",
+      "title": "Antenna and radiation example projects",
+      "category": "EM / RF",
+      "status": "guide",
+      "summary": "Open retained patch/radome studies through the existing EMerge project library.",
+      "engine": "Existing EMerge library",
+      "dependencies": "Saved projects need no new solve; new solves need compatible separately installed EMerge; advanced wrappers use separate gateway",
+      "primaryAction": "emerge-library",
+      "assets": [
+        "examples/emerge/gallery/README.md"
+      ],
+      "steps": [
+        "Open the EMerge library and select patch or radome.",
+        "Inspect saved S-parameters, radiation samples and retained assumptions.",
+        "For a new run, review the compatible runtime and explicit setup before execution."
+      ],
+      "limits": "Retained physical model remains unvalidated; no calibrated gain, enclosure qualification or chamber compliance.",
+      "license": "Apache-2.0 guide; library entries preserve their individual source licenses"
+    },
+    {
+      "id": "em-filter",
+      "title": "RF filters and guided structures",
+      "category": "EM / RF",
+      "status": "guide",
+      "summary": "Discover stepped-impedance, lumped-filter and guided-structure study wrappers.",
+      "engine": "Existing EMerge library",
+      "dependencies": "Saved projects need no new solve; new solves need compatible separately installed EMerge; advanced wrappers use separate gateway",
+      "primaryAction": "emerge-library",
+      "assets": [
+        "examples/emerge/gallery/README.md"
+      ],
+      "steps": [
+        "Open the EMerge library and choose Advanced studies.",
+        "Filter for Filters or Guided structures and CAD, then save a study wrapper.",
+        "Use the separate SPIKE-Em gateway with its pinned source resources and runtime."
+      ],
+      "limits": "Wrappers are not standalone desktop runs. External resources retain their own licenses; suspended thermal studies remain unavailable.",
+      "license": "Apache-2.0 guide; library entries preserve their individual source licenses"
+    },
+    {
+      "id": "em-probe",
+      "title": "EM fields and exact saved-sample probing",
+      "category": "EM / RF",
+      "status": "guide",
+      "summary": "Inspect retained E/H planes and saved samples using the existing library.",
+      "engine": "Existing EMerge library",
+      "dependencies": "Saved projects need no new solve; new solves need compatible separately installed EMerge; advanced wrappers use separate gateway",
+      "primaryAction": "emerge-library",
+      "assets": [
+        "examples/emerge/gallery/README.md"
+      ],
+      "steps": [
+        "Open the EMerge library and select the saved patch-fields project.",
+        "Inspect returned sample coordinates and plane/frequency controls.",
+        "Probe an existing sample and review its model status and source binding."
+      ],
+      "limits": "No fabricated interpolation, measured field accuracy or EMI pass/fail; a new solve needs its declared runtime.",
+      "license": "Apache-2.0 guide; library entries preserve their individual source licenses"
+    },
+    {
+      "id": "thermal-slab",
+      "title": "3D solid conduction with surface losses",
+      "category": "Thermal / CFD",
+      "status": "runnable",
+      "summary": "Structured slab with prescribed temperature, convection and radiation.",
+      "engine": "Structured solid thermal",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/thermal/structured_slab_request.json",
+        "examples/thermal/README.md"
+      ],
+      "steps": [
+        "Review dimensions in metres, conductivity, temperature and face boundaries.",
+        "Run the bounded source CLI and retain its returned field.",
+        "Inspect conservation, residuals and refinement before using temperatures."
+      ],
+      "limits": "Not arbitrary CAD meshing, measured thermal accuracy or production qualification.",
+      "command": "python scripts/run_structured_solid_thermal.py --request examples/thermal/structured_slab_request.json --result build/example-thermal.json",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "thermal-diode",
+      "title": "Transient diode to solid thermal field",
+      "category": "Thermal / CFD",
+      "status": "runnable",
+      "summary": "A pulsed current-driven forward diode with implicit solid thermal stepping.",
+      "engine": "Structured transient diode electrothermal",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/thermal/transient_diode_field_request.json",
+        "examples/thermal/README.md"
+      ],
+      "steps": [
+        "Review the pulse, independent forward-diode reference law and cell heat map.",
+        "Run the request with the source thermal CLI.",
+        "Inspect per-step device heat deposition, nonlinear convergence and energy balance."
+      ],
+      "limits": "Not general SPICE/transistor coupling, switching loss or airflow qualification.",
+      "command": "python scripts/run_structured_solid_thermal.py --request examples/thermal/transient_diode_field_request.json --result build/example-diode-thermal.json",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "cht-channel",
+      "title": "Laminar channel conjugate heat transfer",
+      "category": "Thermal / CFD",
+      "status": "runnable",
+      "summary": "A bounded rectangular fluid region with two conducting walls.",
+      "engine": "Internal laminar channel CHT",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/thermal/laminar_channel_cht_request.json"
+      ],
+      "steps": [
+        "Review the 0.1 m channel, wall grid and declared material/flow inputs.",
+        "Run the source structured thermal CLI with the CHT request.",
+        "Inspect fluid/solid temperatures, heat transfer and convergence diagnostics."
+      ],
+      "limits": "Restricted internal channel model; not general enclosure CFD, turbulence or measured cooling performance.",
+      "command": "python scripts/run_structured_solid_thermal.py --request examples/thermal/laminar_channel_cht_request.json --result build/example-channel-cht.json",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "cht-cavity",
+      "title": "Native moving-lid cavity CHT",
+      "category": "Thermal / CFD",
+      "status": "setup-only",
+      "summary": "Review air-like and liquid-like bounded native cavity inputs and executable discovery.",
+      "engine": "Experimental native CHT",
+      "dependencies": "Source checkout; explicitly built/provided native CHT executable via SPIKE_NATIVE_CHT_EXECUTABLE",
+      "primaryAction": "download",
+      "assets": [
+        "examples/internal_cfd/native-cht-conduction.json",
+        "examples/internal_cfd/native-cht-air-like.json",
+        "examples/internal_cfd/native-cht-liquid-like.json",
+        "examples/internal_cfd/README.md"
+      ],
+      "steps": [
+        "Read the native executable build/discovery instructions.",
+        "Select the conduction or moving-flow request and run only after runtime admission.",
+        "Inspect heat, momentum and thermal residuals and refine the actual case."
+      ],
+      "limits": "Square fluid with two quarter-height solid strips; illustrative constant materials. No turbulence, buoyancy or arbitrary enclosure.",
+      "command": "python scripts/run_cfd.py --engine native-cht --request examples/internal_cfd/native-cht-air-like.json --output build/example-native-cht.json",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "assembly-contact",
+      "title": "Retained solids and thermal contact",
+      "category": "Assemblies / harness",
+      "status": "runnable",
+      "summary": "Two original homogeneous solids with explicit contact and an 80 W series-resistance oracle.",
+      "engine": "Assembly field / solid thermal",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/assembly_field/run_examples.py",
+        "examples/assembly_field/README.md"
+      ],
+      "steps": [
+        "Inspect setup(), occurrence frames, tetrahedra and explicit matched contact.",
+        "Run the original source runner and retain request/result digests.",
+        "Compare 80 W transfer, contact temperatures and local refinement identity."
+      ],
+      "limits": "Synthetic one-metre solids are not real boards/enclosures; the runner's EM handoff remains non-executable.",
+      "command": "python examples/assembly_field/run_examples.py",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "assembly-volume",
+      "title": "Multi-board reduced circuit to solid heat",
+      "category": "Assemblies / harness",
+      "status": "runnable",
+      "summary": "Original two-slab PI/SI reduced-circuit coupling with retained occurrence identity.",
+      "engine": "Multi-board volume electrothermal",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/assembly_field/run_multiboard_volume.py",
+        "examples/assembly_field/run_examples.py"
+      ],
+      "steps": [
+        "Review the original runner, logical board occurrences and reduced circuit.",
+        "Run it from the checkout with its assembly setup companion present.",
+        "Inspect explicit loss mapping, returned thermal field and coupling limitations."
+      ],
+      "limits": "Reduced circuit and supplied homogeneous solids; imported artwork does not establish distributed SI or field extraction.",
+      "command": "python -m examples.assembly_field.run_multiboard_volume",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "harness-reference",
+      "title": "Interboard harness PI and coupled SI evidence",
+      "category": "Assemblies / harness",
+      "status": "saved-evidence",
+      "summary": "A synthetic 600 mm six-conductor harness with explicit board/connector/pin identities.",
+      "engine": "Harness PI / uniform SI; separate coupled MTL",
+      "dependencies": "Saved JSON is inspectable offline; fresh runs need source worker and compatible native module",
+      "primaryAction": "download",
+      "assets": [
+        "examples/high_speed_si/harness/README.md",
+        "examples/high_speed_si/harness/evidence/assembly-view.json",
+        "examples/high_speed_si/harness/evidence/harness-document.json",
+        "examples/high_speed_si/harness/evidence/pi-request.json",
+        "examples/high_speed_si/harness/evidence/pi-result.json",
+        "examples/high_speed_si/harness/evidence/harness-si-request.json",
+        "examples/high_speed_si/harness/evidence/harness-si-result.json"
+      ],
+      "steps": [
+        "Review the original harness document and assembly connector identities.",
+        "Inspect saved requests alongside results; import only through the matching harness/assembly workflows.",
+        "For fresh execution use the source runner documented in the bundled guide."
+      ],
+      "limits": "Thin-wire quasi-TEM above an ideal infinite ground plane. Coupled MTL has no dedicated report panel; no bend, shield, radiation or BER qualification.",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "coupled-replay",
+      "title": "Co-simulation and recorded digital twin",
+      "category": "Coupled / automation",
+      "status": "runnable",
+      "summary": "Dimensionless delayed gain, voltage replay and synthetic telemetry comparison.",
+      "engine": "Fixed-grid co-simulation / recorded twin",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/cosimulation/run_demo.py",
+        "examples/cosimulation/coupled-replay.json",
+        "examples/cosimulation/recorded-twin.json",
+        "examples/cosimulation/README.md"
+      ],
+      "steps": [
+        "Keep the three source files together in their original directory.",
+        "Run the reviewed demo explicitly from the repository root.",
+        "Inspect 0,2,4,6 V outputs, 0.3 V maximum difference and the declared 0.25 V threshold."
+      ],
+      "limits": "Original synthetic telemetry; no live hardware synchronization, hardware data or general continuous coupling.",
+      "command": "python examples/cosimulation/run_demo.py",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "coupled-resistor",
+      "title": "Steady resistor to 3D solid feedback",
+      "category": "Coupled / automation",
+      "status": "runnable",
+      "summary": "An explicit resistor-to-cell loss map with temperature-dependent resistance.",
+      "engine": "MNA / structured solid thermal",
+      "dependencies": "Python 3.11+ source checkout with development dependencies",
+      "primaryAction": "download",
+      "assets": [
+        "examples/thermal/structured_electrothermal_request.json",
+        "examples/thermal/README.md"
+      ],
+      "steps": [
+        "Review the independent sources, DC resistor and normalized heat map.",
+        "Run the explicit source thermal CLI.",
+        "Check returned power and temperature against deltaT*(1+0.004*deltaT)=108."
+      ],
+      "limits": "This fixture is steady DC resistor feedback; it does not establish arbitrary switching or transistor electrothermal support.",
+      "command": "python scripts/run_structured_solid_thermal.py --request examples/thermal/structured_electrothermal_request.json --result build/example-feedback.json",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "review-limits",
+      "title": "Part limits, stress and a deliberate failure",
+      "category": "Reviews / mechanics",
+      "status": "setup-only",
+      "summary": "Original voltage, temperature and current checks including an intentional over-current failure.",
+      "engine": "Engineering review / Part limits & stress",
+      "dependencies": "Desktop project with exact board-a/u1 identity, or reviewed replacement IDs",
+      "primaryAction": "download",
+      "assets": [
+        "examples/part_limits/part-limits.json",
+        "examples/part_limits/README.md"
+      ],
+      "steps": [
+        "Review the synthetic rules, observations, quantities and units.",
+        "Import into a matching project using Engineering review > Part limits & stress.",
+        "Run review and retain the deliberate over-current failure and source provenance."
+      ],
+      "limits": "Arithmetic synthetic observations and ratings are not solved board data or real component qualification.",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "mechanics-exchange",
+      "title": "Named assembly and folded-sheet geometry",
+      "category": "Reviews / mechanics",
+      "status": "setup-only",
+      "summary": "Original retained MCAD exchange and sheet fixtures for geometry/identity review.",
+      "engine": "Neutral MCAD / sheet geometry import",
+      "dependencies": "Matching MCAD or sheet import workflow; no solver/runtime needed for text inspection",
+      "primaryAction": "download",
+      "assets": [
+        "examples/mcad/named-assembly.spike-mcad.json",
+        "examples/mcad/folded-sheet.spike-sheet.json",
+        "examples/mcad/rigid-flex-strip.spike-sheet.json"
+      ],
+      "steps": [
+        "Review units, material and retained object identities in each contract.",
+        "Open through the matching MCAD or sheet workflow and inspect transforms/folds.",
+        "Retain geometry and identity through explicit save/open checks before analysis."
+      ],
+      "limits": "Geometry exchange is not a mechanical stress solve, general MCAD authoring product or manufacturing qualification.",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "mechanics-thermal-stress",
+      "title": "One-way dielectric loss, heat and stress slab",
+      "category": "Reviews / mechanics",
+      "status": "runnable",
+      "summary": "Synthetic AC loss to heat to thermomechanical slab ladder with retained source evidence.",
+      "engine": "PDN dielectric thermomechanical",
+      "dependencies": "Python 3.11+ source checkout with development dependencies and a matching built SPIKE native module",
+      "primaryAction": "download",
+      "assets": [
+        "examples/pdn_dielectric_thermomechanical/run_slab.py",
+        "examples/pdn_dielectric_thermal/run_slab.py"
+      ],
+      "steps": [
+        "Inspect the original ladder, constraints, materials and source dependencies.",
+        "Run from the original source directory into a fresh output folder.",
+        "Review AC, heat and stress evidence separately, including all validity limits."
+      ],
+      "limits": "One-way supplied slab ladder; no arbitrary PCB mechanics, measured stress or mechanical-to-electrical feedback.",
+      "command": "python examples/pdn_dielectric_thermomechanical/run_slab.py --output build/example-thermomechanical",
+      "license": "Apache-2.0; original SPIKE fixture"
+    },
+    {
+      "id": "automation-batch",
+      "title": "Parallel harness load sweep request",
+      "category": "Coupled / automation",
+      "status": "setup-only",
+      "summary": "A bounded original multi-job request using the existing harness PI worker method.",
+      "engine": "Local parallel batch / harness PI",
+      "dependencies": "Source or desktop worker with run_parallel_batch support and compatible native runtime",
+      "primaryAction": "download",
+      "assets": [
+        "examples/parallel/harness-batch.json"
+      ],
+      "steps": [
+        "Inspect each job's explicit harness, load and method; review the full batch before submission.",
+        "Submit the request through the existing parallel batch workflow with an explicit worker budget.",
+        "Inspect each returned job status and conservation separately; retain failures."
+      ],
+      "limits": "Saving does not submit jobs. Parallel execution does not validate model inputs or replace per-job numerical checks.",
+      "license": "Apache-2.0; original SPIKE fixture"
+    }
+  ]
+}

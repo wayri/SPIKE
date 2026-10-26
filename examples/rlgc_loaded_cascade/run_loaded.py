@@ -7,7 +7,7 @@ ROOT=Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path: sys.path.insert(0,str(ROOT))
 from examples.rlgc_coupled_cascade.run_cascade import request as sections_request
 from examples.rlgc_reactive_pair.run_pair import request as terminal_request
-from python.spike_core.rlgc_loaded_cascade import run_rlgc_loaded_cascade
+from python.spike_core.solvers.signal_integrity.lines.rlgc_loaded_cascade import run_rlgc_loaded_cascade
 
 
 def request():

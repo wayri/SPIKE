@@ -34,7 +34,7 @@ async function createAssistantWindow(next: Owner, onClosed: () => void) {
     if (!owner || request?.token !== session || token !== session || typeof request.id !== "string" || request.id.length > 80) return;
     let result: unknown, error: string | undefined;
     try {
-      if (JSON.stringify(request).length > 2 * 1024 * 1024) throw new Error("Assistant request exceeds the transport budget.");
+      if (new TextEncoder().encode(JSON.stringify(request)).length > (request.kind === "worker" && request.request?.method === "assistant_turn" ? 30 : 2) * 1024 * 1024) throw new Error("Assistant request exceeds the transport budget.");
       if (request.kind === "context") result = null;
       else if (request.kind === "cancel") {
         if (!request.operation || !operations.has(request.operation)) throw new Error("Unknown assistant operation.");
@@ -50,6 +50,8 @@ async function createAssistantWindow(next: Owner, onClosed: () => void) {
         const entry = assistantToolCatalog.find(tool => tool.command === request.command);
         if (request.command === "assistant_review_context") {
           if (typeof request.args?.caseId !== "string") throw new Error("Missing prepared case identity.");
+        } else if (request.command === "assistant_choose_work_folder") {
+          if (Object.keys(request.args ?? {}).length) throw new Error("Use the native work-folder picker.");
         } else {
           if (!entry) throw new Error("Unsupported assistant action.");
           validateAssistantToolCall(entry.name, request.args ?? {});
@@ -94,7 +96,7 @@ export async function connectAssistantWindow() {
     if (closed) throw new Error("Assistant disconnected. Reopen it from SPIKE.");
     const id = crypto.randomUUID();
     const promise = new Promise<unknown>((resolve, reject) => {
-      const timer = setTimeout(() => { pending.delete(id); reject(new Error("SPIKE did not respond. Return to the workspace and retry.")); }, 150000);
+      const timer = setTimeout(() => { pending.delete(id); reject(new Error("SPIKE did not respond. Return to the workspace and retry.")); }, data.kind === "command" && data.command === "assistant_choose_work_folder" ? 30 * 60 * 1000 : 150000);
       pending.set(id, { resolve, reject, timer });
     });
     try { await emitTo("main", REQUEST, { ...data, token, id, revision: snapshot.revision }); }

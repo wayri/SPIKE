@@ -7,7 +7,7 @@ from pathlib import Path
 import unittest
 
 from jsonschema import Draft202012Validator
-from python.spike_core.multiboard_circuit import compile_multiboard_circuit, run_multiboard_circuit
+from python.spike_core.solvers.circuits.models.multiboard_circuit import compile_multiboard_circuit, run_multiboard_circuit
 
 
 def fixture():

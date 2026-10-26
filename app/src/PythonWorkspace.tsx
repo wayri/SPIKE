@@ -24,7 +24,7 @@ import "./PythonCodeEditor.css";
 
 const errorText = (error: unknown) => error instanceof Error ? error.message : String(error);
 type Closing = { kind: "tab"; id: string } | { kind: "workspace" };
-export type PythonInitialScript = { id: string; name: string; code: string };
+export type PythonInitialScript = { id: string; name: string; code: string; workingDirectory?: string };
 
 export default function PythonWorkspace({ design, results, workspace, initialScript, onUiAction, onClose, onStatus, onAttachDataset, onShowViewport }: {
   design: Record<string, unknown> | null; results: unknown;
@@ -124,9 +124,9 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
     const name = initialScript.name.toLowerCase().endsWith(".py") ? initialScript.name : `${initialScript.name}.py`;
     if (!pythonCodeFits(initialScript.code)) { setMessage("This script exceeds the 512 KB script limit."); return; }
     if (sessionRef.current.documents.length >= PYTHON_TAB_LIMIT) { setMessage(`Close a tab before opening another. The workspace allows ${PYTHON_TAB_LIMIT} tabs.`); return; }
-    const document = { ...newPythonDocument(initialScript.code, name), savedCode: "" };
+    const document = { ...newPythonDocument(initialScript.code, name), savedCode: "", ...(initialScript.workingDirectory ? { root: initialScript.workingDirectory } : {}) };
     addDocument(document);
-    setMessage(`${name} opened as an unsaved script. Review the source and choose Run.`);
+    setMessage(`${name} opened as an unsaved script. ${initialScript.workingDirectory ? `Working folder: ${initialScript.workingDirectory}. ` : ""}Review the source and choose Run.`);
   }, [initialScript]);
   useEffect(() => {
     setBackup(current => ({ ...current, pending: true }));
@@ -319,7 +319,7 @@ export default function PythonWorkspace({ design, results, workspace, initialScr
     setOutputVisible(true); setInspectorVisible(true); setRunDocumentId(document.id); setExecution("run"); setRunStartedAt(performance.now()); setDebug(null); setStopping(false); lastPause.current = ""; debugRevision.current = -1; pendingDebugSequence.current = 0;
     setOutputs(current => ({ ...current, [document.id]: { status: "running" } })); setMessage(debugging ? "Starting debugger…" : geometryOnly ? "Loading bundled EMerge model geometry…" : "Running Python script…");
     try {
-      const response = await runLocalWorker({ id, method: debugging ? "start_python_debug" : "run_python_script", params: { code: preparedCode, filename: document.path ?? document.name, working_directory: document.path ? pythonParent(document.path) : sessionRef.current.root, breakpoints: document.breakpoints, design, results, workspace: context, timeout_seconds: timeoutSeconds, ...(!debugging && interpreter.trim() ? { python_executable: interpreter.trim() } : {}) } });
+      const response = await runLocalWorker({ id, method: debugging ? "start_python_debug" : "run_python_script", params: { code: preparedCode, filename: document.path ?? document.name, working_directory: document.path ? pythonParent(document.path) : document.root ?? sessionRef.current.root, breakpoints: document.breakpoints, design, results, workspace: context, timeout_seconds: timeoutSeconds, ...(!debugging && interpreter.trim() ? { python_executable: interpreter.trim() } : {}) } });
       if (!mounted.current) return;
       if (!response.ok) throw new Error(response.error ?? "Python execution failed.");
       if (debugging) {

@@ -9,12 +9,9 @@ from jsonschema import Draft202012Validator, ValidationError
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.via_transition_geometry import AntipadSpec, build_via_transition_geometry
-from python.spike_core.via_transition_mesh import ViaTransitionMeshError, build_via_transition_mesh
-from python.spike_core.via_transition_native_handoff import (
-    ViaTransitionNativeHandoffError,
-    build_native_via_transition_handoff,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_geometry import AntipadSpec, build_via_transition_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_mesh import ViaTransitionMeshError, build_via_transition_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_native_handoff import ViaTransitionNativeHandoffError, build_native_via_transition_handoff
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -87,7 +84,7 @@ class ViaTransitionNativeHandoffTests(unittest.TestCase):
                 self.validator.validate(promoted)
 
     def test_missing_native_symbol_fails_closed(self) -> None:
-        import python.spike_core.via_transition_native_handoff as module
+        import python.spike_core.solvers.geometry_meshing.preparation.via_transition_native_handoff as module
 
         original = module._load_native
         module._load_native = lambda: object()

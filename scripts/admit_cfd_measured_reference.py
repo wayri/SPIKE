@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.cfd_reference_correlation import admit_nasa_backstep_cf, compare_backstep_cf
+from python.spike_core.solvers.thermal_fluid.flow.cfd_reference_correlation import admit_nasa_backstep_cf, compare_backstep_cf
 
 
 if __name__ == "__main__":

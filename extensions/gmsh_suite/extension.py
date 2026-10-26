@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from extension_sdk.python.spike_extension_sdk import read_request, write_result
-from python.spike_core.gmsh_extension_runtime import dispatch
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_extension_runtime import dispatch
 
 
 def main():

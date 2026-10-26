@@ -8,7 +8,7 @@ import numpy as np
 from scipy.linalg import expm
 from numpy.polynomial.legendre import leggauss
 from examples.rlgc_coupled_star.run_star import request
-from python.spike_core import rlgc_coupled_star as star
+from python.spike_core.solvers.signal_integrity.lines import rlgc_coupled_star as star
 
 
 def value(z): return complex(z["real"], z["imag"])

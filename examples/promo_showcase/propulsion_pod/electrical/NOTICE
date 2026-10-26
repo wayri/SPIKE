@@ -1,0 +1,11 @@
+SPIKE restrained propulsion-pod electrical starter — Apache-2.0
+
+pod_bus_startup.cir, generated native Studio layout/dashboard, run_examples.py
+and documentation are original firstparty example material.
+
+current_sensing.cir and current_sensing.spksch are copied unchanged from
+examples/promo_showcase/esc/studio/ in this repository. They are original SPIKE
+illustrative ideal sensing models, with no vendor code or firmware included.
+
+The native solver DLL/compiler is a local runtime dependency, not redistributed.
+No physical pod, motor or ESC qualification is implied. See LICENSE.

@@ -11,8 +11,8 @@ ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from python.spike_core.kicad_importer import import_kicad_design
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.project_package import write_spike_package,read_spike_package,_source_member_name
-from python.spike_core.assembly_em_study import admit_assembly_em_study
+from python.spike_core.project_package import write_spike_package, read_spike_package, _source_member_name
+from python.spike_core.solvers.electromagnetics.fields.assembly_em_study import admit_assembly_em_study
 
 
 def pin_glb(body):

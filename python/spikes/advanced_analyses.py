@@ -16,11 +16,11 @@ import numpy as np
 from scipy.linalg import eig
 
 try:
-    from python.spike_core.native_mna import _assemble, run_native_mna
+    from python.spike_core.solvers.circuits.models.native_mna import _assemble, run_native_mna
 except ModuleNotFoundError as exc:
     if exc.name != "python":
         raise
-    from spike_core.native_mna import _assemble, run_native_mna  # type: ignore[no-redef]
+    from spike_core.solvers.circuits.models.native_mna import _assemble, run_native_mna  # type: ignore[no-redef]
 
 from .analyses import AcExcitation, AcSweep, run_ac_analysis
 from .contracts import CircuitProject, ProbeDescriptor

@@ -4,7 +4,7 @@
 import copy
 import unittest
 from unittest.mock import Mock
-from python.spike_core.openems_assembly_geometry import compile_assembly_geometry,emit_csxcad_geometry
+from python.spike_core.solvers.external_engines.openems.openems_assembly_geometry import compile_assembly_geometry, emit_csxcad_geometry
 
 
 def fixture():

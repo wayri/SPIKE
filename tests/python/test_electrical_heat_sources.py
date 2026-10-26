@@ -10,9 +10,7 @@ from unittest.mock import patch
 
 import jsonschema
 
-from python.spike_core.electrical_heat_sources import (
-    ElectricalHeatSourceError, evaluate_electrical_heat_source,
-)
+from python.spike_core.solvers.thermal_fluid.electrothermal.electrical_heat_sources import ElectricalHeatSourceError, evaluate_electrical_heat_source
 
 
 def waveform():
@@ -190,9 +188,9 @@ class ElectricalHeatSourcesTests(unittest.TestCase):
                 self.reject(request(model), "invalid_number")
 
     def test_resource_budgets_and_arithmetic_overflow(self):
-        with patch("python.spike_core.electrical_heat_sources.MAX_SAMPLES", 1):
+        with patch("python.spike_core.solvers.thermal_fluid.electrothermal.electrical_heat_sources.MAX_SAMPLES", 1):
             self.reject(request(), "array_budget")
-        with patch("python.spike_core.electrical_heat_sources.MAX_DISTRIBUTION", 1):
+        with patch("python.spike_core.solvers.thermal_fluid.electrothermal.electrical_heat_sources.MAX_DISTRIBUTION", 1):
             self.reject(request(), "distribution_budget")
         for factory, key in ((waveform, "voltage_v"), (spectral, "rms_current_a"), (table, "turn_on_energy_j")):
             model = factory()

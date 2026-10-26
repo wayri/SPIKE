@@ -9,7 +9,7 @@ from unittest.mock import patch
 import numpy as np
 from scipy.linalg import expm
 
-from python.spike_core import sparameter_transient as transient
+from python.spike_core.solvers.signal_integrity.networks import sparameter_transient as transient
 from tests.python.test_sparameter_rational import request as multi_fit, DIRECT, RESIDUES
 
 

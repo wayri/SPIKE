@@ -1,4 +1,4 @@
-#include "peec/via_transition_mesh_input.hpp"
+#include "solvers/power_integrity/peec/via_transition_mesh_input.hpp"
 
 #include <cassert>
 #include <iostream>

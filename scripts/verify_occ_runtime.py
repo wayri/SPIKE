@@ -11,8 +11,8 @@ from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.gmsh_occ_runtime import run_occ_case
-from python.spike_core.gmsh_occ_mesher import OccMeshingError
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import run_occ_case
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_mesher import OccMeshingError
 from jsonschema import Draft202012Validator
 
 

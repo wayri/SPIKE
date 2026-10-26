@@ -11,9 +11,7 @@ import re
 import tempfile
 
 from python.spike_core.contracts import SpiDeR, ValidationIssue
-from python.spike_core.importers import (
-    FunctionImporter, ImportPolicy, ImporterDescriptor, ImporterRegistry,
-)
+from python.spike_core.importers import FunctionImporter, ImportPolicy, ImporterDescriptor, ImporterRegistry
 
 
 CONTRACT = "spike/emerge-gerber-source/v1"

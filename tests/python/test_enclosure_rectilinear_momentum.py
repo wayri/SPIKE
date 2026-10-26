@@ -6,10 +6,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.enclosure_refinement import build_enclosure_grid, prolong_mac_fluxes
-from python.spike_core.enclosure_rectilinear_momentum import (
-    CONTRACT, _advection, _assemble, solve_enclosure_rectilinear_momentum,
-)
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_refinement import build_enclosure_grid, prolong_mac_fluxes
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_rectilinear_momentum import CONTRACT, _advection, _assemble, solve_enclosure_rectilinear_momentum
 from tests.python.test_enclosure_laminar import exact_fields
 
 
@@ -180,7 +178,7 @@ class RectilinearMomentumTests(unittest.TestCase):
             result = solve_enclosure_rectilinear_momentum(variant)
             self.assertEqual(result["status"], "blocked", result)
             self.assertNotIn("fields", result)
-        with patch("python.spike_core.enclosure_rectilinear_momentum.onenormest", return_value=1e20):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.enclosure_rectilinear_momentum.onenormest", return_value=1e20):
             result = solve_enclosure_rectilinear_momentum(request)
             self.assertEqual(result["status"], "blocked", result)
             self.assertIn("condition", result["issues"][0]["message"])

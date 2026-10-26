@@ -14,7 +14,7 @@ import numpy as np
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from python.spike_core.external_engines import _run_isolated_python
 from python.spike_core.runtime_locations import openems_python, openems_install_root
-from python.spike_core.si_ringdown import qualify_ringdown, qualify_ringdown_convergence
+from python.spike_core.solvers.signal_integrity.receivers.si_ringdown import qualify_ringdown, qualify_ringdown_convergence
 
 WORKER = r'''
 import json, sys
@@ -59,7 +59,7 @@ def reference_checks(errors, convergence, sources_unchanged):
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--output',required=True)
     args=parser.parse_args(); root=Path(args.output).resolve(); root.mkdir(parents=True,exist_ok=False)
-    source_paths=[Path(__file__),Path(__file__).resolve().parents[1]/'python/spike_core/si_ringdown.py']
+    source_paths=[Path(__file__),Path(__file__).resolve().parents[1]/'python/spike_core/solvers/signal_integrity/receivers/si_ringdown.py']
     source_hashes={str(p.resolve()):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
     (root/'worker.py').write_bytes(WORKER.encode())
     env=os.environ.copy(); env['OPENEMS_INSTALL_PATH']=openems_install_root()

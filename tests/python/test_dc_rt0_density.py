@@ -9,14 +9,10 @@ import numpy as np
 from shapely.geometry import Polygon, box
 
 from python.spike_core.contracts import AnalysisSpec
-from python.spike_core.dc_copper_domain import explicit_terminal_contacts
-from python.spike_core.dc_rt0_density import (
-    _percentile, reconstruct_rt0_density, rt0_dissipation_w, volume_percentile_enclosure,
-)
-from python.spike_core.dc_triangle_partition import partition_polygon_groups
-from python.spike_core.peec_conforming_dc import (
-    assemble_conforming_dc, solve_hybridized_conforming_dc, triangle_resistance,
-)
+from python.spike_core.solvers.power_integrity.dc.dc_copper_domain import explicit_terminal_contacts
+from python.spike_core.solvers.power_integrity.dc.dc_rt0_density import _percentile, reconstruct_rt0_density, rt0_dissipation_w, volume_percentile_enclosure
+from python.spike_core.solvers.power_integrity.dc.dc_triangle_partition import partition_polygon_groups
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import assemble_conforming_dc, solve_hybridized_conforming_dc, triangle_resistance
 
 
 def groups(shape, thickness=1., conductivity=1000.):

@@ -14,9 +14,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.si_workflow import _loaded_response
-from python.spike_core.si_passives import KB
-from python.spike_core.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import _loaded_response
+from python.spike_core.solvers.signal_integrity.receivers.si_passives import KB
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
 
 
 def scalar_reference(network, y, drive, temperature, excess_current):
@@ -64,7 +64,7 @@ def main():
     args=parser.parse_args()
     if args.output.exists():
         parser.error("Output must not already exist")
-    paths=[Path(__file__),ROOT/"python/spike_core/si_workflow.py",ROOT/"python/spike_core/si_passives.py",ROOT/"python/spike_core/sparameters.py"]
+    paths=[Path(__file__),ROOT/"python/spike_core/solvers/signal_integrity/receivers/si_workflow.py",ROOT/"python/spike_core/solvers/signal_integrity/receivers/si_passives.py",ROOT/"python/spike_core/solvers/signal_integrity/networks/sparameters.py"]
     def hashes():
         return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()for p in paths}
     before=hashes()

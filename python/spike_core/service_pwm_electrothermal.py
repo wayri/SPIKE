@@ -11,9 +11,9 @@ def handle_pwm_electrothermal_request(method, params, *, request_id=None):
         if not isinstance(params, dict) or set(params) != {"request"}:
             raise ValueError("PWM_FIELDS: only request accepted")
         if "volume" in method:
-            from .pwm_volume_electrothermal import validate_pwm_volume_electrothermal as validate, run_pwm_volume_electrothermal as run
+            from .solvers.thermal_fluid.electrothermal.pwm_volume_electrothermal import validate_pwm_volume_electrothermal as validate, run_pwm_volume_electrothermal as run
         else:
-            from .pwm_electrothermal import validate_pwm_electrothermal as validate, run_pwm_electrothermal as run
+            from .solvers.thermal_fluid.electrothermal.pwm_electrothermal import validate_pwm_electrothermal as validate, run_pwm_electrothermal as run
         if method.startswith("validate_"):
             result = validate(params["request"])
         else:

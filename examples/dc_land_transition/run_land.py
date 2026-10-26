@@ -8,8 +8,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from python.spike_core.dc_land_transition import solve_land_transition
-from python.spike_core.dc_land_transition_evidence import validate_land_result
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition import solve_land_transition
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition_evidence import validate_land_result
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)

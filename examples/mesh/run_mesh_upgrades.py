@@ -15,11 +15,11 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.tetra_mesh_refinement import refine_tetra_mesh, _det
-from python.spike_core.tetra_mesh_optimization import optimize_tetra_mesh
-from python.spike_core.mom_surface_basis import build_surface_basis, divergence
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_refinement import refine_tetra_mesh, _det
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_optimization import optimize_tetra_mesh
+from python.spike_core.solvers.electromagnetics.fields.mom_surface_basis import build_surface_basis, divergence
 from python.spike_core.contracts import SpiDeR, AnalysisSpec
-from python.spike_core.hybrid_mesh import build_hybrid_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh
 
 
 def fixture():

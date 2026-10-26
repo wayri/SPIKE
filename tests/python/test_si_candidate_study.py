@@ -7,7 +7,7 @@ import math
 import unittest
 from unittest.mock import patch
 
-from python.spike_core import si_candidate_study as study
+from python.spike_core.solvers.signal_integrity.networks import si_candidate_study as study
 
 
 def request():

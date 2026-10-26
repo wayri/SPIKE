@@ -7,8 +7,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import pdn_dielectric_thermal as coupled
-from python.spike_core.pdn_dielectric_ac import extract_pdn_dielectric_ac
+from python.spike_core.solvers.power_integrity.pdn import pdn_dielectric_thermal as coupled
+from python.spike_core.solvers.power_integrity.pdn.pdn_dielectric_ac import extract_pdn_dielectric_ac
 from tests.python.test_assembly_tetra_thermal import boundary, faces_at
 from tests.python.test_pdn_dielectric_ac import plate, layered
 

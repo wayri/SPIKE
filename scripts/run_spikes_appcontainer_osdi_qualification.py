@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 from python.spikes.hdl_frontend import OsdiModuleManifest
 from python.spikes.osdi_runtime import NativeOsdiCallbackRuntime
 

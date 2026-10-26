@@ -1,0 +1,109 @@
+{
+  "primary": {
+    "board_mm": [
+      44,
+      38,
+      0.8
+    ],
+    "pins": {
+      "P1": {
+        "reference": "J1",
+        "pad": "1",
+        "xy_mm": [
+          -20,
+          -1.27
+        ]
+      },
+      "P2": {
+        "reference": "J1",
+        "pad": "2",
+        "xy_mm": [
+          -20,
+          1.27
+        ]
+      }
+    },
+    "nominal_turns": 8,
+    "layers": 4,
+    "copper_um": 70,
+    "series_topology": "2turns_per_layer_4layers_series"
+  },
+  "secondary": {
+    "board_mm": [
+      50,
+      50,
+      0.8
+    ],
+    "pins": {
+      "S1": {
+        "reference": "J1",
+        "pads": "1..16",
+        "rows_y_mm": [
+          20,
+          22.54
+        ]
+      },
+      "S2": {
+        "reference": "J2",
+        "pads": "1..16",
+        "rows_y_mm": [
+          -20,
+          -22.54
+        ]
+      }
+    },
+    "x_positions_mm": [
+      -8.89,
+      -6.35,
+      -3.81,
+      -1.27,
+      1.27,
+      3.81,
+      6.35,
+      8.89
+    ],
+    "nominal_turns": 1,
+    "layers": 4,
+    "copper_um": 70,
+    "parallel_topology": "1turn_per_layer_4layers_parallel",
+    "primary_pin_clearance_npth": {
+      "xy_mm": [
+        -20,
+        0
+      ],
+      "oval_drill_mm": [
+        3,
+        5.54
+      ]
+    }
+  },
+  "dot_equivalence": [
+    "P1",
+    "S2"
+  ],
+  "core_slots_mm": {
+    "center": [
+      7.05,
+      21.05
+    ],
+    "outer_each": [
+      3.875,
+      21.05
+    ],
+    "outer_centers_x": [
+      -14.2875,
+      14.2875
+    ]
+  },
+  "assembly_body_z_mm": {
+    "primary": [
+      0,
+      0.8
+    ],
+    "secondary": [
+      1,
+      1.8
+    ]
+  },
+  "rating_status": "geometry_candidate_only; no current/insulation/thermal/magnetic/converter qualification"
+}

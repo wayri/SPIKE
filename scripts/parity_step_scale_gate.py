@@ -22,7 +22,7 @@ from scripts.parity_native_step_placement_gate import points
 SOURCES = ('scripts/parity_step_scale_gate.py', 'python/spike_core/component_step_scale.py',
            'python/spike_core/freecad_scale_step.py', 'tests/python/test_component_step_scale.py',
            'python/spike_core/mcad_importer.py', 'python/spike_core/mcad_tessellation.py',
-           'python/spike_core/sparselizard_process.py', 'scripts/parity_native_step_placement_gate.py',
+           'python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py', 'scripts/parity_native_step_placement_gate.py',
            'benchmarks/parity-import/component-solid.step',
            'benchmarks/parity-import/step-scale/cylinder.step',
            'benchmarks/parity-import/step-scale/probe_native.py',

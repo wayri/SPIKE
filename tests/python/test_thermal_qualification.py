@@ -5,11 +5,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.thermal_qualification import (
-    QUALIFICATION_CONTRACT,
-    required_qualification_gates,
-    validate_thermal_qualification,
-)
+from python.spike_core.thermal_qualification import QUALIFICATION_CONTRACT, required_qualification_gates, validate_thermal_qualification
 
 
 ROOT = Path(__file__).resolve().parents[2]

@@ -11,11 +11,9 @@ import unittest
 from unittest.mock import Mock
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import MeshBranch, build_hybrid_mesh
-from python.spike_core.peec_volume_adapter import extract_volume_matrices
-from python.spike_core.peec_volume_support import (
-    ZoneBasisSupportError, admit_zone_basis_support, zone_basis_support_report,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import MeshBranch, build_hybrid_mesh
+from python.spike_core.solvers.power_integrity.peec.peec_volume_adapter import extract_volume_matrices
+from python.spike_core.solvers.power_integrity.peec.peec_volume_support import ZoneBasisSupportError, admit_zone_basis_support, zone_basis_support_report
 
 
 def _design(points):

@@ -9,8 +9,8 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "python"))
-from spike_core.enclosure_refinement import build_enclosure_grid
-from spike_core.enclosure_sa_transport import (
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_refinement import build_enclosure_grid
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_sa_transport import (
     CONTRACT, sa_noft2_coefficients, solve_enclosure_sa_transport,
 )
 

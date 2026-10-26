@@ -5,8 +5,8 @@ import itertools
 import json
 from pathlib import Path
 import unittest
-from python.spike_core.assembly_field_handoff import field_resource_limits, prepare_assembly_field_handoff
-from python.spike_core.assembly_field_geometry import assert_disjoint_occurrences
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import field_resource_limits, prepare_assembly_field_handoff
+from python.spike_core.solvers.execution.coupling.assembly_field_geometry import assert_disjoint_occurrences
 from tests.python.test_assembly_tetra_thermal import cube
 from tests.python.test_assembly_field_handoff import fixture
 

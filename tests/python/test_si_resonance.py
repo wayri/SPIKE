@@ -3,7 +3,7 @@
 """Single-RLC analytical oracles, not arbitrary-network resonance claims."""
 import unittest
 import numpy as np
-from python.spike_core.si_resonance import fit_single_rlc
+from python.spike_core.solvers.signal_integrity.receivers.si_resonance import fit_single_rlc
 
 
 def fixture(model,q=10,points=4097):

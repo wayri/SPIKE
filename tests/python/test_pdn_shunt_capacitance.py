@@ -9,10 +9,8 @@ import unittest
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import MeshBranch
-from python.spike_core.pdn_shunt_capacitance import (
-    estimate_geometry_shunts, normalize_shunt_capacitance, pdn_capacitor_elements,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import MeshBranch
+from python.spike_core.solvers.power_integrity.pdn.pdn_shunt_capacitance import estimate_geometry_shunts, normalize_shunt_capacitance, pdn_capacitor_elements
 
 
 def digest(value):
@@ -56,7 +54,7 @@ class PdnShuntCapacitanceTests(unittest.TestCase):
                 normalize_shunt_capacitance(request)
 
     def test_backend_adapter_preserves_two_terminal_mutual_edges(self):
-        from python.spike_core.pdn_network import evaluate_pdn_network
+        from python.spike_core.solvers.power_integrity.pdn.pdn_network import evaluate_pdn_network
         request = supplied()
         request.update(kind="supplied_maxwell_matrix", nodes=["rail", "other"],
                        matrix_f=[[5e-9, -3e-9], [-3e-9, 7e-9]])

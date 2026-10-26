@@ -15,11 +15,11 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.structured_solid_thermal import solve_structured_solid_thermal
-from python.spike_core.structured_electrothermal import CONTRACT as COUPLED_CONTRACT, solve_structured_electrothermal
-from python.spike_core.transient_diode_field import CONTRACT as DIODE_CONTRACT, solve_transient_diode_field
-from python.spike_core.laminar_channel_cht import CONTRACT as CHANNEL_CONTRACT, solve_laminar_channel_cht
-from python.spike_core.enclosure_stokes import CONTRACT as ENCLOSURE_CONTRACT, solve_enclosure_stokes
+from python.spike_core.solvers.thermal_fluid.heat.structured_solid_thermal import solve_structured_solid_thermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.structured_electrothermal import CONTRACT as COUPLED_CONTRACT, solve_structured_electrothermal
+from python.spike_core.solvers.circuits.models.transient_diode_field import CONTRACT as DIODE_CONTRACT, solve_transient_diode_field
+from python.spike_core.solvers.thermal_fluid.flow.laminar_channel_cht import CONTRACT as CHANNEL_CONTRACT, solve_laminar_channel_cht
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_stokes import CONTRACT as ENCLOSURE_CONTRACT, solve_enclosure_stokes
 
 
 MAX_CONTROL_BYTES = 8 * 1024 * 1024

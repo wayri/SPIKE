@@ -4,10 +4,10 @@
 import unittest
 import math
 import numpy as np
-from python.spike_core.si_workflow import REQUEST, run_si_workflow
-from python.spike_core.sparameters import touchstone_text, parse_touchstone_text
-from python.spike_core.si_symbol_clock import sample_nrz_clock
-from python.spike_core.si_channel import _prbs7, normalized_nrz_eye
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import REQUEST, run_si_workflow
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text, parse_touchstone_text
+from python.spike_core.solvers.signal_integrity.receivers.si_symbol_clock import sample_nrz_clock
+from python.spike_core.solvers.signal_integrity.channels.si_channel import _prbs7, normalized_nrz_eye
 
 
 def through(rate=10.3125e9, samples=15.7, points=513):

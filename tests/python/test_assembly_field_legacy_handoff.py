@@ -3,9 +3,9 @@
 """Exact legacy diagnostic-digest migration without physical-input weakening."""
 import copy
 import unittest
-from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal, verify_assembly_field_result, _legacy_handoff_digest
-from python.spike_core.assembly_field_study import import_assembly_field_study
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal, verify_assembly_field_result, _legacy_handoff_digest
+from python.spike_core.solvers.execution.coupling.assembly_field_study import import_assembly_field_study
 from python.spike_core.multiboard_identity import canonical_json_digest
 from tests.python.test_assembly_field_handoff import fixture
 

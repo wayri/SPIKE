@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 // Presentation adapter only: converts admitted field traces into BoardViewport resources.
 import * as THREE from "three";
-import { fieldViewPlot, type FieldPoint, type FieldViewOptions, type FieldVolumeData } from "./fieldVolumeModel";
+import { fieldViewPlot, fieldSavedSpeedRange, fieldColorRange, type FieldPoint, type FieldViewOptions, type FieldVolumeData } from "./fieldVolumeModel";
+import { attachFieldStreamAnimation, type FieldStreamAnimationController } from "./fieldStreamAnimation";
 import { traceFieldGrid } from "./fieldStreamTracing";
 import { thermalFieldColor } from "./thermalResultFields";
 
@@ -95,39 +96,61 @@ function lineObjects(trace: Trace, unit: FieldVolumeData["lengthUnit"], fallback
   flush(); return result;
 }
 
-function presentation(data: FieldVolumeData, options: FieldViewOptions) {
-  const frame = data.frames[Math.max(0, Math.min(data.frames.length - 1, Math.trunc(options.frame)))];
-  if (options.mode !== "streamtubes" || frame.streamlines?.length) return fieldViewPlot(data, options);
+type FieldPresentation = { plot: ReturnType<typeof fieldViewPlot>; paths: FieldPoint[][];
+  sourceCurveDirection: FieldStreamAnimationController["sourceCurveDirection"] | null };
+
+function selectedSuppliedPaths(paths: FieldVolumeData["frames"][number]["streamlines"], budget: number): FieldPoint[][] {
+  const selected: FieldPoint[][] = []; let vertices = 0;
+  for (const path of paths ?? []) {
+    if (selected.length >= 128 || vertices + path.points.length > Math.min(16_000, Math.max(500, budget * 2))) break;
+    vertices += path.points.length; selected.push(path.points);
+  }
+  return selected;
+}
+
+function presentation(data: FieldVolumeData, options: FieldViewOptions): FieldPresentation {
+  const selectedFrame = Math.max(0, Math.min(data.frames.length - 1, Math.trunc(options.frame))), frame = data.frames[selectedFrame];
+  if (frame.streamlines?.length && (options.mode === "streamlines" || options.mode === "streamtubes")) return {
+    plot: fieldViewPlot(data, options), paths: selectedSuppliedPaths(frame.streamlines, options.budget), sourceCurveDirection: "supplied-point-order" };
+  if (options.mode !== "streamtubes") return { plot: fieldViewPlot(data, options), paths: [], sourceCurveDirection: null };
   const paths = traceFieldGrid(data, options);
   if (!paths.length) {
     const fallback = fieldViewPlot(data, options);
     const speeds = data.frames.flatMap(saved => saved.vectors?.map(vector => Math.hypot(...vector)) ?? []);
     const minimum = speeds.length ? speeds.reduce((low, value) => Math.min(low, value), Infinity) : 0;
     const maximum = speeds.length ? speeds.reduce((high, value) => Math.max(high, value), -Infinity) : 0;
-    return { ...fallback, traces: [], streamCount: 0, minimum, maximum, unit: "m/s",
-      streamNote: "No renderer-generated curves: this frame needs a supported, nondegenerate complete Cartesian fluid grid with velocity vectors." };
+    return { plot: { ...fallback, traces: [], streamCount: 0, minimum, maximum, unit: "m/s",
+      streamNote: "No renderer-generated curves: this frame needs a supported, nondegenerate complete Cartesian fluid grid with velocity vectors." },
+      paths: [], sourceCurveDirection: null };
   }
-  const selectedFrame = Math.max(0, Math.min(data.frames.length - 1, Math.trunc(options.frame)));
   const synthetic: FieldVolumeData = { contract: data.contract, id: `${data.id}:rendered-streams`, label: data.label, lengthUnit: data.lengthUnit,
     geometryNote: data.geometryNote, ...(data.geometry ? { geometry: data.geometry } : {}),
     cells: { centers: data.cells.centers.map(point => [...point] as FieldPoint) }, quantities: [{ id: "speed_m_s", label: "Speed", unit: "m/s" }],
     frames: data.frames.map((saved, index) => ({ timeS: saved.timeS,
       scalars: { speed_m_s: saved.vectors?.map(vector => Math.hypot(...vector)) ?? data.cells.centers.map(() => 0) },
       ...(index === selectedFrame ? { streamlines: paths } : {}) })) };
-  const plot = fieldViewPlot(synthetic, { ...options, frame: selectedFrame, quantity: "speed_m_s", celsius: false, arrows: false });
-  return { ...plot, streamNote: `Renderer-generated frozen-frame curves from the center seed plane; color is speed. ${plot.streamNote}` };
+  // Interpolated path speeds can fall below every saved cell magnitude. Keep
+  // those colors saturated against one history scale rather than changing the legend per frame.
+  const [low, high] = fieldColorRange(options.colorRange, ...fieldSavedSpeedRange(data));
+  const plot = fieldViewPlot(synthetic, { ...options, frame: selectedFrame, quantity: "speed_m_s", celsius: false, arrows: false,
+    colorRange: [low, high > low ? high : low + Math.max(1, Math.abs(low) * 1e-6)] });
+  return { plot: { ...plot, minimum: low, maximum: high, streamNote: `Renderer-generated frozen-frame curves from the center seed plane; color is speed on the fixed saved-vector range. ${plot.streamNote}` },
+    paths: paths.map(path => path.points), sourceCurveDirection: "generated-velocity-trace-order" };
 }
 
 /** Build bounded, unlit field resources in the BoardViewport world frame (millimetres, inverted Y). */
 export function buildFieldVolumeScene(data: FieldVolumeData, options: FieldViewOptions,
   transform: FieldVolumeSceneTransform = { centerX: 0, centerY: 0, scale: 1 }): THREE.Group {
-  const plot = presentation(data, options), group = new THREE.Group();
+  const view = presentation(data, options), plot = view.plot, group = new THREE.Group();
   group.name = "field-volume-overlay"; group.userData.presentationOnly = true; group.userData.fieldVolumeOverlay = true;
   const generated = options.mode === "streamtubes" && !data.frames[Math.max(0, Math.min(data.frames.length - 1, Math.trunc(options.frame)))]?.streamlines?.length;
   group.userData.sourceLengthUnit = data.lengthUnit;
   group.userData.scalarLabel = generated ? "Speed" : data.quantities.find(quantity => quantity.id === options.quantity)?.label ?? options.quantity;
   group.userData.scalarUnit = plot.unit; group.userData.scalarRange = [plot.minimum, plot.maximum];
   group.userData.streamNote = plot.streamNote; group.userData.error = "";
+  group.userData.flowAnimationAvailable = false; group.userData.flowAnimationPathCount = 0;
+  group.userData.flowAnimationMarkerCount = 0; group.userData.sourceCurveDirection = null;
+  group.userData.flowAnimationNote = "Flow motion is presentation along a steady/frozen velocity streamline, not solver time or a transient particle path.";
   if (![transform.centerX, transform.centerY, transform.scale].every(Number.isFinite) || transform.scale <= 0) {
     group.userData.error = "Field volume needs a finite positive BoardViewport transform.";
     group.userData.fieldVolumeError = group.userData.error; return group;
@@ -141,6 +164,21 @@ export function buildFieldVolumeScene(data: FieldVolumeData, options: FieldViewO
   if (!group.children.length && plot.traces.length) {
     group.userData.error = "Field coordinates cannot be represented by GPU float32 buffers.";
     group.userData.fieldVolumeError = group.userData.error;
+  }
+  const frame = data.frames[Math.max(0, Math.min(data.frames.length - 1, Math.trunc(options.frame)))];
+  const velocityFlow = Boolean(frame.vectors?.some(vector => Math.hypot(...vector) > 0))
+    && data.quantities.some(quantity => quantity.unit === "m/s");
+  if (!group.userData.error && velocityFlow && view.sourceCurveDirection && view.paths.length) {
+    const scenePaths = view.paths.flatMap(path => {
+      const points = path.map(point => scenePoint(point[0], point[1], point[2], data.lengthUnit, transform));
+      return points.every((point): point is FieldPoint => Boolean(point)) ? [points] : [];
+    });
+    const animation = attachFieldStreamAnimation(group, scenePaths, view.sourceCurveDirection);
+    if (animation) {
+      group.userData.fieldStreamAnimation = animation; group.userData.flowAnimationAvailable = true;
+      group.userData.flowAnimationPathCount = animation.pathCount; group.userData.flowAnimationMarkerCount = animation.markerCount;
+      group.userData.sourceCurveDirection = animation.sourceCurveDirection;
+    }
   }
   return group;
 }

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
-#include "peec/volume_matrix.hpp"
+#include "solvers/power_integrity/peec/volume_matrix.hpp"
 #include <cmath>
 #include <Eigen/Eigenvalues>
 #include <stdexcept>

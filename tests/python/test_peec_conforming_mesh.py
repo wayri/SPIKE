@@ -7,10 +7,10 @@ import unittest
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import TOPOLOGY_ONLY_BRANCH_KINDS
-from python.spike_core.conforming_local_refinement import LocalCopperRegion, refine_local_rectangles
-from python.spike_core.peec_conforming_mesh import build_conforming_mesh, _coalesce_rectangles
-from python.spike_core.peec_volume_resistance import _basis, assemble_overlap_resistance
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import TOPOLOGY_ONLY_BRANCH_KINDS
+from python.spike_core.solvers.geometry_meshing.preparation.conforming_local_refinement import LocalCopperRegion, refine_local_rectangles
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_mesh import build_conforming_mesh, _coalesce_rectangles
+from python.spike_core.solvers.power_integrity.peec.peec_volume_resistance import _basis, assemble_overlap_resistance
 
 try:
     from shapely.geometry import Polygon

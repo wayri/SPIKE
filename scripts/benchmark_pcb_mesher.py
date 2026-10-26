@@ -143,7 +143,7 @@ def _mesh_summary(mesh) -> dict[str, object]:
 def _internal_worker(payload: dict[str, object]) -> dict[str, object]:
     global _REFERENCE_DISTANCE, _REFERENCE_SEGMENTS
     from python.spike_core.contracts import AnalysisSpec
-    from python.spike_core.hybrid_mesh import _distance_to_segment, _segments, build_hybrid_mesh
+    from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _distance_to_segment, _segments, build_hybrid_mesh
     from python.spike_core.kicad_importer import import_kicad_design
 
     # Bind the legacy predicate's unchanged helpers once before timed work.
@@ -169,7 +169,7 @@ def _internal_worker(payload: dict[str, object]) -> dict[str, object]:
         },
     )
     context = (
-        patch("python.spike_core.hybrid_mesh._point_in_polygon", _legacy_point_in_polygon)
+        patch("python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh._point_in_polygon", _legacy_point_in_polygon)
         if algorithm == "legacy_reference" else nullcontext()
     )
     timings = []
@@ -210,7 +210,7 @@ def _internal_worker(payload: dict[str, object]) -> dict[str, object]:
 
 
 def _gmsh_worker(payload: dict[str, object]) -> dict[str, object]:
-    from python.spike_core.gmsh_occ_runtime import run_occ_case
+    from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import run_occ_case
 
     request_path = Path(str(payload["request"])).resolve()
     request = json.loads(request_path.read_text(encoding="utf-8"))
@@ -388,7 +388,7 @@ def _internal_payload(args, algorithm: str, instances: int, samples: int, warmup
 
 
 def benchmark(args) -> dict[str, object]:
-    mesher_source = ROOT / "python/spike_core/hybrid_mesh.py"
+    mesher_source = ROOT / "python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py"
     source_before = _sha_file(mesher_source)
     rows = []
     for algorithm in ("legacy_reference", "bounded_edge_rejection"):

@@ -4,7 +4,7 @@
  * @version 0.1.7.0
  */
 
-#include "peec/peec_solver.hpp"
+#include "solvers/power_integrity/peec/peec_solver.hpp"
 #include <cmath>
 #include <cassert>
 #include <iomanip>

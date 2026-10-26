@@ -5,17 +5,10 @@ from unittest.mock import patch
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.peec_plugin import native_available
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import native_available
 from python.spike_core.preflight import preflight_analysis
 from python.spike_core.solver_plugins import default_solver_registry
-from python.spike_core.transient_peec import (
-    _admit_visual_records,
-    _assess_passive_inductance,
-    estimate_line_capacitance_per_m,
-    solve_peec_rl_transient,
-    transient_settings,
-    waveform_value,
-)
+from python.spike_core.solvers.power_integrity.peec.transient_peec import _admit_visual_records, _assess_passive_inductance, estimate_line_capacitance_per_m, solve_peec_rl_transient, transient_settings, waveform_value
 
 
 class TransientWaveformTests(unittest.TestCase):
@@ -128,8 +121,8 @@ class TransientPeecTests(unittest.TestCase):
             )
             return solver, SimpleNamespace(eps_r=4.2)
 
-        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
-            "python.spike_core.transient_peec._make_native_solver", side_effect=make_solver,
+        with patch("python.spike_core.solvers.power_integrity.peec.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.solvers.power_integrity.peec.transient_peec._make_native_solver", side_effect=make_solver,
         ):
             result = solve_peec_rl_transient(self.design, self.spec())
         self.assertEqual(result.status, "failed")
@@ -169,8 +162,8 @@ class TransientPeecTests(unittest.TestCase):
         self.assertEqual(settings.max_branches, 1300)
 
     def test_native_solver_construction_failure_is_structured(self):
-        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
-            "python.spike_core.transient_peec._make_native_solver",
+        with patch("python.spike_core.solvers.power_integrity.peec.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.solvers.power_integrity.peec.transient_peec._make_native_solver",
             side_effect=ValueError("PEEC filaments require positive length"),
         ):
             result = solve_peec_rl_transient(self.design, self.spec())
@@ -185,11 +178,11 @@ class TransientPeecTests(unittest.TestCase):
             compute_partial_inductance=lambda: self.fail("filament fallback must not run"),
             compute_resistance=lambda _frequency: self.fail("filament fallback must not run"),
         )
-        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
-            "python.spike_core.transient_peec._make_native_solver",
+        with patch("python.spike_core.solvers.power_integrity.peec.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.solvers.power_integrity.peec.transient_peec._make_native_solver",
             return_value=(solver, SimpleNamespace(eps_r=4.2)),
         ), patch(
-            "python.spike_core.transient_peec.extract_volume_matrices",
+            "python.spike_core.solvers.power_integrity.peec.transient_peec.extract_volume_matrices",
             side_effect=ValueError("volume integration did not converge"),
         ):
             result = solve_peec_rl_transient(self.design, spec)
@@ -214,11 +207,11 @@ class TransientPeecTests(unittest.TestCase):
                 quality={"method": "uniform_volume_current", "pair_count": count * count},
             )
 
-        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
-            "python.spike_core.transient_peec._make_native_solver",
+        with patch("python.spike_core.solvers.power_integrity.peec.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.solvers.power_integrity.peec.transient_peec._make_native_solver",
             return_value=(solver, SimpleNamespace(eps_r=4.2)),
         ), patch(
-            "python.spike_core.transient_peec.extract_volume_matrices", side_effect=volume_result,
+            "python.spike_core.solvers.power_integrity.peec.transient_peec.extract_volume_matrices", side_effect=volume_result,
         ):
             result = solve_peec_rl_transient(self.design, spec)
         self.assertEqual(result.status, "completed")
@@ -356,8 +349,8 @@ class TransientPeecTests(unittest.TestCase):
             )
             return solver, SimpleNamespace(eps_r=4.2)
 
-        with patch("python.spike_core.transient_peec.native_available", return_value=True), patch(
-            "python.spike_core.transient_peec._make_native_solver", side_effect=passive_solver,
+        with patch("python.spike_core.solvers.power_integrity.peec.transient_peec.native_available", return_value=True), patch(
+            "python.spike_core.solvers.power_integrity.peec.transient_peec._make_native_solver", side_effect=passive_solver,
         ):
             result = default_solver_registry().run(design, spec)
         self.assertEqual(result.status, "completed")

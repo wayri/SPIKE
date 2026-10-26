@@ -17,10 +17,10 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.cfd_tetra_mesh import admit_cfd_tetra_mesh, prepare_cfd_tetra_mesh
-from python.spike_core.cfd_tetra_stokes import solve_cfd_tetra_stokes
-from python.spike_core.cfd_tetra_energy import solve_cfd_tetra_energy
-from python.spike_core.gmsh_occ_runtime import run_occ_case
+from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_mesh import admit_cfd_tetra_mesh, prepare_cfd_tetra_mesh
+from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_stokes import solve_cfd_tetra_stokes
+from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_energy import solve_cfd_tetra_energy
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import run_occ_case
 
 SIZES_MM = (.5, .35, .25, .18)
 GATES = {"quadratic_finest_relative_velocity_l2": .05,

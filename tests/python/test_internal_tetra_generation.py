@@ -10,9 +10,7 @@ import random
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.internal_tetra_generation import (
-    generate_tetra_mesh, TetraGenerationError, _Predicates,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.internal_tetra_generation import generate_tetra_mesh, TetraGenerationError, _Predicates
 
 
 def determinant(matrix):
@@ -200,7 +198,7 @@ class InternalTetraGenerationTests(unittest.TestCase):
         with self.assertRaisesRegex(TetraGenerationError, 'cell resource budget'):
             generate_tetra_mesh(cube(), max_cells=5)
         for constant in ('MAX_PREDICATES', 'MAX_EXACT_PREDICATES'):
-            with patch('python.spike_core.internal_tetra_generation.'+constant, 1):
+            with patch('python.spike_core.solvers.geometry_meshing.preparation.internal_tetra_generation.'+constant, 1):
                 with self.assertRaisesRegex(TetraGenerationError, 'budget'):
                     generate_tetra_mesh(cube())
 

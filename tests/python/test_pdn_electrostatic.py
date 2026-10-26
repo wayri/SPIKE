@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import pdn_electrostatic as electrostatic
+from python.spike_core.solvers.power_integrity.pdn import pdn_electrostatic as electrostatic
 from tests.python.test_assembly_tetra_thermal import cube
 
 EPSILON_0 = 8.8541878128e-12

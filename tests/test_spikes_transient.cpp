@@ -1,6 +1,6 @@
-#include "spikes/transient_solver.hpp"
-#include "spikes/osdi_device.hpp"
-#include "spikes/transient_session.hpp"
+#include "solvers/circuits/spikes/transient_solver.hpp"
+#include "solvers/circuits/spikes/osdi_device.hpp"
+#include "solvers/circuits/spikes/transient_session.hpp"
 
 #include <algorithm>
 #include <cassert>

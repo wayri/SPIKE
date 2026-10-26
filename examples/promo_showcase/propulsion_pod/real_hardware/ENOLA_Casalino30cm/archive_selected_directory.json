@@ -1,0 +1,263 @@
+{
+  "doi": "10.5281/zenodo.20111572",
+  "archive_md5": "245267e590546f160f3b971d7f8e05fb",
+  "archive_size": 223601320,
+  "entries": [
+    {
+      "name": "BBDD/00_Generalnfo.xlsx",
+      "compressed": 13086,
+      "size": 17873,
+      "offset": 67,
+      "method": 8,
+      "crc32": 769759678
+    },
+    {
+      "name": "BBDD/Custom/Casalino/",
+      "compressed": 0,
+      "size": 0,
+      "offset": 48290473,
+      "method": 0,
+      "crc32": 0
+    },
+    {
+      "name": "BBDD/Custom/Casalino/geometry/",
+      "compressed": 0,
+      "size": 0,
+      "offset": 48290556,
+      "method": 0,
+      "crc32": 0
+    },
+    {
+      "name": "BBDD/Custom/Casalino/geometry/Casalino_CAD.x_b",
+      "compressed": 257655,
+      "size": 313845,
+      "offset": 48290648,
+      "method": 8,
+      "crc32": 321581596
+    },
+    {
+      "name": "BBDD/Custom/Casalino/geometry/CASALINO_D30cm_pitch+5deg.stl",
+      "compressed": 774748,
+      "size": 1787284,
+      "offset": 48548427,
+      "method": 8,
+      "crc32": 182944970
+    },
+    {
+      "name": "BBDD/Custom/Casalino/geometry/CASALINO_D30cm_pitch-5deg.stl",
+      "compressed": 781932,
+      "size": 1792484,
+      "offset": 49323312,
+      "method": 8,
+      "crc32": 1036441193
+    },
+    {
+      "name": "BBDD/Custom/Casalino/README.txt",
+      "compressed": 525,
+      "size": 923,
+      "offset": 50105381,
+      "method": 8,
+      "crc32": 4038569233
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/",
+      "compressed": 0,
+      "size": 0,
+      "offset": 50106015,
+      "method": 0,
+      "crc32": 0
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_exp.csv",
+      "compressed": 828,
+      "size": 1691,
+      "offset": 50106106,
+      "method": 8,
+      "crc32": 288265003
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_0deg.csv",
+      "compressed": 5157,
+      "size": 13309,
+      "offset": 50107057,
+      "method": 8,
+      "crc32": 727245326
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_0_90_deg.csv",
+      "compressed": 36183,
+      "size": 100117,
+      "offset": 50112346,
+      "method": 8,
+      "crc32": 2545865138
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_15deg.csv",
+      "compressed": 5157,
+      "size": 13309,
+      "offset": 50148665,
+      "method": 8,
+      "crc32": 727245326
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_30deg.csv",
+      "compressed": 5278,
+      "size": 13262,
+      "offset": 50153955,
+      "method": 8,
+      "crc32": 837144848
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_45deg.csv",
+      "compressed": 5051,
+      "size": 12816,
+      "offset": 50159366,
+      "method": 8,
+      "crc32": 4171364938
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_60deg.csv",
+      "compressed": 6166,
+      "size": 15329,
+      "offset": 50164550,
+      "method": 8,
+      "crc32": 898125376
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_75deg.csv",
+      "compressed": 5477,
+      "size": 13727,
+      "offset": 50170849,
+      "method": 8,
+      "crc32": 1605001498
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_exp_90deg.csv",
+      "compressed": 5292,
+      "size": 13005,
+      "offset": 50176459,
+      "method": 8,
+      "crc32": 724742596
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_Pitch+5deg_exp_0_90_deg.csv",
+      "compressed": 22704,
+      "size": 63855,
+      "offset": 50181884,
+      "method": 8,
+      "crc32": 829361591
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_SLA_Pitch-5deg_exp_0_90_deg.csv",
+      "compressed": 17960,
+      "size": 53444,
+      "offset": 50204735,
+      "method": 8,
+      "crc32": 1596574444
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_0deg.csv",
+      "compressed": 337,
+      "size": 922,
+      "offset": 50222842,
+      "method": 8,
+      "crc32": 2584901704
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_10deg.csv",
+      "compressed": 344,
+      "size": 919,
+      "offset": 50223317,
+      "method": 8,
+      "crc32": 1716283396
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_30deg.csv",
+      "compressed": 335,
+      "size": 915,
+      "offset": 50223800,
+      "method": 8,
+      "crc32": 12848735
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_45deg.csv",
+      "compressed": 320,
+      "size": 912,
+      "offset": 50224274,
+      "method": 8,
+      "crc32": 3334265160
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_5deg.csv",
+      "compressed": 338,
+      "size": 920,
+      "offset": 50224733,
+      "method": 8,
+      "crc32": 2606507073
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_60deg.csv",
+      "compressed": 315,
+      "size": 897,
+      "offset": 50225209,
+      "method": 8,
+      "crc32": 3168959321
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_65deg.csv",
+      "compressed": 305,
+      "size": 897,
+      "offset": 50225663,
+      "method": 8,
+      "crc32": 141898305
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_70deg.csv",
+      "compressed": 303,
+      "size": 897,
+      "offset": 50226107,
+      "method": 8,
+      "crc32": 2874443578
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_75deg.csv",
+      "compressed": 299,
+      "size": 898,
+      "offset": 50226549,
+      "method": 8,
+      "crc32": 3702611386
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_80deg.csv",
+      "compressed": 313,
+      "size": 902,
+      "offset": 50226987,
+      "method": 8,
+      "crc32": 1706662457
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_85deg.csv",
+      "compressed": 320,
+      "size": 903,
+      "offset": 50227439,
+      "method": 8,
+      "crc32": 1140458021
+    },
+    {
+      "name": "BBDD/Custom/Casalino/results/Casalino_StarCCM_urans_90deg.csv",
+      "compressed": 326,
+      "size": 903,
+      "offset": 50227898,
+      "method": 8,
+      "crc32": 2470922864
+    },
+    {
+      "name": "BBDD/README.txt",
+      "compressed": 772,
+      "size": 1592,
+      "offset": 50228363,
+      "method": 8,
+      "crc32": 183010641
+    }
+  ]
+}

@@ -5,8 +5,8 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.enclosure_laminar import CONTRACT, _advection, solve_enclosure_laminar
-from python.spike_core.enclosure_stokes import _assemble
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_laminar import CONTRACT, _advection, solve_enclosure_laminar
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_stokes import _assemble
 
 
 def fixture(n=4):

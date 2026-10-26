@@ -4,13 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from python.spike_core.component_bonds import (
-    COMPONENT_BONDS_CONTRACT,
-    DEFAULT_SEARCH_DISTANCE_MM,
-    bond_defaults,
-    define_component_bond,
-    infer_component_bonds,
-)
+from python.spike_core.component_bonds import COMPONENT_BONDS_CONTRACT, DEFAULT_SEARCH_DISTANCE_MM, bond_defaults, define_component_bond, infer_component_bonds
 
 
 class ComponentBondTests(unittest.TestCase):

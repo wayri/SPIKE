@@ -4,6 +4,9 @@
 
 # SPIKE - Multiphysics Simulation Workbench
 
+[Solver code and method directory](docs/solvers/README.md): domain headings,
+implementation subgroups, setup routes, validation evidence and execution resources.
+
 <p align="center"><strong>PCB-focused multiphysics, from board to complete assembly.</strong></p>
 
 <p align="center">
@@ -71,6 +74,24 @@ Fast entry points: [five-minute ESP32 walkthrough](docs/ESP32_QUICKSTART.md) ·
 
 ## Current UI and navigation
 
+### Learn with pictures
+
+Open **Help → Home** for task cards and numbered steps. Each step explains what to do, what to expect and how to recover, with an actual UI picture and a highlighted control. Select a picture to enlarge it.
+
+| Guided task | What you will learn |
+| --- | --- |
+| [Picture walkthroughs](docs/PICTURE_WALKTHROUGHS.md) | Gerber import, layers, mechanical tools, PI/SI/EM/Thermal setup and results |
+| [Navigation map](docs/UI_NAVIGATION.md) | Command rows, hover previews, pinned controls and panel history |
+| [Work example library](docs/WORK_EXAMPLES.md) | 38 searchable cases including promo projects across PI, SI, EM/RF, thermal/CFD, assemblies, harnesses and coupled tasks; bundled offline inputs and explicit setup staging |
+| [IBIS and spatial SI](docs/SI_IBIS_SPATIAL_WORKFLOW.md) | Driver/Input sink setup, explicit transient execution and sampled noise in the main 3D viewport (development source) |
+| [Maturity closure campaign](docs/MATURITY_CLOSURE_20261025.md) | USB 3.2 Gen 1 and 10GBASE-KR first; finite extraction, assembly, model, correlation and release gates |
+| [Integrated solver capabilities](docs/SOLVER_INTEGRATION.md) | Find every indexed capability, its exact setup or reviewed runner, and its evidence limits |
+| [Solder connections](docs/SOLDER_CONNECTIONS.md) | Model pin/pad fillets and terminal collars in the main viewport (development source) |
+| [Project backups](docs/PROJECT_BACKUPS.md) | Enable local automatic recovery, choose an interval, and restore a copy (development source) |
+| [Run readiness and Tutor](docs/GUIDED_SIMULATION_RUN.md) | Resolve missing setup inputs one at a time, recheck and submit a supported simulation (development source) |
+| [Solver setup flows](docs/SOLVER_SETUP_FLOWS.md) | Inputs → setup → review → run → evidence |
+
+
 ![SPIKE navigation map showing the two command rows, contextual panels, and study loop](app/public/help/ui-current/navigation-map.svg)
 
 Clean mode keeps a global header plus document and assembly tabs. Open a domain
@@ -81,17 +102,17 @@ The six menu sections are **Project**, **Design & view**, **Analyze**, **Results
 maps section ownership, menu depth, keyboard navigation, and the import -> setup
 -> mesh -> solve -> results -> save loop.
 
-| Actual development UI, 19 October 2026 | Actual command search, 19 October 2026 |
+| Actual workbench, 23 October 2026 | Expanded layer controls, 23 October 2026 |
 | --- | --- |
-| ![Clean UI showing the public ESP32 board in the light viewport](app/public/help/ui-current/clean-viewport.jpg) | ![Universal command search showing PI suggestions](app/public/help/ui-current/universal-search.jpg) |
-| Imported geometry and component stand-ins; no analysis was executed. | Search suggestions only; no command or analysis was executed. |
+| ![Current SPIKE workbench with the retained EBrake board](app/public/help/guides-current/workbench-overview.jpg) | ![Layer selector expanded with named layers and Net names controls](app/public/help/guides-current/layers-expanded.jpg) |
+| Two compact command rows around the retained board. | Board-specific layers, opacity controls and downward net-label expansion. |
 
-These are actual local **browser development UI captures**, not mockups, solver
-results, native desktop acceptance captures, or packaged application evidence.
-They use the public ESP32 board recorded in the
-[capture manifest](app/public/help/ui-current/manifest.json). Graphite/Light
-workspace appearance and Graphite/Light/AMOLED viewport appearance are separate
-preferences.
+These are actual local **browser development UI captures**. They show the
+owner-provided EBrake board and current controls; no numerical solve or installed
+native desktop acceptance is demonstrated. The [capture manifest](app/public/help/guides-current/manifest.json)
+records the original image hashes and limitations. The guided Help adds numbered
+highlights without modifying these screenshot pixels. Graphite/Light workspace
+appearance and Graphite/Light/AMOLED viewport appearance are separate preferences.
 
 The main field viewport can display supplied cells, points, velocity arrows,
 temperature and other scalar fields, connected supplied curves, and saved frame
@@ -100,6 +121,8 @@ cell dimensions remain point samples. Renderer-generated frozen-field paths are
 approximate presentation, not transient particle paths. See
 [field visualization](docs/FIELD_VISUALIZATION.md); the planned Blender adapter
 is not implemented.
+
+The development source also adds [guided solver setup and searchable choices](docs/SOLVER_SETUP_FLOWS.md): numbered steps for basic PI, SI, thermal, EM, CFD and assembly airflow workflows, with wildcard search in ordinary dropdowns. These changes are not yet included in the published installer.
 
 ## Analysis gallery
 
@@ -154,6 +177,27 @@ separate program and is not included in the SPIKE desktop release.** SPIKE uses
 only its backend for supported structured runs. See the
 [circuit workflow](docs/USER_TASK_SEQUENCES.md).
 
+
+### User circuit models and future backends
+
+The development workbench adds inspected, user-provided SPICE subcircuit
+libraries: choose an entry, retain local dependencies and map its pins before
+an explicit run. [Model-library and backend guide](docs/USER_MODELS_AND_BACKENDS.md)
+covers the supported subset, examples and existing extension routes for SI
+models and external extraction. This does not complete general 3D board
+extraction, native device coverage or protocol compliance.
+
+### EMerge EM example library
+
+Open **EMerge example projects, fields and probes** from **Ctrl+K** or the EMerge
+setup. Advanced studies index 23 RF wrappers for the separate SPIKE-Em gateway;
+five thermal entries remain suspended. The development library supplies patch/radome radiation, complex E/H
+planes, an attributed ESP32 RF surrogate and a four-layer two-port setup.
+[Illustrated guide](docs/EMERGE_EXAMPLES.md) covers the 1-2-3 flow, field and
+network probes, exports, runtime checks and the advanced EM study map.
+[Ready-to-open projects](examples/emerge/gallery/README.md) preserve original
+unvalidated results and source-binding limits; the two-port project is setup only.
+
 ## Solver modules and the solver suite
 
 Open **Solver manager** from **Ctrl+K** to inspect named modules, scope,
@@ -195,6 +239,7 @@ code, runtime readiness, and numerical qualification remain separate states.
 | [EMerge Suite](extensions/emerge_suite/README.md) | Simplified selected-net S-parameters and relative radiation patterns. | Separate compatible runtime; selected copper, aligned ports, rectangular bounds, one dielectric, and surface PEC. |
 | [ODB++ Import](docs/ODB_AND_HARNESS_EXTENSIONS.md) | Experimental board-job import with quality diagnostics. | Unsupported symbols, compositing, and panel repeats are reported; retain the source archive. |
 | [Harness Engineering](docs/ODB_AND_HARNESS_EXTENSIONS.md) | JSON/CSV/TSV connection editing and assembly binding. | Does not import other harness database formats. |
+| [Mechanical viewport tools](docs/MECHANICAL_VIEWPORT_TOOLS.md) | Object visibility, opacity, isolation, angled sections and point dimensions in the main viewport. | Development UI; uncapped cuts and explicit coordinate/anchor measurements. |
 | [MCAD Collaboration](docs/MCAD_EXPORT.md) | Preview and named STEP, FreeCAD, BREP, and metadata export. | Requires FreeCAD; geometry exchange only. |
 | [PWM Converter Analysis](extensions/converter-analysis/spike-extension.json) | Readiness checks and versioned setup envelope. | No converter solve or efficiency/loss calculation. |
 | [Net Inventory](extensions/net-inventory/spike-extension.json) | Example SDK net/conductor inventory. | No numerical analysis. |
@@ -221,7 +266,9 @@ engine calculation. See the [extension analysis contract](docs/EXTENSION_ANALYSI
 | User workflows and tutorials | [Documentation index](docs/README.md) |
 | Numerical implementation status and limits | [Solver status](docs/SOLVER_STATUS.md) |
 | Mathematics, methods, and references | [Mathematics](docs/SOLVER_MATHEMATICS.md) · [handbook](docs/SOLVER_HANDBOOK.md) · [references](docs/SOLVER_REFERENCES.md) |
-| LM Studio, Ollama, and MCP | [Local LLM and MCP](docs/LOCAL_LLM_MCP.md) |
+| Set up and use the Assistant: files, analysis, data and scripts | [Assistant user guide](docs/ASSISTANT_USER_GUIDE.md) |
+| Local work-folder inspection, CSV summaries and reviewed Python drafts | [Task harness](docs/ASSISTANT_TASK_HARNESS.md) |
+| LM Studio, Ollama, and external MCP configuration | [Local LLM and MCP](docs/LOCAL_LLM_MCP.md) |
 | Build, architecture, and contribution | [Developer guide](docs/DEVELOPER_GUIDE.md) · [architecture](ARCHITECTURE.md) · [contributing](CONTRIBUTING.md) |
 
 The product direction includes larger assemblies and coordinated cross-domain

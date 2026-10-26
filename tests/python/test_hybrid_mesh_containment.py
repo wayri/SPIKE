@@ -6,26 +6,13 @@ from pathlib import Path
 import unittest
 
 from python.core.board_parser import KicadParser
-from python.spike_core.hybrid_mesh import HybridMesh
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import (
-    _PolygonContainmentCache,
-    _clip_polygon_to_rect_fragments,
-    _point_in_polygon,
-    _clean_polygon,
-    _normalize_filled_zone_polygon,
-    _polygon_area,
-    _polygon_is_contained_in,
-    _polygon_is_simple,
-    _point_in_capsule_local,
-    _segment_inside_polygon,
-    _triangulate_polygon,
-    build_hybrid_mesh,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _PolygonContainmentCache, _clip_polygon_to_rect_fragments, _point_in_polygon, _clean_polygon, _normalize_filled_zone_polygon, _polygon_area, _polygon_is_contained_in, _polygon_is_simple, _point_in_capsule_local, _segment_inside_polygon, _triangulate_polygon, build_hybrid_mesh
 from python.spike_core.solver_plugins import default_solver_registry
-from python.spike_core.mesh_ownership import audit_dc_conductor_volume_ownership
-from python.spike_core.meshing import VOLUME_3D, build_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.mesh_ownership import audit_dc_conductor_volume_ownership
+from python.spike_core.solvers.geometry_meshing.preparation.meshing import VOLUME_3D, build_mesh
 
 
 def _xy(vertices):

@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import sparameter_crosstalk_timing as timing
+from python.spike_core.solvers.signal_integrity.networks import sparameter_crosstalk_timing as timing
 from tests.python.test_sparameter_multi_aggressor import request as source_request, physical, signed_request
 
 

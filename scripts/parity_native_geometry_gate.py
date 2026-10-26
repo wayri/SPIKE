@@ -52,7 +52,7 @@ def validate_native_facts(native, source):
 
 
 def validate_kicad_source_geometry(payload, native):
-    from python.spike_core.hybrid_mesh import _pad_boundary_polygon
+    from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _pad_boundary_polygon
     if payload['report']['source_sha256'] != native['source_sha256']:
         raise ValueError('Native pad gate source differs from CLI import.')
     pads = payload['design']['pads']
@@ -76,7 +76,7 @@ def validate_kicad_source_geometry(payload, native):
 
 def validate_pad_cohort(native, source):
     from python.core.board_parser import KicadParser
-    from python.spike_core.hybrid_mesh import _pad_boundary_polygon
+    from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _pad_boundary_polygon
     base = source.read_text(encoding='utf-8')
     expected_keys = {(t,s,f,p) for t in ('footprint','module') for s in ('F.Cu','B.Cu') for f in (0,90,37) for p in (None,0,23,90)}
     rows = native['pad_cases']

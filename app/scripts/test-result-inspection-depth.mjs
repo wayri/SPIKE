@@ -1,0 +1,22 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import * as THREE from "three";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const { applyResultInspectionDepth } = await importTestTypescript("resultInspectionDepth");
+const group = new THREE.Group();
+const material = new THREE.MeshBasicMaterial({ vertexColors: true });
+const geometry = new THREE.BufferGeometry();
+geometry.setAttribute("position", new THREE.Float32BufferAttribute([0,0,0, 1,0,0, 0,1,0], 3));
+geometry.setAttribute("color", new THREE.Float32BufferAttribute([1,0,0, 0,1,0, 0,0,1], 3));
+const surface = new THREE.Mesh(geometry, material); group.add(surface);
+const colors = [...geometry.getAttribute("color").array];
+applyResultInspectionDepth(group, false);
+assert.equal(material.depthTest, true, "opaque CAD retains physical occlusion");
+applyResultInspectionDepth(group, true);
+assert.equal(material.depthTest, false, "inspection exposes filled scalar surfaces through packages");
+assert.equal(material.depthWrite, false);
+assert.equal(material.vertexColors, true);
+assert.deepEqual([...geometry.getAttribute("color").array], colors, "inspection preserves returned value colors");
+assert.ok(surface.renderOrder >= 300);
+geometry.dispose(); material.dispose();
+console.log("Result inspection preserves filled scalar colors while explicitly disabling CAD occlusion.");

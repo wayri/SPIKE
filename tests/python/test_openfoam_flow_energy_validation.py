@@ -4,8 +4,7 @@ import unittest
 import tempfile
 import hashlib
 from pathlib import Path
-from python.spike_core.openfoam_flow_energy_validation import (integrate_energy_history,read_numeric_history,
-    _verify_equation_scope,_verify_history_stability,_initial_region_storage)
+from python.spike_core.solvers.external_engines.openfoam.openfoam_flow_energy_validation import integrate_energy_history, read_numeric_history, _verify_equation_scope, _verify_history_stability, _initial_region_storage
 from unittest.mock import patch
 
 
@@ -19,7 +18,7 @@ class FlowEnergyValidationTests(unittest.TestCase):
             "0/air/p":field("1 -1 -2 0 0 0 0","100"),
             "0/air/p_rgh":field("1 -1 -2 0 0 0 0","100")}
         region={"id":"air","kind":"fluid"};material={"specific_heat_j_kgk":2,"density_kg_m3":3}
-        with tempfile.TemporaryDirectory() as directory, patch("python.spike_core.openfoam_flow_energy_validation._dictionary",side_effect=lambda root,manifest,relative:texts[relative]):
+        with tempfile.TemporaryDirectory() as directory, patch("python.spike_core.solvers.external_engines.openfoam.openfoam_flow_energy_validation._dictionary",side_effect=lambda root,manifest,relative:texts[relative]):
             root=Path(directory);manifest={"input_files":{}}
             result=_initial_region_storage(root,manifest,region,material,.2,True)
             self.assertEqual(result["sensible_enthalpy_j_kg"],27)

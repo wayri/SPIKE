@@ -6,9 +6,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
+from python.spike_core.solvers.power_integrity.dc.hybrid_dc_solver import solve_hybrid_dc
 from python.spike_core.preflight import preflight_analysis
-from python.spike_core.source_current_limits import current_limit_issues, source_capacity
+from python.spike_core.solvers.power_integrity.dc.source_current_limits import current_limit_issues, source_capacity
 from python.spike_core.solver_plugins import default_solver_registry, ExternalProcessSolverPlugin, SolverPluginManifest
 
 
@@ -138,7 +138,7 @@ class SourceCurrentLimitTests(unittest.TestCase):
 
     def test_native_pi_path_compile_and_run_reject_limits(self):
         from tests.python.test_pi_path_circuit import ac_spec, extraction, mappings, three_net_design
-        from python.spike_core.pi_path_circuit import compile_pi_path_to_native_mna, run_pi_path_native_mna
+        from python.spike_core.solvers.power_integrity.dc.pi_path_circuit import compile_pi_path_to_native_mna, run_pi_path_native_mna
 
         for mode in ("dc", "ac", "transient"):
             with self.subTest(mode=mode):
@@ -153,17 +153,17 @@ class SourceCurrentLimitTests(unittest.TestCase):
                 self.assertEqual(compiled["status"], "blocked")
                 self.assertIsNone(compiled["request"])
                 self.assertIn("SPIKE-BE-PI-E-0111", [i["code"] for i in compiled["issues"]])
-                with patch("python.spike_core.pi_path_circuit.run_native_mna", side_effect=AssertionError("must not solve")):
+                with patch("python.spike_core.solvers.power_integrity.dc.pi_path_circuit.run_native_mna", side_effect=AssertionError("must not solve")):
                     result = run_pi_path_native_mna(three_net_design(), spec, extraction(), mappings())
                 self.assertEqual(result["status"], "blocked")
                 self.assertIsNone(result["result"])
 
     def test_direct_peec_rejects_limit_before_native_or_mesh_work(self):
-        from python.spike_core.peec_plugin import solve_peec_2_5d
+        from python.spike_core.solvers.power_integrity.peec.peec_plugin import solve_peec_2_5d
 
         design, spec = fixture()
         spec.mode = "ac"
-        with patch("python.spike_core.peec_plugin.build_hybrid_mesh", side_effect=AssertionError("must not mesh")):
+        with patch("python.spike_core.solvers.power_integrity.peec.peec_plugin.build_hybrid_mesh", side_effect=AssertionError("must not mesh")):
             result = solve_peec_2_5d(design, spec)
         self.assertEqual(result.status, "failed")
         self.assertEqual(result.model_status, "unsupported")

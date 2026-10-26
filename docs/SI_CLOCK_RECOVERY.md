@@ -2,7 +2,7 @@
 <!-- Copyright (c) 2026 SigHarmonic -->
 # Bounded NRZ clock recovery
 
-`python/spike_core/si_clock_recovery.py` implements an approximate behavioral
+`python/spike_core/solvers/signal_integrity/receivers/si_clock_recovery.py` implements an approximate behavioral
 threshold-transition timing detector and proportional/integral (PI) clock.
 It is dynamic feedback, not a best-phase scan or an ideal transmitted clock.
 It is not Gardner, a transistor-level CDR, a recent research novelty, or a

@@ -12,7 +12,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openems_benchmarks import patch_antenna_fixture
+from python.spike_core.solvers.external_engines.openems.openems_benchmarks import patch_antenna_fixture
 from python.spike_core.pcb_entity_ports import CONTRACT, prepare_entity_port_case
 from python.spike_core.external_engines import run_openems_case
 

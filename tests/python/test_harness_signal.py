@@ -11,8 +11,8 @@ import numpy as np
 from jsonschema import Draft202012Validator
 
 from python.spike_core.harness import export_harness, validate_harness
-from python.spike_core.harness_signal import compile_harness_si, prepare_harness_em, run_harness_si
-from python.spike_core.harness_pi import run_harness_pi
+from python.spike_core.solvers.signal_integrity.lines.harness_signal import compile_harness_si, prepare_harness_em, run_harness_si
+from python.spike_core.solvers.signal_integrity.lines.harness_pi import run_harness_pi
 
 
 def fixture():
@@ -201,8 +201,8 @@ class HarnessSignalTests(unittest.TestCase):
         raw = {"contract": "spike/harness-em-request/v1", "harness": harness, "wire_ids": ["p", "n"]}
         # Admission is already covered elsewhere; isolate the output-allocation
         # boundary so deepcopy proves no route copies happen before rejection.
-        with patch("python.spike_core.harness_signal._request", return_value=(harness, {"harness_digest": "a" * 64})), \
-             patch("python.spike_core.harness_signal.copy.deepcopy") as copier:
+        with patch("python.spike_core.solvers.signal_integrity.lines.harness_signal._request", return_value=(harness, {"harness_digest": "a" * 64})), \
+             patch("python.spike_core.solvers.signal_integrity.lines.harness_signal.copy.deepcopy") as copier:
             with self.assertRaisesRegex(ValueError, "HARNESS_EM_OUTPUT_LIMIT.*route points"):
                 prepare_harness_em(raw)
             copier.assert_not_called()
@@ -213,7 +213,7 @@ class HarnessSignalTests(unittest.TestCase):
                               "extensions": {"vendor": "x" * 10000}}]
         for wire in harness["wires"]: wire.update(route_id="r", area_mm2=.5)
         raw = {"contract": "spike/harness-em-request/v1", "harness": harness, "wire_ids": ["p", "n"]}
-        with patch("python.spike_core.harness_signal.MAX_EM_HANDOFF_BYTES", 25000), \
+        with patch("python.spike_core.solvers.signal_integrity.lines.harness_signal.MAX_EM_HANDOFF_BYTES", 25000), \
              self.assertRaisesRegex(ValueError, "HARNESS_EM_OUTPUT_LIMIT.*MiB"):
             prepare_harness_em(raw)
 

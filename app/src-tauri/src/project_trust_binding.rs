@@ -18,8 +18,12 @@ impl ProjectManifestState {
     }
 }
 
+pub fn is_linked_source_method(method: &str) -> bool {
+    matches!(method, "linked_source_status" | "prepare_linked_source_update" | "link_project_source" | "apply_linked_source_update")
+}
+
 pub fn is_targeted_project_read(method: &str) -> bool {
-    matches!(
+    is_linked_source_method(method) || matches!(
         method,
         "read_project_model_artifacts"
             | "read_project_package_shape_selector_previews"
@@ -169,6 +173,11 @@ pub fn update_from_worker_response(
             .remove(project_path);
         return Ok(());
     }
+    if matches!(method, "link_project_source" | "apply_linked_source_update")
+        && response_manifest_identity(response).is_none()
+    {
+        return Err("SPIKE-BE-PACKAGE-S-0001: linked source mutation is missing its updated manifest identity; reopen the project".into());
+    }
     let binding = if method == "read_project_package" {
         Some(opened_project_binding(response)?)
     } else {
@@ -191,6 +200,40 @@ pub fn update_from_worker_response(
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn linked_sources_require_open_identity_and_mutations_advance_it() {
+        for method in ["linked_source_status", "prepare_linked_source_update", "link_project_source", "apply_linked_source_update"] {
+            assert!(is_linked_source_method(method));
+            assert!(is_targeted_project_read(method));
+            let state = ProjectManifestState::new();
+            let path = PathBuf::from("linked.spike");
+            let old = json!({"params": {"expected_manifest_payload_sha256": "a".repeat(64)}});
+            assert!(require_targeted_read_binding(method, &old, &path, &state).is_err());
+            let opened = json!({"ok": true, "result": {"manifest": {"manifest_payload_sha256": "a".repeat(64)}, "manifest_signature": {"present": false}}});
+            update_from_worker_response("read_project_package", &path, &opened, &state).unwrap();
+            require_targeted_read_binding(method, &old, &path, &state).unwrap();
+            let failed = json!({"ok": false, "result": {"manifest_payload_sha256": "b".repeat(64)}});
+            update_from_worker_response(method, &path, &failed, &state).unwrap();
+            require_targeted_read_binding(method, &old, &path, &state).unwrap();
+            let updated = json!({"ok": true, "result": {"manifest": {"manifest_payload_sha256": "b".repeat(64)}}});
+            update_from_worker_response(method, &path, &updated, &state).unwrap();
+            assert!(require_targeted_read_binding(method, &old, &path, &state).is_err());
+            let fresh = json!({"params": {"expected_manifest_payload_sha256": "b".repeat(64)}});
+            require_targeted_read_binding(method, &fresh, &path, &state).unwrap();
+        }
+        assert!(!is_linked_source_method("import_design"));
+    }
+
+    #[test]
+    fn linked_source_mutation_requires_updated_manifest_identity() {
+        let state = ProjectManifestState::new();
+        let response = json!({"ok": true, "result": {"status": "updated"}});
+        for method in ["link_project_source", "apply_linked_source_update"] {
+            assert!(update_from_worker_response(method, Path::new("linked.spike"), &response, &state).is_err());
+        }
+        update_from_worker_response("linked_source_status", Path::new("linked.spike"), &response, &state).unwrap();
+    }
 
     #[test]
     fn saved_results_and_visuals_require_native_open_identity() {

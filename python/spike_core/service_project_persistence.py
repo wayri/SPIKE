@@ -80,7 +80,7 @@ def without_saved_results(payload: dict) -> dict:
             volume_study["result"] = None
         field_study = analyses.get("assembly_field_study")
         if field_study is not None:
-            from .assembly_field_study import import_assembly_field_study, export_assembly_field_study
+            from .solvers.execution.coupling.assembly_field_study import import_assembly_field_study, export_assembly_field_study
             admitted = import_assembly_field_study(field_study)
             analyses["assembly_field_study"] = export_assembly_field_study(
                 admitted["request"], admitted["problem"], admitted["result"], include_results=False,

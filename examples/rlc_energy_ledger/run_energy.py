@@ -18,7 +18,7 @@ def request():
 
 
 if __name__ == '__main__':
-    from python.spike_core.sparameter_rlc_energy import run_rlc_energy_ledger
+    from python.spike_core.solvers.signal_integrity.networks.sparameter_rlc_energy import run_rlc_energy_ledger
     result = run_rlc_energy_ledger(request())
     print(json.dumps({key: result[key] for key in ('contract', 'model_status', 'production_qualified',
                                                   'input_digest', 'totals', 'diagnostics')}))

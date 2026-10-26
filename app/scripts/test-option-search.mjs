@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+const source = readFileSync(new URL("../src/optionSearch.ts", import.meta.url), "utf8");
+const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText;
+const module = { exports: {} }; new Function("module", "exports", compiled)(module, module.exports);
+const { optionMatchesQuery: matches, commitSelectChoice } = module.exports;
+for (const query of ["", "gnd", "G*N*D", "power gnd*", "?ND", "G*ND", "*", "power *plane"]) assert(matches("Power GND plane", query), query);
+for (const query of ["power vcc", "G?D?z", "signal", "[GN]D", "power GND +5V"]) assert(!matches("Power GND plane", query), query);
+assert(matches("C10 supply", "c?0")); assert(!matches("C100", "c?0z"));
+assert(matches("In1.Cu", "in?.cu")); assert(!matches("In1.Cu", "in?.mask"));
+assert(matches("Ｋａｐｔｏｎ", "kapton"), "normalized Unicode");
+assert(matches("Board 🧪 net", "board ? net"), "? matches one Unicode character");
+assert(!matches("a".repeat(1000), "a*".repeat(40) + "z"), "repeated wildcard mismatch terminates without regex backtracking");
+const events = [];
+const option = { value: "net-1", label: "GND", textContent: "GND", hidden: false, disabled: false, parentElement: { tagName: "SELECT" } };
+const select = { isConnected: true, disabled: false, selectedIndex: 0, matches: () => false, options: [option], dispatchEvent: event => events.push(event.type) };
+assert(commitSelectChoice(select, { index: 0, value: "net-1" })); assert.equal(events.length, 0, "reselecting a value does not mutate it");
+select.selectedIndex = -1; assert(commitSelectChoice(select, { index: 0, value: "net-1" })); assert.deepEqual(events, ["change"]);
+select.matches = () => true; assert(!commitSelectChoice(select, { index: 0, value: "net-1" }), "disabled ancestor fieldset blocks changes"); select.matches = () => false;
+option.value = "replacement"; assert(!commitSelectChoice(select, { index: 0, value: "net-1" }), "stale options rejected");
+option.disabled = true; assert(!commitSelectChoice(select, { index: 0, value: "replacement" }));
+select.isConnected = false; assert(!commitSelectChoice(select, { index: 0, value: "replacement" }));
+console.log("Option search: AND terms, * and ? wildcards, Unicode, metacharacters, adversarial pattern, disabled/stale choices and native change semantics passed.");

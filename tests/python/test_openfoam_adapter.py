@@ -9,18 +9,8 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.openfoam import (
-    ADAPTER_CONTRACT,
-    CASE_CONTRACT,
-    RESULT_CONTRACT,
-    _digest,
-    _write_normalized_result,
-    import_case_result,
-    _wsl_case_path,
-    openfoam_capabilities,
-    prepare_case,
-)
-from python.spike_core.thermal import ThermalScenario, validate_scenario
+from python.spike_core.solvers.external_engines.openfoam.openfoam import ADAPTER_CONTRACT, CASE_CONTRACT, RESULT_CONTRACT, _digest, _write_normalized_result, import_case_result, _wsl_case_path, openfoam_capabilities, prepare_case
+from python.spike_core.solvers.thermal_fluid.heat.thermal import ThermalScenario, validate_scenario
 
 
 def _air_scenario(*, forced: bool = False) -> ThermalScenario:
@@ -125,8 +115,8 @@ class OpenFoamAdapterTests(unittest.TestCase):
             "version": "2606", "distribution": "Ubuntu", "launcher": "C:/Windows/System32/wsl.exe",
             "command_prefix": ["C:/Windows/System32/wsl.exe", "-d", "Ubuntu", "--", "/usr/bin/openfoam2606"],
         }
-        with patch("python.spike_core.openfoam.detect_openfoam_runtime", return_value=runtime), patch(
-            "python.spike_core.openfoam.shutil.which", return_value=None
+        with patch("python.spike_core.solvers.external_engines.openfoam.openfoam.detect_openfoam_runtime", return_value=runtime), patch(
+            "python.spike_core.solvers.external_engines.openfoam.openfoam.shutil.which", return_value=None
         ):
             capabilities = openfoam_capabilities()
         self.assertTrue(capabilities["execution_ready"])
@@ -135,7 +125,7 @@ class OpenFoamAdapterTests(unittest.TestCase):
     def test_wsl_case_path_uses_fixed_argv_mounted_drive_validation(self):
         runtime = {"launcher": "C:/Windows/System32/wsl.exe", "distribution": "Ubuntu"}
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="", stderr="")
-        with patch("python.spike_core.openfoam.subprocess.run", return_value=completed) as spawned:
+        with patch("python.spike_core.solvers.external_engines.openfoam.openfoam.subprocess.run", return_value=completed) as spawned:
             path = _wsl_case_path(runtime, Path(r"C:\\Users\\example-user\\AppData\\Local\\Temp\\case"))
         self.assertEqual(path, "/mnt/c/Users/example-user/AppData/Local/Temp/case")
         self.assertEqual(spawned.call_args.args[0][-3:], ["test", "-d", path])

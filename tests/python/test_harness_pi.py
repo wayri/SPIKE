@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.harness_pi import compile_harness_pi, run_harness_pi
+from python.spike_core.solvers.signal_integrity.lines.harness_pi import compile_harness_pi, run_harness_pi
 
 
 def end(connector, pin):
@@ -138,7 +138,7 @@ class HarnessPiTests(unittest.TestCase):
                 compile_harness_pi(raw)
 
     def test_cancellation_discards_output(self):
-        with patch("python.spike_core.harness_pi.run_native_mna") as kernel:
+        with patch("python.spike_core.solvers.signal_integrity.lines.harness_pi.run_native_mna") as kernel:
             with self.assertRaisesRegex(ValueError, "cancelled"):
                 run_harness_pi(fixture(), cancel_check=lambda: True)
             kernel.assert_not_called()

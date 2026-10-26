@@ -13,7 +13,7 @@ def main() -> None:
     parser.add_argument("--generator")
     parser.add_argument("--skip-tests", action="store_true")
     args = parser.parse_args()
-    command = ["cmake", "-S", str(ROOT / "src/airflow"), "-B", str(args.build_dir), "-DCMAKE_BUILD_TYPE=Release"]
+    command = ["cmake", "-S", str(ROOT / 'src/solvers/thermal_fluid/airflow'), "-B", str(args.build_dir), "-DCMAKE_BUILD_TYPE=Release"]
     if args.generator:
         command += ["-G", args.generator]
     subprocess.run(command, check=True)

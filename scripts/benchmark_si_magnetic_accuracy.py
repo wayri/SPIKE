@@ -22,10 +22,10 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
 if str(REPOSITORY_ROOT) not in sys.path:
     sys.path.insert(0, str(REPOSITORY_ROOT))
 
-from python.spike_core.magnetic_fem import MU0, solve_magnetostatic
-from python.spike_core.magnetic_thermal import simulate_magnetic_thermal
-from python.spike_core.si_channel import time_domain_report, uniform_rlgc_network
-from python.spike_core.si_workflow import _loaded_response
+from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import MU0, solve_magnetostatic
+from python.spike_core.solvers.electromagnetics.machines.magnetic_thermal import simulate_magnetic_thermal
+from python.spike_core.solvers.signal_integrity.channels.si_channel import time_domain_report, uniform_rlgc_network
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import _loaded_response
 
 
 def timed(callable_):
@@ -272,10 +272,10 @@ def main():
                        "external_magnetics": "absent_not_run",
                        "source_sha256": {
                            "scripts/benchmark_si_magnetic_accuracy.py": sha256_file(Path(__file__)),
-                           "python/spike_core/si_channel.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/si_channel.py"),
-                           "python/spike_core/si_workflow.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/si_workflow.py"),
-                           "python/spike_core/magnetic_fem.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/magnetic_fem.py"),
-                           "python/spike_core/magnetic_thermal.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/magnetic_thermal.py"),
+                           "python/spike_core/solvers/signal_integrity/channels/si_channel.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/solvers/signal_integrity/channels/si_channel.py"),
+                           "python/spike_core/solvers/signal_integrity/receivers/si_workflow.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/solvers/signal_integrity/receivers/si_workflow.py"),
+                           "python/spike_core/solvers/electromagnetics/machines/magnetic_fem.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/solvers/electromagnetics/machines/magnetic_fem.py"),
+                           "python/spike_core/solvers/electromagnetics/machines/magnetic_thermal.py": sha256_file(REPOSITORY_ROOT / "python/spike_core/solvers/electromagnetics/machines/magnetic_thermal.py"),
                        }},
         "reproduction_command": "build\\qualification-py311\\Scripts\\python.exe scripts\\benchmark_si_magnetic_accuracy.py",
     }

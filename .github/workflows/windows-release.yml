@@ -34,6 +34,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: app/src-tauri -> target
+      - name: Check private research publication boundary
+        run: python scripts/check_private_research.py
       - name: Build, install, and verify Windows package
         shell: powershell
         run: ./scripts/build_windows_ci.ps1

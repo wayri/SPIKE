@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 import unittest
-from python.spike_core.fdtd_completion import screen_fdtd_completion
+from python.spike_core.solvers.electromagnetics.fields.fdtd_completion import screen_fdtd_completion
 
 GOOD='Create FDTD operator\nExcitation signal length is: 20 timesteps\nTimestep: 100 || Energy: ~1e-9 (-40.80dB)\nTime for 100 iterations with 100 cells\n'
 

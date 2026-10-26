@@ -9,11 +9,9 @@ from types import SimpleNamespace
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import build_hybrid_mesh
-from python.spike_core.quasistatic_copper_area import (
-    _partition_area, estimate_branch_capacitance,
-)
-from python.spike_core.quasistatic_capacitance import EPSILON_0_F_M, estimate_line_capacitance_per_m
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh
+from python.spike_core.solvers.power_integrity.pdn.quasistatic_copper_area import _partition_area, estimate_branch_capacitance
+from python.spike_core.solvers.power_integrity.pdn.quasistatic_capacitance import EPSILON_0_F_M, estimate_line_capacitance_per_m
 
 
 def rectangle(x0, y0, x1, y1):

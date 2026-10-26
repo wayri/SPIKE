@@ -97,7 +97,7 @@ def run(
 
 
 def _native_hash() -> str | None:
-    from python.spike_core.peec_plugin import native
+    from python.spike_core.solvers.power_integrity.peec.peec_plugin import native
     return hashlib.sha256(Path(native.__file__).read_bytes()).hexdigest() if native else None
 
 

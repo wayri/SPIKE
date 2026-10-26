@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.board_thermal import run_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.board_thermal import run_board_thermal
 from python.spike_core.kicad_importer import import_kicad_design
 from examples.sas_qualification.run_board_reference import digest, export_fields
 

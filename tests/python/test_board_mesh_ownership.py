@@ -7,15 +7,10 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, ValidationError
 
-from python.spike_core.board_mesh_ownership import (
-    ERROR_CODE,
-    BoardMeshOwnershipError,
-    build_board_mesh_ownership_overlay,
-    validate_board_mesh_ownership_overlay,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.board_mesh_ownership import ERROR_CODE, BoardMeshOwnershipError, build_board_mesh_ownership_overlay, validate_board_mesh_ownership_overlay
 from python.spike_core.contracts import AnalysisSpec
 from python.spike_core.kicad_importer import import_kicad_design
-from python.spike_core.meshing import VOLUME_3D, build_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.meshing import VOLUME_3D, build_mesh
 from tests.python.test_mesh_ownership import _volume_fixture
 
 

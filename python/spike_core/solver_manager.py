@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, Iterable, List
 
-from .acceleration import acceleration_catalog
+from .solvers.execution.resources.acceleration import acceleration_catalog
 from .solver_blocks import solver_blocks_catalog
 from .external_engines import external_engine_catalog
 from .spikes_runtime import engine_status

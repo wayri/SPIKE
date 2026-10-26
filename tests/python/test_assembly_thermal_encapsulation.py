@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from tests.python.test_assembly_thermal_meshing import fixture, has_runtime
-from python.spike_core.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
 
 
 def encapsulated(kind='potting'):
@@ -75,10 +75,10 @@ class PhysicalGeometryTests(unittest.TestCase):
             self.assertAlmostEqual(result['evidence'][1]['metrics']['cad_volume_mm3'],4.064,places=9)
 
     def _assert_physical_power(self, kind):
-        from python.spike_core.assembly_thermal_autolink import autolink_assembly_thermal_contacts
-        from python.spike_core.assembly_thermal_body_power import assign_assembly_thermal_body_power
-        from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
-        from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
+        from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_autolink import autolink_assembly_thermal_contacts
+        from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_body_power import assign_assembly_thermal_body_power
+        from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
+        from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
         p,a,o,r=encapsulated(kind)
         with tempfile.TemporaryDirectory() as d:
             generated=run_assembly_thermal_mesh(p,a,o,Path(d)/'run',artifact_reader=r)

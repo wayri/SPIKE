@@ -2,7 +2,7 @@
 
 ## Scope
 
-`python/spike_core/sparselizard_adapter.py` defines the SPIKE boundary for a
+`python/spike_core/solvers/external_engines/sparselizard/sparselizard_adapter.py` defines the SPIKE boundary for a
 separately built `spike-sparselizard-adapter` executable. It is not a Python
 binding to sparseLizard and does not load a sparseLizard library, source tree,
 plugin, or shared object into the SPIKE process.

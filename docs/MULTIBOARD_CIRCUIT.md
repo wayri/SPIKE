@@ -1,6 +1,6 @@
 # Coupled multi-board reduced circuits
 
-`python/spike_core/multiboard_circuit.py` executes one linear modified nodal
+`python/spike_core/solvers/circuits/models/multiboard_circuit.py` executes one linear modified nodal
 analysis system containing every retained board occurrence and every retained
 harness/mate pin. This is an experimental approximate circuit capability,
 not a geometry extraction or cross-board electromagnetic field solver.

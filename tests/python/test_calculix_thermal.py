@@ -14,10 +14,10 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 
-from python.spike_core.calculix_deck import compile_calculix_deck
-from python.spike_core.calculix_runtime import parse_calculix_temperatures, probe_calculix_runtime, run_calculix_deck
-from python.spike_core.calculix_runtime import _artifact_bytes
-from python.spike_core.calculix_thermal import prepare_calculix_thermal, run_calculix_thermal, verify_calculix_thermal_result
+from python.spike_core.solvers.external_engines.calculix.calculix_deck import compile_calculix_deck
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import parse_calculix_temperatures, probe_calculix_runtime, run_calculix_deck
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import _artifact_bytes
+from python.spike_core.solvers.external_engines.calculix.calculix_thermal import prepare_calculix_thermal, run_calculix_thermal, verify_calculix_thermal_result
 from python.spike_core.multiboard_identity import canonical_json_digest
 from tests.python.test_assembly_tetra_thermal import cube, request, contact_request, boundary, faces_at
 from tests.python.test_assembly_tetra_radiation import slab
@@ -163,8 +163,8 @@ class CalculixExecutableTests(unittest.TestCase):
 
     def test_host_admission_and_embedded_project_reopen(self):
         from python.spike_core.extensions import ExtensionManifest, ProcessExtension
-        from python.spike_core.assembly_field_study import export_assembly_field_study
-        from python.spike_core.assembly_field_study import import_assembly_field_study
+        from python.spike_core.solvers.execution.coupling.assembly_field_study import export_assembly_field_study
+        from python.spike_core.solvers.execution.coupling.assembly_field_study import import_assembly_field_study
         from python.spike_core.project_package import read_project
         from tests.python.test_project_assembly_field import _payload, _call, MODEL_ARTIFACT
         from python.spike_core.project_package import write_spike_package
@@ -192,7 +192,7 @@ class CalculixExecutableTests(unittest.TestCase):
             saved = _call('save_assembly_field_study_in_project', path, package_manifest, record=record)
             self.assertTrue(saved['ok'], saved)
             reopened = read_project(path, include_members=True)
-            with patch('python.spike_core.calculix_runtime.run_calculix_deck', side_effect=AssertionError('Offline reopening cannot solve')):
+            with patch('python.spike_core.solvers.external_engines.calculix.calculix_runtime.run_calculix_deck', side_effect=AssertionError('Offline reopening cannot solve')):
                 loaded = _call('read_assembly_field_study_in_project', path, reopened.manifest)
             self.assertTrue(loaded['ok'], loaded)
             self.assertEqual(loaded['result']['state'], 'current')

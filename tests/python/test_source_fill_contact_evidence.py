@@ -8,9 +8,7 @@ from unittest.mock import patch
 from python.spike_core.kicad_importer import import_kicad_design
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.spike_core.spider_v2_schema import content_digest
-from python.spike_core.zone_pad_connection_evidence import (
-    build_zone_pad_connection_evidence, validate_zone_pad_connection_evidence,
-)
+from python.spike_core.solvers.power_integrity.dc.zone_pad_connection_evidence import build_zone_pad_connection_evidence, validate_zone_pad_connection_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -39,7 +37,7 @@ class SourceFillContactEvidenceTests(unittest.TestCase):
             path = Path(directory) / 'contact.kicad_pcb'
             path.write_text(source, encoding='utf-8')
             design = SpiDeRV2.from_v1(import_kicad_design(str(path)))
-        with patch('python.spike_core.hybrid_mesh.prepare_filled_path',
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh.prepare_filled_path',
                    side_effect=AssertionError('Contact evidence must not validate a mesh domain')):
             report = build_zone_pad_connection_evidence(design)
             validate_zone_pad_connection_evidence(report, source_geometry=design)

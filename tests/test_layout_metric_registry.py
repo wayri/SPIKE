@@ -3,13 +3,7 @@ import copy
 import json
 import unittest
 
-from python.spike_core.layout_metric_registry import (
-    LayoutMetricRegistryError,
-    canonical_metric_registry_json,
-    negotiate_layout_requirements,
-    validate_metric_registry,
-    validate_requirements_for_launch,
-)
+from python.spike_core.layout_metric_registry import LayoutMetricRegistryError, canonical_metric_registry_json, negotiate_layout_requirements, validate_metric_registry, validate_requirements_for_launch
 
 
 class LayoutMetricRegistryTests(unittest.TestCase):

@@ -1,0 +1,4 @@
+(fp_lib_table
+ (version 7)
+ (lib (name "Carrier") (type "KiCad") (uri "${KIPRJMOD}/Carrier.pretty") (options "") (descr "Original illustrative geometry; ratings unqualified"))
+)

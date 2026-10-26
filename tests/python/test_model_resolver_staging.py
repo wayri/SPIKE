@@ -4,10 +4,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.models import (
-    _stage_resolved_model_references,
-    automatic_component_model_overrides,
-)
+from python.spike_core.models import _stage_resolved_model_references, automatic_component_model_overrides
 
 
 class ModelResolverStagingTests(unittest.TestCase):

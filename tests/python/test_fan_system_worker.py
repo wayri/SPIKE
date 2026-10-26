@@ -10,7 +10,7 @@ import unittest
 import jsonschema
 
 from examples.assembly_field.run_fan_system import run_examples, setup_fan_system
-from python.spike_core.fan_system_operating_point import solve_fan_system_operating_point
+from python.spike_core.solvers.thermal_fluid.flow.fan_system_operating_point import solve_fan_system_operating_point
 
 ROOT = Path(__file__).resolve().parents[2]
 METHOD = 'solve_fan_system_operating_point'

@@ -8,9 +8,9 @@ from unittest.mock import patch
 import numpy as np
 from scipy.sparse import csr_matrix, diags
 
-from python.spike_core.hybrid_mesh import MeshBranch
-from python.spike_core.peec_conforming_dc import solve_conforming_dc
-from python.spike_core.peec_rt0_iterative import solve_iterative_conforming_dc, _multilevel_preconditioner
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import MeshBranch
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import solve_conforming_dc
+from python.spike_core.solvers.power_integrity.peec.peec_rt0_iterative import solve_iterative_conforming_dc, _multilevel_preconditioner
 from tests.python.test_peec_conforming_dc import rectangle_mesh
 
 
@@ -135,16 +135,16 @@ class IterativeRT0Tests(unittest.TestCase):
         def bogus_cg(operator, rhs, **kwargs):
             return np.zeros(len(rhs)), 0
 
-        with patch("python.spike_core.peec_rt0_iterative.cg", side_effect=bogus_cg):
+        with patch("python.spike_core.solvers.power_integrity.peec.peec_rt0_iterative.cg", side_effect=bogus_cg):
             with self.assertRaisesRegex(ValueError, "checks failed"):
                 solve_iterative_conforming_dc(coupon(), 0, 1)
 
     def test_cancellation_and_timeout_fail_before_assembly(self):
-        with patch("python.spike_core.peec_rt0_iterative.assemble_conforming_dc") as assemble:
+        with patch("python.spike_core.solvers.power_integrity.peec.peec_rt0_iterative.assemble_conforming_dc") as assemble:
             with self.assertRaisesRegex(ValueError, "cancelled"):
                 solve_iterative_conforming_dc(coupon(), 0, 1, cancelled=lambda: True)
             assemble.assert_not_called()
-        with patch("python.spike_core.peec_rt0_iterative.monotonic", side_effect=[0.0, 2.0]):
+        with patch("python.spike_core.solvers.power_integrity.peec.peec_rt0_iterative.monotonic", side_effect=[0.0, 2.0]):
             with self.assertRaisesRegex(ValueError, "timeout"):
                 solve_iterative_conforming_dc(coupon(), 0, 1, timeout_s=1)
 

@@ -2,7 +2,7 @@
 
 PI02-S02 terminates auxiliary ports of a supplied sampled admittance network
 and retains selected ports in explicit order. Use `reduce_pdn_admittance` from
-`python/spike_core/pdn_admittance_reduction.py` or the worker method with exactly
+`python/spike_core/solvers/power_integrity/pdn/pdn_admittance_reduction.py` or the worker method with exactly
 `{request: ...}`. The request contract is
 `spike/pdn-admittance-reduction-request/v1`; the installed offline schema checks
 structure, and numerical admission additionally checks identities and samples.

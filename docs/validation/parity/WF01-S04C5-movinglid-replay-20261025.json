@@ -1,0 +1,43 @@
+{
+  "contract": "spike/step-scale-stage/v1",
+  "stage_id": "WF01-S04C5",
+  "status": "passed",
+  "production_qualified": false,
+  "material_qualified": false,
+  "source_projection_enabled": false,
+  "sources": {
+    "scripts/parity_step_scale_gate.py": "ea88c3d0dbcaca2195c968688bf4d788b675a24541a1fc5e3fde9edb9c0759cf",
+    "python/spike_core/component_step_scale.py": "31b8be60d32007b81e2f90c1cf88def95970948af8a73b2f0ef80c5e535da875",
+    "python/spike_core/freecad_scale_step.py": "4a8812b02639f88856b080db73d8dd0ebab83a1245e292cd835aa402c5470aa7",
+    "tests/python/test_component_step_scale.py": "6e0b6dcea312a70faff83c334f5bc4d4145b1330d6258fdf38ba20813b32c653",
+    "python/spike_core/mcad_importer.py": "fb317e118a411c70e84f881bba1b9d819041e0f022f7ab59bf8f353b14804cab",
+    "python/spike_core/mcad_tessellation.py": "ea9c3e3d8857c661314059cfe1dbb83c391bec615b192126ecffe2d8d68cc6cb",
+    "python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py": "4a7e2ca2844c5fdd83df946c44bf50040a739e55cc3b40a057e6ae84973337e0",
+    "scripts/parity_native_step_placement_gate.py": "0cc6f5fe77270aa6ceff65ae7eee5530ffea6578db6246342e6c65da4491242c",
+    "benchmarks/parity-import/component-solid.step": "9144054f0ec8ae87e131c88f9383815d4ffaf6605557c891cd95c9451e29bdfc",
+    "benchmarks/parity-import/step-scale/cylinder.step": "589bd8a4d24d0437d41257abcda1f4f2d8b924ff316a920e421913ba495707ad",
+    "benchmarks/parity-import/step-scale/probe_native.py": "2ee9eab9840b7de679713891cdd600f176d752078fec693e3e1bf85bfe464d41",
+    "benchmarks/parity-import/step-scale/report.json": "4f9bbfd90922638006bc0bbb95860eacf02d76faf6c046ec8fcc5e2e1cd2eb1e",
+    "benchmarks/parity-import/step-scale/cylinder_failure_evidence.json": "fcf2a567d72dcb5618050ade610026820eb6963bf5eaab188795b49908757f98"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_component_step_scale.NativeStepScaleTests.test_actual_curved_conversion_fails_closed",
+      "tests.python.test_component_step_scale.NativeStepScaleTests.test_actual_native_cube_factors_and_reimported_vertices",
+      "tests.python.test_component_step_scale.ScaleAdmissionTests.test_constant_volume_does_not_hide_changed_bounds",
+      "tests.python.test_component_step_scale.ScaleAdmissionTests.test_failed_process_produces_no_asset",
+      "tests.python.test_component_step_scale.ScaleAdmissionTests.test_native_failures_cannot_be_admitted",
+      "tests.python.test_component_step_scale.ScaleAdmissionTests.test_source_and_bad_factors_reject_before_native_execution"
+    ],
+    "run": 6,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/WF01-S04C5-movinglid-replay-20261025.log",
+  "log_sha256": "79b1c15b1b397ebfa72e0c81b1a4dfd5956acd1eef816d8882bdc1d9cef6f3f3",
+  "native_evidence": "docs/validation/parity/WF01-S04C5-movinglid-native-20261025.json",
+  "native_evidence_sha256": "1bb467e9cf410d6ef2fad26dd2cf2cc4bc02783a2b9244797b81054e7c98fa8d"
+}

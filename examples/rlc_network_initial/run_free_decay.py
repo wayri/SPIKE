@@ -26,7 +26,7 @@ def request():
 
 
 if __name__ == '__main__':
-    from python.spike_core.sparameter_rlc_initial import run_initialized_rlc_network_transient
+    from python.spike_core.solvers.signal_integrity.networks.sparameter_rlc_initial import run_initialized_rlc_network_transient
     result = run_initialized_rlc_network_transient(request())
     print(json.dumps({key: result[key] for key in ('contract', 'model_status', 'production_qualified',
                                                   'input_digest', 'points', 'restart_state', 'diagnostics')}))

@@ -6,7 +6,7 @@ ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 import numpy as np
 from python.spike_core.project_package import read_project
 from python.spike_core.headless import run_request
-from python.spike_core.multiboard_circuit import compile_multiboard_circuit
+from python.spike_core.solvers.circuits.models.multiboard_circuit import compile_multiboard_circuit
 from python.spike_core.spider_v2 import AssemblyIRV1
 from python.spike_core.harness_authoring import validate_harness_connections, discover_connectors
 from scripts.build_arduino_shield_acceptance import _pin_mapping

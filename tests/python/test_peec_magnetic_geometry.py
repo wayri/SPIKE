@@ -6,11 +6,8 @@ import math
 import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import MeshBranch, build_hybrid_mesh
-from python.spike_core.peec_magnetic_geometry import (
-    MagneticGeometryError,
-    describe_magnetic_cross_section,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import MeshBranch, build_hybrid_mesh
+from python.spike_core.solvers.power_integrity.peec.peec_magnetic_geometry import MagneticGeometryError, describe_magnetic_cross_section
 
 
 def branch(kind="via", width=None, thickness=0.025, source_id="v1"):

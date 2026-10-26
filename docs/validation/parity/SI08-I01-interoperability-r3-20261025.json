@@ -1,0 +1,70 @@
+{
+  "contract": "spike/si08-interoperability-evidence/v1",
+  "point_id": "I01",
+  "status": "passed",
+  "implementation_point_complete": true,
+  "sources_before": {
+    "python/spike_core/solvers/signal_integrity/networks/sparameters.py": "f4b53ce4dd104416e70b6344aa6b817025de46a2c3aae24d69442847c14826e9",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_modes.py": "ec62ba1c80be27064c165d74347f2f8d592294d86b9518cf510fafabe1e0a656",
+    "examples/si08_interoperability/run_campaign.py": "6ea672eeac03bc37a15b7b54cb9feddbe21e43397bcf7a0a2791cfe1a4aeaba6",
+    "tests/python/test_si08_interoperability_campaign.py": "b5f4b40eaae943f04ec5901dc082a2fe36b0d909bfbc332fce24e0f67ca9dc50",
+    "tests/python/test_si08_interoperability_oracles.py": "29b49ca739adffe018021975033de4c984c7d8f2df9b9b0bd2e0331b7e0d741f",
+    "tests/python/test_si08_interoperability_evidence.py": "2d0cc17fb7fc5265a91cc577cad808c1ff5c06b9d6b16cd90ae4052c82fab249",
+    "tests/python/test_sparameter_modes.py": "6156a54e737d0c50648f5ea95ff7ce72447be249f592100978bed53dcf0a67c9",
+    "scripts/verify_si08_interoperability.py": "16e81308bea6254642b1922310e8d73d01974d8a747cea0b8c966bc766a9d2df",
+    "docs/SI08_INTEROPERABILITY_CAMPAIGN.md": "6e3bf34fea04d0b006758c8de91114c73106ecc8666bac9b0866ab7976d2ce50",
+    "docs/validation/SI08_I01_INTEROP_ORACLE_20261025.md": "abb2f3baa739e68f0f88e765556c975926c49eb79c45b9b1a5eadf7a87e5f05f"
+  },
+  "sources_after": {
+    "python/spike_core/solvers/signal_integrity/networks/sparameters.py": "f4b53ce4dd104416e70b6344aa6b817025de46a2c3aae24d69442847c14826e9",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_modes.py": "ec62ba1c80be27064c165d74347f2f8d592294d86b9518cf510fafabe1e0a656",
+    "examples/si08_interoperability/run_campaign.py": "6ea672eeac03bc37a15b7b54cb9feddbe21e43397bcf7a0a2791cfe1a4aeaba6",
+    "tests/python/test_si08_interoperability_campaign.py": "b5f4b40eaae943f04ec5901dc082a2fe36b0d909bfbc332fce24e0f67ca9dc50",
+    "tests/python/test_si08_interoperability_oracles.py": "29b49ca739adffe018021975033de4c984c7d8f2df9b9b0bd2e0331b7e0d741f",
+    "tests/python/test_si08_interoperability_evidence.py": "2d0cc17fb7fc5265a91cc577cad808c1ff5c06b9d6b16cd90ae4052c82fab249",
+    "tests/python/test_sparameter_modes.py": "6156a54e737d0c50648f5ea95ff7ce72447be249f592100978bed53dcf0a67c9",
+    "scripts/verify_si08_interoperability.py": "16e81308bea6254642b1922310e8d73d01974d8a747cea0b8c966bc766a9d2df",
+    "docs/SI08_INTEROPERABILITY_CAMPAIGN.md": "6e3bf34fea04d0b006758c8de91114c73106ecc8666bac9b0866ab7976d2ce50",
+    "docs/validation/SI08_I01_INTEROP_ORACLE_20261025.md": "abb2f3baa739e68f0f88e765556c975926c49eb79c45b9b1a5eadf7a87e5f05f"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_si08_interoperability_campaign.InteroperabilityCampaignTests.test_explicit_pair_polarity_export_and_source_identity",
+      "tests.python.test_si08_interoperability_campaign.InteroperabilityCampaignTests.test_invalid_names_partition_and_source_are_rejected",
+      "tests.python.test_si08_interoperability_campaign.InteroperabilityCampaignTests.test_three_port_row_order_unpaired_and_reference_retention",
+      "tests.python.test_si08_interoperability_campaign.InteroperabilityCampaignTests.test_touchstone1_export_rejects_unequal_modes_instead_of_losing_references",
+      "tests.python.test_si08_interoperability_campaign.InteroperabilityCampaignTests.test_two_port_asymmetric_source_order_all_formats_and_units",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_entry_cap_admission_without_large_allocation",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_every_port_count_two_through_sixty_four_physical_oracle",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_invalid_data_and_within_pair_references",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_invalid_partition_and_names_rejected_before_conversion",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_invalid_shapes_and_port_cap_reject_before_conversion",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_physical_permutation_pair_order_and_single_order",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_receiver_source_asymmetry_and_polarity_closed_form",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_sample_cap_executes_and_excess_rejects",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_source_ownership_and_warning_preservation",
+      "tests.python.test_si08_interoperability_oracles.InteroperabilityOracleTests.test_z_y_inputs_against_physical_boundary_current_solve",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_active_network_is_not_repaired",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_invalid_data_rejected",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_invalid_partition_rejected",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_nonadjacent_polarity_and_order_analytic",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_original_preserved_and_z_input",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_power_reciprocity_and_legacy",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_voltage_current_impedance_oracle"
+    ],
+    "run": 22,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": {
+    "path": "docs/validation/parity/SI08-I01-interoperability-r3-20261025.log",
+    "sha256": "9b85f310a962e02594c0309b781ffe57e0b9288820205cb30113516a8031e63c"
+  },
+  "physical_qualified": false,
+  "production_qualified": false,
+  "family_complete": false,
+  "native_visual_verified": false
+}

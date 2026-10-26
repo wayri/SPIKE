@@ -21,6 +21,16 @@ Use a semantic `<button type="button">` whenever possible. A non-native
 `role="button"` must also implement keyboard activation, focusability, and
 `aria-disabled` behavior in its component.
 
+## Overflow without scrollbar chrome
+
+SPIKE hides native scrollbars throughout first-party interactive UI, including
+workspace pickers, layer strips, inspectors, search and detached tools.
+Scrolling remains enabled: wheel/trackpad gestures, touch and keyboard focus
+can reveal content. Horizontal command strips expose compact previous/next
+arrows when they overflow; they do not add another toolbar row. Preserve these
+access routes when changing a bounded panel. Do not use `overflow: hidden` as
+a substitute for providing access to clipped content.
+
 ## Variants
 
 Use either the class or equivalent `data-spike-control` value:

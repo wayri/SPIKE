@@ -1,0 +1,13 @@
+* SPDX-License-Identifier: Apache-2.0
+* Original SPIKE import fixture. Supplied values are illustrative, not device data.
+.param reference_scale=1
+.subckt RC_STAGE in out ref params: r=1k
++ c=1n
+R1 in out {r*reference_scale}
+C1 out ref {c}
+.ends RC_STAGE
+
+.subckt TWO_STAGE in out ref params: r=2k c=2n
+Xfirst in middle ref RC_STAGE r={r} c={c}
+Xsecond middle out ref RC_STAGE r={r} c={c}
+.ends TWO_STAGE

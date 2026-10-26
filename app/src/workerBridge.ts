@@ -47,6 +47,26 @@ export type WorkerProgress = {
 };
 
 const HEAVY_METHODS = new Set([
+  "run_ibis_behavioral",
+  "run_si_spatial_pair",
+  "run_em_network_resistor_cht",
+  "run_em_spice_coupling",
+  "run_em_body_heating",
+  "simulate_si_pam3",
+  "run_cfd_tetra_cht",
+  "extract_pdn_dielectric_ac",
+  "reduce_pdn_admittance",
+  "run_assembly_tetra_structural",
+  "run_assembly_thermomechanical",
+  "run_pdn_dielectric_thermomechanical",
+  "run_propulsion_pod",
+  "run_propulsion_pod_three_phase",
+
+  "deembed_multiport",
+  "write_project_backup", "open_project_backup",
+  "validate_component_thermal",
+  "prepare_linked_source_update", "apply_linked_source_update", "link_project_source",
+  "run_propulsion_pod_geometry",
   "import_sheet_definition", "preview_sheet_fold",
   "run_studio_board_cosimulation",
   "review_engineering", "quick_engineering_tool",

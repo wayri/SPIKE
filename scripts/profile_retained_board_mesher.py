@@ -36,16 +36,16 @@ DEFAULT_BOARD = (
     ROOT / "build/marble-qualification/sources/Marble-v1.4.4/design/Marble.kicad_pcb"
 )
 PINNED_BOARD_SHA256 = "3304ba37c2bd891849fc36b500cd940934aaf1f2013a95639c03564fb925c512"
-MESHER_SOURCE = ROOT / "python/spike_core/hybrid_mesh.py"
+MESHER_SOURCE = ROOT / "python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py"
 RUNTIME_SOURCES = (
     MESHER_SOURCE,
-    ROOT / "python/spike_core/filled_copper_path.py",
-    ROOT / "python/spike_core/boundary_spatial_index.py",
-    ROOT / "python/spike_core/hybrid_owned_copper.py",
-    ROOT / "python/spike_core/planar_polygon_topology.py",
-    ROOT / "python/spike_core/source_filled_boundary.py",
+    ROOT / "python/spike_core/solvers/power_integrity/dc/filled_copper_path.py",
+    ROOT / "python/spike_core/solvers/geometry_meshing/preparation/boundary_spatial_index.py",
+    ROOT / "python/spike_core/solvers/power_integrity/dc/hybrid_owned_copper.py",
+    ROOT / "python/spike_core/solvers/geometry_meshing/preparation/planar_polygon_topology.py",
+    ROOT / "python/spike_core/solvers/power_integrity/dc/source_filled_boundary.py",
     ROOT / "python/spike_core/kicad_importer.py",
-    ROOT / "python/spike_core/zone_pad_connection_evidence.py",
+    ROOT / "python/spike_core/solvers/power_integrity/dc/zone_pad_connection_evidence.py",
     ROOT / "python/core/board_parser.py",
 )
 
@@ -306,7 +306,7 @@ def _zone_pad_connection_evidence_summary(
 
 def _worker(payload: dict[str, object]) -> dict[str, object]:
     from python.spike_core.contracts import AnalysisSpec
-    from python.spike_core.hybrid_mesh import _point, build_hybrid_mesh
+    from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _point, build_hybrid_mesh
     from python.spike_core.kicad_importer import import_kicad_design
 
     board = Path(str(payload["board"])).absolute()
@@ -320,7 +320,7 @@ def _worker(payload: dict[str, object]) -> dict[str, object]:
         )
     net = str(payload["net"])
     runtime_sources_before = _runtime_source_hashes()
-    mesher_before = runtime_sources_before["python/spike_core/hybrid_mesh.py"]
+    mesher_before = runtime_sources_before["python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py"]
     import_started = time.perf_counter_ns()
     design = import_kicad_design(str(board))
     import_elapsed_ns = time.perf_counter_ns() - import_started
@@ -527,10 +527,7 @@ def _git_head() -> str | None:
 
 
 def _controller(args: argparse.Namespace) -> dict[str, object]:
-    from python.spike_core.sparselizard_process import (
-        SparseLizardAdapterError,
-        run_adapter_process,
-    )
+    from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import SparseLizardAdapterError, run_adapter_process
 
     # Avoid realpath traversal of the managed build/ fixture tree. The caller
     # has already required a regular file, and hashing the opened bytes binds

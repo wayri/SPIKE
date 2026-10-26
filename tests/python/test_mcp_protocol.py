@@ -4,10 +4,7 @@ import json
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.mcp_protocol import (
-    LEGACY_VERSION, MODERN_VERSION, META_PREFIX, SUPPORTED_VERSIONS,
-    McpProtocol, ProtocolError, decode_request, encode_response,
-)
+from python.spike_core.mcp_protocol import LEGACY_VERSION, MODERN_VERSION, META_PREFIX, SUPPORTED_VERSIONS, McpProtocol, ProtocolError, decode_request, encode_response
 from python.spike_core.mcp_protocol_catalog import CatalogPager
 from python.spike_core.mcp_resources import SchemaResources, SCHEMA_URI_PREFIX
 

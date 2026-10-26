@@ -12,7 +12,7 @@ import numpy as np
 from scipy.integrate import quad
 from scipy.linalg import expm
 
-from python.spike_core import sparameter_rlc_initial as initial
+from python.spike_core.solvers.signal_integrity.networks import sparameter_rlc_initial as initial
 from tests.python.test_sparameter_rlc_terminated import request as zero_request, term
 
 

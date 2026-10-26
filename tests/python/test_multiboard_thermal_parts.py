@@ -6,7 +6,7 @@ import math
 from pathlib import Path
 import unittest
 
-from python.spike_core.multiboard_thermal import MultiboardThermalError, run_multiboard_thermal
+from python.spike_core.solvers.thermal_fluid.heat.multiboard_thermal import MultiboardThermalError, run_multiboard_thermal
 from python.spike_core.spider_v2 import AssemblyIRV1
 from tests.python.test_multiboard_thermal import request as board_request
 from tests.python.test_multiboard_radiation import request as radiation_request, scalar_closed_pair_heat

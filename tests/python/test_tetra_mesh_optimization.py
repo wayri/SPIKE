@@ -4,8 +4,8 @@ import copy
 import itertools
 import unittest
 
-from python.spike_core.tetra_mesh_optimization import optimize_tetra_mesh
-from python.spike_core.tetra_mesh_refinement import TetraRefinementError, _det
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_optimization import optimize_tetra_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_refinement import TetraRefinementError, _det
 
 
 def interior_mesh():

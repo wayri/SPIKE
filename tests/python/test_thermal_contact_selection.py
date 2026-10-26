@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.board_thermal import run_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.board_thermal import run_board_thermal
 from python.spike_core.contracts import SpiDeR
 
 

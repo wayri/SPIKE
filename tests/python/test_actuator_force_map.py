@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import unittest
 import numpy as np
-from python.spike_core.actuator_force_map import CONTRACT, analyze_force_map
+from python.spike_core.solvers.electromagnetics.machines.actuator_force_map import CONTRACT, analyze_force_map
 
 
 def fixture(kind="reluctance", count=65):

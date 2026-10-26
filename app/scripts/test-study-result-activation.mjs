@@ -2,6 +2,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const { emResistorChtStudyRunner, selectedEmResistorChtStudy, EM_RESISTOR_CHT_STUDY_TYPE } = await importTestTypescript("emResistorChtStudy");
 // Exercise the actual App activation handler with state boundaries replaced.
 const source = readFileSync(new URL("../src/App.tsx", import.meta.url), "utf8");
 const start = source.indexOf("  const activateStudyCase = ");
@@ -13,6 +15,8 @@ const bundle = { analysis_id: "saved-pi", mode: "pi", scalar_fields: { voltage_v
 function workspace(overrides = {}) {
   const state = {}, records = [], calls = [];
   const env = { boardFile: "fixture.kicad_pcb", activeDesignId: "fixture-design", universalRunning: false,
+    EM_RESISTOR_CHT_STUDY_TYPE, selectedEmResistorChtStudy, emResistorChtStudyRunner,
+    studies: [], projectGeneration: { current: 1 }, studyActivationRevision: { current: 0 },
     recordChange: () => calls.push("change"), requestAnimationFrame: callback => callback(), commandCamera: command => calls.push(command),
     defaultResultVisualization: () => ({ mode: "geometry", visible: false }), normalizePiSetup: value => value,
     normalizeEmiSetup: value => value, normalizeEmiFieldResult: value => value, studyEMergeSetup: value => value,
@@ -51,4 +55,53 @@ for(const candidate of [{...item,settings:{boardFile:"other.kicad_pcb"}},{...ite
  const w=workspace(); w.activate("study",candidate); assert.deepEqual(w.calls,[]); assert.equal(w.state.setSelected,undefined); assert.ok(w.state.setStatus);
 }
 {const w=workspace({universalRunning:true});w.activate("study",item);assert.deepEqual(w.calls,[]);assert.match(w.state.setStatus,/Stop/);}
+const coupled = { ...item, type: EM_RESISTOR_CHT_STUDY_TYPE, settings: { request: { contract: "fixture" } } };
+const coupledStudy = { version: 1, id: "study", cases: [coupled], datasets: [], tags: [] };
+{
+ const messages=[];
+ const w=workspace({ studies:[coupledStudy], runLocalWorker: async request => {
+   messages.push(request); return {ok:true,result:coupledStudy};
+ }});
+ w.activate("study",coupled); await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(messages.length,1); assert.equal(messages[0].method,"prepare_em_resistor_cht_study");
+ assert.deepEqual(messages[0].params.request.request,coupled.settings.request);
+ assert.match(w.state.setContextScriptDraft.code,/STUDY = json.loads/);
+ assert.equal(w.state.setPythonOpen,true); assert.equal(w.state.setAnalysisResult,undefined);
+ assert.equal(w.state.setActiveStudyCaseId,undefined,"staging is not activating a solved workspace");
+ assert.match(w.state.setStatus,/historical.*No solver was run/);
+}
+{
+ const w=workspace({ studies:[coupledStudy], runLocalWorker: async()=>({ok:false,error:"Missing heat target"}) });
+ w.activate("study",coupled); await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(w.state.setContextScriptDraft,undefined); assert.match(w.state.setStatus,/rejected.*Missing heat target/);
+}
+{
+ const generation={current:1}; let complete;
+ const w=workspace({studies:[coupledStudy],projectGeneration:generation,runLocalWorker:()=>new Promise(resolve=>{complete=resolve;})});
+ w.activate("study",coupled); generation.current=2; complete({ok:true,result:coupledStudy});
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(w.state.setContextScriptDraft,undefined,"late validation must not stage into a different project");
+}
+{
+ const w=workspace();w.activate("missing",coupled);
+ assert.match(w.state.setStatus,/missing/); assert.equal(w.state.setContextScriptDraft,undefined);
+}
+{
+ const pending=[]; const revision={current:0};
+ const second={...coupled,id:"second",name:"Second"};
+ const study={...coupledStudy,cases:[coupled,second]};
+ const w=workspace({studies:[study],studyActivationRevision:revision,runLocalWorker:()=>new Promise(resolve=>pending.push(resolve))});
+ w.activate("study",coupled);w.activate("study",second);
+ pending[1]({ok:true,result:{...study,cases:[second]}});await new Promise(resolve=>setImmediate(resolve));
+ const latest=w.state.setContextScriptDraft;
+ pending[0]({ok:true,result:coupledStudy});await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(w.state.setContextScriptDraft,latest,"older same-project activation cannot overwrite newer selection");
+}
+{
+ const revision={current:0};let finish;
+ const w=workspace({studies:[coupledStudy],studyActivationRevision:revision,runLocalWorker:()=>new Promise(resolve=>{finish=resolve;})});
+ w.activate("study",coupled);revision.current+=1;
+ finish({ok:true,result:coupledStudy});await new Promise(resolve=>setImmediate(resolve));
+ assert.equal(w.state.setContextScriptDraft,undefined,"study edits/removal invalidate a pending staging reply");
+}
 console.log("Study result activation: domain viewers, retained overlays, fit/reset, missing-file recovery and incompatible/busy guards passed.");

@@ -6,8 +6,8 @@ import math
 from pathlib import Path
 import unittest
 from jsonschema import Draft202012Validator
-from python.spike_core.pdn_dielectric_ac import extract_pdn_dielectric_ac
-from python.spike_core.pdn_admittance_reduction import dielectric_admittance_source
+from python.spike_core.solvers.power_integrity.pdn.pdn_dielectric_ac import extract_pdn_dielectric_ac
+from python.spike_core.solvers.power_integrity.pdn.pdn_admittance_reduction import dielectric_admittance_source
 from python.spike_core.service import handle
 from tests.python.test_pdn_dielectric_ac_contract import lossy_plate, EPSILON_0
 

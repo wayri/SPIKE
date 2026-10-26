@@ -11,9 +11,9 @@ import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openfoam_fan_fixture import build_fan_heated_fixture
-from python.spike_core.openfoam_flow_energy_validation import validate_flow_energy
-from python.spike_core.openfoam_multiregion_execution import load_verified_runnable_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_fan_fixture import build_fan_heated_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_flow_energy_validation import validate_flow_energy
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import load_verified_runnable_case
 
 
 def evaluate(root):

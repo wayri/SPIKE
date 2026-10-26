@@ -1,0 +1,183 @@
+{
+  "schema": "spike/propulsion-real-hardware-source-inventory/v1",
+  "reviewed_date": "2026-10-23",
+  "status": "incomplete-real-machine-evidence",
+  "redistributed_third_party_motor_cad": false,
+  "third_party_solver_code_used": false,
+  "candidates": [
+    {
+      "repository": "VivekAruja/bldc-motor-design-project",
+      "revision": "7ee5523739e17f6ae4af36183785efe70ba079f1",
+      "primary_document": "README.md",
+      "document_git_blob_sha1": "c6bb10d8b6d5560610e6abaaf84511797af7ac4b",
+      "license": null,
+      "license_observation": "GitHub repository API license=null; pinned root listing has no license file; reuse permission not established.",
+      "cad_redistribution_admitted": false,
+      "hardware_identity": "Physical plastic six-slot/eight-pole three-phase star outrunner prototype",
+      "reported_actual_inputs": {
+        "turns_per_tooth": 8,
+        "magnet_grade_label": "N52",
+        "phases": 3,
+        "rotor_poles": 8,
+        "stator_teeth": 6
+      },
+      "design_targets_not_measurements": {
+        "torque_nm": 0.075,
+        "speed_rpm": 2000,
+        "voltage_v": 12,
+        "estimated_current_a": 1.31,
+        "airgap_m": 0.002,
+        "stator_outer_diameter_m": 0.061,
+        "rotor_inner_diameter_m": 0.065,
+        "rotor_outer_diameter_m": 0.071,
+        "stack_depth_m": 0.03,
+        "calculated_turns_per_tooth": 17
+      },
+      "observed_test_claim": "Only slight rotation; did not sustain independent continuous rotation. Observational ESC test, not a characterized propulsion motor.",
+      "missing": [
+        "reuse license",
+        "as-built gap and winding wire geometry",
+        "magnet vendor, measured recoil curve, remanence vs temperature",
+        "measured phase R and differential L including end turns",
+        "rotor mass distribution/inertia",
+        "thermal capacities, interfaces, cooling and temperature tests",
+        "quantitative speed, back EMF, phase current, torque and efficiency"
+      ],
+      "primary_url": "https://github.com/VivekAruja/bldc-motor-design-project/blob/7ee5523739e17f6ae4af36183785efe70ba079f1/README.md"
+    },
+    {
+      "repository": "brenocq/bldc-motor",
+      "revision": "b74fb1d7a4637e437ef5a33e78a36db7c28fac7e",
+      "primary_document": "README.md",
+      "document_git_blob_sha1": "8bc73544f6472e6ae51c94f1b25ca3965538daa1",
+      "license": "MIT",
+      "license_git_blob_sha1": "d134fca5c9e2899a2d151f44e0d437fe0130abe4",
+      "copyright": "2023 Breno Cunha Queiroz",
+      "cad_redistribution_admitted": false,
+      "hardware_identity": "Custom controller/integration around off-the-shelf EM3215 with original winding",
+      "missing": [
+        "licensed vendor internal motor CAD and topology",
+        "as-built winding and magnet/recoil identity",
+        "measured R/L/back-EMF/inertia/thermal data for exact motor revision"
+      ],
+      "decision": "MIT associated project files are promising for controller/integration only; no permission or internal geometry inference for vendor motor.",
+      "primary_url": "https://github.com/brenocq/bldc-motor/blob/b74fb1d7a4637e437ef5a33e78a36db7c28fac7e/README.md"
+    },
+    {
+      "repository": "rajivtctech/Pancake-Motor-Design",
+      "revision": "973633af59ba9c3f66ad5fdb01bf08710e0214e1",
+      "primary_document": "README.md",
+      "document_git_blob_sha1": "8ecd22330e874dfc194da962e5fe95b3322a24ae",
+      "license": null,
+      "license_observation": "GitHub API license=null; pinned root listing has no license file. Open-source wording does not establish concrete redistribution terms.",
+      "cad_redistribution_admitted": false,
+      "hardware_identity": "Claimed 72 mm two-layer PCB stator axial-flux design, 12 coils/three-phase star/eight poles per rotor disc",
+      "missing": [
+        "reuse license",
+        "documented fabricated running prototype and measured operating data",
+        "specific magnet recoil data",
+        "verified generated native PCB/CAD revision",
+        "measured phase R/end-turn L, inertia and thermal validation"
+      ],
+      "decision": "Do not execute/copy generators or redistribute source CAD under unestablished rights.",
+      "primary_url": "https://github.com/rajivtctech/Pancake-Motor-Design/blob/973633af59ba9c3f66ad5fdb01bf08710e0214e1/README.md"
+    }
+  ],
+  "required_for_real_motor_admission": [
+    "exact manufactured motor revision and rights-cleared internal geometry",
+    "winding map, connection, signed turns and conductor/end-turn geometry",
+    "magnet/recoil and ferromagnetic material curves with temperature and provenance",
+    "phase R at reference temperature and measured/derived inductance consistent with geometry",
+    "rotor inertia/mass distribution and bearing/load definition",
+    "thermal masses, contacts and measured cooling boundaries",
+    "independent electrical, mechanical and thermal validation data"
+  ],
+  "bounded_result": "Selected licensed OpenMotor internalCAD and separate ENOLA geometry/test reference. Complete validated real motor electromagnetic/thermal parameters and matched-pair measurement remain open; synthetic models stay separate.",
+  "separate_large_machine_benchmark": {
+    "repository": "Eomys/pyleecan",
+    "revision": "8654bd49fc005fdb19a38b1e39cd5d06198cdac1",
+    "path": "pyleecan/Data/Machine/Toyota_Prius.json",
+    "license": "Apache-2.0 (repository LICENSE independently inspected)",
+    "internal_version": "pyleecan_1.3.8",
+    "saved": "2022_04_13",
+    "identity": "Toyota Prius 2004 IPM traction-machine parameterization, not a VESC small propulsion motor",
+    "thermal_admission": false,
+    "thermal_gap": "Steel HT.Cp and HT.lambda_x/y/z equal1; unvalidated placeholders, cannot be treated as characterized thermal properties.",
+    "source_url": "https://github.com/Eomys/pyleecan/blob/8654bd49fc005fdb19a38b1e39cd5d06198cdac1/pyleecan/Data/Machine/Toyota_Prius.json",
+    "redistributed": false,
+    "decision": "Potential separate data/validation lineage; no transfer/rescaling into small motor and no physical material measurement inferred from JSON."
+  },
+  "selected_pair": {
+    "motor": {
+      "repository": "eMotres/OpenMotor-Hardware",
+      "revision": "1e1e56d7cf64ea393793ca5c06189251f87b6e98",
+      "model": "CIAG_2_28 125_25",
+      "license": "CERN-OHL-W-2.0",
+      "source_directory": "OpenMotor125_25",
+      "native_geometry": "CIAG_2_28 125_25.step",
+      "native_geometry_sha256": "0f6737f1ddba820376e88298cf05725de36048f03c227714bf391e7cf21b07d3",
+      "datasheet_sha256": "256d463196d33f09f517cffaf355b43609f6a36383b98d46b3b72f1a23d9ba34",
+      "native_import": "FreeCAD1.1.3 imported; root assembly616solids, internal winding/core/tooth/magnets, all1016 inspected shape-bearing objects geometrically valid; assembly parents repeat children.",
+      "physical_parameters_from_datasheet": {
+        "slots": 24,
+        "poles": 28,
+        "lamination_length_mm": 25,
+        "wire_turns": 10,
+        "parallel_wires": 4,
+        "wire_rectangular_mm": [
+          0.8,
+          3.0
+        ],
+        "phase_conductor_area_mm2": 9.6,
+        "magnet_grade_label": "N52UH",
+        "stator_steel_label": "H 070-20",
+        "temperature_sensor": "PT1000",
+        "mass_kg": 2,
+        "kv_rpm_per_v": 74,
+        "kt_nm_per_a_rms": 0.13,
+        "propeller_mount": "4xM5 on35mm",
+        "datasheet_max_working_temperature_c": 150
+      },
+      "missing_measured_inputs": [
+        "phase R(T) and convention",
+        "phase self/mutual/end-turn L",
+        "rotor inertia and density assignment",
+        "magnet vendor/recoil/temperature curve and installed magnetization",
+        "grain-oriented H070-20 anisotropic material curves/orientation",
+        "thermal capacities/contact conductance/cooling correlation/temperature tests"
+      ],
+      "test_scope": "17row primary CSV propeller30x14, unnamed manufacturer/revision; measuredbus76..81.3V; no temperature columns or uncertainty/testdate metadata.",
+      "vesc_scope": "Selected IRFS7530 hardware60V rating does not qualify measured~80V test. Any <=48V composed experiment is a preliminary different operating point, not reproduction or hardware compatibility qualification."
+    },
+    "propeller": {
+      "dataset_doi": "10.5281/zenodo.20111572",
+      "version": "v1 published2026-05-10",
+      "creator": "Universitat Polit\u00e8cnica de Val\u00e8ncia",
+      "license": "CC-BY-SA-4.0 (primary ZenodoAPI verified)",
+      "directory": "ENOLA_Casalino30cm",
+      "geometry_recommended": "CASALINO_D30cm_pitch+5deg.stl",
+      "geometry_sha256": "4659b1f740d6e2ea30819b7a2ce3cdddd54703600ff0d0919d0529ff1db62afd",
+      "matched_measurements": "Casalino_SLA_Pitch+5deg_exp_0_90_deg.csv",
+      "units": "Source GeneralInfo0.3m diameter; STL native300tipspan implies mm, .001conversion to solver metres; axis/origin/hub alignment require explicit geometric confirmation.",
+      "source_lineage": "ENOLA README says reconstructed using geometry data from doi10.1016/j.ast.2021.106707; \u00b15deg versions manufactured and experimentally measured; ASA/SLA GreyV4 experiments.",
+      "archive_md5": "245267e590546f160f3b971d7f8e05fb",
+      "extraction": "Bounded HTTP206 range extraction; exact selected local entries pass ZIPCRC32 and uncompressed-size checks; full223601320byte archive not downloaded.",
+      "mesh_check": "Selected+5STL35744triangles,17868exactuniquevertices,0boundaryedges,0nonmanifoldedges. Topologicaledgeclosure alone is not geometric/selfintersection/volume/CFDvalidation.",
+      "data_warnings": [
+        "RPM0 rows have infinite nondimensional coefficients: preserve raw and explicitly omit from finite-coefficient comparisons",
+        "Do not infer measured inflow from CSVfilename; baseline0deg file begins with measured~15deg inflow",
+        "BaselineCasalinoCAD is proprietaryParasolid.x_b; STL\u00b15variants are separate geometry cases",
+        "No normalized airfoil/chord/twist tables for Casalino inGeneralInfo; use exact surfacegeometry notinventedsectiondata"
+      ]
+    },
+    "composition_status": "Selected as separate reference motor+propeller with oversizedmotor and requiredadapter; not a physically tested pair, no common measured calibration; motorCSV30inch diameter versus selectedprop30cm; no same-pair claim."
+  },
+  "creator_research_fallback": {
+    "doi": "10.3217/sns1d-77m43",
+    "primary_url": "https://repository.tugraz.at/records/sns1d-77m43",
+    "version": "1 published2024-11-04",
+    "license": "CC-BY-NC-4.0 independently verified primaryAPI; distinct from articlearXivCC-BY-NC-ND",
+    "status": "research-only fallback, not a permissively reusable commercial hardwarepack",
+    "strong_data": "Geometry/material/winding/J/R/drivecycles, but d/q inductances are FEA-derived, not measured according to primarypaper6.2.2."
+  }
+}

@@ -2,7 +2,7 @@
 import json,sys,tempfile,unittest
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2];REPO=ROOT.parents[1];sys.path[:0]=[str(REPO),str(ROOT/'studio/python')]
-from python.spike_core.studio_bridge import prepare_spikes_studio_handoff,spikes_studio_launch_arguments
+from python.spike_core.studio_bridge import prepare_spikes_studio_handoff, spikes_studio_launch_arguments
 from spikes_studio.studio_handoff import CONTRACT,_record,cross_selection_id,import_handoff_file,validate_handoff
 DIGEST='a'*64
 def fixture():

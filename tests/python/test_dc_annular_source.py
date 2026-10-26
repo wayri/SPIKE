@@ -7,9 +7,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from python.spike_core.dc_annular_source import (
-    bind_annular_pad_source, solve_source_annular_stack, verify_annular_pad_binding,
-)
+from python.spike_core.solvers.power_integrity.dc.dc_annular_source import bind_annular_pad_source, solve_source_annular_stack, verify_annular_pad_binding
 
 
 ROOT = Path(__file__).resolve().parents[2]

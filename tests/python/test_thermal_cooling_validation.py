@@ -7,7 +7,7 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.calculix_runtime import probe_calculix_runtime
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
 from scripts.validate_thermal_cooling_environments import (
     CFD_FINAL_MASS_RELATIVE_TOLERANCE,
     CFD_MASS_RELATIVE_TOLERANCE,

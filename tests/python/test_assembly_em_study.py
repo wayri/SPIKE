@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import copy
 import unittest
-from python.spike_core.assembly_em import prepare_assembly_em
-from python.spike_core.assembly_em_study import admit_assembly_em_study
+from python.spike_core.solvers.electromagnetics.fields.assembly_em import prepare_assembly_em
+from python.spike_core.solvers.electromagnetics.fields.assembly_em_study import admit_assembly_em_study
 from tests.python.test_assembly_em import fixture
 
 

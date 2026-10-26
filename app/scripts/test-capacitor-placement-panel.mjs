@@ -46,7 +46,7 @@ assert.throws(() => api.parseCapacitorPlacementRequest(JSON.stringify(duplicate)
 const localPython = resolve(root, process.platform === "win32" ? ".venv/Scripts/python.exe" : ".venv/bin/python");
 const python = process.env.SPIKE_TEST_PYTHON ?? process.env.PYTHON ?? (existsSync(localPython) ? localPython : "python");
 function evaluate(value) {
-  const run = spawnSync(python, ["-c", "import json,sys; from python.spike_core.capacitor_placement import evaluate_capacitor_placement; print(json.dumps(evaluate_capacitor_placement(json.load(sys.stdin)),allow_nan=False))"],
+  const run = spawnSync(python, ["-c", "import json,sys; from python.spike_core.solvers.power_integrity.pdn.capacitor_placement import evaluate_capacitor_placement; print(json.dumps(evaluate_capacitor_placement(json.load(sys.stdin)),allow_nan=False))"],
     { cwd: root, input: JSON.stringify(value), encoding: "utf8", maxBuffer: 4 * 1024 * 1024,
       env: { ...process.env, OPENBLAS_NUM_THREADS: "1", OMP_NUM_THREADS: "1" } });
   assert.equal(run.status, 0, run.stderr || String(run.error));

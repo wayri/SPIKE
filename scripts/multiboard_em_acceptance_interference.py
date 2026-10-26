@@ -14,8 +14,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.si_crosstalk import analyze_crosstalk
-from python.spike_core.sparameters import NetworkData, touchstone_text
+from python.spike_core.solvers.signal_integrity.receivers.si_crosstalk import analyze_crosstalk
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData, touchstone_text
 
 
 def main():

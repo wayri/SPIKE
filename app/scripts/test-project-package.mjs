@@ -20,6 +20,7 @@ const payload = {
   },
   analysis: {
     show_net_names: true,
+    assembly_net_name_visibility: { "occ-A": false, "occ-B": true },
     mode: "DC IR Drop",
     result_display: "dc-result-1",
     latest_result: { analysis_id: "dc-1" },
@@ -75,6 +76,7 @@ assert.deepEqual(reopened.project.studies, payload.studies);
 assert.equal(reopened.project.analysis.result_display, "dc-result-1");
 assert.deepEqual(reopened.project.analysis.pdn_review, payload.analysis.pdn_review);
 assert.equal(reopened.project.analysis.show_net_names, true, "net-name visibility survives save/reopen");
+assert.deepEqual(reopened.project.analysis.assembly_net_name_visibility, payload.analysis.assembly_net_name_visibility, "each occurrence retains its own net-name display preference");
 assert.deepEqual(reopened.project.spice.workspace, payload.spice.workspace);
 assert.deepEqual(reopened.project.emi.setup.chamber, payload.emi.setup.chamber);
 assert.deepEqual(reopened.project.workspace, payload.workspace);

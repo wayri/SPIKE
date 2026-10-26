@@ -1,0 +1,373 @@
+{
+  "contract": "spike/emerge-gallery-build/v1",
+  "application_version": "0.4.1",
+  "solver_executed": false,
+  "package_epoch": "1970-01-01T00:00:00.000Z",
+  "builder_path": "examples/emerge/gallery/build.py",
+  "builder_sha256": "0c6c99bf3c9127c66d86c5ed714baa4ac66831c51106b22385f05a68ac2580d4",
+  "catalog_sha256": "298b6354a6104d55f781425427cc6976ba6ef3dcee4c03a14dd31dc2e23a3c96",
+  "examples": [
+    {
+      "id": "patch",
+      "status": "retained_result",
+      "model_status": "unvalidated",
+      "binding_evidence": {
+        "historical_binding": {
+          "design_id": "kicad-f8fd038633c5b49a3867c8f0",
+          "digest_sha256": "8f5b257976341982ca6a996179b524f2f43c5bbbd41e943341756fa1d05284af"
+        },
+        "result_binding": "retained_historical_design_binding",
+        "result_provenance_rewritten": false,
+        "current_import_binding": {
+          "design_id": "kicad-f8fd038633c5b49a3867c8f0",
+          "digest_sha256": "cc3debffff47b134b50488c021890b961cfd6a4f44105291d5691424cccedd4e"
+        },
+        "current_import_source_path_normalized": true,
+        "exact_historical_design_snapshot_available": false,
+        "source_bytes_match_historical_evidence": true,
+        "limitation": "Historical importer DesignIR was not retained; unchanged source bytes and historical binding are preserved. Current importer metadata can differ."
+      },
+      "inputs": [
+        {
+          "path": "examples/emerge/antenna_example.kicad_pcb",
+          "sha256": "f8fd038633c5b49a3867c8f09dc4fb3341b9be5a4a3cd961a088dbde6a77a2f0"
+        },
+        {
+          "path": "examples/emerge/antenna_run.json",
+          "sha256": "ecf80ac08a4738a9bb69331f0e7cb82b4f9d7b232db609d43c1ab904fc2e7222"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/README.md",
+          "sha256": "e40abd2cfa2496f912c2e9db6a429321165bfc0133d13b385d0fe76dec2a8343"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/execution_manifest.json",
+          "sha256": "0c1194d807726f63f9241f5882510349b7ca6428f1a2c55becb5122b3655f3da"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_admitted_result.json",
+          "sha256": "51e8530256f067a03df071f03a0bc48b3ab51b39ca76e7389c91dd2bc403298b"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_evidence.json",
+          "sha256": "ddd622f0e070be8a694c463eecc47255668cfefea270d0c64174320807e5f2cc"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_preview.json",
+          "sha256": "18d5202ae2157785dbb995325bf159f738a9a37b2d0b3aa30436d7c1832fd2e8"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_result.json",
+          "sha256": "51e8530256f067a03df071f03a0bc48b3ab51b39ca76e7389c91dd2bc403298b"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_simulation.py",
+          "sha256": "80e1601aa2e57f08b234a791b858cab896dc831b0add1f8ad61df691d3961eec"
+        }
+      ],
+      "roundtrip": "passed",
+      "package_format": "spike-project-package/v3",
+      "artifacts": [
+        {
+          "path": "examples/emerge/gallery/projects/patch.spike",
+          "sha256": "eb0d839a795623fb05f91c22d7803ee01ba54aa206d85f8849e68c1e72a919ce"
+        },
+        {
+          "path": "examples/emerge/gallery/snapshots/patch.json",
+          "sha256": "42305d9bc0d8c38cc2d69ead24434e82062926496f013e006e43d1c2f511c888"
+        },
+        {
+          "path": "examples/emerge/gallery/probes/patch.json",
+          "sha256": "8214151a1d944213aef307055560cf672c3d513006e0648806a1de45eaaf8810"
+        }
+      ]
+    },
+    {
+      "id": "radome",
+      "status": "retained_result",
+      "model_status": "unvalidated",
+      "binding_evidence": {
+        "historical_binding": {
+          "design_id": "kicad-b99976c1f8f09b1d03001e1d",
+          "digest_sha256": "97d24721197cd0c9669780035f84fa7d51d515c605da2b95f74ffd6f3dcc65a7"
+        },
+        "result_binding": "retained_historical_design_binding",
+        "result_provenance_rewritten": false,
+        "current_import_binding": {
+          "design_id": "kicad-b99976c1f8f09b1d03001e1d",
+          "digest_sha256": "8b2cf300a956b41892683f0b0977b263bab71c06ab84ccc44904ff65fca756a8"
+        },
+        "current_import_source_path_normalized": true,
+        "exact_historical_design_snapshot_available": false,
+        "source_bytes_match_historical_evidence": true,
+        "limitation": "Historical importer DesignIR was not retained; unchanged source bytes and historical binding are preserved. Current importer metadata can differ."
+      },
+      "inputs": [
+        {
+          "path": "examples/emerge/gui_workflow/README.md",
+          "sha256": "e40abd2cfa2496f912c2e9db6a429321165bfc0133d13b385d0fe76dec2a8343"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/execution_manifest.json",
+          "sha256": "0c1194d807726f63f9241f5882510349b7ca6428f1a2c55becb5122b3655f3da"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/radome_admitted_result.json",
+          "sha256": "b4357d9723b6cc96041496cdcc93e62194331ab67fca10712c2d50c57cc31ff4"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/radome_evidence.json",
+          "sha256": "4357e204d64be400971042b3e05f1f308cf4f1d53db990da3dcf6fdba3b309c6"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/radome_preview.json",
+          "sha256": "58c186d254c15fa4faba5b2453658bdc2fbd2bfdca9582ecf31080f4158ebf20"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/radome_result.json",
+          "sha256": "b4357d9723b6cc96041496cdcc93e62194331ab67fca10712c2d50c57cc31ff4"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/radome_simulation.py",
+          "sha256": "42280e142d84d0f16aed75302f191bcfba501c25edb954756d6189bd28f07c3c"
+        },
+        {
+          "path": "examples/emerge/radome/antenna_with_radome_run.json",
+          "sha256": "4c88ae680aad4516f9a5ff00d294fbb2ac676ef27536db78f00e6b82b04e6c13"
+        },
+        {
+          "path": "examples/emerge/radome/patch_with_radome.kicad_pcb",
+          "sha256": "b99976c1f8f09b1d03001e1de75401378d839d18c24cac034bc5d38f5a66b5e1"
+        }
+      ],
+      "roundtrip": "passed",
+      "package_format": "spike-project-package/v3",
+      "artifacts": [
+        {
+          "path": "examples/emerge/gallery/projects/radome.spike",
+          "sha256": "26142b27849fa37c293cf1740bc66bb02592af66176138228930766cdbd9f11e"
+        },
+        {
+          "path": "examples/emerge/gallery/snapshots/radome.json",
+          "sha256": "c442a48f8c428268340eaf69476e7062cb2eab76f1be180dcb8fcece5e5878eb"
+        },
+        {
+          "path": "examples/emerge/gallery/probes/radome.json",
+          "sha256": "45f74a003e8e0f28accaa9c6129b3691565d79a2cf4601667b059fe7834287ce"
+        }
+      ]
+    },
+    {
+      "id": "patch-fields",
+      "status": "retained_result",
+      "model_status": "unvalidated",
+      "binding_evidence": {
+        "historical_binding": {
+          "design_id": "kicad-f8fd038633c5b49a3867c8f0",
+          "digest_sha256": "8f5b257976341982ca6a996179b524f2f43c5bbbd41e943341756fa1d05284af"
+        },
+        "result_binding": "retained_historical_design_binding",
+        "result_provenance_rewritten": false,
+        "current_import_binding": {
+          "design_id": "kicad-f8fd038633c5b49a3867c8f0",
+          "digest_sha256": "cc3debffff47b134b50488c021890b961cfd6a4f44105291d5691424cccedd4e"
+        },
+        "current_import_source_path_normalized": true,
+        "exact_historical_design_snapshot_available": false,
+        "source_bytes_match_historical_evidence": true,
+        "limitation": "Historical importer DesignIR was not retained; unchanged source bytes and historical binding are preserved. Current importer metadata can differ."
+      },
+      "inputs": [
+        {
+          "path": "examples/emerge/antenna_example.kicad_pcb",
+          "sha256": "f8fd038633c5b49a3867c8f09dc4fb3341b9be5a4a3cd961a088dbde6a77a2f0"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/README.md",
+          "sha256": "e40abd2cfa2496f912c2e9db6a429321165bfc0133d13b385d0fe76dec2a8343"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/execution_manifest.json",
+          "sha256": "0c1194d807726f63f9241f5882510349b7ca6428f1a2c55becb5122b3655f3da"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_fields_admitted_result.json",
+          "sha256": "9504f23a0f2d8e43314c3ae9a84cf962310b7eb654df2d77d2ceddb67842c76e"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_fields_evidence.json",
+          "sha256": "82f022b155f2578e0ed8775a08b664e5a397351cb6d9af272acb75359667cb57"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_fields_nearfield_probe.json",
+          "sha256": "ed759824c8d64166f7e2a57644dd7e62559857bac3acb5bf82c57484b9231763"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_fields_preview.json",
+          "sha256": "c2afb006714866dbb7607fbb639b95292bbc790faad5a386fd9cd7116700451b"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_fields_result.json",
+          "sha256": "9504f23a0f2d8e43314c3ae9a84cf962310b7eb654df2d77d2ceddb67842c76e"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_fields_run.json",
+          "sha256": "2414222a333975c8b9d3698ae03ee5e22e04ccc33933d99fa4b7f74d10ae3ed7"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/patch_fields_simulation.py",
+          "sha256": "f0a7342b6e8f786ef5cc74054c2dc1ab35964d22b39dcc08d3c5650bd0327510"
+        }
+      ],
+      "roundtrip": "passed",
+      "package_format": "spike-project-package/v3",
+      "artifacts": [
+        {
+          "path": "examples/emerge/gallery/projects/patch-fields.spike",
+          "sha256": "ab51ea7f26469d50160f861333ecf58e3fbb162345fcba2f7421e72fcff3532a"
+        },
+        {
+          "path": "examples/emerge/gallery/snapshots/patch-fields.json",
+          "sha256": "83d878750e7e0fc8dbf9f4a0ac978f0248c6ef2da2a9b60712a70049861f6bee"
+        },
+        {
+          "path": "examples/emerge/gallery/probes/patch-fields.json",
+          "sha256": "ea4e8729e578e2ed4ed1abfb9e5ed9622da36f3f56611d2d8ac28ff62061bf7e"
+        }
+      ]
+    },
+    {
+      "id": "esp32-surrogate",
+      "status": "retained_result",
+      "model_status": "unvalidated",
+      "binding_evidence": {
+        "historical_binding": {
+          "design_id": "kicad-3199ce0a25f8987020e716d8-rf-two-conductor",
+          "digest_sha256": "8ea41ffbb5e3eb2cafc42db2e4f74d2fcef1b4ce6935e0fb7283088475323ea5"
+        },
+        "result_binding": "retained_historical_design_binding",
+        "result_provenance_rewritten": false,
+        "exact_historical_design_snapshot_available": true
+      },
+      "inputs": [
+        {
+          "path": "examples/emerge/gui_workflow/README.md",
+          "sha256": "e40abd2cfa2496f912c2e9db6a429321165bfc0133d13b385d0fe76dec2a8343"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/esp32_surrogate_admitted_result.json",
+          "sha256": "fccea7b16992e29e1e72e1eef21f3720d5d21eb2e2e12aea33cbcf4c92f08fd8"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/esp32_surrogate_assumptions.json",
+          "sha256": "573630052f33b757312cfe3825bdac72242eb57ae450b33792d233a2f5d86c71"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/esp32_surrogate_design.json",
+          "sha256": "4f0a4f93c64871280d95c7794d7400f501496ae6dfafe85b69f6310848385c1d"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/esp32_surrogate_evidence.json",
+          "sha256": "f2bbf914cae1651fcdd847a3673b9df46e051431f1d7014b8bb259ae124911f2"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/esp32_surrogate_preview.json",
+          "sha256": "114a2c7cda736c9e917d9f486f24e279dead6b693a88b68768213443a8c375de"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/esp32_surrogate_result.json",
+          "sha256": "fccea7b16992e29e1e72e1eef21f3720d5d21eb2e2e12aea33cbcf4c92f08fd8"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/esp32_surrogate_simulation.py",
+          "sha256": "2691aa74afbbc5764342ab8789ffb8f16436e53fbd930e684e7689a725895528"
+        },
+        {
+          "path": "examples/emerge/gui_workflow/execution_manifest.json",
+          "sha256": "0c1194d807726f63f9241f5882510349b7ca6428f1a2c55becb5122b3655f3da"
+        },
+        {
+          "path": "examples/esp32/README.md",
+          "sha256": "ae834a86e7b728d9ae4593d37c4dfa45c038e8a9c59774fcdd81ad39b0b25e98"
+        },
+        {
+          "path": "examples/esp32/source/LICENSE.md",
+          "sha256": "b5324f4605baa739cadc155225cc22cb21be50932463d0b2a23e7a82d399da4e"
+        },
+        {
+          "path": "examples/esp32/source/iot-esp-eth-ind.kicad_pcb",
+          "sha256": "3199ce0a25f8987020e716d82a4a35d9b6b04541d33b2f2e46406376713eab33"
+        }
+      ],
+      "roundtrip": "passed",
+      "package_format": "spike-project-package/v3",
+      "artifacts": [
+        {
+          "path": "examples/emerge/gallery/projects/esp32-surrogate.spike",
+          "sha256": "c1e9bd3645031147425ec632035d3c434b5f7ac102e3f3b09491aaecd0830ca3"
+        },
+        {
+          "path": "examples/emerge/gallery/snapshots/esp32-surrogate.json",
+          "sha256": "c86ff3c75a85e532d9890a5d07d5a89a6e0d2cbeabf3e5ccb63dbcc0c5df2d1f"
+        },
+        {
+          "path": "examples/emerge/gallery/probes/esp32-surrogate.json",
+          "sha256": "0c006a13eaf631c8f0563da36a146d378ceda7d7d5d4bfc79cc4158c6c009d37"
+        }
+      ]
+    },
+    {
+      "id": "multilayer-two-port",
+      "status": "setup_only",
+      "model_status": "unvalidated",
+      "binding_evidence": {
+        "result_binding": "none_setup_only",
+        "exact_historical_design_snapshot_available": false
+      },
+      "inputs": [
+        {
+          "path": "examples/emerge/multilayer/README.md",
+          "sha256": "e5ebd22e0bf054bf6a6ef5cc6e3a89f413a764bcdc80802b3f4ff9e9a057fa4c"
+        },
+        {
+          "path": "examples/emerge/multilayer/case.json",
+          "sha256": "e51ed102cd22cca8cb319544a085fa658037fc45c05903451e6903dad4d6f660"
+        },
+        {
+          "path": "examples/emerge/multilayer/design.json",
+          "sha256": "7e2781ccfe1c22ee6eb01d65cd36b7e34e85dff3da1b4d2bfa5295dfc77d791e"
+        },
+        {
+          "path": "examples/emerge/multilayer/setup.json",
+          "sha256": "a7535b219a2bbb05d23a331723e50be196bb730182893bdea4f221ef02fe2cb8"
+        }
+      ],
+      "roundtrip": "passed",
+      "package_format": "spike-project-package/v3",
+      "artifacts": [
+        {
+          "path": "examples/emerge/gallery/projects/multilayer-two-port.spike",
+          "sha256": "55b7b374cef9d9a7b3a1f553a8fa320e339891b488f01934991620b1513077ac"
+        },
+        {
+          "path": "examples/emerge/gallery/snapshots/multilayer-two-port.json",
+          "sha256": "4a2d64ef3c901fba73e96993fc01a9bf7be06e2796fda9fcd14cdef6628478ca"
+        },
+        {
+          "path": "examples/emerge/gallery/probes/multilayer-two-port.json",
+          "sha256": "38ef73c8142523c3d07d3e82542f8ba76623f86ceaa0537bd9ab404c48b89662"
+        }
+      ]
+    }
+  ],
+  "omissions": [
+    {
+      "id": "multilayer-result",
+      "reason": "Legacy raw engine result has no retained authoritative design/script binding; no numerical envelope is manufactured."
+    },
+    {
+      "id": "board-si",
+      "reason": "Marble/White Rabbit source and results are local build artifacts with redistribution constraints; not copied into this gallery."
+    }
+  ]
+}

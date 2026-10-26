@@ -36,7 +36,7 @@ for(const id of ['picture-guide','recorded-pic-dc','feature-coverage']){
  if(id==='picture-guide'){assert.equal((rendered.match(/<img /g)??[]).length,4);assert.match(rendered,/procedural/);assert.match(rendered,/not simulations/);assert.match(rendered,/ANALYSIS NOT RUN/);}
  if(id==='recorded-pic-dc'){assert.match(rendered,/completed \/ approximate/);assert.match(rendered,/16.382762821/);assert.match(rendered,/49 excluded/);assert.match(rendered,/separate local PI-only evaluation/);}
 }
-const center=fs.readFileSync(path.join(root,'src/HelpCenter.tsx'),'utf8');assert.match(center,/data-help-topic/);assert.match(center,/navigate\(link.dataset.helpTopic\)/);
+const center=fs.readFileSync(path.join(root,'src/HelpCenter.tsx'),'utf8');assert.match(center,/data-help-topic/);assert.match(center,/navigate\(link.dataset.helpTopic, link.dataset.helpAnchor\)/);
 const guide=fs.readFileSync(path.join(root,'src/AnalysisGuide.tsx'),'utf8');
 const app=fs.readFileSync(path.join(root,'src/App.tsx'),'utf8');
 for(const target of ['si-sparameter-solver','si-check-emerge','si-sparameters','si-ports','emerge-si-run']){

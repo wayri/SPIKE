@@ -4,7 +4,7 @@ import unittest
 import tempfile
 from pathlib import Path
 from unittest.mock import patch
-from python.spike_core.openfoam_turbulence import validate_turbulence_model, turbulence_dictionary, field_bodies, turbulence_schemes, turbulence_solution
+from python.spike_core.solvers.external_engines.openfoam.openfoam_turbulence import validate_turbulence_model, turbulence_dictionary, field_bodies, turbulence_schemes, turbulence_solution
 
 
 def model():
@@ -43,7 +43,7 @@ class TurbulenceTests(unittest.TestCase):
         self.assertIn('kOmegaSSTCoeffs { Prt',turbulence_dictionary(model()))
 
     def test_materialized_sst_fields_and_no_laminar_energy_claim(self):
-        from python.spike_core import openfoam_fan_fixture as fixture
+        from python.spike_core.solvers.external_engines.openfoam import openfoam_fan_fixture as fixture
         original = fixture.prepare_runnable_multiregion_case
         def prepare(request,*args,**kwargs):
             request['environment']['turbulence_model']=model()

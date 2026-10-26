@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from python.spike_core.kicad_importer import import_kicad_design
-from python.spike_core.layered_board_thermal import solve_layered_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal import solve_layered_board_thermal
 
 
 def digest(path):
@@ -52,8 +52,8 @@ def replay(case, output):
     engine_hashes = {str(p.relative_to(ROOT)): digest(p) for p in (
         ROOT / "python/core/board_parser.py",
         ROOT / "python/spike_core/kicad_importer.py",
-        ROOT / "python/spike_core/thermal_copper_geometry.py",
-        ROOT / "python/spike_core/layered_board_thermal.py", Path(__file__))}
+        ROOT / "python/spike_core/solvers/thermal_fluid/heat/thermal_copper_geometry.py",
+        ROOT / "python/spike_core/solvers/thermal_fluid/heat/layered_board_thermal.py", Path(__file__))}
     design = import_kicad_design(str(board))
     native = [z for z in design.zones if z.get("source_kind") == "filled_zone"]
     if not native or any(z.get("source_fill_provenance_complete") is not True for z in native):

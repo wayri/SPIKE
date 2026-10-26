@@ -8,8 +8,8 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from python.spike_core import gmsh_occ_runtime as runtime
-from python.spike_core.gmsh_environment import isolated_preflight_source
+from python.spike_core.solvers.geometry_meshing.preparation import gmsh_occ_runtime as runtime
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_environment import isolated_preflight_source
 
 
 class MesherEnvironmentTests(unittest.TestCase):
@@ -85,7 +85,7 @@ class MesherEnvironmentTests(unittest.TestCase):
                     runtime._worker_interpreter()
 
     def test_environment_variable_cannot_select_bridge_executable(self):
-        from python.spike_core import gmsh_extension_runtime as bridge
+        from python.spike_core.solvers.geometry_meshing.preparation import gmsh_extension_runtime as bridge
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             base = root/'Programs'/'Python'/'Python311'

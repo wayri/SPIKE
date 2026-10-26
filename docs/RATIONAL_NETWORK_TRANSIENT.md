@@ -8,7 +8,7 @@ arbitrary source/load feedback or measured transient qualification.
 ## Workflow
 
 Call `run_rational_network_transient(request)` from
-`python.spike_core.sparameter_transient`, or invoke the worker method of that
+`python.spike_core.solvers.signal_integrity.networks.sparameter_transient`, or invoke the worker method of that
 name with `params: {request: ...}`. The desktop script workspace can use the
 API; this stage adds no dedicated desktop waveform editor.
 

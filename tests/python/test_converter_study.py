@@ -3,13 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisResult, SpiDeR
-from python.spike_core.converter_study import (
-    CONVERTER_STUDY_RESULT_CONTRACT,
-    converter_capabilities,
-    materialize_converter_workspace,
-    run_converter_study,
-    validate_converter_study,
-)
+from python.spike_core.solvers.circuits.models.converter_study import CONVERTER_STUDY_RESULT_CONTRACT, converter_capabilities, materialize_converter_workspace, run_converter_study, validate_converter_study
 from python.spike_core.extensions import ExtensionRegistry
 from python.spike_core.extensions import default_extension_roots
 from python.spike_core.service import handle
@@ -180,7 +174,7 @@ class ConverterStudyTests(unittest.TestCase):
             "maximum_output_ripple_v": 0.1,
             "maximum_input_inrush_a": 2,
         }
-        with patch("python.spike_core.converter_study.NgspicePlugin") as plugin:
+        with patch("python.spike_core.solvers.circuits.models.converter_study.NgspicePlugin") as plugin:
             plugin.return_value.run.return_value = circuit_result()
             result = run_converter_study(design(), request)
         self.assertEqual(result["summary"]["statistics_method"], "time_weighted_trapezoidal")
@@ -189,7 +183,7 @@ class ConverterStudyTests(unittest.TestCase):
         self.assertIn("CONVERTER_RIPPLE_LIMIT", codes)
         self.assertIn("CONVERTER_INRUSH_LIMIT", codes)
 
-    @patch("python.spike_core.converter_study.NgspicePlugin")
+    @patch("python.spike_core.solvers.circuits.models.converter_study.NgspicePlugin")
     def test_completed_study_computes_windowed_power_ripple_loss_and_thermal(self, plugin):
         plugin.return_value.run.return_value = circuit_result()
         result = run_converter_study(design(), study())
@@ -207,7 +201,7 @@ class ConverterStudyTests(unittest.TestCase):
         self.assertGreaterEqual(result["elapsed_seconds"], 0)
         self.assertEqual(result["model_status"], "approximate")
 
-    @patch("python.spike_core.converter_study.NgspicePlugin")
+    @patch("python.spike_core.solvers.circuits.models.converter_study.NgspicePlugin")
     def test_missing_bound_result_vector_fails_instead_of_fabricating_metrics(self, plugin):
         incomplete = circuit_result()
         del incomplete.fields["waveforms"]["i(load)"]

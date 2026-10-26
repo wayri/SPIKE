@@ -37,7 +37,7 @@
         "sha256": "bcc2f5f9b4980639d1d53be56a5715d0a72b02fa485449d0ea5b528e1f366171"
       },
       {
-        "path": "python/spike_core/assembly_electrothermal.py",
+        "path": "python/spike_core/solvers/thermal_fluid/electrothermal/assembly_electrothermal.py",
         "sha256": "155d1b383ed94ddcd338174cc75b917588b93d1665c249729209680a44087e6a"
       }
     ]

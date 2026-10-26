@@ -1,7 +1,7 @@
 import unittest
 
-from python.spike_core.native_circuit_result import native_mna_to_analysis_result
-from python.spike_core.native_mna import REQUEST_CONTRACT, run_native_mna
+from python.spike_core.solvers.circuits.models.native_circuit_result import native_mna_to_analysis_result
+from python.spike_core.solvers.circuits.models.native_mna import REQUEST_CONTRACT, run_native_mna
 
 
 class NativeCircuitResultTests(unittest.TestCase):

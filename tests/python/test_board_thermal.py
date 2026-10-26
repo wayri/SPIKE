@@ -8,7 +8,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.board_thermal import run_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.board_thermal import run_board_thermal
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.service_simulation_handlers import handle_simulation_request
 

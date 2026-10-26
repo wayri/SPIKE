@@ -8,8 +8,8 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import ValidationIssue
-from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
-from python.spike_core.pi_return_path import plan_pi_return_path
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
+from python.spike_core.solvers.power_integrity.dc.pi_return_path import plan_pi_return_path
 
 
 def design():
@@ -76,7 +76,7 @@ class PiReturnPathTests(unittest.TestCase):
         mesh = HybridMesh(nodes=nodes, branches=branches, cells=[
             {"source_kind": "pad", "source_id": "source", "node_id": 0},
             {"source_kind": "pad", "source_id": "load", "node_id": 2}])
-        with patch("python.spike_core.pi_return_path.build_hybrid_mesh", return_value=mesh):
+        with patch("python.spike_core.solvers.power_integrity.dc.pi_return_path.build_hybrid_mesh", return_value=mesh):
             result = plan_pi_return_path(design(), request())
         self.assertEqual(result["status"], "connected", result)
         route = result["paths"][0]
@@ -167,7 +167,7 @@ class PiReturnPathTests(unittest.TestCase):
                            (HybridMesh(issues=[ValidationIssue("TEST", "error", "Bad mesh")]), "PI_RETURN_MESH_BLOCKED"),
                            (HybridMesh(), "PI_RETURN_PAD_UNMESHED"),
                            (HybridMesh(nodes=[MeshNode(0, 0, 0, 0, "F.Cu", "VCC")]), "PI_RETURN_INVALID_MESH")]:
-            with self.subTest(code=code), patch("python.spike_core.pi_return_path.build_hybrid_mesh", return_value=mesh):
+            with self.subTest(code=code), patch("python.spike_core.solvers.power_integrity.dc.pi_return_path.build_hybrid_mesh", return_value=mesh):
                 self.blocked(design(), request(), code)
 
 

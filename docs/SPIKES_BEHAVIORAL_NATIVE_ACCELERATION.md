@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Native behavioral-expression acceleration
 
-`src/spikes/behavioral_expression.hpp` remains the owned C++ bounded expression
+`src/solvers/circuits/spikes/behavioral_expression.hpp` remains the owned C++ bounded expression
 DAG used by native behavioral devices. This change moves opcode decoding to
 construction, replaces per-evaluation cache/ready allocations with bounded
 thread-local scratch and generation tags, and replaces the type-erased recursive

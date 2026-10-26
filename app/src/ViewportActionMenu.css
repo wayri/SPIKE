@@ -27,3 +27,10 @@
 
 
 .viewport-action-menu .viewport-action-menu__item { min-height:32px;padding:6px 7px;border:1px solid var(--spike-table-border);border-radius:5px;margin-block:3px;background:var(--spike-table-toolbar); }
+
+.viewport-action-menu__section { padding: 7px 8px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: .7px; color: var(--spike-control-muted); }
+.viewport-action-menu__direct { border-bottom: 1px solid var(--spike-popup-border); padding-bottom: 6px; margin-bottom: 4px; }
+.viewport-action-menu__edit-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; }
+.viewport-action-menu .viewport-action-menu__item--compact { min-height: 36px; font-size: 11px; padding: 6px; }
+.viewport-action-menu__item--compact[aria-disabled="true"] { opacity: .5; }
+.viewport-action-menu .viewport-action-menu__item[aria-checked="true"] { border-color: var(--spike-control-focus); color: var(--spike-table-edit); }

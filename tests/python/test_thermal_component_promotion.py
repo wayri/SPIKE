@@ -13,12 +13,10 @@ from unittest.mock import patch
 
 from examples.assembly_field.run_examples import setup
 from python.spike_core.assembly_frames import IDENTITY, resolve_world
-from python.spike_core.assembly_thermal_components import (
-    promote_thermal_components, thermal_component_inventory, PROVENANCE_KEY)
-from python.spike_core.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_components import promote_thermal_components, thermal_component_inventory, PROVENANCE_KEY
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
 from python.spike_core.project_package import ProjectPackageError, read_project, write_spike_package
-from python.spike_core.service_project_thermal_mesh import (
-    promote_thermal_components_in_project, read_assembly_thermal_mesh_setup)
+from python.spike_core.service_project_thermal_mesh import promote_thermal_components_in_project, read_assembly_thermal_mesh_setup
 from python.spike_core.spider_v2 import AssemblyIRV1
 from tests.python.test_assembly_thermal_meshing import fixture, has_runtime, runtime
 from tests.python.test_project_assembly_field import MODEL_ARTIFACT, _payload

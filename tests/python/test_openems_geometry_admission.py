@@ -10,12 +10,10 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.openems_geometry_admission import screen_geometry, verify_screen_binding
+from python.spike_core.solvers.external_engines.openems.openems_geometry_admission import screen_geometry, verify_screen_binding
 from tests.python.test_openems_far_field import far_field_design, far_field_spec
-from python.spike_core.openems_adapter_source import OPENEMS_DRIVER
-from python.spike_core.external_engines import (
-    ExternalEngineDescriptor, prepare_openems_case, run_openems_case,
-)
+from python.spike_core.solvers.external_engines.openems.openems_adapter_source import OPENEMS_DRIVER
+from python.spike_core.external_engines import ExternalEngineDescriptor, prepare_openems_case, run_openems_case
 
 
 class GeometryAdmissionTests(unittest.TestCase):

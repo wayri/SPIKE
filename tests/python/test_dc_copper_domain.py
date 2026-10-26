@@ -4,8 +4,8 @@ import unittest
 from shapely.geometry import Point, box
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.dc_copper_domain import source_copper_groups, explicit_terminal_contacts
-from python.spike_core.dc_triangle_partition import partition_polygon_groups
+from python.spike_core.solvers.power_integrity.dc.dc_copper_domain import source_copper_groups, explicit_terminal_contacts
+from python.spike_core.solvers.power_integrity.dc.dc_triangle_partition import partition_polygon_groups
 
 
 class CopperDomainTests(unittest.TestCase):

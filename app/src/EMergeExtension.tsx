@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useMemo, useState } from "react";
+import { OPEN_EMERGE_EXAMPLES_EVENT } from "./emergeExampleEvent";
 import { persistedEnginePython } from "./persistedEnginePython";
 import DataTable from "./DataTable";
 import { emergeRuntimePresentation } from "./emergeRuntimePresentation";
@@ -14,6 +15,7 @@ import { suggestEMergePadPairs } from "./emergeSetupSuggestions";
 import { reviewEMergeNetwork } from "./emergeNetworkReview";
 import { EMergeNearField } from "./EMergeNearField";
 import { downloadEMergeText, exportEMergeNetwork } from "./emergeSampleExport";
+import { exportEMergeCosimulationDraft } from "./emergeCosimulationDraft";
 
 export function EMergeCapabilityInventory({ rows }: { rows: unknown }) {
   if (!Array.isArray(rows)) return null;
@@ -37,6 +39,8 @@ export function EMergeScriptPreview({ data }: { data: Record<string, unknown> | 
 
 export type EMergeSetup = {
   geometry_source?: "board" | "gerber";
+  shorting_via_ids?: string;
+  fragment_copper?: boolean;
   geometry_backend?: "emerge" | "emcad";
   reference_impedance_ohm?: string;
   include_dielectric_loss?: boolean;
@@ -74,6 +78,7 @@ export type EMergeSetup = {
 
 export const defaultEMergeSetup = (signalNet = ""): EMergeSetup => ({
   geometry_source: "board", geometry_backend: "emerge", sparse_solver: "auto", field_excited_port: "1",
+  shorting_via_ids: "", fragment_copper: true,
   reference_impedance_ohm: "50", include_dielectric_loss: false, air_margin_mm: "",
   radiation_theta_step_deg: "15", radiation_phi_step_deg: "15", radiation_cut_phi_deg: "0",
   parallel: false, n_workers: "2", nearfield_enabled: false, nearfield_z_mm: "2", nearfield_grid_points: "11",
@@ -125,6 +130,12 @@ export function emergeParameters(setup: EMergeSetup, geometrySource: "board" | "
     frequency_points: points,
     mesh_resolution_mm: rangeNumber(setup.mesh_resolution_mm, "Mesh resolution", 0.05, 10),
   };
+  if (geometrySource === "board") {
+    const viaIds = (setup.shorting_via_ids ?? "").split(/[\s,]+/).filter(Boolean);
+    if (viaIds.length > 16 || new Set(viaIds).size !== viaIds.length || viaIds.some(id => id.length > 128 || !/^[a-zA-Z0-9_.:-]+$/.test(id))) throw new Error("Enter at most 16 distinct source shorting-via IDs.");
+    if (viaIds.length) parameters.shorting_via_ids = viaIds;
+    if (setup.fragment_copper === false) parameters.fragment_copper = false;
+  }
   parameters.reference_impedance_ohm = rangeNumber(setup.reference_impedance_ohm ?? "50", "Reference impedance", 1, 1000);
   parameters.include_dielectric_loss = setup.include_dielectric_loss ?? false;
   if (setup.air_margin_mm?.trim()) parameters.air_margin_mm = rangeNumber(setup.air_margin_mm, "Air margin", 5, 200);
@@ -186,6 +197,7 @@ export function EMergeSetupForm({ value, onChange, netOptions = [], padOptions =
       radome_width_mm: String(boardBounds.maxX - boardBounds.minX + 10), radome_depth_mm: String(boardBounds.maxY - boardBounds.minY + 10) } : {}) });
   return <div className="wizard-section">
     <label>EMERGE PORT SWEEP SETUP</label>
+    <button type="button" className="secondary-btn" onClick={() => window.dispatchEvent(new Event(OPEN_EMERGE_EXAMPLES_EVENT))}>Example projects, fields and probes</button>
     {onOpenGerber && <button className="secondary-btn" onClick={() => onOpenGerber(value.python_executable)} title="Load original Gerber copper with EMerge's native loader; retain KiCad support"><Layers3 size={15}/>Native Gerber study</button>}
     {gerberSource && <section className="emerge-native-source" aria-label="Active native Gerber source"><b>Native Gerber source: {gerberSource.name}</b><small>Copper is loaded by EMerge's native tools during mesh preparation. Imported KiCad net and pad selectors do not define this study.</small><ul>{gerberSource.layers.map(layer => <li key={layer.name}>{layer.name}: {layer.file_name}</li>)}</ul><small>Declared port planes: {gerberSource.ports.map(port => `${port.id}: (${port.x_mm}, ${port.y_mm}) mm, ${port.width_mm} mm wide, ${port.signal_layer} / ${port.return_layer}`).join("; ")}. Inspect conductor contact in the mesh before solving.</small></section>}
     {gerberSource && gerberRuntime?.gerber_available !== true && <p role="status">{gerberRuntime?.gerber_available === false ? String(gerberRuntime.gerber_reason ?? "Native Gerber loading is unavailable. Install EMerge's gerber extra in the selected solver Python, then check the runtime again.") : "Check the EMerge runtime to confirm native Gerber loading before meshing or solving."}</p>}
@@ -221,6 +233,7 @@ export function EMergeSetupForm({ value, onChange, netOptions = [], padOptions =
     </div><label><input type="checkbox" checked={value.include_dielectric_loss ?? false} onChange={event => onChange({ ...value, include_dielectric_loss: event.target.checked })} /> Include imported dielectric loss tangent</label><label><input type="checkbox" checked={value.parallel ?? false} onChange={event => onChange({ ...value, parallel: event.target.checked })} /> Parallel frequency solve</label><label><input type="checkbox" checked={value.nearfield_enabled ?? false} onChange={event => onChange({ ...value, nearfield_enabled: event.target.checked })} /> Capture complex E/H on XY field plane</label>
     {value.nearfield_enabled && <div className="sweep-grid"><label>Field plane Z above top copper (mm)<input type="number" min="-200" max="200" value={value.nearfield_z_mm ?? "2"} onChange={event => update("nearfield_z_mm", event.target.value)} /></label><label>Field grid points per axis<input type="number" min="3" max="41" value={value.nearfield_grid_points ?? "11"} onChange={event => update("nearfield_grid_points", event.target.value)} /></label></div>}
     <small>Loss, air boundaries, mesh and angular sampling need convergence review. Parallel solving depends on the selected EMerge runtime API. Invalid field points remain excluded.</small></details>
+    <details hidden={Boolean(gerberSource)}><summary>Explicit PCB geometry exceptions</summary><label>Return-net shorting via IDs (up to 16, separated by spaces or commas)<textarea maxLength={2048} rows={2} value={value.shorting_via_ids ?? ""} onChange={event => update("shorting_via_ids", event.target.value)} /></label><label><input type="checkbox" checked={value.fragment_copper ?? true} onChange={event => onChange({ ...value, fragment_copper: event.target.checked })} /> Fragment overlapping copper during geometry preparation</label><small>Only source-identified two-layer return through vias can be admitted as solid PEC cylinders. Barrel/drill/antipad physics remain unresolved. Disabling fragmentation is a diagnostic fallback requiring mesh inspection. The worker checks every exception against current geometry.</small></details>
     <label data-guide="emerge-radome"><input type="checkbox" checked={value.radome_enabled} onChange={event => toggleRadome(event.target.checked)} /> Model dielectric cover in front of antenna</label>
     {value.radome_enabled && <><small>Top copper is z = 0; positive gap is above the board. The cover is an ideal dielectric box included in the FEM mesh. Start with a bare run, then compare its pattern with the cover run.</small><div className="sweep-grid">
       <label>Cover X origin (mm)<input type="number" value={value.radome_origin_x_mm} onChange={event => update("radome_origin_x_mm", event.target.value)} /></label>
@@ -329,6 +342,10 @@ export function EMergeResultPlot({ result, frequencyIndex, onFrequencyIndexChang
     try { const output = exportEMergeNetwork(result, format); downloadEMergeText(output.name, output.text); setExportError(""); }
     catch (error) { setExportError(error instanceof Error ? error.message : "Network export failed."); }
   };
+  const exportCosimulation = () => {
+    try { const output = exportEMergeCosimulationDraft(result); downloadEMergeText(output.name, output.text); setExportError(""); }
+    catch (error) { setExportError(error instanceof Error ? error.message : "Co-simulation draft export failed."); }
+  };
   const cutIndex = frequencyIndex ?? localCutIndex;
   const setCutIndex = onFrequencyIndexChange ?? setLocalCutIndex;
   const radiationPoints = useMemo(() => {
@@ -371,6 +388,7 @@ export function EMergeResultPlot({ result, frequencyIndex, onFrequencyIndexChang
   return <div className="extension-output emerge-result-output">
     <label>EMERGE RESULT</label>
     <small>Model status: {status}. Curves and the 3D surface use solved EMerge samples. The 3D radius is relative field amplitude.</small>
+    {networkReview.ports.length > 0 && <section aria-label="EMerge co-solver handoff"><button type="button" className="secondary-btn" onClick={exportCosimulation}>Export co-simulation draft</button><small>Experimental: review terminal pairs, reference planes, expected source hashes and RMS wave convention in the exported draft. Run the EMerge preparation template in Python Workspace, then the sampled AC / resistor-thermal templates. This does not run SPICE or convert radiation into heat.</small></section>}
     {networkReview.ports.length > 0 && <section><div className="extension-actions"><button className="secondary-btn" onClick={() => exportNetwork("csv")}>Export complex CSV</button><button className="secondary-btn" onClick={() => exportNetwork("touchstone")}>Export Touchstone</button></div><label>Probe solved network sample<select aria-label="Probe solved network frequency" value={Math.min(networkSample, frequencies.length - 1)} onChange={event => setNetworkSample(Number(event.target.value))}>{frequencies.map((frequency, index) => <option key={frequency} value={index}>{frequency} Hz</option>)}</select></label><DataTable label="EMerge network samples"><thead><tr><th>Term</th><th>Real</th><th>Imaginary</th><th>Magnitude</th><th>Phase (deg)</th></tr></thead><tbody>{ports.flatMap((receive, row) => ports.map((excited, column) => { const pair = (sParameters.values as number[][][][])[Math.min(networkSample, frequencies.length - 1)][row][column]; return <tr key={`${row}-${column}`}><td>{receive} ← {excited}</td><td>{pair[0].toPrecision(6)}</td><td>{pair[1].toPrecision(6)}</td><td>{Math.hypot(...pair).toPrecision(6)}</td><td>{(Math.atan2(pair[1], pair[0]) * 180 / Math.PI).toPrecision(6)}</td></tr>; }))}</tbody></DataTable>{exportError && <p role="alert">{exportError}</p>}</section>}
     <section><div className="extension-output-title"><b>Analysis information</b></div><DataTable label="EMerge analysis information"><tbody>
       <tr><th>Solver</th><td>{String(summary.engine ?? "EMerge")} {String(summary.engine_version ?? "")}</td></tr>

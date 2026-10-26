@@ -260,6 +260,32 @@ class ReleaseAutomationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'UI version'):
             release.version(self.root)
 
+    def test_owned_cargo_lock_version_is_required_without_constraining_dependencies(self):
+        paths = {
+            'app/package.json': json.dumps({'version': '0.3.0'}),
+            'app/src/appVersion.ts': 'export const APP_VERSION = "0.3.0";\n',
+            'app/package-lock.json': json.dumps({'version': '0.3.0', 'packages': {'': {'version': '0.3.0'}}}),
+            'app/src-tauri/tauri.conf.json': json.dumps({'version': '0.3.0'}),
+            'app/src-tauri/Cargo.toml': '[package]\nname = "spike-desktop"\nversion = "0.3.0"\n',
+            'python/spike_core/__init__.py': '__version__ = "0.3.0"\n',
+            'CMakeLists.txt': 'project(SPIKE VERSION 0.3.0 LANGUAGES CXX)\n',
+        }
+        for name, content in paths.items():
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content)
+        lock = self.root / 'app/src-tauri/Cargo.lock'
+        dependency = '[[package]]\nname = "dependency"\nversion = "9.8.7"\n'
+        application = '[[package]]\nname = "spike-desktop"\nversion = "0.3.0"\n'
+        lock.write_text(dependency + application)
+        self.assertEqual(release.version(self.root), '0.3.0')
+        for invalid in (dependency, dependency + application.replace('0.3.0', '0.2.9'),
+                        application + application, application + 'source = "registry+example"\n'):
+            with self.subTest(lock=invalid):
+                lock.write_text(invalid)
+                with self.assertRaisesRegex(ValueError, 'Cargo.lock'):
+                    release.version(self.root)
+
 
 if __name__ == '__main__':
     unittest.main()

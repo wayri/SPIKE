@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from python.spike_core.board_thermal import run_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.board_thermal import run_board_thermal
 from python.spike_core.contracts import SpiDeR
 
 

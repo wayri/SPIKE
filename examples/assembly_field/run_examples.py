@@ -11,11 +11,11 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
-from python.spike_core.assembly_field_study import export_assembly_field_study, import_assembly_field_study
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
-from python.spike_core.assembly_view_factors import derive_assembly_view_factors
-from python.spike_core.tetra_mesh_refinement import refine_tetra_mesh
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
+from python.spike_core.solvers.execution.coupling.assembly_field_study import export_assembly_field_study, import_assembly_field_study
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
+from python.spike_core.solvers.thermal_fluid.heat.assembly_view_factors import derive_assembly_view_factors
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_refinement import refine_tetra_mesh
 from python.spike_core.multiboard_identity import canonical_json_digest
 from python.spike_core.spider_v2 import AssemblyIRV1
 

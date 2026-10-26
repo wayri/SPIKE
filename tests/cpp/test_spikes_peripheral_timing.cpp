@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-#include "spikes/peripheral_timing.hpp"
+#include "solvers/circuits/spikes/peripheral_timing.hpp"
 #include <array>
 #include <iostream>
 #include <stdexcept>

@@ -125,8 +125,8 @@ class FiniteContactBenchmarkTests(unittest.TestCase):
         # A retained unsupported path, never counted as a successful solve.
         from shapely.affinity import rotate
         from shapely.geometry import box
-        from python.spike_core.dc_triangle_partition import partition_polygon_groups
-        from python.spike_core.peec_conforming_dc import solve_hybridized_conforming_dc
+        from python.spike_core.solvers.power_integrity.dc.dc_triangle_partition import partition_polygon_groups
+        from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import solve_hybridized_conforming_dc
         rotate_shape = lambda shape: rotate(shape, .61, origin=(0, 0), use_radians=True)
         groups = {("F.Cu", "N"): {"geometry": rotate_shape(box(0, 0, 2, 1)),
                   "thickness_mm": .035, "conductivity_s_m": 5.8e7, "z_mm": 0.}}

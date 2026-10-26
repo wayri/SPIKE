@@ -2,7 +2,7 @@
 import copy
 import unittest
 import numpy as np
-from python.spike_core.multiboard_em import run_multiboard_em
+from python.spike_core.solvers.electromagnetics.fields.multiboard_em import run_multiboard_em
 from tests.python.test_harness_authoring import fixture
 
 

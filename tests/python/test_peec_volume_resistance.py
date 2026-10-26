@@ -9,10 +9,8 @@ from pathlib import Path
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import (
-    MeshBranch, TOPOLOGY_ONLY_BRANCH_KINDS, build_hybrid_mesh,
-)
-from python.spike_core.peec_volume_resistance import assemble_overlap_resistance
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import MeshBranch, TOPOLOGY_ONLY_BRANCH_KINDS, build_hybrid_mesh
+from python.spike_core.solvers.power_integrity.peec.peec_volume_resistance import assemble_overlap_resistance
 from python.spike_core.service import _design_from_kicad
 
 

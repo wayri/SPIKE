@@ -10,9 +10,7 @@ import unittest
 import numpy as np
 from jsonschema import Draft202012Validator
 
-from python.spike_core.assembly_view_factors import (
-    AssemblyViewFactorError, derive_assembly_view_factors,
-)
+from python.spike_core.solvers.thermal_fluid.heat.assembly_view_factors import AssemblyViewFactorError, derive_assembly_view_factors
 
 
 def square(z, side=1., upwards=True):

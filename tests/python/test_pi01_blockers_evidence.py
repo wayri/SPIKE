@@ -18,7 +18,7 @@ class PI01BlockerEvidenceTests(unittest.TestCase):
                        lambda r: r.__setitem__("status", "failed"),
                        lambda r: r.__setitem__("report_sha256", "0"*64),
                        lambda r: r.__setitem__("finite_sha256", "0"*64),
-                       lambda r: r["sources_before"].pop("python/spike_core/dc_axial_ownership.py"),
+                       lambda r: r["sources_before"].pop("python/spike_core/solvers/power_integrity/dc/dc_axial_ownership.py"),
                        lambda r: r["tests"].__setitem__("run", 0)):
             changed = deepcopy(receipt); mutate(changed)
             with self.assertRaises(ValueError):

@@ -16,7 +16,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.si_workflow import REQUEST, run_si_workflow
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import REQUEST, run_si_workflow
 
 
 def plot_reference(output: Path) -> dict:

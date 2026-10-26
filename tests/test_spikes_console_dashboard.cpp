@@ -1,4 +1,4 @@
-#include "spikes/console_dashboard.hpp"
+#include "solvers/circuits/spikes/console_dashboard.hpp"
 
 #include <cassert>
 #include <cmath>

@@ -27,7 +27,7 @@ References:
 
 ## Implemented foundation
 
-`python/spike_core/sparameters.py` provides:
+`python/spike_core/solvers/signal_integrity/networks/sparameters.py` provides:
 
 - Touchstone 1 full-matrix parsing for RI, MA, and DB data.
 - Touchstone 2 keyword parsing for port count, reference impedance, and full
@@ -57,7 +57,7 @@ The SI Protocol Suites workbench configures dedicated protocol workflows and
 links to both surfaces. A suite is configuration and prerequisite planning, not
 a standards-compliance solver.
 
-`python/spike_core/si_channel.py` and `si_coupled_channel.py` provide separate
+`python/spike_core/solvers/signal_integrity/channels/si_channel.py` and `si_coupled_channel.py` provide separate
 bounded geometry-derived channel paths. Their strict default admits one
 straight constant-width SpiDeR v2 track chain or two straight, parallel,
 coextensive chains over one simple fully covering reference-zone/homogeneous-

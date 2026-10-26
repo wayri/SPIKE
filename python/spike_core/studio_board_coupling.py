@@ -15,9 +15,9 @@ import math
 import time
 
 from python.spikes.native_runner import _populate, _nodes
-from .cosimulation import bounded_digest
-from .thermal import ThermalScenario
-from .thermal_network import estimate_lumped_thermal_network
+from .solvers.execution.coupling.cosimulation import bounded_digest
+from .solvers.thermal_fluid.heat.thermal import ThermalScenario
+from .solvers.thermal_fluid.heat.thermal_network import estimate_lumped_thermal_network
 from .studio_board_coupling_contract import REQUEST, RESULT, admit, require, resistance, source_breakpoints
 
 LIMITATIONS = [

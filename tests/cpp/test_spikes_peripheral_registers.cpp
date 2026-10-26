@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-#include "spikes/peripheral_registers.hpp"
+#include "solvers/circuits/spikes/peripheral_registers.hpp"
 
 #include <array>
 #include <cstdint>

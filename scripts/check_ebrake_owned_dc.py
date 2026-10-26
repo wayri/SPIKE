@@ -21,13 +21,13 @@ if str(ROOT) not in sys.path:
 
 from python.spike_core.contracts import AnalysisSpec
 from python.spike_core.convergence import run_mesh_convergence
-from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
+from python.spike_core.solvers.power_integrity.dc.hybrid_dc_solver import solve_hybrid_dc
 from python.spike_core.kicad_importer import import_kicad_design
 
 SOURCES = (
-    "scripts/check_ebrake_owned_dc.py", "python/spike_core/hybrid_mesh.py",
-    "python/spike_core/hybrid_owned_copper.py", "python/spike_core/hybrid_drilled_roundrect.py",
-    "python/spike_core/hybrid_dc_solver.py", "python/spike_core/dc_result_utils.py",
+    "scripts/check_ebrake_owned_dc.py", "python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py",
+    "python/spike_core/solvers/power_integrity/dc/hybrid_owned_copper.py", "python/spike_core/solvers/power_integrity/dc/hybrid_drilled_roundrect.py",
+    "python/spike_core/solvers/power_integrity/dc/hybrid_dc_solver.py", "python/spike_core/solvers/power_integrity/dc/dc_result_utils.py",
     "python/spike_core/convergence.py", "python/spike_core/cli.py",
     "python/spike_core/kicad_importer.py", "python/core/board_parser.py",
 )

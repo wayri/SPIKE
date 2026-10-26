@@ -1,0 +1,19 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.emerge-examples { width: min(100%, 1120px); margin: 0 auto; padding: 16px; box-sizing: border-box; min-width: 0; }
+.emerge-examples > header, .emerge-examples article header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.emerge-examples h2, .emerge-examples h3 { margin: 0 0 8px; }
+.emerge-examples p { line-height: 1.5; }
+.emerge-examples > label { display: grid; gap: 6px; max-width: 600px; }
+.emerge-examples input { width: 100%; box-sizing: border-box; min-width: 0; }
+.emerge-examples nav { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.emerge-example-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+.emerge-example-grid article { display: flex; flex-direction: column; min-width: 0; padding: 14px; border: 1px solid var(--spike-table-border); background: var(--spike-table-surface); border-radius: 6px; overflow-wrap: anywhere; }
+.emerge-examples article span, .emerge-examples small { color: var(--spike-table-muted); font-size: 12px; }
+.emerge-examples article ul { padding-left: 20px; line-height: 1.7; }
+.emerge-examples article > button { margin-top: 14px; align-self: flex-start; }
+.emerge-examples footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--spike-table-border); }
+@media(max-width: 640px) { .emerge-examples { padding: 10px; } .emerge-examples > header { flex-wrap: wrap; } }
+
+.emerge-examples figure { margin: 6px 0; }
+.emerge-examples img { display: block; width: 100%; max-height: 190px; object-fit: contain; border-radius: 4px; }
+.emerge-examples figcaption { color: var(--spike-table-muted); font-size: 11px; margin-top: 5px; }

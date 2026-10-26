@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SigHarmonic
 import math
 import unittest
-from python.spike_core.antenna_measured_comparison import compare_forward_gain, evaluate_temporal_admission
+from python.spike_core.solvers.electromagnetics.fields.antenna_measured_comparison import compare_forward_gain, evaluate_temporal_admission
 
 
 class MeasuredGainTests(unittest.TestCase):

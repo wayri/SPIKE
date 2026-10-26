@@ -1,0 +1,285 @@
+{
+  "contract": "spike/emerge-advanced-study-index/v1",
+  "studies": [
+    {
+      "id": "emerge-demo0-parallel-plate",
+      "title": "Demo 0 parallel plate",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo0-parallel-plate.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo0_parallel_plate.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo1-stepped-imp-filter",
+      "title": "Demo 1 stepped imp filter",
+      "category": "Filters",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo1-stepped-imp-filter.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo1_stepped_imp_filter.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo10-sgh",
+      "title": "Demo 10 sgh",
+      "category": "Antennas",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo10-sgh.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo10_sgh.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo11-lumped-element-filter",
+      "title": "Demo 11 lumped element filter",
+      "category": "Filters",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo11-lumped-element-filter.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo11_lumped_element_filter.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo12-mode-alignment",
+      "title": "Demo 12 mode alignment",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo12-mode-alignment.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo12_mode_alignment.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo13-helix-antenna",
+      "title": "Demo 13 helix antenna",
+      "category": "Antennas",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo13-helix-antenna.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo13_helix_antenna.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo14-boundary-selection",
+      "title": "Demo 14 boundary selection",
+      "category": "Boundaries and periodic",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo14-boundary-selection.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo14_boundary_selection.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo15-strip-slotline-transition",
+      "title": "Demo 15 strip slotline transition",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo15-strip-slotline-transition.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo15_strip_slotline_transition.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo16-differential-common-mode",
+      "title": "Demo 16 differential common mode",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo16-differential-common-mode.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo16_differential_common_mode.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo17-step-import",
+      "title": "Demo 17 step import",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo17-step-import.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo17_step_import.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo18-plotting-and-visualization",
+      "title": "Demo 18 plotting and visualization",
+      "category": "Visualization and optimization",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo18-plotting-and-visualization.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo18_plotting_and_visualization.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo19-vivaldi-antenna",
+      "title": "Demo 19 vivaldi antenna",
+      "category": "Antennas",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo19-vivaldi-antenna.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo19_vivaldi_antenna.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo2-combline-filter",
+      "title": "Demo 2 combline filter",
+      "category": "Filters",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo2-combline-filter.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo2_combline_filter.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo20-optimization",
+      "title": "Demo 20 optimization",
+      "category": "Visualization and optimization",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo20-optimization.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo20_optimization.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo21-inverted-f-antenna",
+      "title": "Demo 21 inverted F antenna",
+      "category": "Antennas",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo21-inverted-f-antenna.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo21_inverted_F_antenna.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo22-rcs",
+      "title": "Demo 22 RCS",
+      "category": "Scattering",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo22-rcs.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo22_RCS.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo3-coupled-line-filter",
+      "title": "Demo 3 coupled line filter",
+      "category": "Filters",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo3-coupled-line-filter.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo3_coupled_line_filter.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo4-patch-antenna",
+      "title": "Demo 4 patch antenna",
+      "category": "Antennas",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo4-patch-antenna.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo4_patch_antenna.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo5-revolve",
+      "title": "Demo 5 revolve",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo5-revolve.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo5_revolve.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo6-striplines-with-vias",
+      "title": "Demo 6 striplines with vias",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo6-striplines-with-vias.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo6_striplines_with_vias.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo7-periodic-cells",
+      "title": "Demo 7 periodic cells",
+      "category": "Boundaries and periodic",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo7-periodic-cells.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo7_periodic_cells.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo8-waveguide-bpf-synthesis",
+      "title": "Demo 8 waveguide bpf synthesis",
+      "category": "Filters",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo8-waveguide-bpf-synthesis.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo8_waveguide_bpf_synthesis.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-demo9-dielectric-resonator",
+      "title": "Demo 9 dielectric resonator",
+      "category": "Guided structures and CAD",
+      "study_path": "examples/upstream-emerge/studies/emerge-demo9-dielectric-resonator.spike-em.json",
+      "status": "requires-engine",
+      "upstream_path": "examples/demo9_dielectric_resonator.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-thermal-demo1-basic-simulation",
+      "title": "Demo 1 basic simulation",
+      "category": "Suspended thermal",
+      "study_path": "examples/upstream-emerge/studies/emerge-thermal-demo1-basic-simulation.spike-em.json",
+      "status": "suspended",
+      "upstream_path": "examples/heatconduction/demo1_basic_simulation.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-thermal-demo2-chip-heating",
+      "title": "Demo 2 chip heating",
+      "category": "Suspended thermal",
+      "study_path": "examples/upstream-emerge/studies/emerge-thermal-demo2-chip-heating.spike-em.json",
+      "status": "suspended",
+      "upstream_path": "examples/heatconduction/demo2_chip_heating.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-thermal-demo3-rf-heating",
+      "title": "Demo 3 RF heating",
+      "category": "Suspended thermal",
+      "study_path": "examples/upstream-emerge/studies/emerge-thermal-demo3-rf-heating.spike-em.json",
+      "status": "suspended",
+      "upstream_path": "examples/heatconduction/demo3_RF_heating.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-thermal-demo4-black-body-radiation",
+      "title": "Demo 4 black body radiation",
+      "category": "Suspended thermal",
+      "study_path": "examples/upstream-emerge/studies/emerge-thermal-demo4-black-body-radiation.spike-em.json",
+      "status": "suspended",
+      "upstream_path": "examples/heatconduction/demo4_black_body_radiation.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    },
+    {
+      "id": "emerge-thermal-demo5-transient-heat-conduction",
+      "title": "Demo 5 transient heat conduction",
+      "category": "Suspended thermal",
+      "study_path": "examples/upstream-emerge/studies/emerge-thermal-demo5-transient-heat-conduction.spike-em.json",
+      "status": "suspended",
+      "upstream_path": "examples/heatconduction/demo5_transient_heat_conduction.py",
+      "upstream_commit": "75e6e98170a6628688593f917c1bb63b52578d02",
+      "license": "GPL-2.0-or-later; see isolated upstream LICENSE"
+    }
+  ]
+}

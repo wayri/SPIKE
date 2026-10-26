@@ -7,29 +7,10 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.spider_v2_schema import (
-    Arc,
-    Component,
-    CoordinateFrame,
-    Drill,
-    Layer,
-    Material,
-    Net,
-    Pad,
-    Region,
-    SourceIdentity,
-    Track,
-    Via,
-    Zone,
-)
+from python.spike_core.spider_v2_schema import Arc, Component, CoordinateFrame, Drill, Layer, Material, Net, Pad, Region, SourceIdentity, Track, Via, Zone
 from python.spike_core.spikes_layout_adapter import design_ir_artifact_identity
 from python.spike_core.spikes_layout_contract import SpikesLayoutAdapterError
-from python.spike_core.spikes_layout_geometry_handoff import (
-    DESIGNIR_LAYOUT_HANDOFF_CONTRACT,
-    build_designir_layout_handoff,
-    canonical_designir_layout_handoff_json,
-    validate_designir_layout_handoff_identity,
-)
+from python.spike_core.spikes_layout_geometry_handoff import DESIGNIR_LAYOUT_HANDOFF_CONTRACT, build_designir_layout_handoff, canonical_designir_layout_handoff_json, validate_designir_layout_handoff_identity
 
 
 class SpikesLayoutGeometryHandoffTests(unittest.TestCase):

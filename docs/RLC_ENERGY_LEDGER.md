@@ -14,7 +14,7 @@ network or transfer heat to a thermal mesh. Full SI/PI parity remains open.
 ## API, quantities and provenance
 
 Call `run_rlc_energy_ledger(request)` in
-`python.spike_core.sparameter_rlc_energy`, or invoke that worker method with
+`python.spike_core.solvers.signal_integrity.networks.sparameter_rlc_energy`, or invoke that worker method with
 exactly `params: {request: ...}`. The desktop script workspace can use the API;
 no dedicated energy editor is added. Run the original free-decay example:
 

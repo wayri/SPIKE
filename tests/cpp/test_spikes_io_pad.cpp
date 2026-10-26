@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
-#include "spikes/io_pad.hpp"
-#include "spikes/transient_session.hpp"
+#include "solvers/circuits/spikes/io_pad.hpp"
+#include "solvers/circuits/spikes/transient_session.hpp"
 
 #include <cmath>
 #include <iostream>

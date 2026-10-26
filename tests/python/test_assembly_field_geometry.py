@@ -8,7 +8,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.assembly_field_geometry import lower_body, validate_frames
+from python.spike_core.solvers.execution.coupling.assembly_field_geometry import lower_body, validate_frames
 from python.spike_core.spider_v2 import AssemblyIRV1, BoardInstance
 from python.spike_core.spider_v2_schema import CoordinateFrame
 

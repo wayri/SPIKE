@@ -13,7 +13,7 @@ import unittest
 import numpy as np
 from numpy.polynomial import Polynomial
 
-from python.spike_core.enclosure_rans_research import solve_enclosure_rans_research
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_rans_research import solve_enclosure_rans_research
 from tests.python.test_enclosure_rans_research import exact_mean, fixture
 
 

@@ -9,17 +9,9 @@ from jsonschema import Draft202012Validator
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.reference_plane_antipad_geometry import (
-    ReferencePlaneAntipadGeometryError,
-    build_reference_plane_antipad_geometry,
-    validate_reference_plane_antipad_geometry,
-)
-from python.spike_core.reference_plane_antipad_mesh import (
-    ReferencePlaneAntipadMeshError,
-    build_reference_plane_antipad_mesh,
-    validate_reference_plane_antipad_mesh,
-)
-from python.spike_core.via_transition_geometry import AntipadSpec, ViaTransitionGeometryError, build_via_transition_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_geometry import ReferencePlaneAntipadGeometryError, build_reference_plane_antipad_geometry, validate_reference_plane_antipad_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_mesh import ReferencePlaneAntipadMeshError, build_reference_plane_antipad_mesh, validate_reference_plane_antipad_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_geometry import AntipadSpec, ViaTransitionGeometryError, build_via_transition_geometry
 
 
 ROOT = Path(__file__).resolve().parents[2]

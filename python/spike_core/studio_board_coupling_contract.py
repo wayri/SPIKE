@@ -4,7 +4,7 @@ from copy import deepcopy
 import math
 
 from python.spikes.netlist import parse_netlist
-from .cosimulation import bounded_digest, identity, number
+from .solvers.execution.coupling.cosimulation import bounded_digest, identity, number
 from .owned_spice_workspace import _owned_engine_netlist
 
 REQUEST = "spike/studio-board-cosimulation-request/v1"

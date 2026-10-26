@@ -25,15 +25,12 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.runtime_qualification import (
-    canonical_digest,
-    collect_runtime_snapshot,
-    qualify_runtime_snapshots,
-)
+from python.spike_core.runtime_qualification import canonical_digest, collect_runtime_snapshot, qualify_runtime_snapshots
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.spike_core.geometry_arrow import GEOMETRY_ARROW_CONTRACT_V4, canonical_geometry_rows
 from python.spike_core.project_package import read_geometry_arrow_artifact, read_spike_package
+from scripts.check_private_research import private_paths
 
 
 EXPECTED_PYINSTALLER_VERSION = "6.21.0"
@@ -379,6 +376,8 @@ C1 out 0 1u
 
 
 def _verify(executable: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any], dict[str, Any]]:
+    from scripts.verify_packaged_schema_catalog import verify_packaged_schema_catalog
+    schema_coherence = verify_packaged_schema_catalog(executable)
     runtime_environment = {"SPIKE_HOME": str(ROOT)}
     source = collect_runtime_snapshot(
         [sys.executable, "-m", "python.spike_core.service"],
@@ -420,6 +419,25 @@ def _verify(executable: Path) -> tuple[dict[str, Any], dict[str, Any], dict[str,
     spikes_engine_probe = _verify_spikes_engine(executable)
     from scripts.verify_extension_runtime import verify_extension_runtime
     extension_probe = verify_extension_runtime(executable, _request)
+    extension_probe["schema_source_coherence"] = schema_coherence
+    from scripts.verify_em_cosimulation_runtime import verify_em_cosimulation_runtime
+    extension_probe["em_cosimulation"] = verify_em_cosimulation_runtime(executable, _request)
+    from scripts.verify_native_cht_runtime import verify_native_cht_runtime
+    extension_probe["native_cht"] = verify_native_cht_runtime(executable, _request)
+    from scripts.verify_native_momentum_runtime import verify_native_momentum_runtime
+    extension_probe["native_momentum"] = verify_native_momentum_runtime(executable, _request)
+    from scripts.verify_tetra_cht_runtime import verify_tetra_cht_runtime
+    extension_probe["tetra_cht"] = verify_tetra_cht_runtime(executable, _request)
+    from scripts.verify_si_execution_runtime import verify_si_execution_runtime
+    extension_probe["si_pam3"] = verify_si_execution_runtime(executable, _request)
+    from scripts.verify_si_ibis_spatial_runtime import verify_si_ibis_spatial_runtime
+    extension_probe["si_ibis_spatial"] = verify_si_ibis_spatial_runtime(executable, _request)
+    # A successful numerical snapshot alone can miss concurrent source edits.
+    # Compare actual frozen code after all probes, before writing any success manifest.
+    from scripts.verify_packaged_source_modules import verify_packaged_source_modules
+    extension_probe["python_source_coherence"] = verify_packaged_source_modules(
+        executable, require_em_cosimulation=True, require_si_ibis_spatial=True)
+    extension_probe["schema_source_coherence"] = verify_packaged_schema_catalog(executable)
     return packaged, qualification, geometry_arrow_probe, spikes_engine_probe, extension_probe
 
 
@@ -479,14 +497,43 @@ def _write_manifest(
     return destination
 
 
-def build(*, keep_work: bool = False) -> tuple[Path, Path]:
+def _native_kernels(directory: Path | None = None) -> tuple[Path, Path]:
+    """Require both first-party kernels before replacing any build output."""
+    if directory is None:
+        from python.spike_core.solvers.thermal_fluid.flow.native_airflow import detect_native_airflow
+        from python.spike_core.solvers.thermal_fluid.flow.native_cht import executable_path
+        airflow = Path(detect_native_airflow()["executable"])
+        cht = executable_path()
+    else:
+        directory = directory.resolve()
+        suffix = ".exe" if os.name == "nt" else ""
+        airflow = directory / ("spike_native_airflow" + suffix)
+        cht = directory / ("spike_native_cht" + suffix)
+    missing = [str(path) for path in (airflow, cht) if not path.is_file()]
+    if missing:
+        raise RuntimeError("Native airflow/CHT executable missing: " + ", ".join(missing)
+                           + "; run python scripts/build_native_airflow.py first.")
+    return airflow.resolve(), cht.resolve()
+
+
+def build(*, keep_work: bool = False, native_kernel_dir: Path | None = None) -> tuple[Path, Path]:
+    # Check the actual candidate source inputs, including ignored local files.
+    # Git/CI checks alone cannot protect a dirty-tree freezer build.
+    candidates = [p.relative_to(ROOT).as_posix()
+                  for base in (ROOT / "python", ROOT / "extensions", ROOT / "schemas")
+                  for p in base.rglob("*") if p.is_file()
+                  and "__pycache__" not in p.parts]
+    blocked = private_paths(candidates)
+    if blocked:
+        raise RuntimeError("Unpublished research cannot enter the worker: " + ", ".join(blocked))
     pyinstaller_version = _require_pyinstaller()
     native_extension = _native_extension()
     spikes_library = _spikes_library()
-    from python.spike_core.native_airflow import detect_native_airflow
-    native_airflow = detect_native_airflow()
-    if not native_airflow["available"]:
-        raise RuntimeError("Native airflow executable missing; run python scripts/build_native_airflow.py first.")
+    native_airflow, native_cht = _native_kernels(native_kernel_dir)
+    cleanup_roots = ((RESOURCE_ROOT / "spike-worker").resolve(), BUILD_ROOT.resolve())
+    if any(binary.is_relative_to(directory) for binary in (native_airflow, native_cht)
+           for directory in cleanup_roots):
+        raise RuntimeError("Native kernel inputs must be outside worker output and build scratch directories.")
     RESOURCE_ROOT.mkdir(parents=True, exist_ok=True)
     BUILD_ROOT.mkdir(parents=True, exist_ok=True)
     artifact_dir = RESOURCE_ROOT / "spike-worker"
@@ -522,7 +569,9 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         "--add-binary",
         f"{spikes_library}{os.pathsep}spikes",
         "--add-binary",
-        f"{native_airflow['executable']}{os.pathsep}native",
+        f"{native_airflow}{os.pathsep}native",
+        "--add-binary",
+        f"{native_cht}{os.pathsep}native",
         "--add-data",
         (
             f"{ROOT / 'python' / 'spike_core' / 'validation_data'}"
@@ -547,11 +596,21 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
         "--collect-submodules",
         "extensions.openems_suite",
         "--hidden-import",
-        "python.spike_core.sparselizard_process",
+        "extensions.emerge_suite.cosimulation",
+        "--hidden-import",
+        "extensions.emerge_suite.volume_capture",
+        "--hidden-import",
+        "python.spike_core.solvers.external_engines.sparselizard.sparselizard_process",
         "--hidden-import",
         "python.spike_core.circuit_worker_supervisor",
         "--hidden-import",
         "python.spike_core.solver_state",
+        "--hidden-import",
+        "python.spike_core.service_ibis_behavioral",
+        "--hidden-import",
+        "python.spike_core.service_si_spatial",
+        "--hidden-import",
+        "python.spike_core.solvers.signal_integrity.receivers.ibis_behavioral_execution",
         "--add-data",
         f"{ROOT / 'python' / 'spike_core' / 'freecad_assembly_export.py'}{os.pathsep}python/spike_core",
         "--add-data",
@@ -590,10 +649,21 @@ def build(*, keep_work: bool = False) -> tuple[Path, Path]:
 
 
 def main() -> int:
+    global RESOURCE_ROOT, BUILD_ROOT, RUNTIME_QUALIFICATION_PATH
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--keep-work", action="store_true", help="Retain PyInstaller work/spec directories")
+    parser.add_argument("--candidate-root", type=Path, help="Fresh directory below build/; preserve the current bundled worker")
+    parser.add_argument("--native-kernel-dir", type=Path,
+                        help="Explicit first-party build directory containing both native airflow and CHT binaries")
     args = parser.parse_args()
-    executable, manifest = build(keep_work=args.keep_work)
+    if args.candidate_root is not None:
+        candidate = args.candidate_root.resolve()
+        if candidate.exists() or not candidate.is_relative_to((ROOT / "build").resolve()):
+            parser.error("Candidate root must be a fresh directory strictly below repository build/")
+        RESOURCE_ROOT = candidate / "resources"
+        BUILD_ROOT = candidate / "work"
+        RUNTIME_QUALIFICATION_PATH = candidate / "release-runtime-qualification.json"
+    executable, manifest = build(keep_work=args.keep_work, native_kernel_dir=args.native_kernel_dir)
     print(f"Verified packaged worker: {executable}")
     print(f"Integrity manifest: {manifest}")
     return 0

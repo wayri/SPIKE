@@ -1,11 +1,15 @@
 import { useMemo, useState } from "react";
 import DataTable from "./DataTable";
 import { CheckCircle2, Link2, Plus, Search, Trash2, WandSparkles, X } from "./icons";
+import SolderJointEditor from "./SolderJointEditor";
+import type { SolderJointVisual } from "./solderJointModel";
+import "./buttonStandard.css";
 
 export type BondStatus = "draft" | "ready" | "warning" | "invalid" | "disabled";
 
 export type BondRecord = {
   id: string;
+  boardInstanceId?: string;
   componentId?: string;
   padId?: string;
   position?: [number, number];
@@ -24,6 +28,7 @@ export type BondRecord = {
   bondMaterial: string;
   status: BondStatus;
   enabled: boolean;
+  solderVisual?: SolderJointVisual;
 };
 
 export type BondHoverTarget = {
@@ -46,6 +51,7 @@ export type BondManagerProps = {
   onBondsChange: (bonds: BondRecord[]) => void;
   onAutoConnect?: (searchDistanceMm: number) => void;
   onValidate?: () => void;
+  onModelSolder?: () => void;
   onBondAdd?: (bond: BondRecord) => void;
   onBondChange?: (bond: BondRecord, previous: BondRecord) => void;
   onBondDelete?: (bond: BondRecord) => void;
@@ -98,6 +104,7 @@ export default function BondManager({
   onBondsChange,
   onAutoConnect,
   onValidate,
+  onModelSolder,
   onBondAdd,
   onBondChange,
   onBondDelete,
@@ -108,11 +115,13 @@ export default function BondManager({
   title = "Bond Manager",
 }: BondManagerProps) {
   const [query, setQuery] = useState("");
+  const [selectedBondId, setSelectedBondId] = useState<string | null>(null);
   const [autoConnectDistance, setAutoConnectDistance] = useState(DEFAULT_BOND_VALUES.searchDistanceMm);
   const normalizedQuery = query.trim().toLowerCase();
   const visibleBonds = useMemo(() => bonds.filter(bond => !normalizedQuery || [
     bond.part, bond.reference, bond.pad, bond.net, bond.surface, bond.bondMaterial, bond.status,
   ].some(value => value.toLowerCase().includes(normalizedQuery))), [bonds, normalizedQuery]);
+  const selectedBond = bonds.find(bond => bond.id === selectedBondId) ?? null;
 
   const updateBond = (previous: BondRecord, patch: Partial<BondRecord>) => {
     const nextBond = { ...previous, ...patch };
@@ -123,10 +132,12 @@ export default function BondManager({
     const bond = createBondRecord();
     onBondsChange([...bonds, bond]);
     onBondAdd?.(bond);
+    setSelectedBondId(bond.id);
   };
   const deleteBond = (bond: BondRecord) => {
     onBondsChange(bonds.filter(item => item.id !== bond.id));
     onBondDelete?.(bond);
+    if (selectedBondId === bond.id) setSelectedBondId(null);
   };
   const preview = (bond: BondRecord | null) => {
     onHoverBond?.(bond);
@@ -156,6 +167,7 @@ export default function BondManager({
         <label className="bond-manager-distance"><span>Search</span><input type="number" min="0.001" max="10" step="0.05" value={autoConnectDistance} onChange={event => setAutoConnectDistance(numberOrZero(event.target.value))} /><small>mm</small></label>
         <button onClick={() => onAutoConnect?.(autoConnectDistance)} disabled={!onAutoConnect || autoConnectDistance <= 0 || autoConnectDistance > 10} title="Connect imported footprint terminals to owned pads; use distance only when ownership is missing"><WandSparkles size={15} /> Auto-connect</button>
         <button onClick={onValidate} disabled={!onValidate} title="Validate bond geometry and physical properties"><CheckCircle2 size={15} /> Validate</button>
+        {onModelSolder&&<button onClick={onModelSolder} disabled={!bonds.some(bond=>bond.enabled)} title="Add editable solder shapes to enabled connections with matching owned pads"><Link2 size={15}/>Model solder</button>}
         <button onClick={addBond} title="Add an empty bond"><Plus size={15} /> Add bond</button>
       </div>
 
@@ -167,7 +179,7 @@ export default function BondManager({
               const result = validationFor(bond);
               const status = bond.status;
               const displayStatus = result?.status ?? status;
-              return <tr key={bond.id} className={`bond-manager-row ${displayStatus} ${bond.enabled ? "" : "disabled"}`} onMouseEnter={() => preview(bond)} onMouseLeave={() => preview(null)}>
+              return <tr key={bond.id} className={`bond-manager-row ${displayStatus} ${bond.enabled ? "" : "disabled"} ${selectedBondId === bond.id ? "selected" : ""}`} aria-selected={selectedBondId === bond.id} onPointerDown={() => setSelectedBondId(bond.id)} onFocusCapture={() => setSelectedBondId(bond.id)} onMouseEnter={() => preview(bond)} onMouseLeave={() => preview(null)}>
                 <td><input type="checkbox" checked={bond.enabled} onChange={event => updateBond(bond, { enabled: event.target.checked, status: event.target.checked && bond.status === "disabled" ? "draft" : event.target.checked ? bond.status : "disabled" })} aria-label={`Enable bond ${bond.reference || bond.id}`} /></td>
                 <td><input value={bond.part} onChange={event => updateBond(bond, { part: event.target.value })} aria-label="Part" /></td>
                 <td><input value={bond.reference} onChange={event => updateBond(bond, { reference: event.target.value })} aria-label="Reference" /></td>
@@ -187,6 +199,9 @@ export default function BondManager({
           </DataTable>
           {!visibleBonds.length && <div className="bond-manager-empty"><Link2 size={24} /><b>{bonds.length ? "No bonds match this filter" : "No component bonds configured"}</b><span>{bonds.length ? "Change the filter to show the remaining bonds." : "Add a bond or auto-connect nearby component pads and copper."}</span></div>}
         </div>
+        <SolderJointEditor bond={selectedBond} onChange={solderVisual => {
+          if (selectedBond) updateBond(selectedBond, { solderVisual });
+        }} />
         {!!validation.length && <div className="bond-manager-validation" aria-label="Bond validation results">{validation.map((result, index) => <div key={`${result.bondId ?? "all"}-${index}`} className={result.status}><b>{result.status}</b><span>{result.message}</span></div>)}</div>}
       </div>
 

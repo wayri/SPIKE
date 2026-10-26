@@ -7,9 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from python.spike_core.project_package import ProjectPackageError, _sha256, read_spike_package, write_spike_package
-from python.spike_core.project_state_artifacts import (
-    STATE_REFERENCE, externalize_result_state, hydrate_result_state, read_verified_artifacts,
-)
+from python.spike_core.project_state_artifacts import STATE_REFERENCE, externalize_result_state, hydrate_result_state, read_verified_artifacts
 from python.spike_core.project_visual_artifacts import prepare_visual_artifacts, read_saved_visual_stage
 from tests.python import test_project_package_v3 as fixtures
 from tests.python.test_staged_visual_import import glb_bytes

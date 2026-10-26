@@ -1,6 +1,6 @@
 # Retained assembly volume generation
 
-`python/spike_core/assembly_thermal_meshing.py` connects retained project
+`python/spike_core/solvers/geometry_meshing/preparation/assembly_thermal_meshing.py` connects retained project
 geometry to `assembly_field_handoff` without manually authored tetrahedra.
 The caller supplies the canonical project payload, reviewed physical
 assignments, mesh resource limits, and a manifest-verified artifact reader.

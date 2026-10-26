@@ -11,8 +11,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / 'python'))
-from spike_core.native_airflow import run_native_cavity
-from spike_core.su2_airflow import run_su2_airflow
+from python.spike_core.solvers.thermal_fluid.flow.native_airflow import run_native_cavity
+from python.spike_core.solvers.external_engines.su2.su2_airflow import run_su2_airflow
 
 
 def _interpolate(values, point):

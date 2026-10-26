@@ -11,7 +11,7 @@ from typing import Any, Dict, Mapping
 
 from .contracts import AnalysisSpec, SpiDeR
 from .spider_v2 import SpiDeRV2
-from .spikes_native_adapter import prepare_job_envelope
+from .solvers.circuits.models.spikes_native_adapter import prepare_job_envelope
 from .spikes_layout_contract import (
     HARD_ACCEPTED_VALIDATION_STATES as _HARD_ACCEPTED_VALIDATION_STATES,
     MAX_ENTITY_IDS,

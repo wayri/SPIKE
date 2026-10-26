@@ -3,9 +3,9 @@
 import copy
 import unittest
 import numpy as np
-from python.spike_core.si_multiboard import build_multiboard_network,model_digest
-from python.spike_core.si_network_workflow import line_network
-from python.spike_core.sparameters import touchstone_text
+from python.spike_core.solvers.signal_integrity.networks.si_multiboard import build_multiboard_network, model_digest
+from python.spike_core.solvers.signal_integrity.networks.si_network_workflow import line_network
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text
 
 
 def fixture():

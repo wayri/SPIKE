@@ -7,10 +7,7 @@ import math
 import sys
 import unittest
 
-from python.spike_core.semiconductor_operating_losses import (
-    AXES, LOSS_COLUMNS, MAX_AXIS_NODES, MODEL_KIND,
-    SemiconductorOperatingLossError, evaluate_semiconductor_operating_loss,
-)
+from python.spike_core.solvers.circuits.models.semiconductor_operating_losses import AXES, LOSS_COLUMNS, MAX_AXIS_NODES, MODEL_KIND, SemiconductorOperatingLossError, evaluate_semiconductor_operating_loss
 
 
 def oracle(t, v, i):

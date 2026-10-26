@@ -1,3 +1,4 @@
+import SelectSearchLayer from "./SelectSearchLayer";
 import PanelPopupQualification from "./PanelPopupQualification";
 import React from "react";
 import AssistantWindowRoot from "./AssistantWindowRoot";
@@ -29,5 +30,5 @@ const assemblyTool = assemblyToolKindFromLocation();
 const reportPreview = isReportPreviewLocation();
 const workspaceView = workspaceViewIdFromLocation();
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode><AppErrorBoundary>{new URLSearchParams(window.location.search).get("panelQualification") === "1" ? <PanelPopupQualification /> : isSchematicLocation() ? <SchematicWindowRoot /> : isAssistantWindow() ? <AssistantWindowRoot /> : reportPreview ? <ReportPreviewWindowRoot /> : assemblyTool ? <AssemblyToolWindowRoot kind={assemblyTool}/> : workspaceView ? <WorkspaceViewWindowRoot viewId={workspaceView}/> : detachedTool ? <DetachedToolWindowRoot kind={detachedTool} /> : <App />}</AppErrorBoundary></React.StrictMode>
+  <React.StrictMode><AppErrorBoundary><SelectSearchLayer />{new URLSearchParams(window.location.search).get("panelQualification") === "1" ? <PanelPopupQualification /> : isSchematicLocation() ? <SchematicWindowRoot /> : isAssistantWindow() ? <AssistantWindowRoot /> : reportPreview ? <ReportPreviewWindowRoot /> : assemblyTool ? <AssemblyToolWindowRoot kind={assemblyTool}/> : workspaceView ? <WorkspaceViewWindowRoot viewId={workspaceView}/> : detachedTool ? <DetachedToolWindowRoot kind={detachedTool} /> : <App />}</AppErrorBoundary></React.StrictMode>
 );

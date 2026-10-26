@@ -6,7 +6,7 @@ import random
 import unittest
 from unittest.mock import patch
 
-from python.spike_core import internal_tetra_generation as generation
+from python.spike_core.solvers.geometry_meshing.preparation import internal_tetra_generation as generation
 
 
 def reference_det3(rows):

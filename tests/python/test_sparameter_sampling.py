@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import sparameter_sampling as sampling
+from python.spike_core.solvers.signal_integrity.networks import sparameter_sampling as sampling
 
 
 def pairs(matrix):

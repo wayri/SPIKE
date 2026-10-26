@@ -14,8 +14,8 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.pcb_volume_mesh import prepare_pcb_volume_mesh
-from python.spike_core.gmsh_occ_runtime import run_occ_case
+from python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_mesh import prepare_pcb_volume_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import run_occ_case
 
 
 def audit_case(result):

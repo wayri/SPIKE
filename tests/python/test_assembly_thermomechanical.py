@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_thermomechanical import run_assembly_thermomechanical
+from python.spike_core.solvers.mechanics.elasticity.assembly_thermomechanical import run_assembly_thermomechanical
 from python.spike_core.service_assembly_field import handle_assembly_field_request
 from tests.python.test_assembly_tetra_structural import request as elastic_request, fix, rigid_constraints
 from tests.python.test_assembly_tetra_thermal import request as heat_request
@@ -73,20 +73,20 @@ class ThermomechanicalTests(unittest.TestCase):
             if mutation == 'temperature': raw['structural']['nodal_temperatures_k'] = {'0': 350}
             if mutation == 'nan': raw['thermal']['materials'][0]['thermal_conductivity_w_mk'] = float('nan')
             if mutation == 'extra': raw['result'] = {}
-            with patch('python.spike_core.assembly_thermomechanical.run_assembly_tetra_thermal') as solver:
+            with patch('python.spike_core.solvers.mechanics.elasticity.assembly_thermomechanical.run_assembly_tetra_thermal') as solver:
                 with self.assertRaises(ValueError): run_assembly_thermomechanical(raw)
                 solver.assert_not_called()
 
     def test_cancel_before_and_after_blocking_heat(self):
         raw = request()
         with self.assertRaises(ValueError): run_assembly_thermomechanical(raw, cancel_check=lambda: True)
-        from python.spike_core.assembly_tetra_thermal import run_assembly_tetra_thermal
+        from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal import run_assembly_tetra_thermal
         cancelled = [False]
         def heat(value):
             out = run_assembly_tetra_thermal(value)
             cancelled[0] = True
             return out
-        with patch('python.spike_core.assembly_thermomechanical.run_assembly_tetra_thermal', side_effect=heat):
+        with patch('python.spike_core.solvers.mechanics.elasticity.assembly_thermomechanical.run_assembly_tetra_thermal', side_effect=heat):
             with self.assertRaisesRegex(ValueError, 'CANCELLED'):
                 run_assembly_thermomechanical(raw, cancel_check=lambda: cancelled[0])
 

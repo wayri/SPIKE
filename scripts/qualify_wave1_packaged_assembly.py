@@ -11,17 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.wave1_packaged_acceptance import (  # noqa: E402
-    compose_report,
-    probe_packaged_worker_health,
-    probe_packaged_worker_fixture,
-    probe_packaged_worker_mutation_roundtrip,
-    validate_human_evidence,
-    verify_acceptance_fixture,
-    verify_installer_manifest,
-    verify_packaged_worker_manifest,
-    verify_runtime_report,
-)
+from python.spike_core.wave1_packaged_acceptance import compose_report, probe_packaged_worker_health, probe_packaged_worker_fixture, probe_packaged_worker_mutation_roundtrip, validate_human_evidence, verify_acceptance_fixture, verify_installer_manifest, verify_packaged_worker_manifest, verify_runtime_report
 
 
 def main() -> int:

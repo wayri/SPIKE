@@ -2,8 +2,8 @@
 """Independent mode-wave oracles; original synthetic data, no vendor fixtures."""
 import unittest
 import numpy as np
-from python.spike_core.sparameters import NetworkData, single_ended_to_mixed_mode, s_to_z
-from python.spike_core.sparameter_modes import mixed_mode_network
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData, single_ended_to_mixed_mode, s_to_z
+from python.spike_core.solvers.signal_integrity.networks.sparameter_modes import mixed_mode_network
 
 
 def network(s, refs=None):

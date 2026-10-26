@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/emerge-cosimulation-prepare-parameters/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0; this is the inner request object for prepare_emerge_cosimulation_source.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "result",
+    "binding",
+    "expected_case_sha256",
+    "expected_script_sha256",
+    "port_bindings",
+    "wave_convention"
+  ],
+  "properties": {
+    "result": {
+      "type": "object",
+      "required": ["contract", "status", "model_status", "networks", "issues", "provenance"],
+      "properties": {
+        "contract": {"const": "spike/v1"},
+        "status": {"type": "string", "minLength": 1},
+        "model_status": {"type": "string", "minLength": 1},
+        "networks": {"type": "object"},
+        "issues": {"type": "array", "maxItems": 100000},
+        "provenance": {"type": "object"}
+      }
+    },
+    "binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["design_id", "digest_sha256"],
+      "properties": {
+        "design_id": {"type": "string", "minLength": 1, "maxLength": 256},
+        "digest_sha256": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "expected_case_sha256": {"$ref": "#/$defs/digest"},
+    "expected_script_sha256": {"$ref": "#/$defs/digest"},
+    "port_bindings": {
+      "type": "object",
+      "minProperties": 1,
+      "maxProperties": 16,
+      "propertyNames": {"type": "string", "minLength": 1, "maxLength": 80},
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["positive_node", "negative_node", "reference_plane"],
+        "properties": {
+          "positive_node": {"$ref": "#/$defs/name"},
+          "negative_node": {"$ref": "#/$defs/name"},
+          "reference_plane": {"$ref": "#/$defs/name"}
+        }
+      }
+    },
+    "wave_convention": {"const": "rms_power_waves_common_positive_real_reference"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "name": {"type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[^\\r\\n\\u0000]+$"}
+  }
+}

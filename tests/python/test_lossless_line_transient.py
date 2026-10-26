@@ -12,7 +12,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import lossless_line_transient as line
+from python.spike_core.solvers.signal_integrity.lines import lossless_line_transient as line
 
 
 def boundary(resistance, points):

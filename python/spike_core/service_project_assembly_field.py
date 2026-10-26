@@ -45,7 +45,7 @@ def _assembly_identity(assembly: Any) -> tuple[Dict[str, Any], str]:
 
 
 def _admit_against_assembly(record: Any, assembly: Any) -> tuple[Dict[str, Any], str]:
-    from .assembly_field_study import export_assembly_field_study, import_assembly_field_study
+    from .solvers.execution.coupling.assembly_field_study import export_assembly_field_study, import_assembly_field_study
     from .multiboard_study import physical_assembly
 
     try:

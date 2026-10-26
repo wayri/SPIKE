@@ -1,0 +1,394 @@
+{
+  "contract": "spikes/schematic/v1",
+  "id": "5d5b549012ab44998efb35a2f755f1b3",
+  "title": "IRIS actual I2C1 pullups - supplied charging scenario",
+  "source": ".title IRIS actual I2C1 pullups - supplied charging scenario\n* Board-derived topology/nominal R values: Eugene109/IRIS, GPL-3.0-only.\n* https://github.com/Eugene109/IRIS/tree/999dd2eb725d550889c1ffe2c09f8de0390d081b\n* Adaptation: actual R11/R12 nets + supplied100pF busC and ideal step source.\n* Not a full IO/firmware/digital SI model; upstream EasyEDA conversion warnings remain.\nVPULLUP rail 0 PWL(0 0 1u 0 1.001u 3.3 4u 3.3)\nR11 rail I2C1_SDA 2.2k\nR12 rail I2C1_SCLK 2.2k\nCASSUMED_SDA I2C1_SDA 0 100p\nCASSUMED_SCLK I2C1_SCLK 0 100p\n.tran 1n 4u\n.end\n",
+  "components": [
+    {
+      "id": "86d59629670f4b5ea8148ebf40e5cc28",
+      "ref": "VPULLUP",
+      "kind": "voltage_source",
+      "value": "0",
+      "nodes": [
+        "rail",
+        "0"
+      ],
+      "x": 140,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "e328bd13ad0b45df80df28c8e616a84f",
+      "ref": "R11",
+      "kind": "resistor",
+      "value": "2200",
+      "nodes": [
+        "rail",
+        "i2c1_sda"
+      ],
+      "x": 340,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "98f9202942c2409f95a6b49115d47352",
+      "ref": "R12",
+      "kind": "resistor",
+      "value": "2200",
+      "nodes": [
+        "rail",
+        "i2c1_sclk"
+      ],
+      "x": 540,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "a5b325d35a564225ac6a1bd63947f573",
+      "ref": "CASSUMED_SDA",
+      "kind": "capacitor",
+      "value": "1e-10",
+      "nodes": [
+        "i2c1_sda",
+        "0"
+      ],
+      "x": 740,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "a3248b9ffec94cf6ae951ab0ec5a6561",
+      "ref": "CASSUMED_SCLK",
+      "kind": "capacitor",
+      "value": "1e-10",
+      "nodes": [
+        "i2c1_sclk",
+        "0"
+      ],
+      "x": 140,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    }
+  ],
+  "probes": [
+    {
+      "id": "b81c434b99994cab9ed821b86ebb54f1",
+      "expression": "V(rail)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(rail)",
+        "quantity": "node_voltage",
+        "targets": [
+          "rail"
+        ],
+        "unit": "V"
+      }
+    },
+    {
+      "id": "cfd6b1db272f423db0e261fcad028fe7",
+      "expression": "V(I2C1_SDA)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(I2C1_SDA)",
+        "quantity": "node_voltage",
+        "targets": [
+          "i2c1_sda"
+        ],
+        "unit": "V"
+      }
+    }
+  ],
+  "expressions": [],
+  "metadata": {
+    "board_derived_license": "GPL-3.0-only; Eugene109/IRIS commit999dd2eb725d550889c1ffe2c09f8de0390d081b. Adapted reduced pullups + supplied source/capacitance; retain LICENSE and editable sources."
+  },
+  "revision": 8,
+  "wires": [
+    {
+      "id": "5122e877e6e749fdb101ec2ab46042cc",
+      "a": [
+        "86d59629670f4b5ea8148ebf40e5cc28",
+        0
+      ],
+      "b": [
+        "e328bd13ad0b45df80df28c8e616a84f",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 1
+    },
+    {
+      "id": "246501a5c9674d25941341bb2fee7a74",
+      "a": [
+        "86d59629670f4b5ea8148ebf40e5cc28",
+        0
+      ],
+      "b": [
+        "98f9202942c2409f95a6b49115d47352",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 2
+    },
+    {
+      "id": "1e5c4cc13ceb4cd68c8d43077c098000",
+      "a": [
+        "86d59629670f4b5ea8148ebf40e5cc28",
+        1
+      ],
+      "b": [
+        "a5b325d35a564225ac6a1bd63947f573",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 3
+    },
+    {
+      "id": "70f235db4ff541c18a294e67a40f7673",
+      "a": [
+        "86d59629670f4b5ea8148ebf40e5cc28",
+        1
+      ],
+      "b": [
+        "a3248b9ffec94cf6ae951ab0ec5a6561",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 4
+    },
+    {
+      "id": "da9126ceff534a9894e35801707a39fc",
+      "a": [
+        "e328bd13ad0b45df80df28c8e616a84f",
+        1
+      ],
+      "b": [
+        "a5b325d35a564225ac6a1bd63947f573",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 5
+    },
+    {
+      "id": "e9a998c9be8741bd9059810817a4999a",
+      "a": [
+        "98f9202942c2409f95a6b49115d47352",
+        1
+      ],
+      "b": [
+        "a3248b9ffec94cf6ae951ab0ec5a6561",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 6
+    }
+  ],
+  "junctions": [],
+  "labels": [],
+  "power_symbols": [],
+  "model_policy": {
+    "schematic": {
+      "tier": "source",
+      "enforce": false
+    },
+    "subsheets": {},
+    "components": {}
+  },
+  "simulation_sequences": [],
+  "annotations": [],
+  "dashboard": {
+    "version": 1,
+    "widgets": [
+      {
+        "id": "d48a81d45320494cacffb708295eca24",
+        "kind": "Scope",
+        "title": "V(rail)",
+        "expression": "V(rail)",
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "5b064c9f9f6d486599e29605d2667bf4",
+        "kind": "Scope",
+        "title": "V(I2C1_SDA)",
+        "expression": "V(I2C1_SDA)",
+        "x": 500,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "2480e32988f74806a6204f2576edb69d",
+        "kind": "Note",
+        "title": "IRIS board-derived reduced model",
+        "expression": "Actual R11/R12 2.2k pullups from IRIS BOM/PCB. Supplied100pF buses, ideal source; no IO/firmware/full SI. Eugene109/IRIS GPL3.",
+        "x": 0,
+        "y": 300,
+        "width": 1000,
+        "height": 140,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      }
+    ]
+  },
+  "thermal_setup": {
+    "contract": "spikes/thermal-setup/v1",
+    "solver_binding": "not_coupled",
+    "board": {
+      "length_mm": 100.0,
+      "width_mm": 80.0,
+      "thickness_mm": 1.6,
+      "material": "FR4 (assumption)",
+      "orientation": "horizontal",
+      "layers": [
+        {
+          "name": "L1",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L2",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L3",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L4",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        }
+      ]
+    },
+    "enclosure": {
+      "type": "open_air",
+      "material": "Unspecified",
+      "length_mm": 150.0,
+      "width_mm": 120.0,
+      "height_mm": 50.0,
+      "wall_mm": 2.0,
+      "vent_area_mm2": 0.0
+    },
+    "environment": {
+      "ambient_c": 25.0,
+      "airflow": "natural",
+      "air_speed_m_s": 0.0,
+      "direction": "parallel_to_board",
+      "convection_w_m2k": null,
+      "altitude_m": 0.0
+    },
+    "notes": "Initial authoring assumptions; replace with actual board/environment data."
+  },
+  "run_profile": {
+    "contract": "spikes/run-profile/v1",
+    "name": "Default",
+    "backend": "native",
+    "execution": "batch",
+    "analysis": "from_netlist",
+    "time_step": "10u",
+    "stop_time": "5m",
+    "uic": true,
+    "method": "hybrid_trapezoidal",
+    "capture_samples": 20000,
+    "speed_ratio": 1.0,
+    "electrical_temperature_c": null
+  },
+  "plot_layout": {
+    "mode": "units",
+    "panes": {},
+    "heights": {}
+  },
+  "instruments": [],
+  "controller_setup": null,
+  "controller_boards": [],
+  "power_tree": {
+    "contract": "spikes/power-tree/v1",
+    "stages": []
+  },
+  "analytics_extensions": [],
+  "directives": [
+    {
+      "id": "c053851e64a442a7b9fc6a8fb4dbb37e",
+      "group": "Simulation",
+      "title": "",
+      "visible": true,
+      "x": 100.0,
+      "y": 420.0,
+      "text": ".tran 1n 4u",
+      "enabled": true,
+      "line": 11,
+      "end_line": 11
+    }
+  ]
+}

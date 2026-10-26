@@ -176,7 +176,7 @@ coefficient or external engine algorithm has a complete derivation here. The
 coverage and remaining documentation gaps are explicit below. The separate
 private SPIKES generic FEM program is not part of this repository's implemented
 product physics. Its verification-only handoff must remain distinct from the
-public SPIKES circuit and equilibrium semiconductor kernels in `src/spikes`.
+public SPIKES circuit and equilibrium semiconductor kernels in `src/solvers/circuits/spikes`.
 
 ## Coverage and navigation
 
@@ -232,10 +232,10 @@ substituting an engineering clearance for exact intersection. Constrained
 triangulation preserves boundary segments; orientation, area and Euler checks
 are geometry invariants, not solver convergence tests.
 
-Owners: [planar topology](../src/geometry/planar_topology.cpp),
-[constrained triangulation](../src/geometry/constrained_triangulation.cpp),
-[hybrid DC solver](../python/spike_core/hybrid_dc_solver.py), and
-[PCB volume compiler](../python/spike_core/pcb_volume_compiler.py).
+Owners: [planar topology](../src/solvers/geometry_meshing/geometry/planar_topology.cpp),
+[constrained triangulation](../src/solvers/geometry_meshing/geometry/constrained_triangulation.cpp),
+[hybrid DC solver](../python/spike_core/solvers/power_integrity/dc/hybrid_dc_solver.py), and
+[PCB volume compiler](../python/spike_core/solvers/geometry_meshing/preparation/pcb_volume_compiler.py).
 See [native geometry foundation](CAD_NEUTRAL_NATIVE_MULTIPHYSICS_FOUNDATION.md),
 [OCC conforming mesh](OCC_CONFORMING_PCB_MESH.md), and
 [focused volume meshing](PCB_FOCUSED_VOLUME_MESHING.md).
@@ -268,12 +268,12 @@ centre distance. This approximates `div(sigma grad V)=0`; insulated boundaries
 have zero normal current. Terminal attachment and zone refinement can dominate
 error. Never equate coordinate-nearest attachment with exact geometry binding.
 See [DC scope and terminal contract](DC_SOLVER.md),
-[implementation](../python/spike_core/hybrid_dc_solver.py), and
-[analytical benchmarks](../python/spike_core/benchmarks.py).
+[implementation](../python/spike_core/solvers/power_integrity/dc/hybrid_dc_solver.py), and
+[analytical benchmarks](../python/spike_core/solvers/power_integrity/dc/benchmarks.py).
 Authored wires/harnesses use the same resistive laws with explicit pins,
 wire lengths, conductor data and contacts; see [harness PI](HARNESS_PI.md).
 
-The separate experimental [RT0 probe](../python/spike_core/peec_conforming_dc.py)
+The separate experimental [RT0 probe](../python/spike_core/solvers/power_integrity/peec/peec_conforming_dc.py)
 uses a conservative mixed discretization on triangles. For a CCW triangle
 of area S and opposite vertex p_i, `w_i(x)=(x-p_i)/(2*S)` has unit integrated
 outward flux. For sheet conductance `k=sigma*t`,
@@ -306,11 +306,11 @@ annular cross-section. Overlapping bases produce off-diagonal resistance as
 well as inductance. The older filament approximation and rectangular self
 formula are not interchangeable with a conforming volume current space.
 
-Owners: [native PEEC](../src/peec/peec_solver.cpp),
-[volume integral contract](../src/peec/volume_inductance.hpp),
-[volume adapter](../python/spike_core/peec_volume_adapter.py),
-[overlap R](../python/spike_core/peec_volume_resistance.py), and
-[network assembly](../python/spike_core/peec_network.py).
+Owners: [native PEEC](../src/solvers/power_integrity/peec/peec_solver.cpp),
+[volume integral contract](../src/solvers/power_integrity/peec/volume_inductance.hpp),
+[volume adapter](../python/spike_core/solvers/power_integrity/peec/peec_volume_adapter.py),
+[overlap R](../python/spike_core/solvers/power_integrity/peec/peec_volume_resistance.py), and
+[network assembly](../python/spike_core/solvers/power_integrity/peec/peec_network.py).
 Finite-volume quadrature records tolerance, resource exhaustion and a posteriori
 error estimates; these are not certified bounds on an entire extracted matrix.
 Retarded propagation/radiation and general proximity redistribution are absent.
@@ -341,7 +341,7 @@ distributed stackup shunt capacitance, not a general field-solved multiconductor
 matrix. Initial operating point versus zero state, finite edge times and time
 resolution change the answer. BE numerical damping is not physical loss.
 [Transient PI](TRANSIENT_PI.md) records timestep, residual and memory gates;
-[implementation](../python/spike_core/transient_peec.py) and
+[implementation](../python/spike_core/solvers/power_integrity/peec/transient_peec.py) and
 [tests](../tests/python/test_transient_peec.py) own the executable contract.
 
 ## Electrostatics, dielectric AC and PDN reduction
@@ -355,14 +355,14 @@ open boundary. Unit-electrode solutions assembled as columns P give
 equals integrated field energy. Reference choice and floating conductor
 conditions must be explicit.
 
-See [electrostatic source derivation](../python/spike_core/pdn_electrostatic.py)
+See [electrostatic source derivation](../python/spike_core/solvers/power_integrity/pdn/pdn_electrostatic.py)
 and [tests](../tests/python/test_pdn_electrostatic.py). Ideal parallel plates
 provide an affine oracle, not general PCB fringing qualification. This retained
 tetra route is separate from the approximate PEEC panel potential coefficients
 and stackup shunts; their validity cannot be transferred by relabeling C.
 
-[Dielectric AC](../python/spike_core/pdn_dielectric_ac.py) and
-[admittance reduction](../python/spike_core/pdn_admittance_reduction.py) retain
+[Dielectric AC](../python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_ac.py) and
+[admittance reduction](../python/spike_core/solvers/power_integrity/pdn/pdn_admittance_reduction.py) retain
 explicit frequency/material/terminal contracts. The dielectric operator uses
 RMS `exp(+j*omega*t)` phasors and
 `gamma=sigma*I+omega*tan(delta)*epsilon+j*omega*epsilon` in
@@ -382,8 +382,8 @@ A declared capacitor branch has series
 combines admitted networks and compares impedance to an explicit target, often
 `Ztarget=allowed_voltage_change/current_step`. Frequency sweeps and candidate
 ranking do not solve placement fields or predict bias/temperature-dependent
-parts unless those models are supplied. See [PDN implementation](../python/spike_core/pdn.py),
-[network owner](../python/spike_core/pdn_network.py),
+parts unless those models are supplied. See [PDN implementation](../python/spike_core/solvers/power_integrity/pdn/pdn.py),
+[network owner](../python/spike_core/solvers/power_integrity/pdn/pdn_network.py),
 [capacitor placement](CAPACITOR_PLACEMENT.md), and
 [PDN tests](../tests/python/test_pdn.py).
 
@@ -408,8 +408,8 @@ record change but do not automatically satisfy a convergence gate. The state
 transition becomes a two- or four-port S matrix with declared positive real
 reference impedances. Piecewise planar cascades omit bend discontinuities.
 
-Owners: [single channel](../python/spike_core/si_channel.py),
-[coupled channel](../python/spike_core/si_coupled_channel.py),
+Owners: [single channel](../python/spike_core/solvers/signal_integrity/channels/si_channel.py),
+[coupled channel](../python/spike_core/solvers/signal_integrity/channels/si_coupled_channel.py),
 [geometry derivation and admission](GEOMETRY_DERIVED_SI_CHANNEL.md), and
 [channel tests](../tests/python/test_si_channel.py).
 
@@ -428,9 +428,9 @@ For S partitioned into retained and connected ports, with connection matrix Cw,
 `Seff=See+Sei solve(I-Cw*Sii,Cw*Sie)`. This follows from internal incident waves
 equal to Cw times internal outgoing waves. Use a solve with conditioning checks;
 multiple reflections are included, but no connector or return physics is
-created. [Network graph](../python/spike_core/si_network_graph.py) and
+created. [Network graph](../python/spike_core/solvers/signal_integrity/networks/si_network_graph.py) and
 [tests](../tests/python/test_si_network_graph.py) own the ordering/connection rules.
-[S-parameter conversion](../python/spike_core/sparameters.py) owns wave
+[S-parameter conversion](../python/spike_core/solvers/signal_integrity/networks/sparameters.py) owns wave
 normalization; finite-band passivity screens apply only to that convention.
 
 ## Waveforms, eyes and resonance
@@ -482,7 +482,7 @@ windowing and time-grid policies affect the reconstructed waveform. Imported
 S data are measurements or network models, not geometry extraction. An IBIS
 DC-slope/ramp reduction is not the full IBIS switching or AMI model.
 See [SI workflow](SI_WORKFLOW.md) and
-[workflow owner](../python/spike_core/si_workflow.py).
+[workflow owner](../python/spike_core/solvers/signal_integrity/receivers/si_workflow.py).
 
 Eye samples fold by unit interval and declared phase. PAM4 thresholds, training
 DFE and Gaussian BER proxies describe a finite record; tail extrapolation is
@@ -490,15 +490,15 @@ not measured BER. Clock recovery has its own bounded implementation in
 [clock recovery](SI_CLOCK_RECOVERY.md). Polygon masks test both samples and
 segment crossings, including boundaries; partial mask support is not protocol
 compliance. See [eye masks](SI_EYE_MASK_TESTING.md) and
-[PAM4 owner](../python/spike_core/si_pam4_eye.py).
+[PAM4 owner](../python/spike_core/solvers/signal_integrity/receivers/si_pam4_eye.py).
 
 For an isolated ringdown `u(t)=exp(-alpha*t)*cos(2*pi*f*t+phase)`,
 `Q=pi*f/alpha`. A fitted AR(2) recurrence has complex conjugate roots whose
 radius gives decay and angle gives sampled frequency. Reconstruction and fit
 screens are essential; aliasing, multimode mixtures and forcing violate the
 single free-decay interpretation. Half-power/RLC fitting is a separate network
-estimate. [Resonance](../python/spike_core/si_resonance.py),
-[ringdown](../python/spike_core/si_ringdown.py) and
+estimate. [Resonance](../python/spike_core/solvers/signal_integrity/receivers/si_resonance.py),
+[ringdown](../python/spike_core/solvers/signal_integrity/receivers/si_ringdown.py) and
 [ringdown tests](../tests/python/test_si_ringdown.py) retain these boundaries.
 
 ## Circuit MNA, devices and switching
@@ -511,9 +511,9 @@ pass the applicable residual and update checks. A singular circuit is not made
 physical by hiding a missing reference. AC linearization uses conductance and
 charge Jacobians at the admitted operating point, not a nonlinear transient.
 
-Owners: [native MNA boundary](../python/spike_core/native_mna.py),
-[C++ DC core](../src/spikes/dc_solver.cpp), and
-[transient core](../src/spikes/transient_solver.cpp).
+Owners: [native MNA boundary](../python/spike_core/solvers/circuits/models/native_mna.py),
+[C++ DC core](../src/solvers/circuits/spikes/dc_solver.cpp), and
+[transient core](../src/solvers/circuits/spikes/transient_solver.cpp).
 [Passive model equations](SPIKES_PASSIVE_MODEL_EQUATIONS.md),
 [equation devices](SPIKES_EQUATION_DEVICES.md), and
 [lumped physics parts](SPIKES_LUMPED_PHYSICS_PARTS.md) document supported
@@ -564,9 +564,9 @@ physical stack layers and copper occupancy; local refinement must not silently
 change the copper material sampling. Package/case/junction nodes and supplied
 thermal resistances are reduced models, not reconstructed die fields.
 
-Owners: [structured solid](../python/spike_core/structured_solid_thermal.py),
-[layered board](../python/spike_core/layered_board_thermal.py),
-[component network](../python/spike_core/component_thermal.py).
+Owners: [structured solid](../python/spike_core/solvers/thermal_fluid/heat/structured_solid_thermal.py),
+[layered board](../python/spike_core/solvers/thermal_fluid/heat/layered_board_thermal.py),
+[component network](../python/spike_core/solvers/thermal_fluid/heat/component_thermal.py).
 See [thermal workflow](THERMAL_WORKFLOW.md),
 [component thermal](COMPONENT_THERMAL.md),
 [thermal accuracy checks](THERMAL_ACCURACY_CHECKS.md), and
@@ -580,11 +580,11 @@ matched contact adds `h*[[Mface,-Mface],[-Mface,Mface]]` across paired nodes.
 Dirichlet elimination and positive anchoring remove the thermal constant mode.
 Sparse CG/conditioning and actual residual checks govern the admitted linear
 system; nonlinear ambient radiation has its separate iteration and energy gates.
-[Tetra thermal source](../python/spike_core/assembly_tetra_thermal.py) contains
+[Tetra thermal source](../python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_thermal.py) contains
 the independent weak-form derivation; [tests](../tests/python/test_assembly_tetra_thermal.py)
 cover slab/manufactured and boundary cases. Transient storage and accepted-state
 stepping are separately specified in [assembly transient](ASSEMBLY_THERMAL_TRANSIENT.md)
-and [retained step](../python/spike_core/retained_thermal_step.py).
+and [retained step](../python/spike_core/solvers/thermal_fluid/heat/retained_thermal_step.py).
 
 Retained electrical tetrahedra use the analogous conductivity weak form for
 potential, with `J=-sigma grad V`, bulk `q=J dot E`, and explicit matched
@@ -623,7 +623,7 @@ The single-path electromagnet has
 `flux=N*I/reluctance`, `L=N^2/reluctance`, and
 `Fclosing=flux^2/(2*mu0*Agap)`. These assume linear material and one uniform gap.
 See [machine equations](EM_MACHINES.md),
-[owner](../python/spike_core/em_machines.py), and
+[owner](../python/spike_core/solvers/electromagnetics/machines/em_machines.py), and
 [tests](../tests/python/test_em_machines.py).
 
 Planar magnetic P1 FEM instead solves Az [Wb/m],
@@ -646,7 +646,7 @@ Exact P1 Joule integration and the balance
 distinguish heat from numerical damping. Complete tangents, quadrature, source
 work conventions, nonlinear tolerances and oracles are in
 [magnetic FEM](MAGNETIC_FEM.md),
-[source](../python/spike_core/magnetic_fem.py), and
+[source](../python/spike_core/solvers/electromagnetics/machines/magnetic_fem.py), and
 [tests](../tests/python/test_magnetic_fem.py).
 
 Closed air contours integrate vacuum Maxwell stress
@@ -678,8 +678,8 @@ minimum of explicit diffusive and advective restrictions. Ten consecutive
 accepted velocity-change rates and a divergence gate establish steady
 convergence, not independent accuracy. Full derivation, actual residual units,
 grid/time bounds and cosine eigenmode/refinement oracles are in
-[native CFD](NATIVE_CFD.md); owners are [C++ airflow](../src/airflow/)
-and [process adapter](../python/spike_core/native_airflow.py).
+[native CFD](NATIVE_CFD.md); owners are [C++ airflow](../src/solvers/thermal_fluid/airflow/)
+and [process adapter](../python/spike_core/solvers/thermal_fluid/flow/native_airflow.py).
 
 The separate developed plane-channel model solves no-slip momentum driven by
 constant pressure gradient, then finite-volume conjugate energy across fluid
@@ -689,7 +689,7 @@ Shared solid/fluid face conductance, axial conduction and upwind enthalpy
 transport preserve energy. Width scales an extruded 2D flow; there are no
 entrance momentum, sidewall, turbulence or fan fields. See
 [bounded CHT derivation](BOUNDED_CHT_AND_RADIATION.md) and
-[channel owner](../python/spike_core/laminar_channel_cht.py).
+[channel owner](../python/spike_core/solvers/thermal_fluid/flow/laminar_channel_cht.py).
 
 [SU2 airflow](SU2_AIRFLOW.md), [SU2 CHT](SU2_CHT.md), and
 [fan/CHT qualification](FAN_CHT_QUALIFICATION.md) describe distinct external
@@ -710,7 +710,7 @@ excitations, incident/reflected wave columns satisfy `S*A=B`; normalization
 must solve this system instead of dividing each column by only one amplitude.
 See [retained assembly EM](RETAINED_ASSEMBLY_EM.md),
 [independent retained reference](RETAINED_EM_INDEPENDENT_REFERENCE.md),
-[normalization owner](../python/spike_core/multi_excitation_network.py), and
+[normalization owner](../python/spike_core/solvers/electromagnetics/fields/multi_excitation_network.py), and
 [openEMS reference record](validation/OPENEMS_REFERENCE_VALIDATION.md).
 
 The owned Huygens postprocessor consumes supplied E/H on a closed six-face box.
@@ -721,14 +721,14 @@ field provenance and no PML intersection are required. Angular samples alone
 do not establish integrated power or directivity. The exact implementation,
 dipole oracle and quadrature convergence are linked from
 [closed-box radiation](BOUNDED_CHT_AND_RADIATION.md) and
-[Huygens owner](../python/spike_core/huygens_far_field.py).
+[Huygens owner](../python/spike_core/solvers/electromagnetics/fields/huygens_far_field.py).
 
 Surface MoM groundwork includes oriented RWG triangular bases, singular Green
 moments and supplied-current far-field/RCS postprocessing. The basis is piecewise
 linear with normal-current continuity across its interior edge; singular
 integration uses independently derived transformations. These operators do not
 assemble/solve the EFIE or determine scatterer currents. See
-[surface basis](../python/spike_core/mom_surface_basis.py),
+[surface basis](../python/spike_core/solvers/electromagnetics/fields/mom_surface_basis.py),
 [operator evidence](validation/MOM_REFERENCE_OPERATORS_20260930.md), and
 [recorded mathematical lineage](SOLVER_REFERENCES.md#r17---surface-em-reference-operators).
 Native `spike.mom_surface` and general `spike.fullwave_3d` remain unavailable.
@@ -752,7 +752,7 @@ Boltzmann carriers and one Fermi level are assumptions. There is no biased
 transport, continuity equation, heterointerface or process evolution. Complete
 conditioning bounds, manufactured solution and second-order field/potential
 refinement are in [TCAD equilibrium](SPIKES_TCAD_EQUILIBRIUM.md), with
-[C++ owner](../src/spikes/tcad_equilibrium.cpp). Circuit PDK models are separate.
+[C++ owner](../src/solvers/circuits/spikes/tcad_equilibrium.cpp). Circuit PDK models are separate.
 
 ## Coupled studies and recorded comparisons
 
@@ -761,7 +761,7 @@ Fixed-point iteration `x_next=F(x)` with optional relaxation must check the
 unrelaxed defect `F(x)-x`; small relaxed updates alone are insufficient.
 Prescribed heat versus solved dissipation, averaged versus instantaneous power,
 and one-way versus iterated feedback must remain visible. See
-[field/circuit owner](../python/spike_core/field_circuit_cosim.py),
+[field/circuit owner](../python/spike_core/solvers/execution/coupling/field_circuit_cosim.py),
 [staged PEEC/ngspice](PEEC_NGSPICE_HYBRID.md),
 [scalar co-simulation and digital twin](COSIMULATION_DIGITAL_TWIN.md), and
 [tests](../tests/python/test_cosimulation.py).

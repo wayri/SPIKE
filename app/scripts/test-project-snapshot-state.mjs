@@ -19,14 +19,21 @@ assert.deepEqual(merged.design.metadata, previous.design.metadata);
 assert.deepEqual(merged.design.models, [{ id: 'm1', enabled: false, vendor_data: { future: 42 } }]);
 assert.equal(merged.analysis.latest_result, null, 'explicit clearing must remain possible');
 assert.deepEqual(merged.analysis.future_solver_setup, previous.analysis.future_solver_setup);
+const oldGeometry={analysis:{propulsion_pod_three_phase:{result:{contract:'spike/geometry-propulsion-loop-result/v1',
+  history:[{time_s:0}],field_snapshots:[{history_index:0,snapshot:{old:true}}],field_snapshot_derivation:{old:true}}}}};
+const rerunGeometry={contract:'spike/geometry-propulsion-loop-result/v1',history:[{time_s:0},{time_s:.001}]};
+const replacedGeometry=mergeProjectSnapshot(oldGeometry,{analysis:{propulsion_pod_three_phase:{result:rerunGeometry}}});
+assert.deepEqual(replacedGeometry.analysis.propulsion_pod_three_phase.result,rerunGeometry,'a fresh run cannot inherit old spatial fields or derivation');
+assert.ok(oldGeometry.analysis.propulsion_pod_three_phase.result.field_snapshots,'saving must not mutate the previous captured source');
 const assemblyPresentation = { analysis: {
+  assembly_net_name_visibility: {A:false,B:true},
   assembly_layer_focus: { A:"F.Cu", B:"Overview" },
   assembly_layer_visibility: { A:{"F.Cu":true,"B.Cu":false}, B:{"F.Cu":false,"B.Cu":true} },
   assembly_layer_opacity: { A:{"F.Cu":.3}, B:{"B.Cu":.7} },
 } };
 assert.deepEqual(mergeProjectSnapshot(assemblyPresentation, {analysis:{latest_result:null}}).analysis.assembly_layer_focus,
   assemblyPresentation.analysis.assembly_layer_focus,"unrelated result changes preserve occurrence-specific quick layer preferences");
-for (const key of ["assembly_layer_focus", "assembly_layer_visibility", "assembly_layer_opacity"]) {
+for (const key of ["assembly_net_name_visibility", "assembly_layer_focus", "assembly_layer_visibility", "assembly_layer_opacity"]) {
   assert.deepEqual(withoutSavedResults(assemblyPresentation).analysis[key],assemblyPresentation.analysis[key],
     "saving without results keeps independent assembly layer presentation intact");
 }
@@ -160,6 +167,10 @@ for (const result of [false, 0, 'not a result', []]) {
 }
 
 const parallelState = { contract: 'spike/parallel-workspace/v1', draft: { jobs_json: '[]', concurrency: '2', threads_per_job: '3', timeout_s: '120' }, runs: [{ id:'past', result:{outputs:[1]}, status:'completed' }] };
+const oldPhysicalStudy = { studies: [{ id: "s", cases: [{ id: "c", settings: { request: { power: 2, removed_contact: "old" } }, scenario: { removed_boundary: 300 }, resultSnapshot: { old: true } }] }] };
+const newPhysicalStudy = { studies: [{ id: "s", cases: [{ id: "c", settings: { request: { power: 3 } }, scenario: {} }] }] };
+assert.deepEqual(mergeProjectSnapshot(oldPhysicalStudy, newPhysicalStudy), newPhysicalStudy,
+  "saving a changed study must not resurrect removed physical inputs or its invalidated result");
 const parallelProject = { analysis: { parallel_execution: parallelState } };
 const setupOnly = withoutSavedResults(parallelProject);
 assert.deepEqual(setupOnly.analysis.parallel_execution.draft, parallelState.draft);

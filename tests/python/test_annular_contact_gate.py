@@ -2,6 +2,7 @@
 """Supplementary source-bound acceptance cannot become whole-stage completion."""
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -25,6 +26,7 @@ class AnnularContactGateTests(unittest.TestCase):
             [sys.executable, str(ROOT / "scripts/parity_annular_contact_gate.py"),
              "--output", str(output), "--log", str(log), "--report", str(report)],
             cwd=ROOT, capture_output=True, text=True, timeout=180,
+            env={**os.environ, "TEMP": str(directory), "TMP": str(directory)},
         )
         details = execution.stdout + execution.stderr
         if log.exists():
@@ -37,7 +39,7 @@ class AnnularContactGateTests(unittest.TestCase):
                        lambda r: r.__setitem__("status", "failed"),
                        lambda r: r.__setitem__("report_sha256", "0"*64),
                        lambda r: r.__setitem__("previous_sha256", "0"*64),
-                       lambda r: r["sources_before"].pop("python/spike_core/dc_annular_stack.py"),
+                       lambda r: r["sources_before"].pop("python/spike_core/solvers/power_integrity/dc/dc_annular_stack.py"),
                        lambda r: r["tests"].__setitem__("run", 0),
                        lambda r: r["tests"]["skipped"].append("omitted")):
             changed = deepcopy(receipt); mutate(changed)
@@ -48,7 +50,9 @@ class AnnularContactGateTests(unittest.TestCase):
         stage = next(s for s in backlog["stages"] if s["id"] == "PI01-S02")
         self.assertEqual(stage["status"], "in_progress")
         supplement = stage["supplementary_evidence"][0]
-        self.assertEqual(supplement["evidence"], "docs/validation/parity/PI01-S02-annular-contact-20261021.json")
+        receipt = json.loads((ROOT / supplement["evidence"]).read_text(encoding="utf-8"))
+        validate_receipt(receipt)
+        self.assertEqual(receipt["contract"], "spike/pi01-annular-contact-evidence/v1")
         self.assertFalse(supplement["stage_complete"])
         self.assertEqual(supplement["status"], "verified_bounded_increment")
 

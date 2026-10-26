@@ -4,8 +4,8 @@ import copy
 import json
 
 from examples.assembly_field.run_examples import setup
-from python.spike_core.multiboard_circuit import compile_multiboard_circuit
-from python.spike_core.multiboard_volume_electrothermal import run_multiboard_volume_electrothermal
+from python.spike_core.solvers.circuits.models.multiboard_circuit import compile_multiboard_circuit
+from python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal import run_multiboard_volume_electrothermal
 
 
 def request(domain='pi', *, mechanical_part=False, alpha=0.):

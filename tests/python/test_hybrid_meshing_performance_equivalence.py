@@ -11,14 +11,7 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import (
-    COPPER_CONDUCTIVITY_S_M,
-    _distance_to_segment,
-    _edge_may_be_within_tolerance,
-    _point_in_polygon,
-    _segments,
-    build_hybrid_mesh,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import COPPER_CONDUCTIVITY_S_M, _distance_to_segment, _edge_may_be_within_tolerance, _point_in_polygon, _segments, build_hybrid_mesh
 
 
 def _legacy_point_in_polygon(point, polygon, tolerance=0.0):
@@ -182,7 +175,7 @@ class HybridMeshingPerformanceEquivalenceTests(unittest.TestCase):
 
     def test_complete_mesh_is_byte_exact_with_legacy_predicate(self):
         design, spec = _fixture()
-        with patch("python.spike_core.hybrid_mesh._point_in_polygon", _legacy_point_in_polygon):
+        with patch("python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh._point_in_polygon", _legacy_point_in_polygon):
             reference = build_hybrid_mesh(design, spec)
         optimized = build_hybrid_mesh(design, spec)
         self.assertEqual(_canonical(optimized), _canonical(reference))

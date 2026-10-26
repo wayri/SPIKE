@@ -47,7 +47,7 @@ hardware validation.
 ## API and settings
 
 ```python
-from python.spike_core.assembly_field_transient import run_assembly_field_transient
+from python.spike_core.solvers.execution.coupling.assembly_field_transient import run_assembly_field_transient
 
 settings = {
     "contract": "spike/assembly-tetra-transient-settings/v1",

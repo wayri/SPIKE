@@ -9,10 +9,13 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import tempfile
 import tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 CANONICAL_REPOSITORY = 'wayri/SPIKE'
 CANONICAL_LOGIN = 'wayri'
 CANONICAL_NAME = 'wayri'
@@ -20,6 +23,7 @@ CANONICAL_EMAIL = '16292067+wayri@users.noreply.github.com'
 
 
 def version(root: Path) -> str:
+    from scripts.windows_msi_version import validate_wix_override
     app = json.loads((root / 'app/package.json').read_text())['version']
     if not re.fullmatch(r'\d+\.\d+\.\d+(?:-[A-Za-z0-9.-]+)?', app):
         raise ValueError('Application version must be a semantic version.')
@@ -37,9 +41,17 @@ def version(root: Path) -> str:
     for label, value in values.items():
         if value != app:
             raise ValueError(f'{label} version {value} differs from app version {app}.')
+    cargo = tomllib.loads((root / 'app/src-tauri/Cargo.toml').read_text())['package']
+    cargo_lock = tomllib.loads((root / 'app/src-tauri/Cargo.lock').read_text())
+    owned = [entry for entry in cargo_lock.get('package', [])
+             if entry.get('name') == cargo['name'] and 'source' not in entry]
+    if len(owned) != 1 or owned[0].get('version') != app:
+        raise ValueError('Cargo.lock must contain exactly one local application package matching the app version.')
     native = re.search(r'project\(SPIKE VERSION ([^ ]+)', (root / 'CMakeLists.txt').read_text())[1]
     if native != app.split('-')[0]:
         raise ValueError('CMake version differs from the application version.')
+    config = json.loads((root / 'app/src-tauri/tauri.conf.json').read_text())
+    validate_wix_override(app, config.get('bundle', {}).get('windows', {}).get('wix', {}).get('version'))
     return app
 
 

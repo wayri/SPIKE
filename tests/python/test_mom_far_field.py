@@ -11,11 +11,8 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.mom_surface_basis import build_surface_basis
-from python.spike_core.mom_far_field import (
-    FarFieldError, MAX_DIRECTIONS, MAX_EDGES, SPEED_OF_LIGHT_M_PER_S,
-    VACUUM_PERMEABILITY_H_PER_M, evaluate_far_field, evaluate_bistatic_rcs,
-)
+from python.spike_core.solvers.electromagnetics.fields.mom_surface_basis import build_surface_basis
+from python.spike_core.solvers.electromagnetics.fields.mom_far_field import FarFieldError, MAX_DIRECTIONS, MAX_EDGES, SPEED_OF_LIGHT_M_PER_S, VACUUM_PERMEABILITY_H_PER_M, evaluate_far_field, evaluate_bistatic_rcs
 
 POINTS = np.array([[0.,0.,0.], [1.,0.,0.], [1.,1.,0.], [0.,1.,0.]])
 FACES = [[0,1,2], [0,2,3]]

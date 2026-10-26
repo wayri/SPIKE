@@ -4,7 +4,7 @@
 
 import unittest
 
-from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
 from scripts.audit_peec_refinement import _solve_sparse_dc
 
 

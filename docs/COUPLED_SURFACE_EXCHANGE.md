@@ -4,7 +4,7 @@
 
 ## Bounded claim
 
-`python/spike_core/coupled_surface_exchange.py` is an experimental, solver-neutral
+`python/spike_core/solvers/execution/coupling/coupled_surface_exchange.py` is an experimental, solver-neutral
 transfer kernel for a caller-supplied nonmatching surface partition. It maps a
 piecewise-constant source heat flux in `W/m2` to destination-face integrated heat
 rates in `W`, or a piecewise-constant source traction in `N/m2` to

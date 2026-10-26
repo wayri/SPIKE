@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.dc_port_circuit import solve_port_circuit
+from python.spike_core.solvers.power_integrity.dc.dc_port_circuit import solve_port_circuit
 
 
 def reduced_star(resistances):

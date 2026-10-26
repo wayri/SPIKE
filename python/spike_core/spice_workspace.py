@@ -206,6 +206,19 @@ def validate_spice_workspace(workspace: Dict[str, Any], design: SpiDeR) -> Dict[
             issues.append(_issue("SPICE_MODEL_KIND_INVALID", "Model kind must be primitive or subcircuit.", path=f"{path}.kind"))
         model_by_id[identifier] = model
 
+    imported_models = [model for model in models if isinstance(model, dict) and "import_provenance" in model]
+    if imported_models:
+        from .spice_model_import import import_spice_model, merge_spice_model_sources
+        try:
+            merge_spice_model_sources([str(model.get("source", "")) for model in models if isinstance(model, dict)])
+            for model in imported_models:
+                reparsed = import_spice_model(model.get("source", ""), model.get("subcircuit_name", ""))
+                if reparsed["pins"] != model.get("pins"):
+                    raise ValueError("Imported model pin order differs from its current .subckt declaration.")
+            warnings.append(_issue("SPICE_IMPORTED_MODEL_REVIEW", "Imported libraries are structurally checked; device behavior and engine compatibility require review. Original import provenance does not certify edited source.", severity="warning", path="models"))
+        except ValueError as error:
+            issues.append(_issue("SPICE_MODEL_LIBRARY_CONFLICT", str(error), path="models"))
+
     known_components = _component_references(design)
     pads = _pad_index(design)
     enabled_assignments = 0
@@ -392,7 +405,11 @@ def compose_spice_workspace(workspace: Dict[str, Any], design: SpiDeR) -> Dict[s
         source = str(model.get("source", "")).strip()
         if source:
             model_sources.append(source)
-    lines.extend(model_sources)
+    if any("import_provenance" in model for model in models.values()):
+        from .spice_model_import import merge_spice_model_sources
+        lines.append(merge_spice_model_sources(model_sources))
+    else:
+        lines.extend(model_sources)
     for index, assignment in enumerate(assignments, start=1):
         model = models[str(assignment["model_id"])]
         binding_by_pin = {str(binding["model_pin"]): binding for binding in assignment["pin_bindings"]}

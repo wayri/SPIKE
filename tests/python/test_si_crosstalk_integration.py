@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 from jsonschema import Draft202012Validator
 from tests.python import test_si_channel as fixtures
-from python.spike_core.si_channel import analyze_uniform_design_channel
+from python.spike_core.solvers.signal_integrity.channels.si_channel import analyze_uniform_design_channel
 
 
 class CrosstalkIntegrationTests(unittest.TestCase):
@@ -39,7 +39,7 @@ class CrosstalkIntegrationTests(unittest.TestCase):
                        {"port_map": {"aggressor_near": 0}}, {"waveform_v": [float("nan"), 0]}):
             request = self.request()
             request["crosstalk_model"].update(change)
-            with patch("python.spike_core.si_coupled_channel.extract_coupled_path_rlgc") as extract:
+            with patch("python.spike_core.solvers.signal_integrity.channels.si_coupled_channel.extract_coupled_path_rlgc") as extract:
                 with self.assertRaises(ValueError):
                     analyze_uniform_design_channel(fixtures.SiUniformChannelTests().coupled_design(), request)
                 extract.assert_not_called()

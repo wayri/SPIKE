@@ -1,0 +1,25 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+import { importTestTypescript } from "./import-test-typescript.mjs";
+const optionSearch = await importTestTypescript("optionSearch");
+let query = "";
+const calls = [], preview = [];
+const element = { open: true, querySelector: () => ({ focus() {} }) };
+const jsx = (type, props) => ({ type, props: props ?? {} });
+const module = { exports: {} };
+const code = ts.transpileModule(readFileSync(new URL("../src/AnalysisNetPicker.tsx", import.meta.url), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX } }).outputText;
+new Function("require", "module", "exports", code)(name => name === "react" ? { useState: () => [query, value => { query = value; }], useRef: () => ({ current: element }) } : name === "react/jsx-runtime" ? { jsx, jsxs: jsx } : name === "./optionSearch" ? optionSearch : {}, module, module.exports);
+const nodes = tree => !tree || typeof tree !== "object" ? [] : [tree, ...[tree.props.children].flat(Infinity).flatMap(nodes)];
+const render = () => module.exports.default({ value: "GND", choices: ["GND", "VCC_3V3", "VCC_5V", "CLK_10"], label: "Power net", onNet: value => calls.push(value), onPreview: value => preview.push(value) });
+let tree = render();
+nodes(tree).find(node => node.type === "input").props.onChange({ target: { value: "VCC*5?" } });
+tree = render();
+const options = nodes(tree).filter(node => node.props.role === "option");
+assert.equal(options.length, 1); assert.equal(options[0].props["aria-selected"], false);
+assert.deepEqual(calls, [], "filtering is not a selection");
+options[0].props.onMouseEnter(); assert.equal(preview.at(-1), "VCC_5V", "existing copper hover preview retained");
+options[0].props.onClick(); assert.deepEqual(calls, ["VCC_5V"]); assert.equal(element.open, false); assert.equal(preview.at(-1), null);
+query = "absent"; assert.equal(nodes(render()).filter(node => node.props.role === "option").length, 0);
+console.log("Analysis net picker: wildcard filtering, exact net selection, hover preview, closure and empty recovery passed.");

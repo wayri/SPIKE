@@ -11,7 +11,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'studio/python'))
 from spikes_studio.document import Document,RC_DECK
 from spikes_studio.simulation_setup import default_thermal,default_profile,validate_thermal,validate_profile,effective_source,RunHistory
 from spikes_studio.run_control import ngspice_batch
-from python.spike_core.contracts import AnalysisResult,ValidationIssue
+from python.spike_core.contracts import AnalysisResult, ValidationIssue
 
 
 class SetupTests(unittest.TestCase):
@@ -94,7 +94,7 @@ class SetupTests(unittest.TestCase):
         history.start(doc.data,'test.dll');history.start(doc.data,'test.dll')
         self.assertIsNone(history.get(ident));self.assertEqual(len(history.records),2)
 
-    @patch('python.spike_core.ngspice_plugin.NgspicePlugin')
+    @patch('python.spike_core.solvers.external_engines.circuits.ngspice_plugin.NgspicePlugin')
     def test_explicit_ngspice_result_projection_does_not_infer_power(self,plugin):
         plugin.return_value.run.return_value=AnalysisResult(
             analysis_id='test',mode='spice',status='completed',model_status='solver_dependent',
@@ -119,7 +119,7 @@ class SetupTests(unittest.TestCase):
         self.assertEqual(partial['issues'][-1]['code'],'NGSPICE_WAVEFORM_INCOMPLETE')
         self.assertNotIn('time_s',partial['data'])
 
-    @patch('python.spike_core.ngspice_plugin.NgspicePlugin')
+    @patch('python.spike_core.solvers.external_engines.circuits.ngspice_plugin.NgspicePlugin')
     def test_ngspice_failure_never_falls_back_to_native(self,plugin):
         plugin.return_value.run.return_value=AnalysisResult(
             analysis_id='test',mode='spice',status='blocked',model_status='unsupported',
@@ -131,7 +131,7 @@ class SetupTests(unittest.TestCase):
         self.assertNotIn('time_s',result['data'])
 
     def test_real_ngspice_rc_transient_matches_first_order_reference(self):
-        from python.spike_core.ngspice_plugin import _find_ngspice
+        from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import _find_ngspice
         if not _find_ngspice():self.skipTest('ngspice executable is unavailable')
         result=ngspice_batch(RC_DECK)
         self.assertEqual(result['status'],'completed')

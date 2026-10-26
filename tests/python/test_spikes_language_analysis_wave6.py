@@ -71,7 +71,7 @@ class BehavioralGrammarWave6Tests(unittest.TestCase):
 class NativeBehavioralParityTests(unittest.TestCase):
     def test_smooth_sources_against_native_and_ngspice(self):
         from python.spikes.competitive_benchmark import shared_behavioral_cases, _ngspice_observer
-        from python.spike_core.ngspice_plugin import NgspicePlugin
+        from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin
         from python.spikes.native_runner import run_native_project
         from python.spikes.netlist import parse_netlist
         plugin = NgspicePlugin()

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Original analytical/manufactured oracles. No external solver/source fixtures.
-#include "spikes/tcad_equilibrium.hpp"
+#include "solvers/circuits/spikes/tcad_equilibrium.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>

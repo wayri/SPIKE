@@ -2,12 +2,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from python.spike_core.assembly_analysis_scope import (
-    AssemblyAnalysisScopeError,
-    validate_assembly_analysis_scope,
-    validate_case_scope,
-    write_case_scope,
-)
+from python.spike_core.assembly_analysis_scope import AssemblyAnalysisScopeError, validate_assembly_analysis_scope, validate_case_scope, write_case_scope
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.service import handle
 

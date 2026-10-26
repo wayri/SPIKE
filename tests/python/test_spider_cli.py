@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from python.spike_core.cli import main,EXIT_VALIDATION
+from python.spike_core.cli import main, EXIT_VALIDATION
 from python.spike_core.contracts import SpiDeR
 
 class CliTests(unittest.TestCase):

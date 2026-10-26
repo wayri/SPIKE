@@ -13,17 +13,17 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from scripts.parity_pisi_gate import bound, digest, names
 from scripts.parity_finite_contact_gate import SOURCES as FINITE_SOURCES, validate_receipt as validate_finite
-from python.spike_core.dc_axial_ownership import compile_axial_ownership
-from python.spike_core.dc_land_transition import solve_land_transition
-from python.spike_core.dc_land_transition_evidence import validate_land_result
+from python.spike_core.solvers.power_integrity.dc.dc_axial_ownership import compile_axial_ownership
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition import solve_land_transition
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition_evidence import validate_land_result
 
 MODULES = ("tests.python.test_dc_axial_ownership", "tests.python.test_dc_axial_resolve",
            "tests.python.test_dc_land_transition", "tests.python.test_dc_land_transition_oracle")
 SOURCES = (*FINITE_SOURCES, "scripts/parity_pi01_blockers_gate.py",
-    "python/spike_core/dc_axial_ownership.py", "tests/python/test_dc_axial_ownership.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_axial_ownership.py", "tests/python/test_dc_axial_ownership.py",
     "tests/python/test_dc_axial_resolve.py", "tests/python/test_pi01_blockers_evidence.py",
-    "docs/DC_AXIAL_OWNERSHIP.md", "python/spike_core/dc_land_transition.py",
-    "python/spike_core/dc_land_transition_input.py", "python/spike_core/dc_land_transition_evidence.py",
+    "docs/DC_AXIAL_OWNERSHIP.md", "python/spike_core/solvers/power_integrity/dc/dc_land_transition.py",
+    "python/spike_core/solvers/power_integrity/dc/dc_land_transition_input.py", "python/spike_core/solvers/power_integrity/dc/dc_land_transition_evidence.py",
     "tests/python/test_dc_land_transition.py", "tests/python/test_dc_land_transition_oracle.py",
     "docs/DC_LAND_TRANSITION.md", "docs/adr/0126-conservative-land-transition-face-patches.md",
     "examples/dc_land_transition/run_land.py", "examples/dc_land_transition/three-patch.request.json")

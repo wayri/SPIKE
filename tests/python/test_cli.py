@@ -8,15 +8,7 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.cli import (
-    EXIT_ANALYSIS,
-    EXIT_OK,
-    EXIT_VALIDATION,
-    FIELD_CIRCUIT_PACKAGE_CONTRACT,
-    _project_request,
-    execute_request,
-    main,
-)
+from python.spike_core.cli import EXIT_ANALYSIS, EXIT_OK, EXIT_VALIDATION, FIELD_CIRCUIT_PACKAGE_CONTRACT, _project_request, execute_request, main
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.spike_core.project_package import write_spike_package
@@ -322,7 +314,7 @@ class SpikeCliTests(unittest.TestCase):
 
     def test_sparselizard_validation_status_is_machine_readable_and_fail_closed(self):
         with patch(
-            "python.spike_core.sparselizard_validation.detect_sparselizard_runtime",
+            "python.spike_core.solvers.external_engines.sparselizard.sparselizard_validation.detect_sparselizard_runtime",
             return_value={"available": False, "signature_verified": False, "manifest": {}},
         ):
             code, report = self.invoke(

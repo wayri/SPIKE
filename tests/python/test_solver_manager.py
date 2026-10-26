@@ -5,15 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from python.spike_core.external_engines import external_engine_catalog
-from python.spike_core.solver_manager import (
-    recommend_emi_nets,
-    recommend_solver,
-    select_solver,
-    register_external_solver,
-    solver_manager_catalog,
-    tune_solver,
-    unregister_external_solver,
-)
+from python.spike_core.solver_manager import recommend_emi_nets, recommend_solver, select_solver, register_external_solver, solver_manager_catalog, tune_solver, unregister_external_solver
 from python.spike_core.solver_plugins import default_solver_registry
 
 

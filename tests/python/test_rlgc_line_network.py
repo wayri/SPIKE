@@ -10,8 +10,8 @@ from unittest.mock import patch
 import numpy as np
 from scipy.linalg import expm
 
-from python.spike_core import rlgc_line_network as line
-from python.spike_core.sparameter_sampling import resample_sparameter_network
+from python.spike_core.solvers.signal_integrity.lines import rlgc_line_network as line
+from python.spike_core.solvers.signal_integrity.networks.sparameter_sampling import resample_sparameter_network
 
 
 def request(frequencies=(0., 1e6, 1e8), resistance=3., conductance=2e-4, **changes):

@@ -39,7 +39,7 @@
         "sha256": "c14e2230e9275887fb734300b0eb43de046bc89a79384b3d157031a3792295c2"
       },
       {
-        "path": "python/spike_core/laminar_channel_cht.py",
+        "path": "python/spike_core/solvers/thermal_fluid/flow/laminar_channel_cht.py",
         "sha256": "a7349180ca2763790c25acc7adc265440a9690866151035b44130764eca2745d"
       }
     ]

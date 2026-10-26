@@ -3,18 +3,39 @@
 .universal-search-body { grid-template-rows: auto minmax(0, 1fr) auto; }
 .universal-search-summary { display: flex; align-items: center; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--spike-border-subtle); padding: 6px 9px; background: var(--spike-surface-field); scrollbar-width: thin; }
 .universal-search-summary:empty { display: none; }
-.universal-search-summary button { flex: 0 0 auto; max-width: 190px; overflow: hidden; border: 1px solid var(--spike-border-subtle); border-radius: 4px; padding: 4px 7px; color: var(--spike-text-muted); background: var(--spike-surface-raised); font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.universal-search-summary button { flex: 0 0 auto; max-width: 190px; overflow: hidden; border: 1px solid var(--spike-border-subtle); border-radius: 4px; padding: 4px 7px; color: var(--spike-text-muted); background: var(--spike-surface-raised); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
 .universal-search-summary button:hover { border-color: var(--spike-accent-strong); color: var(--spike-text-strong); }
-.universal-search-summary b { flex: 0 0 auto; color: var(--spike-text-muted); font-size: 8px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+.universal-search-summary b { flex: 0 0 auto; color: var(--spike-text-muted); font-size: 10px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
 .universal-search-summary-modes { flex: 0 0 auto; display: flex; gap: 2px; border-right: 1px solid var(--spike-border-subtle); padding-right: 6px; }
 .universal-search-summary-modes button[aria-pressed="true"] { border-color: var(--spike-accent-strong); color: var(--spike-accent-text); background: var(--spike-surface-selected); }
 .universal-search-row { display: grid; grid-template-columns: minmax(0, 1fr) 48px; border-bottom: 1px solid var(--spike-border-subtle); }
-.universal-search-row > button:first-child { min-height: 43px; display: grid; grid-template-columns: 24px minmax(0, 1fr) minmax(70px, auto) 18px; align-items: center; gap: 8px; border: 0; padding: 5px 8px; color: var(--spike-text); background: transparent; text-align: left; }
+.universal-search-row > button:first-child { min-height: 43px; display: grid; grid-template-columns: 24px minmax(0, 1fr) minmax(60px, 135px) 18px; align-items: center; gap: 8px; border: 0; padding: 7px 10px; color: var(--spike-text); background: transparent; text-align: left; }
 .universal-search-row.active { background: var(--spike-surface-selected); box-shadow: inset 2px 0 var(--spike-accent); }
-.universal-search-row > .universal-search-pin { border: 0; border-left: 1px solid var(--spike-border-subtle); color: var(--spike-text-muted); background: transparent; font-size: 8px; }
+.universal-search-row > .universal-search-pin { border: 0; border-left: 1px solid var(--spike-border-subtle); color: var(--spike-text-muted); background: transparent; font-size: 10px; }
 .universal-search-row > .universal-search-pin[aria-pressed="true"] { color: var(--spike-accent-text); }
 .universal-search-row > button:first-child span { min-width: 0; display: grid; gap: 3px; }
 .universal-search-row > button:first-child b, .universal-search-row > button:first-child small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.universal-search-row > button:first-child b { font-size: 10px; }
-.universal-search-row > button:first-child small, .universal-search-row > button:first-child em { color: var(--spike-text-muted); font-size: 8px; }
+.universal-search-row > button:first-child b { font-size: 12px; line-height: 1.35; }
+.universal-search-row > button:first-child small, .universal-search-row > button:first-child em { color: var(--spike-text-muted); font-size: 10px; }
 @media(max-width:720px) { .universal-search-dialog { width: calc(100vw - 8px); } .universal-search-summary { padding-inline: 5px; } .universal-search-summary button { max-width: 130px; } .universal-search-row { grid-template-columns: minmax(0, 1fr) 42px; } .universal-search-row > button:first-child { grid-template-columns: 22px minmax(0, 1fr) 15px; } .universal-search-row em { display: none; } }
+
+.universal-search-row em { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-style:normal;text-align:right; }
+.universal-search-row:not(.active):hover { background:var(--spike-surface-hover,var(--spike-table-hover)); }
+.universal-search-body > footer { gap:12px;padding:8px 12px; }
+.universal-search-body > footer b { font-size:11px; }
+.universal-search-body > footer small { font-size:10px; }
+.universal-search-row :focus-visible { outline:2px solid var(--spike-control-focus);outline-offset:-2px; }
+
+/* Reserve summary and footer tracks regardless of legacy stylesheet import order. */
+.universal-search-dialog > .universal-search-body { display:flex;flex-direction:column;min-height:0;overflow:hidden; }
+.universal-search-dialog .universal-search-summary { flex:none;flex-wrap:wrap;align-content:start;overflow:auto;max-height:124px;box-sizing:border-box;min-height:40px; }
+.universal-search-dialog .universal-search-summary:empty { display:none; }
+.universal-search-dialog .universal-search-summary button { display:inline-flex;align-items:center;gap:5px;min-height:28px;line-height:1.4;cursor:pointer; }
+.universal-search-dialog .universal-search-summary button:disabled { cursor:not-allowed;opacity:.5; }
+.universal-search-dialog .universal-search-list { flex:1;min-height:0; }
+.universal-search-dialog .universal-search-body > footer { flex:none; }
+.search-category-dot { width:6px;height:6px;border-radius:50%;background:var(--search-category-color);flex:none; }
+.universal-search-dialog .universal-search-row { border-inline-start:3px solid var(--search-category-color); }
+.universal-search-dialog .universal-search-row > button:first-child > svg:first-child { color:var(--search-category-color); }
+.universal-search-dialog .universal-search-row .search-category-badge { color:var(--search-category-color);border:1px solid color-mix(in srgb,var(--search-category-color) 45%,transparent);border-radius:4px;padding:3px 6px;font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+.universal-search-dialog .universal-search-body > footer > span { color:var(--search-category-color); }

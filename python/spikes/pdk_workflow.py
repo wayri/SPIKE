@@ -150,8 +150,8 @@ def run(prepared,*,approval_sha256):
             raise ValueError('Compiled model loading is unsupported in this PDK route')
     fingerprint=_digest(json.dumps(dict(config=prepared['config'],dependencies=prepared['dependencies'],deck_sha256=_digest(prepared['source'].encode())),sort_keys=True,separators=(',',':')).encode())
     if fingerprint!=approval_sha256:raise ValueError('Prepared PDK run was modified after approval')
-    from python.spike_core.contracts import AnalysisSpec,DesignIR
-    from python.spike_core.ngspice_plugin import NgspicePlugin
+    from python.spike_core.contracts import AnalysisSpec, DesignIR
+    from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin
     result=NgspicePlugin().run(DesignIR(design_id='pdk-circuit',name='Explicit PDK simulation'),
         AnalysisSpec(analysis_id='pdk-circuit',mode='spice',solver_id='spike.ngspice',
                      options={'spice_netlist':prepared['source'],'timeout_seconds':120})).to_dict()

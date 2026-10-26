@@ -1,0 +1,45 @@
+{
+  "contract": "spike/component-admission-evidence/v1",
+  "stage_id": "WF01-S04C2",
+  "status": "failed",
+  "production_qualified": false,
+  "material_qualified": false,
+  "limitation": "Synthetic solids and supplied materials verify software admission only; native KiCad composition, conditioned package material laws and physics qualification remain open.",
+  "sources": {
+    "scripts/parity_component_admission_gate.py": "dbaa2f8e5ab6091127982829ff6eb62eef0b90255a073281e51241ed86b41c09",
+    "tests/python/test_thermal_component_promotion.py": "49889e4cb6dfb1b6b77797a45b57325564b9e312f5708e58da309eb41b64493a",
+    "tests/python/test_assembly_thermal_meshing.py": "e2ed75eb9309e9233fc53c555fe9eb1d4ff3589e865aef1176f3498c54d6bf0f",
+    "tests/python/test_project_assembly_field.py": "a4afb858cdd9dde8a80b12b13a9b9fefb321f4d4ae1d4d4e13e2d7ce151a020b",
+    "examples/assembly_field/run_examples.py": "4ccba4941c6bf6d0df8c74b5cae7b2ab511521999333379ffc3df039a7991f14",
+    "python/spike_core/solvers/geometry_meshing/preparation/assembly_thermal_components.py": "7b246f7b9dc285d444c48a9066bb8f250c48096084bc8d45106b284ac7bd6ff3",
+    "python/spike_core/solvers/geometry_meshing/preparation/assembly_thermal_meshing.py": "0f8972b14bbdc6d31478fdf3aa98f9a90477b8c2d1f4fab889bf9dc92e4ef999",
+    "python/spike_core/solvers/execution/coupling/assembly_field_handoff.py": "135566e24a8664796eca58f967b46a11bbeab9348b1f9b56a0d875c47e012efc",
+    "python/spike_core/assembly_frames.py": "e718ccb2d75ae4370b37043f8fa60be144019fd1b3e459382f91ab2fe93b5c70",
+    "python/spike_core/solvers/geometry_meshing/preparation/gmsh_occ_runtime.py": "049236f2bd262da327758640623d8df8c22fa64b8903d965399e8cef2b650606",
+    "python/spike_core/solvers/geometry_meshing/preparation/gmsh_occ_mesher.py": "3d872da940ee704d47e081bb576eb384d107449bf8adfbe1eb3089c3a7b34b03",
+    "python/spike_core/service_project_thermal_mesh.py": "3b51db1fa0d50c1e331e721f51a78aa0aa0a08118870cbaf75a1552393b329e8",
+    "python/spike_core/project_package.py": "0c5c43083f788ad826bc371fd1ed407b4ad6adc2ba3e3d7e8976de098e732db5",
+    "python/spike_core/project_member_metadata.py": "972b26390dd4e470288320bc4b9e84e50a545e16b2bf4da32b4eeff0a5aca3a4",
+    "schemas/thermal-component-promotion-v1.schema.json": "aa6050c84aaf3f4a1cd90a9e8f6e003ad1d2492e94415299fd4a6218dc918f80",
+    "schemas/assembly-thermal-mesh-assignments-v1.schema.json": "e57d084aeeb1c3a4d4377df4bde81474caf258bd80f6886768746079500010e2"
+  },
+  "runtime": {
+    "implementation": "CPython",
+    "python": "3.11.14"
+  },
+  "tests": {
+    "names": [
+      "unittest.loader._FailedTest.test_thermal_component_promotion"
+    ],
+    "run": 1,
+    "failures": [],
+    "errors": [
+      "unittest.loader._FailedTest.test_thermal_component_promotion"
+    ],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/WF01-S04C2-movinglid-replay-20261025.log",
+  "log_sha256": "524f6f040d0e387a4d056442d67cc2308b7633b0c33c8b954504fc69facdcbb2"
+}

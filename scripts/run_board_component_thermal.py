@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.component_thermal import run_component_thermal
+from python.spike_core.solvers.thermal_fluid.heat.component_thermal import run_component_thermal
 from python.spike_core.kicad_importer import import_kicad_design
 
 

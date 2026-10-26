@@ -32,14 +32,14 @@ def source_snapshot(root=ROOT):
     paths.update(root / spec[0] for spec in BOARDS.values())
     # Package-wide coverage catches newly added helpers and changed file sets.
     for directory, suffixes in (("python/spike_core", {".py"}), ("python/core", {".py"}),
-            ("python/bindings", {".cpp", ".hpp", ".h"}), ("src/peec", {".cpp", ".hpp", ".h"})):
+            ("python/bindings", {".cpp", ".hpp", ".h"}), ("src/solvers/power_integrity/peec", {".cpp", ".hpp", ".h"})):
         paths.update(path for path in (root / directory).rglob("*")
                      if path.is_file() and path.suffix in suffixes and "__pycache__" not in path.parts)
     return {path.relative_to(root).as_posix(): digest(path) for path in sorted(paths)}
 
 
 def runtime_descriptor():
-    from python.spike_core.peec_plugin import native
+    from python.spike_core.solvers.power_integrity.peec.peec_plugin import native
     path = Path(native.__file__).resolve() if native is not None else None
     versions = {}
     for name in ("numpy", "scipy", "shapely"):

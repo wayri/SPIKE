@@ -6,10 +6,10 @@ import unittest
 
 from shapely.geometry import Point
 
-from python.spike_core.dc_axial_ownership import compile_axial_ownership, make_gap_branches
-from python.spike_core.dc_triangle_partition import partition_polygon_groups
-from python.spike_core.hybrid_mesh import HybridMesh, MeshNode
-from python.spike_core.peec_conforming_dc import solve_hybridized_conforming_dc
+from python.spike_core.solvers.power_integrity.dc.dc_axial_ownership import compile_axial_ownership, make_gap_branches
+from python.spike_core.solvers.power_integrity.dc.dc_triangle_partition import partition_polygon_groups
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshNode
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import solve_hybridized_conforming_dc
 from tests.python.test_dc_axial_ownership import explicit_stack
 
 

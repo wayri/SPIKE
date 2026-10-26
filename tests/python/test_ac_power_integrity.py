@@ -5,7 +5,7 @@ import math
 import unittest
 import numpy as np
 from numpy.polynomial.legendre import leggauss
-from python.spike_core.ac_power_integrity import analyze_ac_power_integrity, slab_field_loss, MU0
+from python.spike_core.solvers.power_integrity.peec.ac_power_integrity import analyze_ac_power_integrity, slab_field_loss, MU0
 
 
 def request():

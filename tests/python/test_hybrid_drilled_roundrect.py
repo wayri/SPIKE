@@ -6,10 +6,8 @@ from dataclasses import replace
 from pathlib import Path
 import unittest
 
-from python.spike_core.hybrid_mesh import (
-    _Builder, _pad_world_to_local, _shared_polygon_face_length,
-)
-from python.spike_core.hybrid_owned_copper import area, centroid
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _Builder, _pad_world_to_local, _shared_polygon_face_length
+from python.spike_core.solvers.power_integrity.dc.hybrid_owned_copper import area, centroid
 from tests.python.test_hybrid_owned_copper import builder
 
 
@@ -182,7 +180,7 @@ class NativeEBrakeDrilledRoundrectTests(unittest.TestCase):
                 self.assertAlmostEqual(sum(area([p[:2] for p in c["vertices_mm"]]) for c in cells), area(source), delta=1e-8)
                 for cell in cells:
                     local = [_pad_world_to_local(custom, p[:2]) for p in cell["vertices_mm"]]
-                    from python.spike_core.hybrid_mesh import _polygon_is_contained_in
+                    from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _polygon_is_contained_in
                     self.assertTrue(_polygon_is_contained_in(local, [tuple(p) for p in source], 1e-8))
 
 

@@ -4,13 +4,7 @@ import math
 import unittest
 
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.spikes_layout_adapter import (
-    SpikesLayoutAdapterError,
-    canonical_layout_json,
-    map_layout_results,
-    prepare_native_jobs,
-    validate_layout_request,
-)
+from python.spike_core.spikes_layout_adapter import SpikesLayoutAdapterError, canonical_layout_json, map_layout_results, prepare_native_jobs, validate_layout_request
 
 
 class SpikesLayoutAdapterTests(unittest.TestCase):

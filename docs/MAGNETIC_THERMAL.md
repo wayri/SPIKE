@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Experimental planar magnetic and thermal coupling
 
-`python/spike_core/magnetic_thermal.py` provides isotropic heat conduction on
+`python/spike_core/solvers/electromagnetics/machines/magnetic_thermal.py` provides isotropic heat conduction on
 a fixed planar triangular mesh extruded through a uniform stack depth. It also
 couples that thermal step to the stationary-conductor eddy step described in
 [MAGNETIC_FEM.md](MAGNETIC_FEM.md). This is an experimental numerical slice,

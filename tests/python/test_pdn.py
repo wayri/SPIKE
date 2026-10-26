@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from python.spike_core.cli import main
-from python.spike_core.pdn import optimize_pdn, review_pdn
+from python.spike_core.solvers.power_integrity.pdn.pdn import optimize_pdn, review_pdn
 
 
 class PdnReviewTests(unittest.TestCase):

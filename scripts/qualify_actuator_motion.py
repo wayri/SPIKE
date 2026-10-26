@@ -10,7 +10,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from python.spike_core.actuator_motion import simulate_actuator_motion
+from python.spike_core.solvers.electromagnetics.machines.actuator_motion import simulate_actuator_motion
 
 
 def qualification_report():

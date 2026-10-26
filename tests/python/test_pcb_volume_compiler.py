@@ -7,7 +7,7 @@ import math
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.pcb_volume_compiler import compile_pcb_volume_model, PcbVolumeError
+from python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_compiler import compile_pcb_volume_model, PcbVolumeError
 
 
 def rectangle(x0, y0, x1, y1):
@@ -52,7 +52,7 @@ class PcbVolumeDependencyTests(unittest.TestCase):
 @unittest.skipUnless(importlib.util.find_spec('shapely'), 'Optional Shapely runtime unavailable')
 class PcbVolumeCompilerTests(unittest.TestCase):
     def test_output_shapes_pass_independent_occ_admission_without_allocation(self):
-        from python.spike_core.gmsh_occ_mesher import validate_request
+        from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_mesher import validate_request
         result = compile_pcb_volume_model(model())
         # This small fixture also fits the legacy shape admission budget. The
         # compiler does not require or instantiate the Gmsh native runtime.
@@ -214,13 +214,13 @@ class PcbVolumeCompilerTests(unittest.TestCase):
                 compile_pcb_volume_model(value)
 
     def test_resource_limits_before_expansion_and_pair_work(self):
-        with patch('python.spike_core.pcb_volume_compiler.MAX_SOLIDS', 15):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_compiler.MAX_SOLIDS', 15):
             with self.assertRaisesRegex(PcbVolumeError, 'solid budget'):
                 compile_pcb_volume_model(model())
-        with patch('python.spike_core.pcb_volume_compiler.MAX_POLYGON_POINTS', 39):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_compiler.MAX_POLYGON_POINTS', 39):
             with self.assertRaisesRegex(PcbVolumeError, 'Expanded output polygon'):
                 compile_pcb_volume_model(model())
-        with patch('python.spike_core.pcb_volume_compiler.MAX_PAIR_CHECKS', 0):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_compiler.MAX_PAIR_CHECKS', 0):
             with self.assertRaisesRegex(PcbVolumeError, 'pair-work budget'):
                 compile_pcb_volume_model(model())
 

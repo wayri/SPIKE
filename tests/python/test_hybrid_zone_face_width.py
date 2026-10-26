@@ -4,7 +4,7 @@ import math
 import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import _shared_polygon_face_length, build_hybrid_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _shared_polygon_face_length, build_hybrid_mesh
 
 
 class HybridZoneFaceWidthTests(unittest.TestCase):

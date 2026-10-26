@@ -5,6 +5,7 @@ from __future__ import annotations
 import tempfile
 import json
 import copy
+from dataclasses import asdict, fields
 from pathlib import Path
 from typing import Any, Dict
 
@@ -206,7 +207,19 @@ def frontend_project_payload(package_payload: Dict[str, Any]) -> Dict[str, Any]:
         if isinstance(package_payload.get("assembly_designs"), dict):
             projected["assembly_designs"] = package_payload["assembly_designs"]
         return projected
-    design = SpiDeRV2.from_dict(package_payload.get("design_ir") or {}).to_v1(allow_unprojected_arcs=True).to_dict()
+    legacy_design = SpiDeRV2.from_dict(package_payload.get("design_ir") or {}).to_v1(allow_unprojected_arcs=True)
+    # to_v1 has already allocated every legacy collection. dataclasses.asdict
+    # recursively rebuilds that complete multi-megabyte tree a second time.
+    # Keep the public detached-dictionary contract with one ordinary deepcopy;
+    # ValidationIssue remains the only nested dataclass in SpiDeR.
+    design = {
+        item.name: (
+            [asdict(issue) for issue in legacy_design.issues]
+            if item.name == "issues"
+            else copy.deepcopy(getattr(legacy_design, item.name))
+        )
+        for item in fields(legacy_design)
+    }
     projected = {
         "format": "spike-project-package/v2",
         "contract": "spike/project/v2",

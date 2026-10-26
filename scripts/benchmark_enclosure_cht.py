@@ -22,7 +22,7 @@ import scipy
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.enclosure_cht import solve_enclosure_cht
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_cht import solve_enclosure_cht
 from tests.python.test_enclosure_cht import fixture as cht_fixture
 from tests.python.test_enclosure_cht import layered_fixture, material
 from tests.python.test_enclosure_cht_advection import manufactured_advection
@@ -33,11 +33,11 @@ from tests.python.test_enclosure_laminar import manufactured
 CONTRACT = "spike/enclosure-cht-benchmark/v1"
 SOURCE_PATHS = (
     "scripts/benchmark_enclosure_cht.py",
-    "python/spike_core/enclosure_cht.py",
-    "python/spike_core/enclosure_energy.py",
-    "python/spike_core/enclosure_refinement.py",
-    "python/spike_core/enclosure_laminar.py",
-    "python/spike_core/enclosure_stokes.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_cht.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_energy.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_refinement.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_laminar.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_stokes.py",
     "tests/python/test_enclosure_cht.py",
     "tests/python/test_enclosure_cht_advection.py",
     "tests/python/test_enclosure_laminar.py",

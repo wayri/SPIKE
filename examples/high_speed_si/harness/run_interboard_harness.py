@@ -23,10 +23,10 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from python.spike_core.harness_authoring import validate_harness_connections
-from python.spike_core.harness_mtl import run_harness_mtl
-from python.spike_core.harness_pi import run_harness_pi
-from python.spike_core.harness_rlgc_geometry import extract_parallel_round_rlgc
-from python.spike_core.harness_signal import run_harness_si
+from python.spike_core.solvers.signal_integrity.lines.harness_mtl import run_harness_mtl
+from python.spike_core.solvers.signal_integrity.lines.harness_pi import run_harness_pi
+from python.spike_core.solvers.signal_integrity.lines.harness_rlgc_geometry import extract_parallel_round_rlgc
+from python.spike_core.solvers.signal_integrity.lines.harness_signal import run_harness_si
 from python.spike_core.spider_v2 import AssemblyIRV1
 
 BOARD_A, BOARD_B = "harness-board-A", "harness-board-B"
@@ -364,8 +364,8 @@ def run_case() -> dict[str, object]:
         "rlgc-result.json": geometry_result, "mtl-request.json": mtl_input, "mtl-result.json": mtl_result,
         "mtl-diagonal-control-result.json": control_result, "validation.json": validation,
         "integration.json": integration, "report.json": report}
-    source_paths = ["examples/high_speed_si/harness/run_interboard_harness.py", "python/spike_core/harness_pi.py",
-                    "python/spike_core/harness_rlgc_geometry.py", "python/spike_core/harness_mtl.py"]
+    source_paths = ["examples/high_speed_si/harness/run_interboard_harness.py", "python/spike_core/solvers/signal_integrity/lines/harness_pi.py",
+                    "python/spike_core/solvers/signal_integrity/lines/harness_rlgc_geometry.py", "python/spike_core/solvers/signal_integrity/lines/harness_mtl.py"]
     artifacts["evidence.json"] = {"status": "passed", "production_qualified": False,
         "artifact_sha256": {name: _sha256_json(value) for name, value in artifacts.items()},
         "source_sha256": {path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest() for path in source_paths},

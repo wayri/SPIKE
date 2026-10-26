@@ -3,7 +3,7 @@
 import copy
 import unittest
 import numpy as np
-from python.spike_core.enclosure_stokes import CONTRACT, solve_enclosure_stokes, _assemble
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_stokes import CONTRACT, solve_enclosure_stokes, _assemble
 
 
 def fixture(shape=(4, 4, 3)):

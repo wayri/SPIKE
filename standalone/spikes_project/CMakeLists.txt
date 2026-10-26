@@ -16,7 +16,7 @@ option(SPIKES_BUILD_STUDIO "Build the SPIKES Studio desktop workbench" OFF)
 find_package(Eigen3 3.4 REQUIRED NO_MODULE)
 find_package(OpenMP REQUIRED)
 
-set(SPIKES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine/src/spikes")
+set(SPIKES_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/engine/src/solvers/circuits/spikes")
 
 add_library(spikes_core STATIC
     ${SPIKES_SOURCE_DIR}/smps_stability.cpp

@@ -8,7 +8,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 const output=fileURLToPath(new URL(".focus-tool-deck-test.mjs",import.meta.url));
 try {
   await build({entryPoints:[fileURLToPath(new URL("../src/FocusToolDeck.tsx",import.meta.url))],outfile:output,bundle:true,platform:"node",format:"esm",external:["react","react-dom","lucide-react"],logLevel:"silent"});
-  const {default:Deck,activeFocusPanel,normalizeFocusPanelWidth,FOCUS_PANEL_DEFAULT_WIDTH}=await import(pathToFileURL(output).href);
+  const {default:Deck,isRedundantPanelDismiss,activeFocusPanel,normalizeFocusPanelWidth,FOCUS_PANEL_DEFAULT_WIDTH}=await import(pathToFileURL(output).href);
+  assert.equal(isRedundantPanelDismiss("", "Close", "Study"),true,"footer Close is redundant with the shared header Close");
+  assert.equal(isRedundantPanelDismiss("Close panel", "", "Study"),true);
+  assert.equal(isRedundantPanelDismiss("Close Study", "", "Study"),true);
+  assert.equal(isRedundantPanelDismiss("Close project", "Close", "Study"),false,"domain-specific commands are preserved");
+  assert.equal(isRedundantPanelDismiss("Discard changes", "Close", "Study"),false,"explicit workflow semantics take precedence over text");
+  assert.equal(isRedundantPanelDismiss("", "", "Study",true),true,"unlabelled header X is replaced");
   const panels=[
     {id:"layers",title:"Layers",open:true,content:React.createElement("input",{defaultValue:"retained layer draft"})},
     {id:"study",title:"Study",open:true,content:React.createElement("input",{defaultValue:"retained study draft"})},
@@ -36,9 +42,18 @@ try {
   assert.match(active,/lucide-grip-vertical/,"the resize edge has a visible affordance");
   assert.match(active,/aria-label="Expand tool panel"/,"workspace expansion stays in the panel header");
   assert.match(active,/aria-label="Hide panel"/,"the panel can be dismissed without using an embedded editor control");
+  assert.ok(!active.includes('aria-label="Close Layers"'),"retained-only panels do not falsely advertise Close");
+  const closable=renderToStaticMarkup(React.createElement(Deck,{panels:[{...panels[0],onClose:()=>{}}],activeId:"layers",commandsOpen:false,onActivate:()=>{}}));
+  assert.match(closable,/<button[^>]+aria-label="Close Layers"[^>]*>.*?<\/button><\/header>/,"the owning Close workflow is the rightmost header action");
   const layout=readFileSync(fileURLToPath(new URL("../src/FocusWorkspace.css",import.meta.url)),"utf8");
   assert.match(layout,/focus-panel-open\s*\{[^}]*grid-template-columns:[^;]*clamp\(280px,[^;]*720px/s,"the dock keeps an editable minimum while bounding its share of the viewport");
   assert.match(layout,/\.focus-panel-resizer\s*\{[^}]*width:\s*14px;[^}]*transform:\s*translate\(-50%,-50%\)/s,"the resize handle is visible on the panel boundary");
   assert.match(layout,/\.focus-tool-content\s+:is\(input,select,textarea\):focus-visible\s*\{[^}]*outline:/s,"embedded editors retain an explicit keyboard focus indication");
+  const documents=renderToStaticMarkup(React.createElement(Deck,{panels:[{...panels[0],presentation:"document"}],activeId:"layers",commandsOpen:false,onActivate:()=>{}}));
+  assert.match(documents,/aria-label="Expand tool panel"/,"editors choose expansion explicitly instead of hiding the viewport by default");
+  assert.match(documents,/aria-label="Panel navigation"/,"managed editor headers expose workspace navigation");
+  const editorLayout=readFileSync(fileURLToPath(new URL("../src/WorkspaceEditorTabs.css",import.meta.url)),"utf8");
+  assert.ok(!editorLayout.includes('visibility:hidden'),"opening an editor must not hide the current viewport");
+  assert.match(editorLayout,/"viewport" "focus-tool"/,"narrow editors reserve a visible canvas above the form");
   console.log("Focus panel admission, bounded width, visible panel controls, one-visible-slot, hidden input retention and manager aliases passed");
 } finally { try { unlinkSync(output); } catch {} }

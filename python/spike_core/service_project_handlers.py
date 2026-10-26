@@ -29,6 +29,8 @@ from .service_project import (
     canonicalize_project_payload, design_source_digest, frontend_project_payload,
     has_authoritative_source_identity, import_design, merge_project_payload,
 )
+from .service_project_backup import handle_backup_request
+from .service_linked_sources import handle_linked_source_request
 from .service_project_topology import update_assembly_topology_setup
 from .service_project_assembly import handle_assembly_project_request
 from .service_project_assembly_field import handle_assembly_field_project_request
@@ -48,6 +50,12 @@ def handle_project_request(
     method: Any, params: Dict[str, Any], *, request_id: Any, application_version: str,
 ) -> Dict[str, Any] | None:
     """Handle project persistence and import requests, or return ``None``."""
+    backup_response = handle_backup_request(method, params, request_id=request_id, application_version=application_version)
+    if backup_response is not None:
+        return backup_response
+    linked_response = handle_linked_source_request(method, params, request_id=request_id, application_version=application_version)
+    if linked_response is not None:
+        return linked_response
     airflow_response = handle_airflow_project_request(method, params, request_id=request_id, application_version=application_version)
     if airflow_response is not None:
         return airflow_response
@@ -247,6 +255,9 @@ def handle_project_request(
                 if not base_path.is_file():
                     raise ProjectPackageError("The source SPIKE package selected for lossless Save As does not exist.")
                 base = read_project(base_path, include_members=True)
+                expected_base = params.get("expected_base_manifest_sha256")
+                if expected_base is not None and expected_base != base.manifest.get("manifest_payload_sha256"):
+                    raise ProjectPackageError("The source package changed since it was opened; reopen it before backing up.")
                 if not base.migrated:
                     base_digest = design_source_digest(base.payload)
                     updated_digest = design_source_digest(payload)

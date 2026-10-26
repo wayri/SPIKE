@@ -1,17 +1,7 @@
 import math
 import unittest
 
-from python.spike_core.electrothermal_sharing import (
-    DiodeInstance,
-    DiodeParameters,
-    ElectrothermalInputError,
-    MismatchSpec,
-    ParallelDiodeScenario,
-    RunawayLimits,
-    ThermalParameters,
-    sample_diode_instances,
-    simulate_parallel_diodes,
-)
+from python.spike_core.solvers.execution.coupling.electrothermal_sharing import DiodeInstance, DiodeParameters, ElectrothermalInputError, MismatchSpec, ParallelDiodeScenario, RunawayLimits, ThermalParameters, sample_diode_instances, simulate_parallel_diodes
 
 
 class ElectrothermalSharingReferenceTests(unittest.TestCase):

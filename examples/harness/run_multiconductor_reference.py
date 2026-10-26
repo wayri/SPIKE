@@ -18,8 +18,8 @@ import scipy
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.harness_mtl import run_harness_mtl
-from python.spike_core.harness_rlgc_geometry import extract_parallel_round_rlgc
+from python.spike_core.solvers.signal_integrity.lines.harness_mtl import run_harness_mtl
+from python.spike_core.solvers.signal_integrity.lines.harness_rlgc_geometry import extract_parallel_round_rlgc
 
 
 def requests():
@@ -64,8 +64,8 @@ def main():
             if destination.exists():
                 raise ValueError("Use a fresh evidence directory; refusing to overwrite " + str(destination))
             destination.write_text(encoded, encoding="utf-8", newline="\n")
-    source_paths = ["python/spike_core/harness_mtl.py", "python/spike_core/harness_rlgc_geometry.py",
-                    "python/spike_core/sparameters.py", "examples/harness/run_multiconductor_reference.py",
+    source_paths = ["python/spike_core/solvers/signal_integrity/lines/harness_mtl.py", "python/spike_core/solvers/signal_integrity/lines/harness_rlgc_geometry.py",
+                    "python/spike_core/solvers/signal_integrity/networks/sparameters.py", "examples/harness/run_multiconductor_reference.py",
                     "schemas/harness-mtl-request-v1.schema.json", "schemas/harness-round-wire-rlgc-request-v1.schema.json"]
     evidence = {"status": result["status"], "model_status": derived["model_status"], "artifact_sha256": hashes,
                 "source_sha256": {p: hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in source_paths},

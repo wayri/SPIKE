@@ -6,22 +6,9 @@ from pathlib import Path
 import numpy as np
 from jsonschema import Draft202012Validator
 
-from python.spike_core.spider_v2 import (
-    SpiDeRV2, Layer, Material, Net, SourceIdentity, Track, Via, Zone,
-)
-from python.spike_core.si_channel import (
-    REQUEST_CONTRACT,
-    SiChannelError,
-    analyze_uniform_design_channel,
-    extract_uniform_path_rlgc,
-    normalized_nrz_eye,
-    time_domain_report,
-    uniform_rlgc_network,
-)
-from python.spike_core.si_coupled_channel import (
-    analyze_coupled_design_channel,
-    extract_coupled_path_rlgc,
-)
+from python.spike_core.spider_v2 import SpiDeRV2, Layer, Material, Net, SourceIdentity, Track, Via, Zone
+from python.spike_core.solvers.signal_integrity.channels.si_channel import REQUEST_CONTRACT, SiChannelError, analyze_uniform_design_channel, extract_uniform_path_rlgc, normalized_nrz_eye, time_domain_report, uniform_rlgc_network
+from python.spike_core.solvers.signal_integrity.channels.si_coupled_channel import analyze_coupled_design_channel, extract_coupled_path_rlgc
 from python.spike_core.cli import main as cli_main
 from python.spike_core.service import handle
 

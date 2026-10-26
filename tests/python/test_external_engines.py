@@ -13,16 +13,9 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.external_engines import (
-    ExternalEngineDescriptor,
-    _run_isolated_python,
-    _terminate_process_tree,
-    external_engine_catalog,
-    prepare_openems_case,
-    run_openems_case,
-)
-from python.spike_core.openems_case_integrity import load_strict_json
-from python.spike_core.openems_validation import validate_normalized_result
+from python.spike_core.external_engines import ExternalEngineDescriptor, _run_isolated_python, _terminate_process_tree, external_engine_catalog, prepare_openems_case, run_openems_case
+from python.spike_core.solvers.external_engines.openems.openems_case_integrity import load_strict_json
+from python.spike_core.solvers.external_engines.openems.openems_validation import validate_normalized_result
 from extensions.openems_suite.openems_mesh_policy import actual_grid_report, require_time_window
 
 
@@ -80,7 +73,7 @@ class ExternalEngineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory, patch.dict(
             os.environ, {"SPIKE_STATE_HOME": str(Path(directory) / "state")}
         ), patch(
-            "python.spike_core.openems_case_integrity.secrets.token_bytes",
+            "python.spike_core.solvers.external_engines.openems.openems_case_integrity.secrets.token_bytes",
             return_value=b"\n" * 32,
         ):
             result = prepare_openems_case(openems_design(), spec, Path(directory) / "case")

@@ -11,8 +11,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openfoam_multiregion_execution import run_multiregion_case
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import run_multiregion_case
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 
 
 def main():
@@ -21,7 +21,7 @@ def main():
     args = parser.parse_args()
     output = ROOT / "build" / ("fan-cht-run-" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S.%fZ"))
     output.mkdir(parents=True)
-    sources = list((ROOT / "python/spike_core").glob("openfoam*.py")) + [Path(__file__), ROOT / "python/spike_core/sparselizard_process.py"]
+    sources = list((ROOT / "python/spike_core").rglob("openfoam*.py")) + [Path(__file__), ROOT / "python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py"]
     def hashes():
         return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in sources}
     before = hashes()

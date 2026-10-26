@@ -5,6 +5,20 @@
 
 [Source ledger](parity-capability-backlog-v1.json) · [execution roadmap](PI_SI_PARITY_EXECUTION.md) · [solver validity](SOLVER_STATUS.md)
 
+24 October: [scalable PI01-S02 meshing and field evidence](validation/PI01_SCALABLE_20261024.md)
+adds 80 focused checks and actual reviewed-Marble transfer solves through
+39,675 tetrahedra. Heat/p99 refinement is not stable within the frozen limits;
+EBrake24V and full Marble+1V0 still exceed current mesh budgets. The full stage
+and family counts do not increase. Original board studies and gates remain.
+
+23 October supplement: [conservative board-volume DC and finite source contacts](validation/PI01_BOARD_VOLUME_20261023.md)
+adds 47 focused tests and independent retained-field evidence. The owner's new
+EBrake study uses 24V full-pad electrodes. EBrake24V and two Marble studies now
+reach explicit volume preparation, but native board solves hit mesh/barrel
+resource limits. The next PI01-S02 work is scalable conforming volume/trace
+execution and board refinement; the full stage remains in progress and the
+bounded-stage/family counts above do not increase from this supplement.
+
 | Family | Family state | Verified stages | Current bounded coverage | Remaining goal |
 | --- | --- | ---: | --- | --- |
 | SI01: Pre-layout topology exploration and constraints | in_progress | 1 | Finite supplied candidate/corner comparison | Actual topology and constraint workflows; geometry-backed references and family benchmark |

@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2026 SigHarmonic
 import unittest
-from python.spike_core.openfoam_flow_diagnostics import render_flow_energy_objects
+from python.spike_core.solvers.external_engines.openfoam.openfoam_flow_diagnostics import render_flow_energy_objects
 
 
 class FlowEnergyObjectsTests(unittest.TestCase):

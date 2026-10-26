@@ -36,11 +36,11 @@
         "sha256": "4ebb89836c4c372d9d6177bd983f025b33d3fba3d4d3f5f0e0b9901ac98e8e76"
       },
       {
-        "path": "python/spike_core/multiboard_circuit.py",
+        "path": "python/spike_core/solvers/circuits/models/multiboard_circuit.py",
         "sha256": "eb4b3f76f4a53b712843a606a48ba00e2737954bd779840b15f73e0238ea5db9"
       },
       {
-        "path": "python/spike_core/multiboard_thermal.py",
+        "path": "python/spike_core/solvers/thermal_fluid/heat/multiboard_thermal.py",
         "sha256": "f64bf9eefc933db8f2e5a02879ecf928e4887e07dc7a296d180b5a76bb79c420"
       },
       {

@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from python.spike_core.external_engines import _run_isolated_python
 from python.spike_core.runtime_locations import openems_python, openems_install_root
-from python.spike_core.antenna_measured_comparison import compare_forward_gain, evaluate_temporal_admission
+from python.spike_core.solvers.electromagnetics.fields.antenna_measured_comparison import compare_forward_gain, evaluate_temporal_admission
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

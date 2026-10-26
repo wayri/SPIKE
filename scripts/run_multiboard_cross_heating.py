@@ -13,11 +13,11 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openfoam_fan_fixture import build_fan_heated_fixture
-from python.spike_core.openfoam_multiregion import prepare_runnable_multiregion_case
-from python.spike_core.openfoam_multiregion_execution import load_verified_runnable_case, run_multiregion_case
-from python.spike_core.openfoam import _parse_internal_field, _latest_time
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.openfoam.openfoam_fan_fixture import build_fan_heated_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion import prepare_runnable_multiregion_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import load_verified_runnable_case, run_multiregion_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam import _parse_internal_field, _latest_time
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 from scripts.fan_wsl_scratch import ScratchRunner
 
 
@@ -45,8 +45,8 @@ def main():
     args = parser.parse_args()
     root = args.output.resolve()
     root.mkdir(parents=True, exist_ok=False)
-    source_paths = [p for p in (ROOT / "python/spike_core").glob("openfoam*.py") if "validation" not in p.name and "refinement_study" not in p.name]
-    source_paths += [Path(__file__), ROOT / "scripts/fan_wsl_scratch.py", ROOT / "python/spike_core/sparselizard_process.py"]
+    source_paths = [p for p in (ROOT / "python/spike_core").rglob("openfoam*.py") if "validation" not in p.name and "refinement_study" not in p.name]
+    source_paths += [Path(__file__), ROOT / "scripts/fan_wsl_scratch.py", ROOT / "python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py"]
     def hashes():
         return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
     before = hashes()
@@ -86,7 +86,7 @@ def main():
         check = next((item for item in command_records if "checkMesh" in item["argv"] and "-help" not in item["argv"]), None)
         nonorth = re.findall(r"Mesh non-orthogonality Max:\s*([\d.eE+-]+)", check.get("stdout", "")) if check else []
         if check and check["return_code"] == 0 and len(nonorth) == 3 and all(float(value) <= 1e-10 for value in nonorth):
-            from python.spike_core.openfoam_flow_energy_validation import validate_flow_energy
+            from python.spike_core.solvers.external_engines.openfoam.openfoam_flow_energy_validation import validate_flow_energy
             report["energy"] = validate_flow_energy(root / "case", dpdt_enabled=True, orthogonal_constant_k=True, relative_tolerance=.001)
         report["status"] = "passed" if report["cross_heating_passed"] and report.get("energy", {}).get("passed", False) else "failed"
     report["scope"] = "Synthetic 2-board orthogonal laminar duct; lower board 0.1W, upper board 0W; not arbitrary CAD or release qualification"

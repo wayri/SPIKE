@@ -8,9 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.pcb_entity_ports import (
-    CONTRACT, compile_entity_ports, prepare_entity_port_case, validate_entity_port_binding,
-)
+from python.spike_core.pcb_entity_ports import CONTRACT, compile_entity_ports, prepare_entity_port_case, validate_entity_port_binding
 from python.spike_core.external_engines import ExternalEngineDescriptor, run_openems_case
 from tests.python.test_openems_far_field import far_field_design, far_field_spec, far_field_request
 

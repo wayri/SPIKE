@@ -4,8 +4,7 @@ import copy
 import tempfile
 from pathlib import Path
 import unittest
-from python.spike_core.cfd_reference_correlation import (
-    NASA_CF_SHA256, REFERENCE_ID, admit_nasa_backstep_cf, _compare_admitted)
+from python.spike_core.solvers.thermal_fluid.flow.cfd_reference_correlation import NASA_CF_SHA256, REFERENCE_ID, admit_nasa_backstep_cf, _compare_admitted
 
 
 class MeasuredCorrelationTests(unittest.TestCase):

@@ -3,8 +3,8 @@
 from pathlib import Path
 import tempfile
 import unittest
-from python.spike_core.openfoam_pressure_work import pressure_work_policy
-from python.spike_core.openfoam_multiregion import prepare_runnable_multiregion_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_pressure_work import pressure_work_policy
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion import prepare_runnable_multiregion_case
 from tests.python.test_openfoam_multiregion import materialize_runnable_request
 
 

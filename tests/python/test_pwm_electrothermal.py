@@ -8,7 +8,7 @@ import json
 import os
 from pathlib import Path
 import unittest
-from python.spike_core.pwm_electrothermal import REQUEST, run_pwm_electrothermal, validate_pwm_electrothermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.pwm_electrothermal import REQUEST, run_pwm_electrothermal, validate_pwm_electrothermal
 
 ROOT = Path(__file__).resolve().parents[2]
 

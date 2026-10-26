@@ -5,7 +5,7 @@ import tempfile
 from pathlib import Path
 import unittest
 
-from python.spike_core.openfoam_fan_fixture import build_fan_heated_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_fan_fixture import build_fan_heated_fixture
 
 
 class MultiBoardFixtureTests(unittest.TestCase):

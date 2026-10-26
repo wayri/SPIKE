@@ -5,7 +5,10 @@ param(
     [switch]$SkipTests,
     [switch]$SkipWorker,
     [switch]$BuildOnly,
-    [string]$ResourceConfig
+    [ValidateSet("nsis", "msi")]
+    [string[]]$Bundles = @("nsis", "msi"),
+    [string]$ResourceConfig,
+    [string]$FrontendSnapshot
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,6 +30,16 @@ $config = Join-Path $app "src-tauri\tauri.conf.json"
 $package = Join-Path $app "package.json"
 $isProduction = $Channel -eq "Production"
 if ($BuildOnly -and $isProduction) { throw "BuildOnly is for preview native-UI verification, not production release packaging." }
+$bundleKinds = @($Bundles | ForEach-Object { $_.ToLowerInvariant() })
+if ($bundleKinds.Count -eq 0 -or @($bundleKinds | Sort-Object -Unique).Count -ne $bundleKinds.Count) {
+    throw "Bundles must name one or both installer types exactly once: nsis, msi."
+}
+if ($isProduction -and (($bundleKinds | Sort-Object) -join ',') -ne 'msi,nsis') {
+    throw "Production packaging requires both NSIS and MSI installers. Use NSIS-only builds only with -Channel Preview."
+}
+$bundleArgument = $bundleKinds -join ','
+$msiRequested = $bundleKinds -contains "msi"
+$expectedExtensions = @($bundleKinds | ForEach-Object { if ($_ -eq "nsis") { ".exe" } else { ".msi" } })
 $artifactRelative = if ($isProduction) { "artifacts\windows\production-candidate" } else { "artifacts\windows\installer" }
 $artifactRoot = [System.IO.Path]::GetFullPath((Join-Path $root $artifactRelative))
 $version = (Get-Content -LiteralPath $config -Raw | ConvertFrom-Json).version
@@ -36,6 +49,30 @@ if ([string]::IsNullOrWhiteSpace($applicationVersion)) {
 }
 $projectPython = Join-Path $root ".venv\Scripts\python.exe"
 $python = if (Test-Path -LiteralPath $projectPython) { $projectPython } else { "python" }
+$frontendBuildOutput = if ($isProduction) { Join-Path $app "dist" } else {
+    Join-Path $root ("build\frontend-builds\" + [Guid]::NewGuid().ToString("N") + "\dist")
+}
+$frontendSource = $frontendBuildOutput
+if ($FrontendSnapshot) {
+    if ($isProduction) { throw "Retained frontend snapshots are preview-only; production must use its reviewed build inputs." }
+    $frontendSource = [System.IO.Path]::GetFullPath($FrontendSnapshot)
+    $buildPrefix = [System.IO.Path]::GetFullPath((Join-Path $root "build")) + [System.IO.Path]::DirectorySeparatorChar
+    if ((Get-Item -LiteralPath (Join-Path $root "build")).Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+        throw "Frontend snapshot reparse points are not allowed."
+    }
+    if (-not $frontendSource.StartsWith($buildPrefix, [System.StringComparison]::OrdinalIgnoreCase) -or
+        -not (Test-Path -LiteralPath (Join-Path $frontendSource "index.html") -PathType Leaf)) {
+        throw "Retained frontend must be an existing snapshot strictly below this checkout's build directory."
+    }
+    $scan = Get-Item -LiteralPath $frontendSource
+    while ($scan.FullName.StartsWith($buildPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        if ($scan.Attributes -band [System.IO.FileAttributes]::ReparsePoint) { throw "Frontend snapshot reparse points are not allowed." }
+        $scan = $scan.Parent
+    }
+    if (Get-ChildItem -LiteralPath $frontendSource -Recurse -Force | Where-Object { $_.Attributes -band [System.IO.FileAttributes]::ReparsePoint }) {
+        throw "Frontend snapshot reparse points are not allowed."
+    }
+}
 
 function Invoke-Checked {
     param([string]$Executable, [string[]]$Arguments, [string]$WorkingDirectory)
@@ -104,6 +141,28 @@ if ($isProduction) {
     }
 }
 
+# Every installer requires a coherent semantic application/config version.
+# MSI additionally uses only three components for upgrade comparison, so its
+# stricter admission remains in windows_msi_version.py.
+$effectiveVersionConfig = if ($ResourceConfig) { $ResourceConfig } else { $config }
+if (-not $BuildOnly) {
+    $effectiveConfig = Get-Content -LiteralPath $effectiveVersionConfig -Raw | ConvertFrom-Json
+    $effectiveConfigVersion = [string]$effectiveConfig.version
+    if ($effectiveConfigVersion -ne $applicationVersion) {
+        throw "Effective Tauri version differs from application version."
+    }
+    $semanticVersionPattern = '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$'
+    if ($applicationVersion -notmatch $semanticVersionPattern) {
+        throw "Invalid application semantic version."
+    }
+    foreach ($identifier in @($Matches[4] -split '\.')) {
+        if ($identifier -match '^0[0-9]+$') { throw "Invalid numeric prerelease identifier." }
+    }
+    $version = $effectiveConfigVersion
+    if ($msiRequested) {
+        Invoke-Checked $python @("scripts/windows_msi_version.py", "--config", $effectiveVersionConfig, "--application", $applicationVersion) $root
+    }
+}
 if (-not $SkipWorker) {
     Invoke-Checked $python @(
         "scripts/build_native_airflow.py", "--build-dir", "build-native-airflow",
@@ -116,7 +175,11 @@ if (-not $SkipTests) {
     Invoke-Checked $python @("scripts/check_architecture.py") $root
     Invoke-Checked $python @("-m", "unittest", "discover", "-s", "tests/python", "-p", "test_errors.py", "-v") $root
     Invoke-Checked $python @("-m", "unittest", "discover", "-s", "tests/python", "-p", "test_schema_catalog.py", "-v") $root
-    Invoke-Checked "npm.cmd" @("run", "build") $app
+    if ($isProduction) {
+        Invoke-Checked "npm.cmd" @("run", "build") $app
+    } else {
+        Invoke-Checked "npm.cmd" @("run", "build", "--", "--outDir", $frontendBuildOutput) $app
+    }
     Invoke-Checked "cargo" @("test", "--lib") (Join-Path $app "src-tauri")
 }
 if ($ResourceConfig) {
@@ -130,7 +193,7 @@ if ($isProduction) {
         "--dependency-signature", $dependencySignaturePath
     ) $root
     Invoke-Checked "npm.cmd" @(
-        "run", "tauri", "build", "--", "--bundles", "nsis,msi",
+        "run", "tauri", "build", "--", "--bundles", $bundleArgument,
         "--features", "custom-protocol", "--config", "src-tauri/tauri.production.conf.json"
     ) $app
 } else {
@@ -140,7 +203,7 @@ if ($isProduction) {
     $frontendSnapshotRoot = Join-Path $root ("build\frontend-snapshots\" + [Guid]::NewGuid().ToString("N"))
     New-Item -ItemType Directory -Path $frontendSnapshotRoot -Force | Out-Null
     $frontendSnapshot = Join-Path $frontendSnapshotRoot "dist"
-    Copy-Item -LiteralPath (Join-Path $app "dist") -Destination $frontendSnapshot -Recurse -ErrorAction Stop
+    Copy-Item -LiteralPath $frontendSource -Destination $frontendSnapshot -Recurse -ErrorAction Stop
     if (-not (Test-Path -LiteralPath (Join-Path $frontendSnapshot "index.html"))) {
         throw "Frontend snapshot is missing index.html. Build the frontend before packaging."
     }
@@ -154,7 +217,7 @@ if ($isProduction) {
     Write-Output "Frontend snapshot config: $frontendSnapshotConfig"
     $previewBuildArguments = @("run", "tauri", "build", "--", "--features", "custom-protocol", "--config", $frontendSnapshotConfig)
     if ($BuildOnly) { $previewBuildArguments += "--no-bundle" }
-    else { $previewBuildArguments += @("--bundles", "nsis,msi") }
+    else { $previewBuildArguments += @("--bundles", $bundleArgument) }
     Invoke-Checked "npm.cmd" $previewBuildArguments $app
 }
 
@@ -168,18 +231,40 @@ if (-not (Test-Path -LiteralPath $bundleRoot)) {
     throw "Tauri completed without producing a bundle directory."
 }
 New-Item -ItemType Directory -Path $artifactRoot -Force | Out-Null
-$installers = Get-ChildItem -LiteralPath $bundleRoot -Recurse -File |
+$installers = @(Get-ChildItem -LiteralPath $bundleRoot -Recurse -File |
     Where-Object {
-        $_.Extension -in @(".exe", ".msi") -and
+        $_.Extension.ToLowerInvariant() -in $expectedExtensions -and
         $_.BaseName.StartsWith("SPIKE_$version`_", [System.StringComparison]::OrdinalIgnoreCase)
     } |
-    Sort-Object FullName
+    Sort-Object FullName)
 if ($installers.Count -eq 0) {
-    throw "No NSIS or MSI installer was produced for Windows product version $version."
+    throw "No requested installer was produced for Windows product version $version."
 }
 $installerExtensions = @($installers | ForEach-Object { $_.Extension.ToLowerInvariant() } | Sort-Object -Unique)
-if (@($installers).Count -ne 2 -or ($installerExtensions -join ',') -ne '.exe,.msi') {
-    throw "The Windows candidate must contain exactly one NSIS EXE and one MSI installer."
+$missingExtensions = @($expectedExtensions | Where-Object { $_ -notin $installerExtensions })
+if (@($installers).Count -ne $expectedExtensions.Count -or $missingExtensions.Count -ne 0) {
+    throw "The Windows candidate must contain exactly one installer for each requested bundle type: $bundleArgument."
+}
+
+# Read-only MSI database access; never invoke msiexec or Win32_Product.
+if ($msiRequested) {
+    $msiPath = @($installers | Where-Object { $_.Extension -ieq '.msi' })[0].FullName
+    $msiInstaller = $null; $msiDatabase = $null; $msiView = $null; $msiRecord = $null
+    try {
+        $msiInstaller = New-Object -ComObject WindowsInstaller.Installer
+        $msiDatabase = $msiInstaller.OpenDatabase($msiPath, 0)
+        $msiView = $msiDatabase.OpenView('SELECT `Value` FROM `Property` WHERE `Property` = ''ProductVersion''')
+        $msiView.Execute()
+        $msiRecord = $msiView.Fetch()
+        if ($null -eq $msiRecord) { throw "MSI ProductVersion is absent." }
+        $msiProductVersion = [string]$msiRecord.StringData(1)
+        Invoke-Checked $python @("scripts/windows_msi_version.py", "--config", $config, "--application", $applicationVersion, "--product-version", $msiProductVersion) $root
+    } finally {
+        if ($null -ne $msiView) { $msiView.Close() }
+        foreach ($comObject in @($msiRecord, $msiView, $msiDatabase, $msiInstaller)) {
+            if ($null -ne $comObject) { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($comObject) }
+        }
+    }
 }
 
 if ($isProduction) {
@@ -188,7 +273,7 @@ if ($isProduction) {
     }
 }
 
-$manifestItems = foreach ($installer in $installers) {
+$manifestItems = @(foreach ($installer in $installers) {
     $destination = Join-Path $artifactRoot $installer.Name
     Copy-Item -LiteralPath $installer.FullName -Destination $destination -Force
     if ($isProduction) {
@@ -208,7 +293,7 @@ $manifestItems = foreach ($installer in $installers) {
             authenticode = (Get-AuthenticodeSignature -LiteralPath $destination).Status.ToString()
         }
     }
-}
+})
 
 if ($isProduction) {
     $manifest = [ordered]@{

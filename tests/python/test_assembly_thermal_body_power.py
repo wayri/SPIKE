@@ -7,9 +7,9 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
-from python.spike_core.assembly_thermal_body_power import assign_assembly_thermal_body_power
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_body_power import assign_assembly_thermal_body_power
 from python.spike_core.service_assembly_field import handle_assembly_field_request
 from tests.python.test_assembly_field_handoff import fixture
 from tests.python.test_assembly_tetra_thermal import cube, exterior
@@ -92,7 +92,7 @@ class AssemblyThermalBodyPowerTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'SOURCE'):
             self.assign()
         self.problem['heat_sources'] = [source]*11
-        with patch('python.spike_core.assembly_thermal_body_power.MAX_CELLS', 10), self.assertRaisesRegex(ValueError, 'LIMIT'):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_body_power.MAX_CELLS', 10), self.assertRaisesRegex(ValueError, 'LIMIT'):
             self.assign()
 
     def test_bulk_body_power_field_solve_conserves_authored_watts(self):

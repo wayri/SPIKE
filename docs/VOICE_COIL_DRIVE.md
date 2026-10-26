@@ -2,7 +2,7 @@
 <!-- Copyright (c) 2026 SigHarmonic -->
 # Linear voice-coil drive
 
-`python/spike_core/voice_coil_drive.py` is a bounded, verification-only
+`python/spike_core/solvers/electromagnetics/machines/voice_coil_drive.py` is a bounded, verification-only
 electrical/mechanical simulation for an ideal reciprocal voice-coil actuator.
 It closes the back-EMF loop that the fixed-excitation actuator workflow does
 not model. It does not consume a geometry or force map and makes no magnetic
@@ -11,7 +11,7 @@ field or geometry-derived force claim.
 Run the checked-in request with:
 
 ```powershell
-build/qualification-py311/Scripts/python.exe -m python.spike_core.voice_coil_drive --request examples/actuator/voice-coil-drive.json --result build/voice-coil-drive-result.json
+build/qualification-py311/Scripts/python.exe -m python.spike_core.solvers.electromagnetics.machines.voice_coil_drive --request examples/actuator/voice-coil-drive.json --result build/voice-coil-drive-result.json
 ```
 
 The request contract is `spike/voice-coil-drive/v1`. All values use SI units.

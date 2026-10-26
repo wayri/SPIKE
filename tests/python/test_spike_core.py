@@ -13,30 +13,10 @@ from python.spike_core.contracts import AnalysisSpec, SpiDeR
 from python.spike_core.extensions import ExtensionManifest, ExtensionRegistry
 from python.spike_core.kicad_importer import _resolve_model_reference
 from python.spike_core.service import handle, validate_design
-from python.spike_core.models import (
-    _stage_resolved_model_references,
-    build_model_manifest,
-    converter_capabilities,
-    export_kicad_scene,
-    export_kicad_visual_bundle,
-    export_kicad_visual_bundle_path_payload,
-    export_kicad_visual_bundle_payload,
-    search_model_library,
-)
-from python.spike_core.ngspice_plugin import (
-    NgspicePlugin,
-    _build_transient_visualization,
-    _component_stress,
-    _find_ngspice,
-    _parse_ascii_raw,
-    _validate_netlist,
-)
-from python.spike_core.solver_plugins import (
-    ExternalProcessSolverPlugin,
-    SolverPluginManifest,
-    default_solver_registry,
-)
-from python.spike_core.solver_geometry import build_solver_geometry
+from python.spike_core.models import _stage_resolved_model_references, build_model_manifest, converter_capabilities, export_kicad_scene, export_kicad_visual_bundle, export_kicad_visual_bundle_path_payload, export_kicad_visual_bundle_payload, search_model_library
+from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin, _build_transient_visualization, _component_stress, _find_ngspice, _parse_ascii_raw, _validate_netlist
+from python.spike_core.solver_plugins import ExternalProcessSolverPlugin, SolverPluginManifest, default_solver_registry
+from python.spike_core.solvers.geometry_meshing.preparation.solver_geometry import build_solver_geometry
 
 
 class SpikeCoreContractTests(unittest.TestCase):

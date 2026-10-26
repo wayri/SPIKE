@@ -17,7 +17,7 @@ from python.spike_core.mcad_tessellation import _freecad_path, McadTessellationE
 from python.spike_core.mcad_importer import import_mcad_artifact
 from python.spike_core.project_package import read_project, write_spike_package
 from python.spike_core.service_project_handlers import handle_project_request
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 
 ROOT = Path(__file__).resolve().parents[2]
 

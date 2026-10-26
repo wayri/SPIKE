@@ -36,7 +36,7 @@
         "sha256": "ceee206abdefa479e075e7142451930b6cafac0c228233b30a24724bc97d2f26"
       },
       {
-        "path": "python/spike_core/huygens_far_field.py",
+        "path": "python/spike_core/solvers/electromagnetics/fields/huygens_far_field.py",
         "sha256": "f5684ea4ade79871de9b64287e65fc1554d3b6f9ee651428b51af5589e54e991"
       }
     ]

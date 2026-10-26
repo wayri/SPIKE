@@ -8,11 +8,9 @@ import subprocess
 import sys
 import unittest
 
-from python.spike_core.internal_meshing_engine import (
-    CONTROL_LIMIT_BYTES, internal_mesh_capabilities, run_internal_meshing,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.internal_meshing_engine import CONTROL_LIMIT_BYTES, internal_mesh_capabilities, run_internal_meshing
 from python.spike_core.service_meshing import handle_meshing_request
-from python.spike_core.tetra_mesh_refinement import TetraRefinementError
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_refinement import TetraRefinementError
 
 
 ROOT = Path(__file__).resolve().parents[2]

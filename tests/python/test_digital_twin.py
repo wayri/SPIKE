@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.digital_twin import REQUEST_CONTRACT, compare_digital_twin
+from python.spike_core.solvers.execution.coupling.digital_twin import REQUEST_CONTRACT, compare_digital_twin
 
 
 def fixture():
@@ -163,7 +163,7 @@ class DigitalTwinTests(unittest.TestCase):
 
     def test_canonical_request_size_is_bounded_before_admission(self):
         request = fixture()
-        with patch("python.spike_core.digital_twin.MAX_CANONICAL_BYTES", 100):
+        with patch("python.spike_core.solvers.execution.coupling.digital_twin.MAX_CANONICAL_BYTES", 100):
             first = compare_digital_twin(request)
             second = compare_digital_twin(request)
         self.assertEqual(first, second)

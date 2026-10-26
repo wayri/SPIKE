@@ -1,0 +1,77 @@
+{
+  "contract": "spike/multiport-calibration-evidence/v1",
+  "stage_id": "SI08-S07",
+  "status": "passed",
+  "stage_complete": true,
+  "workflow": "offline_reference",
+  "family_complete": false,
+  "production_qualified": false,
+  "measurement_qualified": false,
+  "linearization_qualified": false,
+  "sources_before": {
+    "python/spike_core/solvers/signal_integrity/networks/multiport_calibration.py": "26c92fba072b409fec145481a69ae7775272076637c6a2a0af56095c863fa67e",
+    "python/spike_core/solvers/signal_integrity/networks/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "examples/multiport_calibration/run_calibration.py": "1f7076a2d2b77a3309c844fb2a0dc6251ee98b4b0cf0bba32859c72effaec4da",
+    "tests/python/test_multiport_calibration.py": "cc4bc5f10d03670c960ceb09254b4c12e0d85361b928739af4a0b47e262817fc",
+    "tests/python/test_multiport_calibration_oracles.py": "c2fbf35168b39207248392ea050a3ee0611ee13175fb0b3700c608917f0f161a",
+    "scripts/verify_multiport_calibration.py": "934f7cbbaf7b18135b7bb8ad20834f6f4c8c6b618e1a8b9cd373b1579229d6af",
+    "scripts/verify_one_port_calibration.py": "8fb073d955fce274d95a70f01be2f3c8db599cddae29bbdbbfce1575dfa8ab99",
+    "tests/python/test_multiport_calibration_evidence.py": "91642fb384afbade745e3e97155852b6afb117ecd6c551a59a02f5c98cce67d8",
+    "docs/MULTIPORT_CALIBRATION.md": "d07829590f68fb46db5ab00f161bd645e39d9978ffd6306dc891834781ed5896",
+    "docs/validation/MULTIPORT_CALIBRATION_DERIVATION_20261024.md": "1f074b9dac59448367d65795499b529bf64983a06dfa20397a1f5e984c96d83d"
+  },
+  "sources_after": {
+    "python/spike_core/solvers/signal_integrity/networks/multiport_calibration.py": "26c92fba072b409fec145481a69ae7775272076637c6a2a0af56095c863fa67e",
+    "python/spike_core/solvers/signal_integrity/networks/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "examples/multiport_calibration/run_calibration.py": "1f7076a2d2b77a3309c844fb2a0dc6251ee98b4b0cf0bba32859c72effaec4da",
+    "tests/python/test_multiport_calibration.py": "cc4bc5f10d03670c960ceb09254b4c12e0d85361b928739af4a0b47e262817fc",
+    "tests/python/test_multiport_calibration_oracles.py": "c2fbf35168b39207248392ea050a3ee0611ee13175fb0b3700c608917f0f161a",
+    "scripts/verify_multiport_calibration.py": "934f7cbbaf7b18135b7bb8ad20834f6f4c8c6b618e1a8b9cd373b1579229d6af",
+    "scripts/verify_one_port_calibration.py": "8fb073d955fce274d95a70f01be2f3c8db599cddae29bbdbbfce1575dfa8ab99",
+    "tests/python/test_multiport_calibration_evidence.py": "91642fb384afbade745e3e97155852b6afb117ecd6c551a59a02f5c98cce67d8",
+    "docs/MULTIPORT_CALIBRATION.md": "d07829590f68fb46db5ab00f161bd645e39d9978ffd6306dc891834781ed5896",
+    "docs/validation/MULTIPORT_CALIBRATION_DERIVATION_20261024.md": "1f074b9dac59448367d65795499b529bf64983a06dfa20397a1f5e984c96d83d"
+  },
+  "runtime": {
+    "python": "3.12.9",
+    "numpy": "2.4.2"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_actual_example_cli_preserves_existing_capture",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_atomic_late_unidentifiable_path_rejection",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_cancel_resource_and_callback_failures",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_error_box_interoperates_with_supplied_fixture_removal",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_example_recovery_and_all_source_arrays_are_independent",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_rank_deficient_covariance_and_diagnostic_only_redundant_data",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_rejects_indefinite_and_nonsymmetric_covariance",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_strict_shapes_identities_wave_basis_and_covariance_basis",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_all_coordinates_and_dense_joint_covariance",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_coincident_standards_or_collapsed_tracking_at_last_frequency",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_coupling_feedback_and_dut_inverse_poles_at_last_frequency",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_gauge_scaling_and_reference_changes",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_missing_reference_paths_and_zero_gains",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_near_poles_cannot_hide_behind_small_condition_number",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_port_permutation_reorders_full_covariance",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_redundant_measurements_remain_diagnostic_only",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_source_snapshot_and_result_ownership",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_symmetric_nonlinear_small_noise_refinement",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_two_three_four_port_truth_and_independent_waves",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_zero_and_rank_one_covariance"
+    ],
+    "run": 20,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": {
+    "path": "docs/validation/parity/SI08-S07-migration-replay-20261025.log",
+    "sha256": "7de7a78e9ebb111014d0e179e7d9e8b9cf14d7980f80f869f0fd2606b48fbc7a"
+  },
+  "capture": {
+    "path": "build/moving-lid-receipt-replay-20261025/SI08-S07-capture.json",
+    "sha256": "a8612862b296597a0b82f8a4f6a9502c88fef985878416d9493807d0330e3c78"
+  }
+}

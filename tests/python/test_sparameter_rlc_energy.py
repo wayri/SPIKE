@@ -9,7 +9,7 @@ import numpy as np
 from scipy.integrate import quad
 from scipy.linalg import expm
 
-from python.spike_core import sparameter_rlc_energy as energy
+from python.spike_core.solvers.signal_integrity.networks import sparameter_rlc_energy as energy
 from tests.python.test_sparameter_rlc_initial import request as transient_request, analytic_loaded, memory_request, reslice
 from tests.python.test_sparameter_rlc_terminated import term, physical_pwl
 from tests.python.test_sparameter_transient import one_fit

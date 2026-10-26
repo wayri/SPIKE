@@ -3,7 +3,7 @@
 import unittest
 import numpy as np
 from scripts.admit_cambridge_measured_si import admit_blob,partial_crosstalk,FILES
-from python.spike_core.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
 
 
 class CambridgeAdmissionTests(unittest.TestCase):

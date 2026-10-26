@@ -44,13 +44,13 @@ not promote visual component models into solid physics automatically.
 
 ## API and contracts
 
-`python/spike_core/assembly_field_thermal.py` owns shared pure occurrence
+`python/spike_core/solvers/execution/coupling/assembly_field_thermal.py` owns shared pure occurrence
 binding through `bind_assembly_field_thermal(request, problem)`. Both the
 internal thermal solver and the external adapter reuse it. It returns the
 handoff, admitted tetrahedral request, assigned boundary IDs and contact face
 IDs; it does not execute a solver.
 
-`python/spike_core/calculix_thermal.py` exposes:
+`python/spike_core/solvers/external_engines/calculix/calculix_thermal.py` exposes:
 
 - `prepare_calculix_thermal(request, problem)`: deterministic SI deck,
   node/element/material/boundary/contact maps, source traceability, source

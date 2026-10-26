@@ -7,7 +7,7 @@ def handle_parallel_request(method, params, *, request_id=None):
     try:
         if not isinstance(params, dict) or set(params) != ({"request"} if method == "run_parallel_batch" else set()):
             raise ValueError("Unexpected parallel-pool fields.")
-        from .parallel_pool import pool_catalog, run_parallel_batch
+        from .solvers.execution.resources.parallel_pool import pool_catalog, run_parallel_batch
         result = pool_catalog() if method == "parallel_pool_catalog" else run_parallel_batch(params["request"])
         return {"ok": True, "result": result}
     except (ValueError, TypeError, KeyError, RuntimeError, OSError) as exc:

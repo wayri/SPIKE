@@ -21,11 +21,7 @@ REPO_ROOT = EXAMPLE_ROOT.parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from python.spike_core.circuit_worker_supervisor import (  # noqa: E402
-    run_circuit_worker,
-    sha256_file,
-    supervise_process,
-)
+from python.spike_core.circuit_worker_supervisor import run_circuit_worker, sha256_file, supervise_process
 
 
 def owned_spice_job() -> dict[str, Any]:

@@ -191,7 +191,7 @@ def main():
     if args.static_only:
         return
     from tests.python.test_assembly_em import fixture
-    from python.spike_core.assembly_em import run_assembly_em
+    from python.spike_core.solvers.electromagnetics.fields.assembly_em import run_assembly_em
     cases = [('base', .001, .006, 40000, 1e-6),
              ('duration', .001, .006, 80000, 1e-9),
              ('pml-distance', .001, .012, 40000, 1e-6),

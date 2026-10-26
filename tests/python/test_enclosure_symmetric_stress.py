@@ -7,11 +7,9 @@ from unittest.mock import patch
 import numpy as np
 from scipy.sparse import diags, vstack
 
-from python.spike_core.enclosure_rectilinear_momentum import _assemble
-from python.spike_core.enclosure_refinement import build_enclosure_grid
-from python.spike_core.enclosure_symmetric_stress import (
-    CONTRACT, _stress_operator, solve_enclosure_symmetric_stress,
-)
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_rectilinear_momentum import _assemble
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_refinement import build_enclosure_grid
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_symmetric_stress import CONTRACT, _stress_operator, solve_enclosure_symmetric_stress
 
 
 def fixture(n=4, refined=False):
@@ -189,7 +187,7 @@ class SymmetricStressTests(unittest.TestCase):
         # Predeclared detector budgets: >1e-3 changed velocity and >.05 Pa
         # additional pressure error on the same n=12 independent continuum case.
         correct = manufactured(12, variable="quadratic")
-        with patch("python.spike_core.enclosure_symmetric_stress._stress_operator",
+        with patch("python.spike_core.solvers.thermal_fluid.flow.enclosure_symmetric_stress._stress_operator",
                    side_effect=scalar_diffusion_substitute):
             wrong = manufactured(12, variable="quadratic")
         changed, reference = 0., 0.

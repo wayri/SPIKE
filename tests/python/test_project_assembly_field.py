@@ -13,8 +13,8 @@ import unittest
 from pathlib import Path
 
 from examples.assembly_field.run_examples import setup
-from python.spike_core.assembly_field_study import export_assembly_field_study, import_assembly_field_study
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
+from python.spike_core.solvers.execution.coupling.assembly_field_study import export_assembly_field_study, import_assembly_field_study
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.multiboard_identity import canonical_json_digest
 from python.spike_core.multiboard_study import physical_assembly
@@ -72,8 +72,8 @@ class AssemblyFieldProjectTests(unittest.TestCase):
         check = subprocess.run(
             [sys.executable, "-c", (
                 "import sys; import python.spike_core.service_project_handlers; "
-                "assert 'python.spike_core.assembly_field_study' not in sys.modules; "
-                "assert 'python.spike_core.assembly_field_thermal' not in sys.modules"
+                "assert 'python.spike_core.solvers.execution.coupling.assembly_field_study' not in sys.modules; "
+                "assert 'python.spike_core.solvers.execution.coupling.assembly_field_thermal' not in sys.modules"
             )],
             cwd=Path(__file__).resolve().parents[2], capture_output=True, text=True,
         )

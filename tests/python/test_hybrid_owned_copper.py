@@ -9,9 +9,9 @@ from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import spsolve
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import _Builder, _point_in_polygon
-from python.spike_core.hybrid_owned_copper import area, centroid, difference, hull
-from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _Builder, _point_in_polygon
+from python.spike_core.solvers.power_integrity.dc.hybrid_owned_copper import area, centroid, difference, hull
+from python.spike_core.solvers.power_integrity.dc.hybrid_dc_solver import solve_hybrid_dc
 
 
 def builder(pad, target=.25, zone=True):
@@ -186,7 +186,7 @@ class OwnedCopperTests(unittest.TestCase):
             self.assertAlmostEqual(audit["pad_void_area_mm2"],0,places=9)
             self.assertGreater(audit["contacts"][0]["face_count"],4)
             self.assertAlmostEqual(audit["contacts"][0]["face_length_mm"],6+math.sqrt(5),places=7)
-            from python.spike_core.hybrid_mesh import _shared_polygon_face_length
+            from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _shared_polygon_face_length
             polygons=dict(profile["cells"])
             for edge in mesh.branches:
                 if edge.kind=="pad":
@@ -195,7 +195,7 @@ class OwnedCopperTests(unittest.TestCase):
                     self.assertAlmostEqual(edge.width_mm,expected,places=9)
 
     def test_asymmetric_custom_mirror_preserves_area_and_reflected_source(self):
-        from python.spike_core.hybrid_mesh import _pad_world_to_local
+        from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _pad_world_to_local
         polygon=[[-1,-1],[2,-1],[1.5,.5],[-.5,1]]
         reflected=[(-x,y) for x,y in polygon]
         for rotation in (0,31):

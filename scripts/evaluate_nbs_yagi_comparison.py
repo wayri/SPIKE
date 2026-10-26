@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from python.spike_core.antenna_measured_comparison import evaluate_temporal_admission
+from python.spike_core.solvers.electromagnetics.fields.antenna_measured_comparison import evaluate_temporal_admission
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)

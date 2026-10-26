@@ -3,10 +3,10 @@
 import copy
 import unittest
 import numpy as np
-from python.spike_core.si_network_graph import build_network_graph
-from python.spike_core.si_multiboard import model_digest
-from python.spike_core.si_network_workflow import line_network,cascade_networks
-from python.spike_core.sparameters import touchstone_text
+from python.spike_core.solvers.signal_integrity.networks.si_network_graph import build_network_graph
+from python.spike_core.solvers.signal_integrity.networks.si_multiboard import model_digest
+from python.spike_core.solvers.signal_integrity.networks.si_network_workflow import line_network, cascade_networks
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text
 
 
 def graph_fixture(coupled=True):

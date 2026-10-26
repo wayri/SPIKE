@@ -9,13 +9,7 @@ import time
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.parallel_pool import (
-    ALLOWED_METHODS,
-    configure_worker_prefix,
-    pool_catalog,
-    run_parallel_batch,
-    validate_batch,
-)
+from python.spike_core.solvers.execution.resources.parallel_pool import ALLOWED_METHODS, configure_worker_prefix, pool_catalog, run_parallel_batch, validate_batch
 from python.spike_core.cluster_protocol import encode as encode_cluster_message
 from tests.python.test_harness_pi import fixture as harness_pi_fixture
 from tests.python.test_internal_airflow import request as airflow_request
@@ -42,7 +36,7 @@ class ParallelPoolTests(unittest.TestCase):
             {"id": "airflow", "method": "run_internal_airflow",
              "params": {"request": airflow_request(nx=120, ny=24)}},
         ], concurrency=2)
-        with patch("python.spike_core.parallel_pool.cpu_thread_budget", return_value=4):
+        with patch("python.spike_core.solvers.execution.resources.parallel_pool.cpu_thread_budget", return_value=4):
             result = run_parallel_batch(request)
 
         self.assertEqual(result["status"], "completed", result)
@@ -91,7 +85,7 @@ class ParallelPoolTests(unittest.TestCase):
         for value, message in cases:
             with self.subTest(message=message), self.assertRaisesRegex(ValueError, message):
                 validate_batch(value)
-        with patch("python.spike_core.parallel_pool.cpu_thread_budget", return_value=3):
+        with patch("python.spike_core.solvers.execution.resources.parallel_pool.cpu_thread_budget", return_value=3):
             with self.assertRaisesRegex(ValueError, "CPU threads"):
                 validate_batch(batch([valid_job, {**valid_job, "id": "second"}],
                                      concurrency=2, threads_per_job=2))
@@ -139,7 +133,7 @@ class ParallelPoolTests(unittest.TestCase):
             for index in range(3)
         ]
         started = time.monotonic()
-        with patch("python.spike_core.parallel_pool.cpu_thread_budget", return_value=4):
+        with patch("python.spike_core.solvers.execution.resources.parallel_pool.cpu_thread_budget", return_value=4):
             result = run_parallel_batch(
                 batch(jobs, concurrency=2, timeout_s=30),
                 cancel_check=lambda: time.monotonic() - started > 0.1,
@@ -191,7 +185,7 @@ class ParallelPoolTests(unittest.TestCase):
             "id": f"large-{index}", "method": "run_internal_airflow",
             "params": {"request": airflow_request()},
         } for index in range(2)]
-        with patch("python.spike_core.parallel_pool.cpu_thread_budget", return_value=2):
+        with patch("python.spike_core.solvers.execution.resources.parallel_pool.cpu_thread_budget", return_value=2):
             result = run_parallel_batch(batch(jobs, concurrency=2))
 
         self.assertEqual([item["id"] for item in result["outcomes"]],

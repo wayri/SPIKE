@@ -10,9 +10,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openfoam_fan_fixture import build_fan_heated_fixture
-from python.spike_core.openfoam_multiregion_execution import load_verified_runnable_case, run_multiregion_case
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.openfoam.openfoam_fan_fixture import build_fan_heated_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import load_verified_runnable_case, run_multiregion_case
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 from scripts.fan_wsl_scratch import ScratchRunner
 
 SETTINGS = {'time16': (4, .016), 'time8': (4, .008), 'mesh16': (16, .001)}
@@ -38,10 +38,10 @@ def main():
     if len(set(args.cases)) != len(args.cases) or any(name not in SETTINGS for name in args.cases):
         parser.error('Cases must be unique fixed names: time16, time8, mesh16')
     args.output.mkdir(parents=True, exist_ok=False)
-    source_paths = [p for p in (ROOT/'python/spike_core').glob('openfoam*.py')
+    source_paths = [p for p in (ROOT/'python/spike_core').rglob('openfoam*.py')
                     if 'validation' not in p.name and 'refinement_study' not in p.name]
     source_paths += [Path(__file__), ROOT/'scripts/fan_wsl_scratch.py',
-                     ROOT/'python/spike_core/sparselizard_process.py']
+                     ROOT/'python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py']
     def source_hashes():
         return {str(path.relative_to(ROOT)): file_digest(path) for path in source_paths}
     initial = source_hashes()

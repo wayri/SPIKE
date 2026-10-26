@@ -5,21 +5,7 @@ import unittest
 from dataclasses import FrozenInstanceError
 from pathlib import Path
 
-from python.spike_core.errors import (
-    ERROR_CATALOG,
-    ERROR_CONTRACT,
-    ErrorClassification,
-    ErrorCodeFormatError,
-    ErrorDomain,
-    ErrorOrigin,
-    SpikeError,
-    UnknownErrorCodeError,
-    envelope_from_exception,
-    error_envelope,
-    error_metadata,
-    parse_error_code,
-    redact_context,
-)
+from python.spike_core.errors import ERROR_CATALOG, ERROR_CONTRACT, ErrorClassification, ErrorCodeFormatError, ErrorDomain, ErrorOrigin, SpikeError, UnknownErrorCodeError, envelope_from_exception, error_envelope, error_metadata, parse_error_code, redact_context
 
 
 class ErrorCodeTests(unittest.TestCase):

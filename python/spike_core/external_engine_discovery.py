@@ -7,11 +7,11 @@ import shutil
 from pathlib import Path
 from typing import Any, Dict, Iterable, List
 
-from .openfoam_runtime import detect_openfoam_runtime
+from .solvers.external_engines.openfoam.openfoam_runtime import detect_openfoam_runtime
 from .solver_state import registered_solver_path
-from .sparselizard_adapter import discover_sparselizard_adapter
-from .sparselizard_runtime import detect_sparselizard_runtime
-from .sparselizard_validation import evaluate_sparselizard_validation
+from .solvers.external_engines.sparselizard.sparselizard_adapter import discover_sparselizard_adapter
+from .solvers.external_engines.sparselizard.sparselizard_runtime import detect_sparselizard_runtime
+from .solvers.external_engines.sparselizard.sparselizard_validation import evaluate_sparselizard_validation
 
 
 def _app_root() -> Path:

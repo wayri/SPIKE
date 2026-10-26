@@ -303,7 +303,7 @@ def compile_board_library(project: CircuitProject, output_dir: str | Path, *, na
     with tempfile.TemporaryDirectory(prefix=".board-build-", dir=destination.parent) as temp:
         staging = Path(temp)
         for filename in ("board_library.h", "board_library.hpp", "board_library_runtime.cpp", "c_api.h"):
-            shutil.copyfile(ROOT / "src" / "spikes" / filename, staging / filename)
+            shutil.copyfile(ROOT / 'src/solvers/circuits/spikes' / filename, staging / filename)
         (staging / "board_definition.inc").write_text(definition, encoding="ascii", newline="\n")
         (staging / "circuit.json").write_text(json.dumps(project.to_dict(), sort_keys=True, indent=2) + "\n", encoding="utf-8")
         suffix = ".dll" if os.name == "nt" else ".dylib" if sys.platform == "darwin" else ".so"

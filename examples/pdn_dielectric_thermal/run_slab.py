@@ -10,7 +10,7 @@ import numpy as np
 
 ROOT=Path(__file__).resolve().parents[2]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.pdn_dielectric_thermal import run_pdn_dielectric_thermal
+from python.spike_core.solvers.power_integrity.pdn.pdn_dielectric_thermal import run_pdn_dielectric_thermal
 
 
 def setup(n=4):

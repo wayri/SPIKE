@@ -14,11 +14,10 @@ import time
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.cluster_protocol import (CONTRACT, ClusterError, MAX_FRAME,
-                                                digest, fingerprint, receive, strict_json)
+from python.spike_core.cluster_protocol import CONTRACT, ClusterError, MAX_FRAME, digest, fingerprint, receive, strict_json
 from python.spike_core.cluster_transport import NodeServer, node_request, tls_context
 from python.spike_core.cluster_manager import load_pool, probe_pool, run_cluster_batch
-from python.spike_core.parallel_pool import pool_catalog, run_parallel_batch
+from python.spike_core.solvers.execution.resources.parallel_pool import pool_catalog, run_parallel_batch
 from tests.python.test_harness_pi import fixture
 
 

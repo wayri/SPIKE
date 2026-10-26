@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from python.spike_core.contracts import AnalysisSpec, DesignIR
-from python.spike_core.ngspice_plugin import NgspicePlugin
+from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin
 
 from .contracts import ProbeDescriptor
 from .native_runner import run_native_project

@@ -5,12 +5,7 @@ from pathlib import Path
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.public_release_readiness import (
-    BLOCKED_EXTERNAL,
-    _schema_check,
-    _version_check,
-    evaluate_public_release,
-)
+from python.spike_core.public_release_readiness import BLOCKED_EXTERNAL, _schema_check, _version_check, evaluate_public_release
 
 
 ROOT = Path(__file__).resolve().parents[2]

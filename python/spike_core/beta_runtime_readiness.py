@@ -14,8 +14,8 @@ import subprocess
 import sys
 from typing import Any, Mapping
 
-from .spikes_native_adapter import capability_manifest as native_adapter_manifest
-from .spikes_native_adapter import probe_runtime_capabilities
+from .solvers.circuits.models.spikes_native_adapter import capability_manifest as native_adapter_manifest
+from .solvers.circuits.models.spikes_native_adapter import probe_runtime_capabilities
 from python.spikes.version import ENGINE_VERSION
 
 

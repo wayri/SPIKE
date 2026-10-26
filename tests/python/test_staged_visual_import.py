@@ -7,11 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.models import (
-    _stage_resolved_model_references,
-    export_kicad_visual_bundle_path_payload,
-    model_library_roots,
-)
+from python.spike_core.models import _stage_resolved_model_references, export_kicad_visual_bundle_path_payload, model_library_roots
 
 
 def glb_bytes():

@@ -3,6 +3,24 @@ import { helpSlug, resolveHelpLink } from "./helpModel";
 
 // Explicit local assets only: do not fetch arbitrary Markdown image URLs.
 const galleryImages = [
+  "emerge/patch_sphere.png", "emerge/patch_analysis.png", "emerge/patch_fields_nearfield.png", "emerge/radome_analysis.png",
+  "guides-current/command-search.jpg",
+  "guides-current/pi-geometry.jpg",
+  "guides-current/pi-terminals.jpg",
+  "guides-current/pi-review.jpg",
+  "guides-current/thermal-setup.jpg",
+  "guides-current/si-setup.jpg",
+
+  "guides-current/gerber-source.jpg",
+  "guides-current/gerber-stack.jpg",
+  "guides-current/section-help.jpg",
+  "guides-current/layer-grid.jpg",
+  "guides-current/viewport-fields.jpg",
+  "guides-current/mechanical-measure.jpg",
+  "guides-current/mechanical-section.jpg",
+  "guides-current/workbench-overview.jpg",
+  "guides-current/layers-expanded.jpg",
+
   "analytics/pi-dielectric-admittance.png", "analytics/si-rlgc-line-fields.png",
   "analytics/em-huygens-far-field.png", "analytics/thermal-two-solid-conduction.png",
   "analytics/hybrid-electrothermal-convergence.png", "analytics/cfd-native-cavity.png",

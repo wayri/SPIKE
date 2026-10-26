@@ -1,0 +1,49 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI02-S03",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "d5ca375c71a9987dab8bcf13419973a487dbcc2ba9257a5009777ceb80f15e05",
+    "python/spike_core/solvers/signal_integrity/lines/rlgc_line_network.py": "b666190f67b771dc37cc8c0a29eda8bb0b920bc0a3ab65d2bc65ccfe510ae688",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "6dd4f3efc7b6119fe5b9ca1868619381fc1e89fc6c1d0b8c5e357cda18b628cd",
+    "python/spike_core/service_simulation_handlers.py": "14e3b49268177b438d719790303a9258fe81bfbc33a45c76ad9bd5cc36bc6c8c",
+    "tests/python/test_rlgc_line_network.py": "ec9a639e63c92dab7e05f2ef5c0922506ffb4a28fd377cec0ca7b3926c3e7923",
+    "tests/python/test_rlgc_line_network_contract.py": "e653e2bb9079e627ed7efefa6fb58679e6a22174645ab07870a418d07c6e3c86",
+    "examples/rlgc_line_network/run_line.py": "2996502cf19adc056866b93f64b0dd02600e623ee9eb4eff3c51546e18888c41",
+    "schemas/rlgc-line-network-request-v1.schema.json": "48ec45d9304748e7532c3be44f81a57366804028ff32818f82b7759667f54378",
+    "schemas/rlgc-line-network-result-v1.schema.json": "597599f0a39930597a1c6326ee1b234f21da117713ef3625fff724f13fed4833",
+    "docs/RLGC_LINE_NETWORK.md": "a497ef9fd5114b86d6ac9c09cbdb4fad40043abacaf7094311d627a089a2b60f"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_callback_cannot_change_frozen_input_mid_sweep",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_contract_digest_snapshot_and_existing_network_consumer",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_dc_through_series_and_shunt_limits_are_exactly_real",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_heaviside_distortionless_attenuation_and_delay",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_independent_spatial_exponential_and_wave_boundary_solves",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_invariant_failures_do_not_return_repaired_samples",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_long_loss_retains_tiny_finite_transmission_without_cosh",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_matched_lossless_delay_and_power_conservation",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_port_reversal_reciprocity_passivity_and_length_units",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_representation_overflow_underflow_and_phase_rejections",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_sample_bound_and_cancellation",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_short_line_retains_first_order_reflection",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_small_loss_is_retained_at_large_phase",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_strict_admission_and_frequency_precision",
+      "tests.python.test_rlgc_line_network.RLGCLineNetworkTests.test_symmetric_lumped_ladder_second_order_convergence",
+      "tests.python.test_rlgc_line_network_contract.RLGCLineContractTests.test_example_executes_and_schemas_registered",
+      "tests.python.test_rlgc_line_network_contract.RLGCLineContractTests.test_strict_schema_and_worker_reject_unsupported_requests",
+      "tests.python.test_rlgc_line_network_contract.RLGCLineContractTests.test_worker_spatial_reference_source_identity_and_network_handoff"
+    ],
+    "run": 18,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI02-S03-migration-replay-20261025.log",
+  "log_sha256": "4c1026570cbac3f38e5855a25074bac939af3e9f4d07658d60fd86b503e8c8ae"
+}

@@ -85,7 +85,7 @@ def build_engine_release(
         ReleaseInput(workspace / "LICENSE", "legal/LICENSE"),
         ReleaseInput(workspace / "THIRD_PARTY_NOTICES.md", "legal/THIRD_PARTY_NOTICES.md"),
         ReleaseInput(workspace / "RELEASE_NOTES.md", "RELEASE_NOTES.md"),
-        ReleaseInput(workspace / "src/spikes/c_api.h", "include/spikes/c_api.h"),
+        ReleaseInput(workspace / "src/solvers/circuits/spikes/c_api.h", "include/spikes/c_api.h"),
         ReleaseInput(library_path, "bin/spikes_c_api.dll"),
     ]
     # A native build places the console, import archive, and static SDK
@@ -105,10 +105,10 @@ def build_engine_release(
         if source.is_file():
             inputs.append(ReleaseInput(source, destination))
     for header in (
-        "dc_solver.hpp", "transient_solver.hpp", "transient_session.hpp",
+        "behavioral_expression.hpp", "dc_solver.hpp", "transient_solver.hpp", "transient_session.hpp",
         "console_dashboard.hpp", "osdi_device.hpp",
     ):
-        inputs.append(ReleaseInput(workspace / "src/spikes" / header,
+        inputs.append(ReleaseInput(workspace / 'src/solvers/circuits/spikes' / header,
                                    f"include/spikes/{header}"))
     inputs.extend(collect_tree(workspace, workspace / "python/spikes", "python/spikes"))
     # The public CLI delegates strict project validation and bounded numerical

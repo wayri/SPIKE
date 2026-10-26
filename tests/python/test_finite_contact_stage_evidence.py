@@ -16,8 +16,8 @@ class FiniteContactEvidenceTests(unittest.TestCase):
         validate_done_import_stage({"id": "PI01-S02A", "evidence": evidence}, ROOT)
         for mutate in (lambda r: r.__setitem__("production_qualified", True),
                        lambda r: r.__setitem__("status", "failed"),
-                       lambda r: r["sources_after"].__setitem__("python/spike_core/dc_rt0_density.py", "0"*64),
-                       lambda r: r["sources_before"].pop("python/spike_core/peec_conforming_dc.py"),
+                       lambda r: r["sources_after"].__setitem__("python/spike_core/solvers/power_integrity/dc/dc_rt0_density.py", "0"*64),
+                       lambda r: r["sources_before"].pop("python/spike_core/solvers/power_integrity/peec/peec_conforming_dc.py"),
                        lambda r: r["tests"].__setitem__("skipped", [r["tests"]["names"][0]]),
                        lambda r: r["tests"].__setitem__("run", 0),
                        lambda r: r.__setitem__("log_sha256", "0"*64),

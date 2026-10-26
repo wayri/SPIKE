@@ -16,7 +16,7 @@ import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.sparameters import parse_touchstone_text, analyze_network
+from python.spike_core.solvers.signal_integrity.networks.sparameters import parse_touchstone_text, analyze_network
 
 ITEM='https://api.repository.cam.ac.uk/server/api/core/items/31231488-051d-4828-a97f-b4daecca0125'
 DOI='https://doi.org/10.17863/CAM.65674'

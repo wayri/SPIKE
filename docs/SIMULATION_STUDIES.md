@@ -3,6 +3,11 @@
 
 Simulation studies organize saved workspace setups, recorded result snapshots, and supplied datasets. A study is a project artifact, not a solver or scheduler. Activating a case loads its saved setup into the matching workspace; solver readiness and execution remain controlled by that workspace.
 
+The [experimental AC resistor / CHT study adapter](EM_RESISTOR_CHT_STUDIES.md)
+retains its exact request and bound captures in the same version-one study
+format. Its activation stages a reviewed Python runner instead of loading a
+field workspace or starting a solver.
+
 ## Workflow
 
 Open **Simulation studies**, create a study, and add one or more cases. A case records its analysis domain, mode, scenario, notes, and a copy of the workspace settings saved for it. The active marker means that the case setup is loaded in the workspace. It does not mean that a solver is running, that a result is current, or that a model is validated.

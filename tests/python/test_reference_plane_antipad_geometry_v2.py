@@ -9,11 +9,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 
 from tests.python import test_via_transition_geometry as fixtures
-from python.spike_core.reference_plane_antipad_geometry_v2 import (
-    ReferencePlaneAntipadGeometryV2Error,
-    build_reference_plane_antipad_geometry_v2,
-    validate_reference_plane_antipad_geometry_v2,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_geometry_v2 import ReferencePlaneAntipadGeometryV2Error, build_reference_plane_antipad_geometry_v2, validate_reference_plane_antipad_geometry_v2
 
 
 ROOT = Path(__file__).resolve().parents[2]

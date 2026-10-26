@@ -4,7 +4,7 @@ import copy
 import itertools
 import unittest
 
-from python.spike_core.assembly_em import prepare_assembly_em
+from python.spike_core.solvers.electromagnetics.fields.assembly_em import prepare_assembly_em
 from tests.python.test_assembly_tetra_thermal import cube,exterior
 
 
@@ -81,7 +81,7 @@ class AssemblyEmTests(unittest.TestCase):
         import json,tempfile
         from pathlib import Path
         from unittest.mock import patch
-        from python.spike_core.assembly_em import run_assembly_em
+        from python.spike_core.solvers.electromagnetics.fields.assembly_em import run_assembly_em
         request=fixture(); compiled=prepare_assembly_em(request)['compiled']
         def fake_run(*args,**kwargs):
             (kwargs['cwd']/'result.json').write_text(json.dumps({'contract':'spike/assembly-em-result/v1',

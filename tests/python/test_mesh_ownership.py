@@ -6,8 +6,8 @@ import copy
 import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.mesh_ownership import audit_dc_conductor_volume_ownership
-from python.spike_core.meshing import VOLUME_3D, build_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.mesh_ownership import audit_dc_conductor_volume_ownership
+from python.spike_core.solvers.geometry_meshing.preparation.meshing import VOLUME_3D, build_mesh
 
 
 def _volume_fixture() -> tuple[SpiDeR, list[dict]]:

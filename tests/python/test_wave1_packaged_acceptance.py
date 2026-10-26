@@ -383,10 +383,7 @@ class Wave1PackagedAcceptanceTests(unittest.TestCase):
 
     def test_packaged_mutation_probe_chains_manifests_and_preserves_world_pose(self) -> None:
         from python.spike_core.project_package import read_project
-        from python.spike_core.service_project_mcad_placement import (
-            reparent_mcad_part_in_project,
-            update_mcad_part_in_project,
-        )
+        from python.spike_core.service_project_mcad_placement import reparent_mcad_part_in_project, update_mcad_part_in_project
 
         calls: list[str] = []
 

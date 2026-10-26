@@ -9,7 +9,7 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from python.spike_core.calculix_thermal import prepare_calculix_thermal, run_calculix_thermal
+from python.spike_core.solvers.external_engines.calculix.calculix_thermal import prepare_calculix_thermal, run_calculix_thermal
 
 
 def execute(request):

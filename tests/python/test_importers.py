@@ -3,12 +3,7 @@ import unittest
 from pathlib import Path
 
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.importers import (
-    FunctionImporter,
-    ImporterDescriptor,
-    ImporterRegistry,
-    UnsupportedDesignFormatError,
-)
+from python.spike_core.importers import FunctionImporter, ImporterDescriptor, ImporterRegistry, UnsupportedDesignFormatError
 
 
 class ImporterRegistryTests(unittest.TestCase):

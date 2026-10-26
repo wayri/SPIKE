@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "python"))
-from spike_core.native_airflow import detect_native_airflow, run_native_cavity, _settings, _centerline
+from python.spike_core.solvers.thermal_fluid.flow.native_airflow import detect_native_airflow, run_native_cavity, _settings, _centerline
 
 
 class NativeAirflowContractTests(unittest.TestCase):
@@ -38,7 +38,7 @@ class NativeAirflowContractTests(unittest.TestCase):
 
     def test_malformed_native_output_is_rejected(self):
         for payload in ("not json", "null", '{"status":"converged"}'):
-            with patch("spike_core.native_airflow.subprocess.run", return_value=subprocess.CompletedProcess([],0,payload,"")):
+            with patch("python.spike_core.solvers.thermal_fluid.flow.native_airflow.subprocess.run", return_value=subprocess.CompletedProcess([],0,payload,"")):
                 with self.assertRaises(RuntimeError):
                     run_native_cavity({}, executable=__file__)
 
@@ -51,7 +51,7 @@ class NativeAirflowContractTests(unittest.TestCase):
                        {"poisson_residual_linf":1e-5}, {"dt":0}, {"time":.001},
                        {"steps":True}, {"n":8.0}, {"status":"failed_to_converge"},
                        {"u":[0]*63}, {"pressure":[math.nan]*64}, {"u":[1e308]*64}):
-            with self.subTest(change=change), patch("spike_core.native_airflow.subprocess.run",
+            with self.subTest(change=change), patch("python.spike_core.solvers.thermal_fluid.flow.native_airflow.subprocess.run",
                     return_value=subprocess.CompletedProcess([],0,json.dumps({**valid,**change}),"")):
                 with self.assertRaises(RuntimeError):
                     run_native_cavity({"n":8,"lid_velocity_m_s":3}, executable=__file__)
@@ -64,7 +64,7 @@ class NativeAirflowContractTests(unittest.TestCase):
             self.assertAlmostEqual(actual,expected)
 
     def test_timeout_is_not_partial_success(self):
-        with patch("spike_core.native_airflow.subprocess.run", side_effect=subprocess.TimeoutExpired([],1)):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.native_airflow.subprocess.run", side_effect=subprocess.TimeoutExpired([],1)):
             with self.assertRaisesRegex(RuntimeError,"timed out"):
                 run_native_cavity({}, executable=__file__)
 

@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 import copy
 import unittest
-from python.spike_core.assembly_em_grid import retained_em_grid_axes
-from python.spike_core.assembly_em import prepare_assembly_em
+from python.spike_core.solvers.electromagnetics.fields.assembly_em_grid import retained_em_grid_axes
+from python.spike_core.solvers.electromagnetics.fields.assembly_em import prepare_assembly_em
 from tests.python.test_assembly_em import fixture
 
 
@@ -39,7 +39,7 @@ class RetainedEmGridTests(unittest.TestCase):
             retained_em_grid_axes(compiled,{'mesh_resolution_m':.005,'air_margin_m':.01,'mesh_policy':'cartesian_sampling_v1'})
 
     def test_native_unused_materials_are_not_silently_qualified(self):
-        from python.spike_core.assembly_em_diagnostics import native_material_sampling
+        from python.spike_core.solvers.electromagnetics.fields.assembly_em_diagnostics import native_material_sampling
         compiled={'primitives':[{'material':{'conductivity_s_m':5.8e7}},{'material':{'conductivity_s_m':0}}]}
         log='Warning: Unused primitive (type: Polyhedron) detected in property: spike_retained_0!\nWarning: Unused primitive (type: Polyhedron) detected in property: spike_retained_1!'
         value=native_material_sampling(log,compiled)

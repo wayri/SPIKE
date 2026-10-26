@@ -6,7 +6,9 @@ export PYTHONDONTWRITEBYTECODE=1
 export RUSTFLAGS="--remap-path-prefix=$PWD=/build/spike --remap-path-prefix=$HOME=/build/user"
 export CFLAGS="${CFLAGS:-} -ffile-prefix-map=$PWD=/build/spike"
 export CXXFLAGS="${CXXFLAGS:-} -ffile-prefix-map=$PWD=/build/spike"
-python -m pip install numpy scipy shapely matplotlib mplcursors reportlab nanobind jsonschema==4.25.1 pyarrow==25.0.1 pyinstaller==6.21.0
+mkdir -p build/qualification
+python -m pip install --report build/qualification/python-install.json numpy scipy shapely matplotlib mplcursors reportlab nanobind jsonschema==4.25.1 pyarrow==25.0.1 pyinstaller==6.21.0
+python -m unittest tests.python.test_circuit_worker_dependency_provenance tests.python.test_circuit_worker_platform_identity tests.python.test_unix_release_payload tests.python.test_posix_supervisor_cleanup tests.python.test_circuit_worker_resource_admission -q
 cmake_args=(-DCMAKE_BUILD_TYPE=Release -DBUILD_PYTHON_BINDINGS=ON -DSPIKE_PORTABLE_BUILD=ON
   "-DPython_EXECUTABLE=$(command -v python)" "-Dnanobind_DIR=$(python -m nanobind --cmake_dir)")
 if [[ "$(uname)" == Darwin ]]; then
@@ -20,7 +22,7 @@ fi
 cmake -S . -B build-spikes-hybrid -G Ninja "${cmake_args[@]}"
 cmake --build build-spikes-hybrid --target spike_peec_native spikes_c_api --parallel 2
 python scripts/build_native_airflow.py --build-dir build-native-airflow --generator Ninja
-python scripts/build_packaged_circuit_worker.py
+python scripts/build_packaged_circuit_worker.py --dependency-report build/qualification/python-install.json
 python scripts/build_packaged_worker.py
 python scripts/verify_packaged_cli.py -- app/src-tauri/resources/worker/spike-worker/spike-worker --cli
 cd app

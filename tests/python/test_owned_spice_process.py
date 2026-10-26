@@ -8,13 +8,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.owned_spice_process import (
-    JOB_CONTRACT,
-    MAX_CIRCUIT_RESULT_BYTES,
-    PROCESS_RESULT_CONTRACT,
-    capability_manifest,
-    main,
-)
+from python.spike_core.solvers.external_engines.circuits.owned_spice_process import JOB_CONTRACT, MAX_CIRCUIT_RESULT_BYTES, PROCESS_RESULT_CONTRACT, capability_manifest, main
 from tests.python.test_native_circuit_compiler import design, workspace
 from tests.python.test_owned_spice_workspace import request as circuit_request
 
@@ -136,7 +130,7 @@ class OwnedSpiceProcessTests(unittest.TestCase):
                     "--result", "job/result.json",
                 ]), 2)
                 with patch(
-                    "python.spike_core.owned_spice_process._has_reparse_point",
+                    "python.spike_core.solvers.external_engines.circuits.owned_spice_process._has_reparse_point",
                     side_effect=lambda path: path == job,
                 ):
                     self.assertEqual(main([

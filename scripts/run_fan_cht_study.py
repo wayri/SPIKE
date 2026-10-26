@@ -10,9 +10,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openfoam_fan_fixture import build_fan_heated_fixture
-from python.spike_core.openfoam_multiregion_execution import run_multiregion_case, load_verified_runnable_case
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.openfoam.openfoam_fan_fixture import build_fan_heated_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import run_multiregion_case, load_verified_runnable_case
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 
 
 def digest(value):
@@ -33,8 +33,8 @@ def main():
     args.output.mkdir(parents=True, exist_ok=False)
     # Execution identity excludes independent analysis modules developed while
     # runs proceed: they are not imported by this runner or the solver.
-    source_paths = [p for p in (ROOT / "python/spike_core").glob("openfoam*.py") if "validation" not in p.name and "refinement_study" not in p.name]
-    source_paths += [Path(__file__), ROOT / "scripts/fan_wsl_scratch.py", ROOT / "python/spike_core/sparselizard_process.py"]
+    source_paths = [p for p in (ROOT / "python/spike_core").rglob("openfoam*.py") if "validation" not in p.name and "refinement_study" not in p.name]
+    source_paths += [Path(__file__), ROOT / "scripts/fan_wsl_scratch.py", ROOT / "python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py"]
     def hashes():
         return {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
     sources = hashes()

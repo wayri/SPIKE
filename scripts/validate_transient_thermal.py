@@ -22,12 +22,11 @@ from scipy.linalg import eigh
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.assembly_tetra_thermal_validation import validate_request
-from python.spike_core.assembly_tetra_transient import run_assembly_tetra_transient
-from python.spike_core.assembly_field_transient import run_assembly_field_transient
-from python.spike_core.calculix_runtime import probe_calculix_runtime
-from python.spike_core.calculix_transient import (run_calculix_transient, run_calculix_field_transient,
-    compare_transient_fields, compare_thermal_transient_results)
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation import validate_request
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient import run_assembly_tetra_transient
+from python.spike_core.solvers.execution.coupling.assembly_field_transient import run_assembly_field_transient
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
+from python.spike_core.solvers.external_engines.calculix.calculix_transient import run_calculix_transient, run_calculix_field_transient, compare_transient_fields, compare_thermal_transient_results
 from tests.python.test_calculix_transient import settings, sine_case
 from tests.python.test_assembly_tetra_thermal import request
 
@@ -103,9 +102,9 @@ def board_step_case(directory):
     """Create an original STEP, import/mesh it with two retained PCB occurrences."""
     from tests.python.test_assembly_joint_thermal_mesh import RealJointMeshTests
     from tests.python.test_thermal_component_promotion import pure_fixture
-    from python.spike_core.assembly_thermal_components import promote_thermal_components
-    from python.spike_core.assembly_thermal_meshing import run_assembly_thermal_mesh
-    from python.spike_core.assembly_thermal_autolink import autolink_assembly_thermal_contacts
+    from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_components import promote_thermal_components
+    from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import run_assembly_thermal_mesh
+    from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_autolink import autolink_assembly_thermal_contacts
     RealJointMeshTests.setUpClass()
     try:
         payload, assignments, options, selection, reader = pure_fixture()
@@ -162,10 +161,9 @@ def board_step_case(directory):
 
 def export_study_project(directory, geometry, problem, transient, internal, authored, source):
     from tests.python.test_project_assembly_field import _payload
-    from python.spike_core.assembly_field_study import export_assembly_field_study
+    from python.spike_core.solvers.execution.coupling.assembly_field_study import export_assembly_field_study
     from python.spike_core.project_package import write_spike_package, read_project
-    from python.spike_core.service_project_assembly_field import (
-        save_assembly_field_study_in_project, read_assembly_field_study_in_project)
+    from python.spike_core.service_project_assembly_field import save_assembly_field_study_in_project, read_assembly_field_study_in_project
     record = export_assembly_field_study(geometry,problem,internal,transient_settings=transient)
     (directory/'original-transient.fieldstudy.json').write_text(json.dumps(record,indent=2),encoding='utf-8')
     payload = _payload(geometry)
@@ -228,15 +226,15 @@ def main():
         return
     if not probe_calculix_runtime()['available']:
         raise SystemExit('Actual CalculiX is required; this benchmark never substitutes mock results.')
-    from python.spike_core.gmsh_occ_runtime import verify_installation
+    from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import verify_installation
     verify_installation()
     if args.output.exists() or args.artifacts.exists():
         raise ValueError('Use new output and artifact paths; historical evidence is never overwritten.')
     args.artifacts.mkdir(parents=True,exist_ok=False)
-    sources = ['scripts/validate_transient_thermal.py', 'python/spike_core/gmsh_occ_runtime.py',
-               'python/spike_core/gmsh_environment.py', 'python/spike_core/assembly_thermal_meshing.py',
-               'python/spike_core/assembly_thermal_joint_mesh.py', 'python/spike_core/assembly_tetra_transient.py',
-               'python/spike_core/calculix_transient.py']
+    sources = ['scripts/validate_transient_thermal.py', 'python/spike_core/solvers/geometry_meshing/preparation/gmsh_occ_runtime.py',
+               'python/spike_core/solvers/geometry_meshing/preparation/gmsh_environment.py', 'python/spike_core/solvers/geometry_meshing/preparation/assembly_thermal_meshing.py',
+               'python/spike_core/solvers/geometry_meshing/preparation/assembly_thermal_joint_mesh.py', 'python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_transient.py',
+               'python/spike_core/solvers/external_engines/calculix/calculix_transient.py']
     source_before = {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in sources}
     result={'contract':'spike/transient-thermal-validation/v1','model_status':'experimental','production_qualified':False,
             'reference':'https://www.dhondt.de/ccx_2.20.pdf',

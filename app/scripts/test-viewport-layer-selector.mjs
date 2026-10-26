@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import ts from "typescript";
+
+let expanded=false;
+const useRef=initial=>({current:initial});
+const useState=()=>[expanded,value=>{expanded=typeof value==="function"?value(expanded):value;}];
+const jsx=(type,props)=>({type,props:props??{}}),module={exports:{}};
+const source=readFileSync(new URL("../src/ViewportLayerSelector.tsx",import.meta.url),"utf8");
+const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,jsx:ts.JsxEmit.ReactJSX}}).outputText;
+new Function("require","module","exports",compiled)(name=>name==="react/jsx-runtime"?{jsx,jsxs:jsx}:name==="react"?{useRef,useState,useEffect:()=>{},useId:()=>"layer-choices"}:name==="./icons"?{Layers3:"Layers3"}:name==="./layerPalette"?{layerCssColor:()=>"#abcdef"}:{},module,module.exports);
+const Selector=module.exports.default;
+const flatten=node=>!node||typeof node!=="object"?[]:[node,...[node.props?.children].flat(Infinity).flatMap(flatten)];
+const calls=[],visibility={A:{"F.Cu":true,"B.Cu":false},B:{"F.Cu":false,"B.Cu":true}};
+const props={onToggle:(...args)=>calls.push(["toggle",...args]),onShowAll:id=>calls.push(["all",id]),onShowNetNames:(...args)=>calls.push(["net-names",...args]),onManage:()=>calls.push(["manage"])};
+for(const id of ["A","B","A"]){
+  const board={id,name:`Duplicate board ${id}`,layers:["F.Cu","B.Cu"],visibility:visibility[id]};
+  expanded=false;
+  const render=()=>Selector({...props,board,selectedBoardIds:[id]});
+  let tree=render();
+  assert.equal(tree.props["data-board-id"],id);
+  assert.equal(flatten(tree).some(node=>node.props?.className==="viewport-layer-choices"),false,"resting edge pull hides the layer array");
+  tree.props.onMouseEnter();tree=render();let nodes=flatten(tree);
+  assert.equal(tree.props["data-expanded"],true,"hover expands the complete control boundary");
+  assert.ok(nodes.some(node=>node.props?.className==="viewport-layer-grid"),"layers use their own wrapping grid rather than a nested command strip");
+  assert.ok(!nodes.some(node=>node.props?.className?.includes("command-strip")),"no nested horizontal strip can collide with toolbar controls");
+  const layer=nodes.find(node=>node.props?.["aria-label"]===`F.Cu on ${board.name}`);
+  assert.equal(layer.props["aria-pressed"],visibility[id]["F.Cu"]);
+  const netSection=nodes.find(node=>node.type==="details"&&node.props.className==="viewport-layer-net-names");
+  assert.ok(netSection,"net names expand vertically inside the same selector");
+  assert.equal(netSection.props.open,undefined,"net names start collapsed");
+  const netToggle=nodes.find(node=>node.props?.["aria-label"]===`Net names on ${board.name}`);
+  assert.equal(netToggle.props["aria-pressed"],false);
+  netToggle.props.onClick();assert.deepEqual(calls.at(-1),["net-names",id,true]);
+  const shown=flatten(Selector({...props,board,selectedBoardIds:[id],showNetNames:true})).find(node=>node.props?.["aria-label"]===`Net names on ${board.name}`);
+  assert.equal(shown.props["aria-pressed"],true);shown.props.onClick();assert.deepEqual(calls.at(-1),["net-names",id,false]);
+  layer.props.onClick();assert.deepEqual(calls.at(-1),["toggle",id,"F.Cu"]);
+  nodes.find(node=>node.props?.title===`Show all layers on ${board.name}`).props.onClick();assert.deepEqual(calls.at(-1),["all",id]);
+  tree.props.onMouseLeave();tree=render();assert.equal(tree.props["data-expanded"],undefined,"leaving the general bounds collapses the layer array");
+  let trigger=flatten(tree).find(node=>node.props?.["aria-label"]===`Show layers for ${board.name}`);
+  trigger.props.onClick();tree=render();assert.equal(tree.props["data-expanded"],true,"click provides touch access without a permanent pin");
+  let stopped=false;tree.props.onPointerDown({stopPropagation:()=>{stopped=true;}});assert.equal(stopped,true,"layer actions cannot initiate viewport dragging");
+  tree.props.onBlur({currentTarget:{contains:()=>true},relatedTarget:{}});assert.equal(expanded,true,"moving focus inside the array keeps it open");
+  tree.props.onBlur({currentTarget:{contains:()=>false},relatedTarget:{}});assert.equal(expanded,false,"keyboard focus leaving the bounds collapses the array");
+  expanded=true;tree=render();trigger=flatten(tree).find(node=>node.props?.["aria-label"]===`Show layers for ${board.name}`);trigger.props.onKeyDown({key:"Escape",preventDefault(){}});assert.equal(expanded,false,"Escape collapses the array");
+  assert.equal(Selector({...props,board,selectedBoardIds:["A","B"]}),null,"multiple boards cannot expose a layer editor");
+  assert.equal(Selector({...props,board,selectedBoardIds:[]}),null,"no selected occurrence is not a layer-editing scope");
+  assert.equal(Selector({...props,board,selectedBoardIds:[id==="A"?"B":"A"]}),null,"a stale scope cannot edit another occurrence");
+  assert.ok(flatten(Selector({...props,board,selectedBoardIds:[id],disabled:true})).filter(node=>node.type==="button").every(node=>node.props.disabled),"disconnected scoped views are read-only");
+}
+assert.deepEqual(visibility,{A:{"F.Cu":true,"B.Cu":false},B:{"F.Cu":false,"B.Cu":true}},"dispatch never mutates shared source preferences");
+assert.equal(Selector({...props,board:null,selectedBoardIds:[]}),null);
+console.log("Viewport edge layers: hover/click reveal, boundary and keyboard dismissal, viewport gesture isolation, exact occurrence scope and read-only state passed.");

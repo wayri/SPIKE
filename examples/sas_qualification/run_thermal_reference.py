@@ -7,7 +7,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
-from python.spike_core.transient_resistive_electrothermal import run_transient_resistive_electrothermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal import run_transient_resistive_electrothermal
 from python.spikes.qualification_artifacts import export_qualification_evidence
 
 

@@ -11,7 +11,7 @@ nonlinear receiver, physical broadband or thermal-coupling qualification.
 ## Public contract and topology
 
 Call `run_capacitive_network_transient(request)` from
-`python.spike_core.sparameter_capacitive_terminated`, or the worker method of
+`python.spike_core.solvers.signal_integrity.networks.sparameter_capacitive_terminated`, or the worker method of
 the same name with exactly `params: {request: ...}`. Run the original example:
 
 ```powershell

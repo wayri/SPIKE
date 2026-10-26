@@ -11,7 +11,7 @@ import numpy as np
 from extensions.openems_suite.retained_volume_geometry import (
     compile_retained_volume_geometry, emit_retained_volume_geometry, _tetra_intersects_open_box,
 )
-from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
 from python.spike_core.multiboard_identity import canonical_json_digest
 from tests.python.test_assembly_tetra_thermal import cube, exterior
 

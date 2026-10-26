@@ -5,12 +5,7 @@ import hashlib
 import json
 import unittest
 
-from python.spike_core.thermal_release_candidate import (
-    CANDIDATE_CONTRACT,
-    PACKAGE_IDENTITY_CONTRACT,
-    evaluate_thermal_release_candidate,
-    validate_package_identity,
-)
+from python.spike_core.thermal_release_candidate import CANDIDATE_CONTRACT, PACKAGE_IDENTITY_CONTRACT, evaluate_thermal_release_candidate, validate_package_identity
 
 
 def digest(index: int) -> str:

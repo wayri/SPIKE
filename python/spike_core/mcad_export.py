@@ -11,7 +11,7 @@ import zipfile
 from .mcad_export_contract import MAX_BYTES, validate_assembly
 from .mcad_importer import validate_step_mcad_artifact
 from .mcad_tessellation import _freecad_path
-from .sparselizard_process import run_adapter_process
+from .solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 
 
 def export_assembly(assembly, *, freecad_executable=None, cancellation_event=None):

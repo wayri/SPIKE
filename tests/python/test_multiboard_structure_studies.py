@@ -7,9 +7,9 @@ import unittest
 from pathlib import Path
 
 from python.spike_core.multiboard_study import prepare_multiboard_study, physical_assembly, validate_study_result
-from python.spike_core.multiboard_circuit import run_multiboard_circuit
-from python.spike_core.multiboard_em import run_multiboard_em
-from python.spike_core.multiboard_thermal import run_multiboard_thermal
+from python.spike_core.solvers.circuits.models.multiboard_circuit import run_multiboard_circuit
+from python.spike_core.solvers.electromagnetics.fields.multiboard_em import run_multiboard_em
+from python.spike_core.solvers.thermal_fluid.heat.multiboard_thermal import run_multiboard_thermal
 from python.spike_core.project_package import read_project, write_spike_package
 from python.spike_core.project_state_artifacts import hydrate_result_state
 from python.spike_core.service_project_handlers import handle_project_request

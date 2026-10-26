@@ -1,0 +1,9 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.si-spatial-workbench{display:grid;gap:9px;min-width:0;padding:10px;font:12px/1.4 system-ui,sans-serif;color:var(--spike-table-text)}
+.si-spatial-workbench header,.si-spatial-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;min-width:0}
+.si-spatial-workbench p{margin:0;overflow-wrap:anywhere}.si-spatial-workbench small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.si-spatial-binding-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.si-spatial-workbench label{display:grid;gap:4px;min-width:0}.si-spatial-workbench input,.si-spatial-workbench select,.si-spatial-workbench textarea{box-sizing:border-box;width:100%;min-width:0;min-height:30px;font:inherit}.si-spatial-workbench textarea{resize:vertical;font-family:monospace}.si-spatial-workbench details>*+*{margin-top:8px}
+.si-spatial-actions button{max-width:100%;white-space:normal}
+.si-spatial-legend{display:grid;gap:4px;min-width:0;max-width:340px;font:11px/1.4 system-ui,sans-serif;overflow-wrap:anywhere}
+@media(max-width:520px){.si-spatial-binding-fields{grid-template-columns:minmax(0,1fr)}}

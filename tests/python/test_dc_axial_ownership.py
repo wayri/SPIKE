@@ -7,10 +7,8 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.dc_axial_ownership import (
-    REQUEST, AxialOwnershipError, compile_axial_ownership, make_gap_branches,
-)
-from python.spike_core.hybrid_mesh import HybridMesh
+from python.spike_core.solvers.power_integrity.dc.dc_axial_ownership import REQUEST, AxialOwnershipError, compile_axial_ownership, make_gap_branches
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh
 
 
 def explicit_stack():

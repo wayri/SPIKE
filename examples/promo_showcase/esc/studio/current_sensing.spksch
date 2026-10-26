@@ -1,0 +1,453 @@
+{
+  "contract": "spikes/schematic/v1",
+  "id": "3479fb1b425342efb0cc15b086d46f09",
+  "title": "Original ESC teaching example - shunt sensing and filter",
+  "source": ".title Original ESC teaching example - shunt sensing and filter\n* Supplied ideal current pulses; ideal gain stage, no ADC quantization/noise.\nIphase 0 shunt PULSE(0 20 500u 10u 10u 1m 3m)\nRshunt shunt 0 1m\nEamp amplified 0 shunt 0 50\nRfilter amplified adc 1k\nCfilter adc 0 1n\n.tran 2u 6m uic\n.end\n",
+  "components": [
+    {
+      "id": "714b3feeffc54a9f8f9eeb36691b2c00",
+      "ref": "IPHASE",
+      "kind": "current_source",
+      "value": "0",
+      "nodes": [
+        "0",
+        "shunt"
+      ],
+      "x": 140,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "5ebadeea6166445c8f42ec4fa480b41c",
+      "ref": "RSHUNT",
+      "kind": "resistor",
+      "value": "0.001",
+      "nodes": [
+        "shunt",
+        "0"
+      ],
+      "x": 340,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "0ba0c508a079488a9a54ec1b4ab0b548",
+      "ref": "EAMP",
+      "kind": "vcvs",
+      "value": "50",
+      "nodes": [
+        "amplified",
+        "0",
+        "shunt",
+        "0"
+      ],
+      "x": 540,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "fb6e13f1b4564291967e29c7c0deeacd",
+      "ref": "RFILTER",
+      "kind": "resistor",
+      "value": "1000",
+      "nodes": [
+        "amplified",
+        "adc"
+      ],
+      "x": 740,
+      "y": 180,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    },
+    {
+      "id": "ef79fb9a77fa46bd842a6c740f33a407",
+      "ref": "CFILTER",
+      "kind": "capacitor",
+      "value": "1e-09",
+      "nodes": [
+        "adc",
+        "0"
+      ],
+      "x": 140,
+      "y": 340,
+      "package": "",
+      "variant": "fitted",
+      "temperature_k": 300.15,
+      "limits": {},
+      "model_source": "",
+      "evidence": "",
+      "parameters": {},
+      "rotation": 0,
+      "mirror_x": false,
+      "mirror_y": false
+    }
+  ],
+  "probes": [
+    {
+      "id": "cefaa9f48dc34e4590989f8737d02912",
+      "expression": "V(shunt)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(shunt)",
+        "quantity": "node_voltage",
+        "targets": [
+          "shunt"
+        ],
+        "unit": "V"
+      }
+    },
+    {
+      "id": "24f15191e6da4488a1f1dd944dec4bf2",
+      "expression": "V(adc)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "V(adc)",
+        "quantity": "node_voltage",
+        "targets": [
+          "adc"
+        ],
+        "unit": "V"
+      }
+    },
+    {
+      "id": "d47842ae00024effbbbbf62417303b8d",
+      "expression": "I(Rshunt)",
+      "anchor": null,
+      "descriptor": {
+        "contract": "spikes/probe/v1",
+        "name": "I(Rshunt)",
+        "quantity": "element_current",
+        "targets": [
+          "RSHUNT"
+        ],
+        "unit": "A"
+      }
+    }
+  ],
+  "expressions": [],
+  "metadata": {
+    "example_limitations": "Explicit ideal supplied excitation, linear sensing or gate RLC; no vendor transistor, ADC, commutation, switching-loss, field or thermal coupling."
+  },
+  "revision": 11,
+  "wires": [
+    {
+      "id": "4255fea3ae574df4bad14881eeefea73",
+      "a": [
+        "714b3feeffc54a9f8f9eeb36691b2c00",
+        0
+      ],
+      "b": [
+        "5ebadeea6166445c8f42ec4fa480b41c",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 1
+    },
+    {
+      "id": "cd58dce92f644d4ca0ce3a0972fc36f7",
+      "a": [
+        "714b3feeffc54a9f8f9eeb36691b2c00",
+        0
+      ],
+      "b": [
+        "0ba0c508a079488a9a54ec1b4ab0b548",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 2
+    },
+    {
+      "id": "ac0ec54c93c3476caf224605439ce321",
+      "a": [
+        "714b3feeffc54a9f8f9eeb36691b2c00",
+        0
+      ],
+      "b": [
+        "0ba0c508a079488a9a54ec1b4ab0b548",
+        3
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 3
+    },
+    {
+      "id": "4746d7bce8ee4cecb2c74566470d838e",
+      "a": [
+        "714b3feeffc54a9f8f9eeb36691b2c00",
+        0
+      ],
+      "b": [
+        "ef79fb9a77fa46bd842a6c740f33a407",
+        1
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 4
+    },
+    {
+      "id": "3c36e21319ed4068b8b3200cda49b235",
+      "a": [
+        "714b3feeffc54a9f8f9eeb36691b2c00",
+        1
+      ],
+      "b": [
+        "5ebadeea6166445c8f42ec4fa480b41c",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 5
+    },
+    {
+      "id": "f32c3ba4e8f5430b9759403ce05e48e6",
+      "a": [
+        "714b3feeffc54a9f8f9eeb36691b2c00",
+        1
+      ],
+      "b": [
+        "0ba0c508a079488a9a54ec1b4ab0b548",
+        2
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 6
+    },
+    {
+      "id": "7b5197d7554840e69508622d9d2e01f0",
+      "a": [
+        "0ba0c508a079488a9a54ec1b4ab0b548",
+        0
+      ],
+      "b": [
+        "fb6e13f1b4564291967e29c7c0deeacd",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 7
+    },
+    {
+      "id": "a2ce74790c0048069828c0633e7e2ca9",
+      "a": [
+        "fb6e13f1b4564291967e29c7c0deeacd",
+        1
+      ],
+      "b": [
+        "ef79fb9a77fa46bd842a6c740f33a407",
+        0
+      ],
+      "waypoints": [],
+      "bend": "horizontal",
+      "manual": true,
+      "draw_order": 8
+    }
+  ],
+  "junctions": [],
+  "labels": [],
+  "power_symbols": [],
+  "model_policy": {
+    "schematic": {
+      "tier": "source",
+      "enforce": false
+    },
+    "subsheets": {},
+    "components": {}
+  },
+  "simulation_sequences": [],
+  "annotations": [],
+  "dashboard": {
+    "version": 1,
+    "widgets": [
+      {
+        "id": "3115061b6153453699b5074e977136d8",
+        "kind": "Scope",
+        "title": "V(shunt)",
+        "expression": "V(shunt)",
+        "x": 0,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "10f83dc36164487697a25f95c57495bf",
+        "kind": "Scope",
+        "title": "V(adc)",
+        "expression": "V(adc)",
+        "x": 500,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "2b8330652ae445f29972ac2df4f7a674",
+        "kind": "Scope",
+        "title": "I(Rshunt)",
+        "expression": "I(Rshunt)",
+        "x": 1000,
+        "y": 0,
+        "width": 480,
+        "height": 280,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      },
+      {
+        "id": "bc948f0f47ac448ca00b18be7b91fde3",
+        "kind": "Note",
+        "title": "Model scope",
+        "expression": "Original illustrative sensing/linear transient, not VESC firmware or a qualified three-phase motor controller.",
+        "x": 0,
+        "y": 300,
+        "width": 900,
+        "height": 160,
+        "minimum": 0.0,
+        "maximum": 5.0,
+        "source": ""
+      }
+    ]
+  },
+  "thermal_setup": {
+    "contract": "spikes/thermal-setup/v1",
+    "solver_binding": "not_coupled",
+    "board": {
+      "length_mm": 100.0,
+      "width_mm": 80.0,
+      "thickness_mm": 1.6,
+      "material": "FR4 (assumption)",
+      "orientation": "horizontal",
+      "layers": [
+        {
+          "name": "L1",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L2",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L3",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        },
+        {
+          "name": "L4",
+          "copper_um": 35.0,
+          "coverage_pct": 50.0
+        }
+      ]
+    },
+    "enclosure": {
+      "type": "open_air",
+      "material": "Unspecified",
+      "length_mm": 150.0,
+      "width_mm": 120.0,
+      "height_mm": 50.0,
+      "wall_mm": 2.0,
+      "vent_area_mm2": 0.0
+    },
+    "environment": {
+      "ambient_c": 25.0,
+      "airflow": "natural",
+      "air_speed_m_s": 0.0,
+      "direction": "parallel_to_board",
+      "convection_w_m2k": null,
+      "altitude_m": 0.0
+    },
+    "notes": "Initial authoring assumptions; replace with actual board/environment data."
+  },
+  "run_profile": {
+    "contract": "spikes/run-profile/v1",
+    "name": "Default",
+    "backend": "native",
+    "execution": "batch",
+    "analysis": "from_netlist",
+    "time_step": "10u",
+    "stop_time": "5m",
+    "uic": true,
+    "method": "hybrid_trapezoidal",
+    "capture_samples": 20000,
+    "speed_ratio": 1.0,
+    "electrical_temperature_c": null
+  },
+  "plot_layout": {
+    "mode": "units",
+    "panes": {},
+    "heights": {}
+  },
+  "instruments": [],
+  "controller_setup": null,
+  "controller_boards": [],
+  "power_tree": {
+    "contract": "spikes/power-tree/v1",
+    "stages": []
+  },
+  "analytics_extensions": [],
+  "directives": [
+    {
+      "id": "7982f1d8eedb40b68766c6ac308203cd",
+      "group": "Simulation",
+      "title": "",
+      "visible": true,
+      "x": 100.0,
+      "y": 420.0,
+      "text": ".tran 2u 6m uic",
+      "enabled": true,
+      "line": 8,
+      "end_line": 8
+    }
+  ]
+}

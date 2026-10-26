@@ -9,7 +9,7 @@ from types import SimpleNamespace
 
 import numpy as np
 
-from python.spike_core.openems_adapter_source import OPENEMS_DRIVER
+from python.spike_core.solvers.external_engines.openems.openems_adapter_source import OPENEMS_DRIVER
 
 
 class FarFieldNormalizationTests(unittest.TestCase):

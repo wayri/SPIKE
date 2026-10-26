@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 import { useId, useState, type ReactNode } from "react";
-import { ChevronDown, FolderOpen, PanelLeft, Search, type LucideIcon } from "./icons";
+import { ChevronDown, FolderOpen, ListTree, PanelLeft, Search, type LucideIcon } from "./icons";
 import ActionContextMenu, { type ContextAction } from "./ActionContextMenu";
 import CommandStrip from "./CommandStrip";
 
@@ -10,14 +10,19 @@ type Props = {
   workspaces: readonly WorkspaceShortcut[]; activeWorkspace: string; onWorkspace: (name: string) => void;
   showWorkspaceBar: boolean; workspaceSwitcher: ReactNode; utilities: ReactNode;
   menuOpen: boolean; onMenu: () => void; searchOpen: boolean; onSearch: () => void;
+  studyActions?: ContextAction[];
+  simulationActions?: ReactNode;
 };
 
 /** File actions remain wired to the owner's unsaved-change and native-dialog flows. */
 export default function WorkspaceHeader(props: Props) {
   const [fileAnchor, setFileAnchor] = useState<{x:number;y:number}|null>(null);
   const fileMenuId = useId();
+  const studyMenuId = useId();
+  const [studyAnchor, setStudyAnchor] = useState<{x:number;y:number}|null>(null);
   const openFiles = (button: HTMLButtonElement) => {
     props.onFilesOpen();
+    setStudyAnchor(null);
     const bounds = button.getBoundingClientRect();
     setFileAnchor({x:bounds.left,y:bounds.bottom+4});
   };
@@ -32,6 +37,12 @@ export default function WorkspaceHeader(props: Props) {
         onKeyDown={event=>{if(event.key==="ArrowDown"){event.preventDefault();openFiles(event.currentTarget);}}}>
         <FolderOpen size={16}/><b>{props.projectName}</b><ChevronDown size={13}/>
       </button>
+      {props.studyActions && <button type="button" className="workspace-studies-trigger spike-control--compact" aria-label="Studies and simulations" title="Studies and simulations: saved cases, runs and visualization" aria-haspopup="menu" aria-expanded={Boolean(studyAnchor)} aria-controls={studyAnchor?studyMenuId:undefined}
+        onClick={event=>{setFileAnchor(null);if(studyAnchor)setStudyAnchor(null);else {props.onFilesOpen();const bounds=event.currentTarget.getBoundingClientRect();setStudyAnchor({x:bounds.left,y:bounds.bottom+4});}}}
+        onKeyDown={event=>{if(event.key==="ArrowDown"){event.preventDefault();setFileAnchor(null);props.onFilesOpen();const bounds=event.currentTarget.getBoundingClientRect();setStudyAnchor({x:bounds.left,y:bounds.bottom+4});}}}>
+        <ListTree size={16}/><span>Studies</span><ChevronDown size={12}/>
+      </button>}
+      <div className="workspace-simulation-actions">{props.simulationActions}</div>
       <button type="button" className={`universal-search-trigger workspace-header-search ${props.searchOpen?"active":""}`} aria-label="Open universal search" title="Search commands, workspaces, parts, nets and settings (Ctrl+K)" aria-keyshortcuts="Control+K Meta+K" aria-expanded={props.searchOpen} onClick={props.onSearch}>
         <Search size={19}/><span>Search commands, parts, nets…</span><kbd>Ctrl K</kbd>
       </button>
@@ -41,5 +52,6 @@ export default function WorkspaceHeader(props: Props) {
       {props.workspaces.map(item=><button type="button" key={item.name} aria-pressed={props.activeWorkspace===item.name} onClick={()=>props.onWorkspace(item.name)} title={`${item.name} workspace`}><item.icon size={14}/><span>{item.name}</span></button>)}
     </CommandStrip></nav>}
     {fileAnchor&&<ActionContextMenu id={fileMenuId} {...fileAnchor} title="Project files" actions={props.fileActions} onClose={()=>setFileAnchor(null)}/>}
+    {studyAnchor&&props.studyActions&&<ActionContextMenu id={studyMenuId} {...studyAnchor} title="Studies and simulations" actions={props.studyActions} onClose={()=>setStudyAnchor(null)}/>}
   </header>;
 }

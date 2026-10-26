@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.sparselizard_validation import evaluate_sparselizard_validation
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_validation import evaluate_sparselizard_validation
 
 
 class SparseLizardValidationTests(unittest.TestCase):
@@ -24,7 +24,7 @@ class SparseLizardValidationTests(unittest.TestCase):
 
     def test_absent_evidence_is_blocked(self):
         with tempfile.TemporaryDirectory() as directory, patch(
-            "python.spike_core.sparselizard_validation.detect_sparselizard_runtime",
+            "python.spike_core.solvers.external_engines.sparselizard.sparselizard_validation.detect_sparselizard_runtime",
             return_value={"available": True, "signature_verified": True, "manifest": {"backend": {"mumps_registered": True}}},
         ):
             report = evaluate_sparselizard_validation(directory)
@@ -38,7 +38,7 @@ class SparseLizardValidationTests(unittest.TestCase):
                 "resistance_ohm": 0.009852216748768473,
             })), encoding="utf-8")
             with patch(
-                "python.spike_core.sparselizard_validation.detect_sparselizard_runtime",
+                "python.spike_core.solvers.external_engines.sparselizard.sparselizard_validation.detect_sparselizard_runtime",
                 return_value={"available": True, "signature_verified": True, "manifest": {"backend": {"mumps_registered": True}}},
             ):
                 report = evaluate_sparselizard_validation(directory)
@@ -50,7 +50,7 @@ class SparseLizardValidationTests(unittest.TestCase):
             path = Path(directory) / "pcb-dc-copper-bar-v1.json"
             path.write_text(json.dumps(self.evidence("pcb-dc-copper-bar-v1", {"resistance_ohm": 1.0})), encoding="utf-8")
             with patch(
-                "python.spike_core.sparselizard_validation.detect_sparselizard_runtime",
+                "python.spike_core.solvers.external_engines.sparselizard.sparselizard_validation.detect_sparselizard_runtime",
                 return_value={"available": True, "manifest": {"backend": {"mumps_registered": True}}},
             ):
                 report = evaluate_sparselizard_validation(directory)
@@ -76,7 +76,7 @@ class SparseLizardValidationTests(unittest.TestCase):
                     json.dumps(self.evidence(fixture_id, metrics)), encoding="utf-8",
                 )
             with patch(
-                "python.spike_core.sparselizard_validation.detect_sparselizard_runtime",
+                "python.spike_core.solvers.external_engines.sparselizard.sparselizard_validation.detect_sparselizard_runtime",
                 return_value={
                     "available": True, "signature_verified": False,
                     "manifest": {"backend": {"mumps_registered": True}},

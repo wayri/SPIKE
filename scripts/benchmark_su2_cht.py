@@ -7,8 +7,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.su2_cht import compile_su2_cht, parse_su2_cht, run_su2_cht
-from python.spike_core.su2_airflow import _sha256, find_su2
+from python.spike_core.solvers.external_engines.su2.su2_cht import compile_su2_cht, parse_su2_cht, run_su2_cht
+from python.spike_core.solvers.external_engines.su2.su2_airflow import _sha256, find_su2
 
 
 def _resume(path, cells, speed, executable):

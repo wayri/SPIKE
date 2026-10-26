@@ -7,7 +7,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.mom_singular_source import MomSourceIntegrationError, integrate_triangle_green
+from python.spike_core.solvers.electromagnetics.fields.mom_singular_source import MomSourceIntegrationError, integrate_triangle_green
 
 
 TRIANGLE = np.array([[0., 0., 0.], [1., 0., 0.], [0., 1., 0.]])

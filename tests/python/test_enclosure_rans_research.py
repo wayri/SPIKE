@@ -8,12 +8,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.enclosure_rans_research import (
-    CONTRACT, solve_enclosure_rans_research,
-)
-from python.spike_core.enclosure_symmetric_stress import (
-    CONTRACT as STRESS_CONTRACT, solve_enclosure_symmetric_stress,
-)
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_rans_research import CONTRACT, solve_enclosure_rans_research
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_symmetric_stress import CONTRACT as STRESS_CONTRACT, solve_enclosure_symmetric_stress
 from tests.python.test_enclosure_sa_transport import manufactured_request as scalar_fixture
 
 
@@ -234,7 +230,7 @@ class CoupledRANSResearchTests(unittest.TestCase):
         result = solve_enclosure_rans_research(request, cancel_check=late_cancel)
         self.assertEqual(result["status"], "cancelled")
         self.assertNotIn("fields", result)
-        with patch("python.spike_core.enclosure_rans_research.MAX_FIELD_BYTES", 1):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.enclosure_rans_research.MAX_FIELD_BYTES", 1):
             result = solve_enclosure_rans_research(request)
         self.assertEqual(result["status"], "blocked")
         self.assertIn("2 MiB", str(result["issues"]))
@@ -263,7 +259,7 @@ class CoupledRANSResearchTests(unittest.TestCase):
         def false_success(req, **kwargs):
             return {"status": "completed", "fields": {"nu_tilde_m2_s": np.zeros((4, 4, 4)).tolist()},
                     "diagnostics": {"iterations": 1, "residual_reference_m5_s2": 1.}}
-        with patch("python.spike_core.enclosure_rans_research.solve_enclosure_sa_transport",
+        with patch("python.spike_core.solvers.thermal_fluid.flow.enclosure_rans_research.solve_enclosure_sa_transport",
                    side_effect=false_success):
             result = solve_enclosure_rans_research(request)
         self.assertEqual(result["status"], "blocked", result)

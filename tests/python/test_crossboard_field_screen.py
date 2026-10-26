@@ -6,8 +6,8 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
-from python.spike_core.crossboard_field_screen import screen_case,compare_mesh_cases
-from python.spike_core.openems_assembly_geometry import compile_assembly_geometry
+from python.spike_core.solvers.electromagnetics.fields.crossboard_field_screen import screen_case, compare_mesh_cases
+from python.spike_core.solvers.external_engines.openems.openems_assembly_geometry import compile_assembly_geometry
 from tests.python.test_openems_assembly_geometry import fixture
 
 

@@ -11,9 +11,7 @@ import unittest
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.spider_api import (
-    document_for_legacy_worker, handle_spider_request, normalize_document,
-)
+from python.spike_core.spider_api import document_for_legacy_worker, handle_spider_request, normalize_document
 
 
 ROOT = Path(__file__).resolve().parents[2]

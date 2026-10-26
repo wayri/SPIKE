@@ -12,7 +12,7 @@ import unittest
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
-from python.spike_core import si_candidate_study as study
+from python.spike_core.solvers.signal_integrity.networks import si_candidate_study as study
 from tests.python.test_si_candidate_study import request
 from python.spike_core.service import handle
 

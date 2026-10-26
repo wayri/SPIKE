@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.sparselizard_runtime import detect_sparselizard_runtime
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_runtime import detect_sparselizard_runtime
 
 
 class SparseLizardRuntimeTests(unittest.TestCase):

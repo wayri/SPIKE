@@ -6,15 +6,8 @@ from math import cos, fsum, inf, nextafter, sin
 import unittest
 from unittest.mock import patch
 
-import python.spike_core.filled_copper_path as filled_path
-from python.spike_core.filled_copper_path import (
-    MAX_HOLES,
-    MAX_SOURCE_VERTICES,
-    FilledCopperPath,
-    FilledPathBudgetError,
-    FilledPathError,
-    prepare_filled_path,
-)
+import python.spike_core.solvers.power_integrity.dc.filled_copper_path as filled_path
+from python.spike_core.solvers.power_integrity.dc.filled_copper_path import MAX_HOLES, MAX_SOURCE_VERTICES, FilledCopperPath, FilledPathBudgetError, FilledPathError, prepare_filled_path
 
 
 def area(polygon):
@@ -153,7 +146,7 @@ class FilledCopperPathTests(unittest.TestCase):
     def test_disjoint_hole_bboxes_prune_nested_ring_ray_checks(self):
         original = filled_path._strictly_inside_integer
         with patch(
-            "python.spike_core.filled_copper_path._strictly_inside_integer",
+            "python.spike_core.solvers.power_integrity.dc.filled_copper_path._strictly_inside_integer",
             wraps=original,
         ) as contains:
             domain = prepare_filled_path(several_holes(12))
@@ -171,9 +164,9 @@ class FilledCopperPathTests(unittest.TestCase):
         budget = filled_path._TopologyBudget()
         original = filled_path._intersects
         with (
-            patch("python.spike_core.filled_copper_path.MAX_TOPOLOGY_WORK", 1),
+            patch("python.spike_core.solvers.power_integrity.dc.filled_copper_path.MAX_TOPOLOGY_WORK", 1),
             patch(
-                "python.spike_core.filled_copper_path._intersects",
+                "python.spike_core.solvers.power_integrity.dc.filled_copper_path._intersects",
                 wraps=original,
             ) as intersects,
             self.assertRaisesRegex(FilledPathBudgetError, "aggregate work"),
@@ -217,7 +210,7 @@ class FilledCopperPathTests(unittest.TestCase):
             prepare_filled_path(several_holes(MAX_HOLES + 1))
         domain = prepare_filled_path(annulus_path())
         with (
-            patch("python.spike_core.filled_copper_path.MAX_CELL_FRAGMENT_WORK", 1),
+            patch("python.spike_core.solvers.power_integrity.dc.filled_copper_path.MAX_CELL_FRAGMENT_WORK", 1),
             self.assertRaises(FilledPathBudgetError),
         ):
             domain.cell_fragments(0, 0, 4, 4)

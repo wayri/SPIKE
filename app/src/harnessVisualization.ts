@@ -71,8 +71,8 @@ export type HarnessVisualizationProjection = {
 };
 
 export type VirtualBoardVisual = {
-  netIdsByName?: Record<string, string>;
-  netNamesById?: Record<string, string>;
+  netIdsByName?: Readonly<Record<string, string>>;
+  netNamesById?: Readonly<Record<string, string>>;
   id: string;
   name: string;
   designId: string;
@@ -224,25 +224,46 @@ function retainedBoardEnvelope(design: Record<string, unknown>): { widthMm: numb
 export function buildVirtualBoardVisualization(assembly: AssemblyIr | null, designs: AssemblyDesigns | null): VirtualBoardProjection {
   if (!assembly || !designs) return { visuals: [], unresolvedBoardIds: (assembly?.boards ?? []).map(board => text(board.id)) };
   const designIndex = new Map(designs.designs.map(design => [design.design_id, design]));
+  const designPresentation = new Map<string, {
+    envelope: { widthMm: number; heightMm: number; center: readonly [number, number, number] } | null;
+    netNamesById: Readonly<Record<string, string>>;
+    netIdsByName: Readonly<Record<string, string>>;
+    sourceNativeId?: string;
+  }>();
   const transforms = boardTransforms(assembly);
   const visuals: VirtualBoardVisual[] = [];
   const unresolvedBoardIds: string[] = [];
+  let activeAssigned = false;
   for (const rawBoard of assembly.boards.slice(0, 30) as BoardRecord[]) {
     const id = text(rawBoard.id);
     const designId = text((rawBoard as Record<string, unknown>).design_id);
     const design = designIndex.get(designId);
     const transform = transforms.get(id);
-    const envelope = design ? retainedBoardEnvelope(design) : null;
+    let presentation = designPresentation.get(designId);
+    if (!presentation && design) {
+      const netNamesById = Object.freeze(Object.fromEntries(
+        (Array.isArray(design.nets) ? design.nets : []).map((net: any) => [net.id, net.name]),
+      ));
+      const source = design.source;
+      presentation = {
+        envelope: retainedBoardEnvelope(design),
+        netNamesById,
+        netIdsByName: Object.freeze(uniqueNetIdsByName(netNamesById)),
+        sourceNativeId: source && typeof source === "object" && !Array.isArray(source)
+          ? text((source as Record<string, unknown>).native_id) || undefined : undefined,
+      };
+      designPresentation.set(designId, presentation);
+    }
+    const envelope = presentation?.envelope ?? null;
     if (!id || !designId || !transform || !envelope || envelope.widthMm > 1000 || envelope.heightMm > 1000) {
       if (id) unresolvedBoardIds.push(id);
       continue;
     }
-    const netNamesById = Object.fromEntries((Array.isArray(design?.nets) ? design.nets : []).map((net: any) => [net.id, net.name]));
-    const netIdsByName = uniqueNetIdsByName(netNamesById);
-    const source = design?.source;
-    const sourceNativeId = source && typeof source === "object" && !Array.isArray(source)
-      ? text((source as Record<string, unknown>).native_id) || undefined : undefined;
-    visuals.push({ netNamesById, netIdsByName, id, name: text(rawBoard.name) || id, designId, sourceNativeId, active: designId === designs.active_design_id && !visuals.some(board => board.active), widthMm: envelope.widthMm, heightMm: envelope.heightMm, localCenterMm: envelope.center, transform });
+    const active: boolean = designId === designs.active_design_id && !activeAssigned;
+    if (active) activeAssigned = true;
+    visuals.push({ netNamesById: presentation!.netNamesById, netIdsByName: presentation!.netIdsByName,
+      id, name: text(rawBoard.name) || id, designId, sourceNativeId: presentation!.sourceNativeId, active,
+      widthMm: envelope.widthMm, heightMm: envelope.heightMm, localCenterMm: envelope.center, transform });
   }
   return { visuals, unresolvedBoardIds };
 }

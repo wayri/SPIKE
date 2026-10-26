@@ -5,7 +5,7 @@ import importlib.util
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.gmsh_occ_mesher import OccMeshingError, build_occ_mesh, validate_request
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_mesher import OccMeshingError, build_occ_mesh, validate_request
 
 
 def request():

@@ -8,7 +8,7 @@ from unittest.mock import patch
 import numpy as np
 from scipy.linalg import expm
 
-from python.spike_core import sparameter_reflectometry as reflectometry
+from python.spike_core.solvers.signal_integrity.networks import sparameter_reflectometry as reflectometry
 from tests.python.test_sparameter_rlc_initial import request as transient_request, memory_request, analytic_loaded
 from tests.python.test_sparameter_rlc_terminated import term
 from tests.python.test_sparameter_transient import one_fit

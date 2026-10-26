@@ -1,0 +1,30 @@
+{
+  "license": "Apache-2.0, original firstparty fixture and example glue",
+  "sources": [
+    {
+      "path": "examples/em_machines/planar_pm_fem.json",
+      "sha256": "e051a567185739af81b8917511f7251252869222b5fb008e27c03a55876bb86b"
+    },
+    {
+      "path": "python/spike_core/solvers/electromagnetics/machines/magnetic_machine_study.py",
+      "sha256": "f06616d1812c145a9154886c88489746920ca787bea45647f7418cc73c613f49"
+    },
+    {
+      "path": "python/spike_core/solvers/electromagnetics/machines/magnetic_fem.py",
+      "sha256": "ae92fe4e55ea0e5a1fa37369daa219c6e110589bae93ea5e20faa1b85f2c18ff"
+    },
+    {
+      "path": "python/spike_core/solvers/electromagnetics/machines/machine_geometry.py",
+      "sha256": "26599f5dad5f5b83ebba06a6a3206c8c08965e67116a7a4f2fca2174ccf52b14"
+    },
+    {
+      "path": "python/spike_core/project_package.py",
+      "sha256": "cfcc602e2751706d4c4d54100ecd1578f02855c2b658b4e3c2d656d87ec29136"
+    }
+  ],
+  "request_exact_source_copy": true,
+  "generator_sha256": "3614075231670e04c0cf614c68549431547779228c501d528c1be02fe4115929",
+  "native_project_sha256": "5b421ace647dc5fb329eb72e37b7a6b4ab58dc170bb257b94da8c8f505822dcc",
+  "no_new_physics": true,
+  "field_history_capture": "observation wrapper retains actual unchanged results from existing solver calls"
+}

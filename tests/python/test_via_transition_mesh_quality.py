@@ -10,13 +10,9 @@ from jsonschema import Draft202012Validator, ValidationError
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.via_transition_geometry import AntipadSpec, build_via_transition_geometry
-from python.spike_core.via_transition_mesh_quality import (
-    ViaTransitionMeshQualityError,
-    build_via_transition_mesh_quality,
-    validate_via_transition_mesh_quality,
-)
-from python.spike_core.via_transition_native_handoff import build_native_via_transition_handoff
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_geometry import AntipadSpec, build_via_transition_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_mesh_quality import ViaTransitionMeshQualityError, build_via_transition_mesh_quality, validate_via_transition_mesh_quality
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_native_handoff import build_native_via_transition_handoff
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -115,7 +111,7 @@ class ViaTransitionMeshQualityTests(unittest.TestCase):
             result["source"]["mesh_sha256"] = "0" * 64
             return result
 
-        with patch("python.spike_core.via_transition_mesh_quality.build_native_via_transition_handoff",
+        with patch("python.spike_core.solvers.geometry_meshing.preparation.via_transition_mesh_quality.build_native_via_transition_handoff",
                    side_effect=forged), self.assertRaisesRegex(ViaTransitionMeshQualityError, "quality=False"):
             build_via_transition_mesh_quality(source)
 

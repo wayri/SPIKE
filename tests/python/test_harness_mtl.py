@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.harness_mtl import run_harness_mtl
+from python.spike_core.solvers.signal_integrity.lines.harness_mtl import run_harness_mtl
 
 
 def fixture(count=1, frequencies=None):
@@ -175,7 +175,7 @@ class HarnessMtlTests(unittest.TestCase):
             result = solve(*args, **kwargs)
             cancelled = True
             return result
-        with patch("python.spike_core.harness_mtl.np.linalg.solve", side_effect=late_cancel):
+        with patch("python.spike_core.solvers.signal_integrity.lines.harness_mtl.np.linalg.solve", side_effect=late_cancel):
             with self.assertRaisesRegex(ValueError, "CANCELLED"):
                 run_harness_mtl(raw, cancel_check=lambda: cancelled)
         raw["segments"][0]["model"]["frequency_hz"] = [False]

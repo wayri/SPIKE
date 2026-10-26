@@ -5,7 +5,7 @@ import json
 import unittest
 from copy import deepcopy
 
-from python.spike_core.structured_electrothermal import CONTRACT, solve_structured_electrothermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.structured_electrothermal import CONTRACT, solve_structured_electrothermal
 from tests.python.test_structured_solid_thermal import _request
 
 

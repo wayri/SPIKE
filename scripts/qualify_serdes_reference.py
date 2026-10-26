@@ -19,8 +19,8 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.si_workflow import REQUEST, run_si_workflow  # noqa: E402
-from python.spike_core.sparameters import touchstone_text  # noqa: E402
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import REQUEST, run_si_workflow  # noqa: E402
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text  # noqa: E402
 
 
 BIT_RATE_HZ = 10_312_500_000.0
@@ -95,9 +95,10 @@ def _fixed_band_rc_request(points: int) -> dict[str, Any]:
     return request
 
 
-def qualification_report() -> dict[str, Any]:
-    fine = run_si_workflow(_request(16))
-    coarse = run_si_workflow(_request(8))
+def qualification_report(*, run_workflow=run_si_workflow) -> dict[str, Any]:
+    """Run identical fixed gates through source or an explicit process adapter."""
+    fine = run_workflow(_request(16))
+    coarse = run_workflow(_request(8))
     fine_frequencies = _grid(16)
     expected = 0.5 * VOLTAGE_GAIN * np.exp(-2j * np.pi * fine_frequencies * DELAY_S)
     transfer_error = float(np.max(np.abs(_transfer(fine) - expected)))
@@ -116,7 +117,7 @@ def qualification_report() -> dict[str, Any]:
                                 "model": {"kind": "capacitor", "grade": "C0G",
                                           "capacitance_f": capacitance_f, "esr_ohm": 0.0,
                                           "esl_h": 0.0, "leakage_ohm": 1e15}}]
-    rc = run_si_workflow(rc_request)
+    rc = run_workflow(rc_request)
     rc_expected = 1 / (2 + 2j * np.pi * fine_frequencies * 50 * capacitance_f)
     rc_error = float(np.max(np.abs(_transfer(rc) - rc_expected)))
 
@@ -128,18 +129,18 @@ def qualification_report() -> dict[str, Any]:
         "frequency_points": 513, "frequency_stop_hz": float(_grid(2)[-1]),
         "reference_impedance_ohm": 50.0,
     }
-    blocked = run_si_workflow(insufficient)
+    blocked = run_workflow(insufficient)
     exact_eye_request = _request(16)
     exact_eye_request["channel"] = _known_channel(16, delay_s=1 / BIT_RATE_HZ)
     exact_eye_request["sources"][0].update({"rise_time_s": 0.0, "fall_time_s": 0.0})
-    exact_eye = run_si_workflow(exact_eye_request)
+    exact_eye = run_workflow(exact_eye_request)
     exact_eye_height = _eye_height(exact_eye)
     fine_eye = _eye_height(fine)
     coarse_eye = _eye_height(coarse)
     sensitivity_delta = abs(fine_eye - coarse_eye) if fine_eye is not None and coarse_eye is not None else None
 
     refinement_points = [257, 513, 1025, 2049, 4097, 8193]
-    refinement_results = [run_si_workflow(_fixed_band_rc_request(points)) for points in refinement_points]
+    refinement_results = [run_workflow(_fixed_band_rc_request(points)) for points in refinement_points]
     refinement_eyes = [_eye_height(result) for result in refinement_results]
     refinement_rates = [float(result["time_domain"]["represented_bit_rate_hz"])
                         if result.get("time_domain", {}).get("status") == "completed" else None

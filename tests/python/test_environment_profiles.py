@@ -2,16 +2,7 @@ import json
 import unittest
 from pathlib import Path
 
-from python.spike_core.environment_profiles import (
-    ENVIRONMENT_PROFILE_CONTRACT,
-    ENVIRONMENT_PROFILE_VALIDATION_CONTRACT,
-    EnvironmentProfileError,
-    create_user_defined_profile,
-    get_environment_profile,
-    list_environment_profiles,
-    materialize_environment_profile,
-    validate_environment_profile,
-)
+from python.spike_core.environment_profiles import ENVIRONMENT_PROFILE_CONTRACT, ENVIRONMENT_PROFILE_VALIDATION_CONTRACT, EnvironmentProfileError, create_user_defined_profile, get_environment_profile, list_environment_profiles, materialize_environment_profile, validate_environment_profile
 
 
 class EnvironmentProfileTests(unittest.TestCase):

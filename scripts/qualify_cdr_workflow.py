@@ -11,8 +11,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from python.spike_core.si_channel import _prbs7
-from python.spike_core.si_workflow import run_si_workflow
+from python.spike_core.solvers.signal_integrity.channels.si_channel import _prbs7
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import run_si_workflow
 
 
 def qualification_report():

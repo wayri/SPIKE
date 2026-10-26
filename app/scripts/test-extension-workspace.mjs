@@ -37,7 +37,7 @@ assert.match(html, /Qualification/); assert.match(html, /unvalidated/); assert.m
 for (const [trusted, state] of [[false, "loaded"], [true, "disabled"]]) {
   const altered = structuredClone(catalog); Object.assign(altered[0], { trusted, state });
   const blocked = renderToStaticMarkup(React.createElement(Panel, { ...props, extensions: altered }));
-  assert.match(blocked, /<button disabled=""[^>]*>Generate mesh/);
+  assert.match(blocked, /<button>Generate mesh/, "Run remains reachable to explain missing trust or availability");
 }
 const structured = structuredClone(catalog); structured[0].contributes.applications[0].input_schema = { properties: { geometry: { type: "array" } } };
 assert.match(renderToStaticMarkup(React.createElement(Panel, { ...props, extensions: structured })), /structured inputs/);
@@ -51,12 +51,12 @@ assert.match(referenceHtml, /reference geometry independently of any loaded boar
 assert.doesNotMatch(referenceHtml, /Load a board/);
 assert.match(referenceHtml, /<button>Preview generated case<\/button>/);
 assert.match(referenceHtml, /<button>Generate mesh<\/button>/);
-assert.match(renderToStaticMarkup(React.createElement(Panel,{...props,boardLoaded:false})), /<button disabled=""[^>]*>Generate mesh/);
+assert.match(renderToStaticMarkup(React.createElement(Panel,{...props,boardLoaded:false})), /<button>Generate mesh/, "Missing geometry opens the guide rather than hiding the next step");
 for (const [trusted,state,busy] of [[false,"loaded",false],[true,"disabled",false],[true,"loaded",true]]) {
   const blockedCatalog=structuredClone(referenceCatalog); Object.assign(blockedCatalog[0],{trusted,state});
   const blocked=renderToStaticMarkup(React.createElement(Panel,{...referenceProps,extensions:blockedCatalog,busy}));
   assert.match(blocked, /<button disabled=""[^>]*>Preview generated case/);
-  assert.match(blocked, /<button disabled=""[^>]*>Generate mesh/);
+  assert.match(blocked, busy ? /<button disabled=""[^>]*>Generate mesh/ : /<button>Generate mesh/);
 }
 console.log("Extension workspace routes: declared IDs, trust/state, scalar GUI validation and structured-setup handoff passed.");
 
@@ -95,3 +95,37 @@ for (const su2Route of su2Routes) {
 }
 for (const workspace of ["mesh","pi","si","em"]) assert.equal(extensionWorkspaceRoutes(su2Catalog,workspace).length,0);
 console.log("SU2 CFD and CHT: thermal reference routes, scalar setup, board-independent preview/run and trust/busy gates passed.");
+
+// Live hook host tests the adapter and the actual button handler without launching during checks.
+const { readFileSync } = await import("node:fs"); const { default: ts } = await import("typescript");
+const slots = [], refs = []; let at = 0, captured, guideRequests = 0, engineRuns = 0, tree;
+const hooks = {
+  useState(initial) { const i = at++; if (!(i in slots)) slots[i] = initial; return [slots[i], value => { slots[i] = typeof value === "function" ? value(slots[i]) : value; }]; },
+  useRef(initial) { return refs[at++] ??= { current: initial }; },
+};
+const jsx = (type, props) => ({ type, props: props ?? {} });
+const code = ts.transpileModule(readFileSync(new URL("../src/ExtensionWorkspacePanel.tsx", import.meta.url), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
+const fixture = { exports: {} };
+new Function("require", "module", "exports", code)(name => name === "react" ? hooks : name === "react/jsx-runtime" ? { jsx, jsxs: jsx } : name === "./ExtensionWorkspaceRoutes" ? { extensionWorkspaceRoutes, extensionScalarFields, extensionScalarParameters } : name === "./useGuidedRunAdapter" ? { useGuidedRunAdapter: adapter => { captured = adapter; return () => guideRequests++; } } : {}, fixture, fixture.exports);
+let liveProps = { ...props, onRun: async () => { engineRuns++; } };
+const render = () => { at = 0; tree = fixture.exports.default(liveProps); };
+const nodes = node => !node || typeof node !== "object" ? [] : [node, ...[node.props?.children].flat(Infinity).flatMap(nodes)];
+const check = async () => (await captured.check(captured.context, new AbortController().signal)).requirements;
+const submit = () => captured.run(captured.context, new AbortController().signal);
+render(); assert.equal(captured.id, "extension-mesh"); assert.equal(captured.context.workspace, "Mesh");
+assert.ok((await check()).some(row => row.id === "parameters")); assert.equal(engineRuns, 0, "setup checks must never execute the engine");
+nodes(tree).find(node => node.type === "button" && node.props.children === "Generate mesh").props.onClick(); assert.equal(guideRequests, 1);
+await assert.rejects(submit(), /required/); assert.equal(engineRuns, 0);
+for (const [label, value] of [["mesh mm", "0.5"], ["enabled", "true"]]) { nodes(tree).find(node => node.props["aria-label"] === label).props.onChange({ target: { value } }); render(); }
+let admitted = await check(); assert.equal(admitted.filter(row => row.severity === "blocker").length, 0); assert.ok(admitted.some(row => row.id === "engine-admission" && /authoritative/.test(row.detail)));
+await submit(); assert.equal(engineRuns, 1);
+render(); const stableRevision = captured.context.revision; liveProps = { ...liveProps, busy: true }; render(); assert.equal(captured.context.revision, stableRevision, "busy transitions do not invalidate the captured setup revision");
+assert.ok((await check()).some(row => row.id === "busy")); await assert.rejects(submit(), /already running/);
+liveProps = { ...liveProps, busy: false, boardLoaded: false }; render(); assert.ok((await check()).some(row => row.id === "board"));
+liveProps = { ...liveProps, boardLoaded: true, dedicatedExecution: true }; render(); assert.ok((await check()).some(row => row.id === "dedicated")); await assert.rejects(submit(), /dedicated/);
+liveProps = { ...liveProps, dedicatedExecution: false, onRun: undefined }; render(); assert.ok((await check()).some(row => row.id === "dedicated"));
+liveProps = { ...liveProps, parameters: { mesh_mm: 99, enabled: true } }; render(); assert.ok((await check()).some(row => row.id === "parameters"), "supplied scalar parameters retain existing range validation");
+liveProps = { ...liveProps, parameters: undefined };
+liveProps = { ...liveProps, onRun: async () => { throw new Error("Engine admission failed"); } }; render(); await assert.rejects(submit(), /Engine admission failed/);
+for (const [workspace, expected] of [["pi", "PI"], ["si", "HF / SI"], ["em", "EM"], ["thermal", "Thermal"]]) { liveProps = { ...liveProps, workspace }; render(); assert.equal(captured.id, `extension-${workspace}`); assert.equal(captured.context.workspace, expected); }
+console.log("Extension guided runs: live scalar requirements, board/route/dedicated/busy gates, warnings, semantic revisions and launch-only execution passed.");

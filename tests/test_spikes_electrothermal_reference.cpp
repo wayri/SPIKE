@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
 // Independent synthetic analytical fixture; not a physical device qualification.
-#include "spikes/transient_session.hpp"
+#include "solvers/circuits/spikes/transient_session.hpp"
 
 #include <algorithm>
 #include <array>

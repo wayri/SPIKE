@@ -2,8 +2,8 @@
 import math
 import unittest
 import numpy as np
-from python.spike_core.magnetic_machine_study import maxwell_stress_integral, run_magnetic_machine
-from python.spike_core.magnetic_fem import MU0
+from python.spike_core.solvers.electromagnetics.machines.magnetic_machine_study import maxwell_stress_integral, run_magnetic_machine
+from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import MU0
 
 
 class MagneticMachineStudyTests(unittest.TestCase):
@@ -91,7 +91,7 @@ class MagneticMachineStudyTests(unittest.TestCase):
         self.assertEqual(args.command,"magnetic-machine")
 
     def test_stationary_pm_splits_disconnected_conductors_and_retains_heat(self):
-        from python.spike_core.machine_geometry import build_pm_machine_mesh
+        from python.spike_core.solvers.electromagnetics.machines.machine_geometry import build_pm_machine_mesh
         mesh = build_pm_machine_mesh(target_edge_m=.004)
         properties = {key:{"k_w_m_k":10,"rho_kg_m3":1000,"cp_j_kg_k":1000} for key in mesh["materials"]}
         request = {"contract":"spike/magnetic-machine-study/v1","model":"pm_rotor","mesh_edge_m":.004,

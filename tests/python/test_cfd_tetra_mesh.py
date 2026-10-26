@@ -10,9 +10,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.cfd_tetra_mesh import (
-    CONTRACT, CfdTetraMeshError, admit_cfd_tetra_mesh, prepare_cfd_tetra_mesh,
-)
+from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_mesh import CONTRACT, CfdTetraMeshError, admit_cfd_tetra_mesh, prepare_cfd_tetra_mesh
 
 
 def mesh_fixture(two=False):
@@ -169,7 +167,7 @@ class CfdTetraMeshTests(unittest.TestCase):
     def test_resource_and_cancellation_gates_before_numerical_allocation(self):
         mesh = mesh_fixture()
         mesh["cells"] *= 4097
-        with patch("python.spike_core.cfd_tetra_mesh.np.array", side_effect=AssertionError("allocated")):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_mesh.np.array", side_effect=AssertionError("allocated")):
             with self.assertRaisesRegex(CfdTetraMeshError, "resource"):
                 admit_cfd_tetra_mesh(mesh)
         with self.assertRaises(InterruptedError):
@@ -257,17 +255,17 @@ class CfdTetraMeshTests(unittest.TestCase):
             mesh = with_boundary(vertices.tolist(), [[0, 1, 2, 3], [4, 5, 6, 7]])
             result = admit_cfd_tetra_mesh(mesh)
             self.assertTrue(result["intersection_screening"]["positive_volume_overlap_checked"])
-        with patch("python.spike_core.cfd_tetra_intersections.MAX_CANDIDATES", 0):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_intersections.MAX_CANDIDATES", 0):
             with self.assertRaisesRegex(CfdTetraMeshError, "candidate budget"):
                 admit_cfd_tetra_mesh(mesh)
         vertices = np.vstack((original, original+[.5, .25, .25]))
         mesh = with_boundary(vertices.tolist(), [[0, 1, 2, 3], [4, 5, 6, 7]])
-        with patch("python.spike_core.cfd_tetra_intersections.MAX_EXACT_PREDICATES", 0):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_intersections.MAX_EXACT_PREDICATES", 0):
             with self.assertRaisesRegex(CfdTetraMeshError, "Exact intersection"):
                 admit_cfd_tetra_mesh(mesh)
 
     def test_floating_sign_filter_against_independent_exact_determinants(self):
-        from python.spike_core.cfd_tetra_intersections import _filtered_determinants
+        from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_intersections import _filtered_determinants
         random = np.random.default_rng(20261021)
         for shift in (0., 2.**40):
             for _ in range(30):

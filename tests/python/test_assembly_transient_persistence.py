@@ -8,8 +8,8 @@ import unittest
 from pathlib import Path
 
 from examples.assembly_field.run_examples import setup
-from python.spike_core.assembly_field_study import export_assembly_field_study, import_assembly_field_study
-from python.spike_core.assembly_field_transient import run_assembly_field_transient, verify_assembly_field_transient_result
+from python.spike_core.solvers.execution.coupling.assembly_field_study import export_assembly_field_study, import_assembly_field_study
+from python.spike_core.solvers.execution.coupling.assembly_field_transient import run_assembly_field_transient, verify_assembly_field_transient_result
 from python.spike_core.multiboard_identity import canonical_json_digest
 from python.spike_core.multiboard_study import physical_assembly
 from python.spike_core.project_package import read_project, write_spike_package

@@ -13,7 +13,7 @@ from unittest.mock import patch
 import numpy as np
 from scipy.integrate import quad
 
-from python.spike_core import distortionless_line_transient as lossy
+from python.spike_core.solvers.signal_integrity.lines import distortionless_line_transient as lossy
 from tests.python.test_lossless_line_transient import request as line_request, boundary, source_value
 
 

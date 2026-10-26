@@ -1,7 +1,7 @@
 import math
 import unittest
 
-from python.spike_core.native_mna import REQUEST_CONTRACT, run_native_mna, validate_native_mna_request
+from python.spike_core.solvers.circuits.models.native_mna import REQUEST_CONTRACT, run_native_mna, validate_native_mna_request
 from python.spike_core.service import handle
 
 

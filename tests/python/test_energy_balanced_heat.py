@@ -4,7 +4,7 @@
 import copy
 import unittest
 
-from python.spike_core.electrical_heat_sources import ElectricalHeatSourceError, evaluate_electrical_heat_source
+from python.spike_core.solvers.thermal_fluid.electrothermal.electrical_heat_sources import ElectricalHeatSourceError, evaluate_electrical_heat_source
 from tests.python.test_electrical_heat_sources import request
 
 
@@ -99,7 +99,7 @@ class EnergyBalancedHeatTests(unittest.TestCase):
 
     def test_actual_coupled_field_deposition(self):
         from tests.python.test_assembly_electrothermal import request as coupled_request
-        from python.spike_core.assembly_electrothermal import run_assembly_electrothermal
+        from python.spike_core.solvers.thermal_fluid.electrothermal.assembly_electrothermal import run_assembly_electrothermal
         raw = coupled_request(multi_board=True)
         source = request(model())
         source['distribution'] = [{'occurrence_id': 'board', 'cell_id': '0', 'weight': .25},

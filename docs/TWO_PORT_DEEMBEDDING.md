@@ -9,7 +9,7 @@ general multiport fixture removal remain open.
 ## Workflow and orientation
 
 Call `deembed_two_port(request)` in
-`python.spike_core.sparameter_deembedding`, or invoke worker method
+`python.spike_core.solvers.signal_integrity.networks.sparameter_deembedding`, or invoke worker method
 `deembed_two_port` with `params: {request: ...}`. This API is available from
 the desktop script workspace; this stage adds no dedicated desktop editor.
 The `spike/two-port-deembedding-request/v1` contract supplies `measured`,

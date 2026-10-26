@@ -17,21 +17,21 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 SOURCE_FILES = (
-    "python/spike_core/internal_tetra_generation.py",
-    "python/spike_core/dynamic_tetra_adaptation.py",
-    "python/spike_core/internal_meshing_engine.py",
+    "python/spike_core/solvers/geometry_meshing/preparation/internal_tetra_generation.py",
+    "python/spike_core/solvers/geometry_meshing/preparation/dynamic_tetra_adaptation.py",
+    "python/spike_core/solvers/geometry_meshing/preparation/internal_meshing_engine.py",
     "python/spike_core/service_meshing.py",
-    "python/spike_core/tetra_mesh_refinement.py",
-    "python/spike_core/tetra_mesh_optimization.py",
+    "python/spike_core/solvers/geometry_meshing/preparation/tetra_mesh_refinement.py",
+    "python/spike_core/solvers/geometry_meshing/preparation/tetra_mesh_optimization.py",
     "python/spike_core/service.py",
     "schemas/internal-mesh-request-v1.schema.json",
     "examples/internal_meshing/run_examples.py",
     "examples/internal_meshing/noncuboidal.json",
 )
 
-from python.spike_core.internal_meshing_engine import run_internal_meshing
+from python.spike_core.solvers.geometry_meshing.preparation.internal_meshing_engine import run_internal_meshing
 from python.spike_core.service_meshing import handle_meshing_request
-from python.spike_core.tetra_mesh_refinement import _det
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_refinement import _det
 
 
 def _envelope(operation, parameters):

@@ -3,10 +3,7 @@
 import json
 import unittest
 
-from python.spike_core.si_ethernet_qualification import (
-    SUPPORTED_MODES,
-    assess_10gbe_evidence,
-)
+from python.spike_core.solvers.signal_integrity.receivers.si_ethernet_qualification import SUPPORTED_MODES, assess_10gbe_evidence
 
 
 class EthernetQualificationBoundaryTests(unittest.TestCase):

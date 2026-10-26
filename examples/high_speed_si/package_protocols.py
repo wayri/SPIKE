@@ -5,7 +5,7 @@ import hashlib,json,sys
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.project_package import write_spike_package,read_project
+from python.spike_core.project_package import write_spike_package, read_project
 from python.spike_core.project_state_artifacts import hydrate_result_state
 from python.spike_core.service_project_handlers import handle_project_request
 OUT=ROOT/'output/high-speed-si/projects';OUT.mkdir(parents=True,exist_ok=True)

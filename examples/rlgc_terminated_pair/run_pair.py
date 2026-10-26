@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 from examples.rlgc_coupled_pair.run_pair import request as coupled_request
-from python.spike_core.rlgc_terminated_pair import run_rlgc_terminated_pair
+from python.spike_core.solvers.signal_integrity.lines.rlgc_terminated_pair import run_rlgc_terminated_pair
 
 
 def request():

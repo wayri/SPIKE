@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import pdn_decap_corners as corners
+from python.spike_core.solvers.power_integrity.pdn import pdn_decap_corners as corners
 from tests.python.test_pdn_network import basic, element, z, PROV
 
 

@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import numpy as np
 
-from python.spike_core.assembly_thermal_cad import import_step_solid
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_cad import import_step_solid
 
 
 class RetainedStepPlacementTests(unittest.TestCase):

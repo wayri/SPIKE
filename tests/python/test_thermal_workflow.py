@@ -2,8 +2,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from python.spike_core.openfoam import prepare_case
-from python.spike_core.thermal import ThermalScenario, estimate_compact_thermal, validate_scenario
+from python.spike_core.solvers.external_engines.openfoam.openfoam import prepare_case
+from python.spike_core.solvers.thermal_fluid.heat.thermal import ThermalScenario, estimate_compact_thermal, validate_scenario
 
 
 class ThermalWorkflowTests(unittest.TestCase):

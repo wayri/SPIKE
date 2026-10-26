@@ -1,0 +1,80 @@
+{
+  "status": "background_viewport_verified_with_declared_limits",
+  "renderer_snapshot": "D:/SPIKE-0.4.2-beta-20261025/app/src",
+  "url": "http://127.0.0.1:1438/",
+  "installed_desktop_capture": false,
+  "product_source_changed": false,
+  "observed_modes": [
+    "E lines",
+    "H lines",
+    "motor section and torque",
+    "fan airflow",
+    "board transient",
+    "air temperature",
+    "native DC PI and separate SPICE plot",
+    "SI context and isolated numerical samples"
+  ],
+  "observed_frame_changes": [
+    "motor 0 to 6: angle and torque changed",
+    "board .4s to 2s: hotspots changed",
+    "air 2s: lower-quarter Z cut reveals warmed cells"
+  ],
+  "thermal_mesh_text_gate": {
+    "passed": true,
+    "return_code": 0,
+    "expected_region_count": 2,
+    "mesh_ok_count": 2,
+    "reported_failed_check_counts": [],
+    "gate": "Both regions must print Mesh OK. and no nonzero Failed N mesh checks line may occur."
+  },
+  "screenshots": {
+    "air-temperature-2s.png": {
+      "bytes": 105478,
+      "sha256": "1f5694f60b1ef64f3f650d99e82cdad979315aedb89012be655ba808f93b6bb3"
+    },
+    "air-temperature-near-board-2s.png": {
+      "bytes": 105161,
+      "sha256": "ca55a00183c54d0701b9e9d9a0f699757f96f6c4b1394808d0f6b5cad3999a34"
+    },
+    "board-temperature-04s.png": {
+      "bytes": 105406,
+      "sha256": "704e25a8fe06a1ecd95b4d2ccd78e23752781f564e398e478def629f623410e7"
+    },
+    "board-temperature-2s.png": {
+      "bytes": 105689,
+      "sha256": "e9b04cf2ae7c6cdf08643acdccc2a83a85f3e6d943964c4324910878fc8c459f"
+    },
+    "electric-field-lines.png": {
+      "bytes": 59830,
+      "sha256": "98e968527a9d3e56dd62571c01c330c999e8d4001af4eb91df74a4923ff827cf"
+    },
+    "fan-airflow.png": {
+      "bytes": 108907,
+      "sha256": "703f5ca4d14ec13c4ccd9683214d3183db5ddedc71417f98210ca5afc3be64b4"
+    },
+    "magnetic-field-lines.png": {
+      "bytes": 61098,
+      "sha256": "710fe70076063229917b6025b09b39c8ec35cb73ce1c7971116bfc43f2ee225d"
+    },
+    "motor-angle-0.png": {
+      "bytes": 100008,
+      "sha256": "7900a0389ae7ecdbf441b1ea2c0471667bd1c16d0386f7132b9d96e859f3180b"
+    },
+    "motor-angle-6.png": {
+      "bytes": 100368,
+      "sha256": "97164d705b94ba764e02de99671c240cb4c83bfa5611313e5d2380f97bca174b"
+    },
+    "pi-spice.png": {
+      "bytes": 94821,
+      "sha256": "37e9b93e9f20e86c0d5fcc230857f576d3b4e00e2ff6cb53440c0560f379bd1a"
+    },
+    "si-board-context.png": {
+      "bytes": 111815,
+      "sha256": "6d23a5143f9df45ae04f96c8a590e94e2343305be58132a3cf0c5202efc60f56"
+    },
+    "si-victim-trace-detail.png": {
+      "bytes": 118686,
+      "sha256": "704b10c0bb9a8987a17a1aac19f48199abf8c721a202e3f7ba94fca6933c8025"
+    }
+  }
+}

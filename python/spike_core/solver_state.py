@@ -10,7 +10,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict
 
-from .openems_case_integrity import load_strict_json
+from .solvers.external_engines.openems.openems_case_integrity import load_strict_json
 
 
 SOLVER_STATE_CONTRACT = "spike/solver-manager-state/v1"

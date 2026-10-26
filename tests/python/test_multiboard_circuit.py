@@ -4,7 +4,7 @@ import copy
 import math
 import unittest
 
-from python.spike_core.multiboard_circuit import MultiboardCircuitError, compile_multiboard_circuit, run_multiboard_circuit
+from python.spike_core.solvers.circuits.models.multiboard_circuit import MultiboardCircuitError, compile_multiboard_circuit, run_multiboard_circuit
 
 
 def fixture():

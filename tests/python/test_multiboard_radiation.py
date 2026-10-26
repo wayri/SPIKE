@@ -5,8 +5,8 @@ import json
 import math
 import unittest
 
-from python.spike_core.multiboard_radiation import RadiationExchange, SIGMA
-from python.spike_core.multiboard_thermal import MultiboardThermalError, run_multiboard_thermal
+from python.spike_core.solvers.electromagnetics.fields.multiboard_radiation import RadiationExchange, SIGMA
+from python.spike_core.solvers.thermal_fluid.heat.multiboard_thermal import MultiboardThermalError, run_multiboard_thermal
 from tests.python.test_multiboard_thermal import request as conduction_request
 
 

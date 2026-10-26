@@ -1,0 +1,134 @@
+{
+  "contract": "spike/emerge-gallery-probes/v1",
+  "example_id": "esp32-surrogate",
+  "result_path": "examples/emerge/gui_workflow/esp32_surrogate_admitted_result.json",
+  "model_status": "unvalidated",
+  "interpolation_performed_by_gallery": false,
+  "samples": [
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 0,
+      "frequency_hz": 2300000000.0,
+      "source_pointer": "/networks/s_parameters/values/0",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            -0.057260262274082055,
+            0.6581527535630891
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 1,
+      "frequency_hz": 2450000000.0,
+      "source_pointer": "/networks/s_parameters/values/1",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.2162682548206073,
+            0.7377613719791918
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 2,
+      "frequency_hz": 2600000000.0,
+      "source_pointer": "/networks/s_parameters/values/2",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.4625874319058042,
+            0.6766230316878058
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 0,
+      "sample_index": 259,
+      "frequency_hz": 2300000000.0,
+      "theta_deg": 150.0,
+      "phi_deg": 135.0,
+      "source_pointer": "/fields/radiation/patterns_3d/0",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        4.529710446419742,
+        2.951261938509648
+      ],
+      "e_phi_v_m": [
+        5.483633552182598,
+        2.850229096326189
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 1,
+      "sample_index": 258,
+      "frequency_hz": 2450000000.0,
+      "theta_deg": 150.0,
+      "phi_deg": 120.0,
+      "source_pointer": "/fields/radiation/patterns_3d/1",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        1.3944442408313118,
+        5.73913163147448
+      ],
+      "e_phi_v_m": [
+        1.5331170567135617,
+        3.709273562759796
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 2,
+      "sample_index": 258,
+      "frequency_hz": 2600000000.0,
+      "theta_deg": 150.0,
+      "phi_deg": 120.0,
+      "source_pointer": "/fields/radiation/patterns_3d/2",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        1.639223393537727,
+        5.057705383996106
+      ],
+      "e_phi_v_m": [
+        1.9359886579934118,
+        3.3214497608359146
+      ]
+    }
+  ],
+  "recipes": [
+    "Choose a saved frequency and receive/excited port for a complex S sample.",
+    "Select a stored angular-grid point; no angular interpolation or realized-gain inference.",
+    "For near-field planes, select a valid coordinate and inspect complex E/H components."
+  ],
+  "status": "retained_result",
+  "result_sha256": "fccea7b16992e29e1e72e1eef21f3720d5d21eb2e2e12aea33cbcf4c92f08fd8",
+  "analysis_id": "emerge-2e0e10f5-6ece-41f4-be37-447e0b03f3e7",
+  "network_metadata": {
+    "contract": "spike/emerge-s-parameters/v1",
+    "frequencies_hz": [
+      2300000000.0,
+      2450000000.0,
+      2600000000.0
+    ],
+    "ports": [
+      "P1"
+    ],
+    "reference_impedance_ohm": 50.0,
+    "matrix_order": "values[frequency][receive_port][excited_port]"
+  },
+  "radiation_normalization": "each cut and sphere independently peak-normalized to 0 dB",
+  "nearfield_metadata": {}
+}

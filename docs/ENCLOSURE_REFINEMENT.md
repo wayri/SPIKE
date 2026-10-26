@@ -4,7 +4,7 @@
 
 ## Scope and status
 
-`python/spike_core/enclosure_refinement.py` supplies a bounded geometry helper
+`python/spike_core/solvers/thermal_fluid/flow/enclosure_refinement.py` supplies a bounded geometry helper
 for the [experimental enclosure thermal composition](ENCLOSURE_CHT_3D.md). It inserts selected
 cuts into a Cartesian grid and prolongs already computed coarse MAC normal
 velocities to those cuts without changing the parent-cell divergence.

@@ -16,6 +16,28 @@ from scripts import build_packaged_worker as packaged_worker
 
 
 class PackagedWorkerArrowProbeTests(unittest.TestCase):
+    def test_candidate_build_rejects_existing_or_outside_target_before_build(self):
+        for target in (packaged_worker.ROOT / "build", packaged_worker.ROOT / ".local" / "not-a-candidate"):
+            with self.subTest(target=target), patch.object(packaged_worker.sys, "argv", [
+                    "build_packaged_worker.py", "--candidate-root", str(target)]), patch.object(
+                        packaged_worker, "build") as build:
+                with self.assertRaises(SystemExit) as error:
+                    packaged_worker.main()
+                self.assertEqual(error.exception.code, 2)
+                build.assert_not_called()
+
+    def test_em_cosimulation_release_probe_executes_actual_owned_solvers(self):
+        from python.spike_core.service import handle
+        from scripts.verify_em_cosimulation_runtime import verify_em_cosimulation_runtime
+        def request(executable, method, params):
+            response = handle({"id": "cosim-release-test", "method": method, "params": params})
+            self.assertTrue(response["ok"], response)
+            return response
+        result = verify_em_cosimulation_runtime(None, request)
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["resistor_heat_w"], .02)
+        self.assertAlmostEqual(result["free_node_temperature_k"], 300.015, places=10)
+
     def test_extension_release_probe_executes_real_source_extensions(self) -> None:
         from python.spike_core.service import handle
         from scripts.verify_extension_runtime import verify_extension_runtime

@@ -7,24 +7,16 @@ from unittest.mock import patch
 import numpy as np
 from scipy.sparse import csr_matrix
 
-from python.spike_core.acceleration import (
-    AccelerationUnavailableError,
-    _package_version,
-    acceleration_catalog,
-    assemble_graph_laplacian,
-    choose_assembly_backend,
-    choose_sparse_backend,
-    solve_sparse_system,
-)
+from python.spike_core.solvers.execution.resources.acceleration import AccelerationUnavailableError, _package_version, acceleration_catalog, assemble_graph_laplacian, choose_assembly_backend, choose_sparse_backend, solve_sparse_system
 
 
 class AccelerationTests(unittest.TestCase):
     def test_package_version_falls_back_to_frozen_module_metadata(self):
         module = type("FrozenModule", (), {"__version__": "9.8.7"})()
         with patch(
-            "python.spike_core.acceleration.importlib.metadata.version",
+            "python.spike_core.solvers.execution.resources.acceleration.importlib.metadata.version",
             side_effect=__import__("importlib.metadata").metadata.PackageNotFoundError,
-        ), patch("python.spike_core.acceleration.importlib.import_module", return_value=module):
+        ), patch("python.spike_core.solvers.execution.resources.acceleration.importlib.import_module", return_value=module):
             self.assertEqual(_package_version("frozen-package"), "9.8.7")
 
     def test_catalog_distinguishes_assembly_and_sparse_backends(self):
@@ -79,28 +71,28 @@ class AccelerationTests(unittest.TestCase):
         np.testing.assert_allclose(solution, np.linalg.solve(matrix.toarray().astype(np.float64), rhs))
 
     def test_auto_policy_only_selects_mumps_when_available_and_large(self):
-        with patch("python.spike_core.acceleration._available_backend", return_value=True), patch.dict(
+        with patch("python.spike_core.solvers.execution.resources.acceleration._available_backend", return_value=True), patch.dict(
             os.environ, {"SPIKE_MUMPS_MIN_UNKNOWNS": "100"}
         ):
             selected = choose_sparse_backend(100, 500)
         self.assertEqual(selected["selected"], "petsc-mumps")
 
     def test_complex_auto_policy_skips_a_real_only_mumps_runtime(self):
-        with patch("python.spike_core.acceleration._available_backend", return_value=True), patch(
-            "python.spike_core.acceleration._backend_supports", return_value=False
+        with patch("python.spike_core.solvers.execution.resources.acceleration._available_backend", return_value=True), patch(
+            "python.spike_core.solvers.execution.resources.acceleration._backend_supports", return_value=False
         ), patch.dict(os.environ, {"SPIKE_MUMPS_MIN_UNKNOWNS": "1"}):
             selected = choose_sparse_backend(100, 500, complex_values=True)
         self.assertEqual(selected["selected"], "scipy-superlu")
 
     def test_explicit_complex_mumps_requires_complex_scalars(self):
-        with patch("python.spike_core.acceleration._available_backend", return_value=True), patch(
-            "python.spike_core.acceleration._backend_supports", return_value=False
+        with patch("python.spike_core.solvers.execution.resources.acceleration._available_backend", return_value=True), patch(
+            "python.spike_core.solvers.execution.resources.acceleration._backend_supports", return_value=False
         ):
             with self.assertRaisesRegex(AccelerationUnavailableError, "complex scalars"):
                 choose_sparse_backend(100, 500, requested="petsc-mumps", complex_values=True)
 
     def test_explicit_unavailable_numba_is_not_silently_ignored(self):
-        with patch("python.spike_core.acceleration._available_backend", return_value=False):
+        with patch("python.spike_core.solvers.execution.resources.acceleration._available_backend", return_value=False):
             with self.assertRaises(AccelerationUnavailableError):
                 choose_assembly_backend(1000, requested="numba")
 

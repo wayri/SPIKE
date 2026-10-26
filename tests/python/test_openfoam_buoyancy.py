@@ -5,8 +5,8 @@ import tempfile
 import json
 import hashlib
 from pathlib import Path
-from python.spike_core.openfoam_buoyancy import validate_density_model,density_at_temperature,render_buoyancy_observers,validate_buoyancy_runtime
-from python.spike_core.openfoam_multiregion import _material,_thermophysical_properties
+from python.spike_core.solvers.external_engines.openfoam.openfoam_buoyancy import validate_density_model, density_at_temperature, render_buoyancy_observers, validate_buoyancy_runtime
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion import _material, _thermophysical_properties
 
 
 def model():

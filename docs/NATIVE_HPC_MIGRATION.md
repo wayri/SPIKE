@@ -188,6 +188,12 @@ executed gates, not assumed benefits.
 
 ## Primary architecture references reviewed
 
+The [24 October worker resource policy](WORKER_NUMERICAL_RUNTIME.md) separates
+outer CPU allocation from pre-import inner BLAS/OpenMP budgets. Its
+[fresh-process benchmark](validation/SOLVER_RUNTIME_MEMORY_20261024.md) records
+substantial Windows private-commit savings, nearly unchanged solve timing and
+preserved AC/CHT numerical checks. It is not a native-kernel or MPI milestone.
+
 - [MPI Forum documents](https://www.mpi-forum.org/docs/), reviewed21October2026:
   standard/implementation distinction; this does not require every deployment
   to implement the newest standard or approve a particular MPI dependency.

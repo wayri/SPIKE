@@ -46,8 +46,8 @@ def reference(case):
 def solve_level(case, target):
     from shapely.affinity import rotate
     from shapely.geometry import box
-    from python.spike_core.dc_triangle_partition import partition_polygon_groups
-    from python.spike_core.peec_conforming_dc import solve_hybridized_conforming_dc
+    from python.spike_core.solvers.power_integrity.dc.dc_triangle_partition import partition_polygon_groups
+    from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import solve_hybridized_conforming_dc
     shape = box(0, 0, 2, 1)
     if case["inactive_area_mm2"]:
         shape = shape.union(box(3, 0, 3.5, 1))

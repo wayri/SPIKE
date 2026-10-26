@@ -9,9 +9,7 @@ from unittest.mock import patch
 
 from examples.assembly_field.run_multiboard_volume import request
 from python.spike_core.multiboard_identity import canonical_json_digest
-from python.spike_core.multiboard_volume_electrothermal import (
-    prepare_multiboard_volume_electrothermal, run_multiboard_volume_electrothermal,
-    verify_multiboard_volume_electrothermal_result)
+from python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal import prepare_multiboard_volume_electrothermal, run_multiboard_volume_electrothermal, verify_multiboard_volume_electrothermal_result
 
 
 class MultiboardVolumeTests(unittest.TestCase):
@@ -104,7 +102,7 @@ class MultiboardVolumeTests(unittest.TestCase):
     def test_offline_admission_checks_rehashed_loss_and_geometry_without_solving(self):
         raw = request()
         result = run_multiboard_volume_electrothermal(raw)
-        with patch('python.spike_core.multiboard_volume_electrothermal.run_native_mna', side_effect=AssertionError('solver forbidden')):
+        with patch('python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal.run_native_mna', side_effect=AssertionError('solver forbidden')):
             verify_multiboard_volume_electrothermal_result(raw, result)
         for mutation in [lambda r: r['loss_balance'].update(deposited_power_w=1000),
                          lambda r: r['thermal_geometry']['assembly'].update(name='changed'),
@@ -116,7 +114,7 @@ class MultiboardVolumeTests(unittest.TestCase):
                 verify_multiboard_volume_electrothermal_result(raw, changed)
 
     def test_real_calculix_when_available(self):
-        from python.spike_core.calculix_runtime import probe_calculix_runtime
+        from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
         if not probe_calculix_runtime()['available']:
             self.skipTest('Separately installed CalculiX unavailable')
         raw = request()

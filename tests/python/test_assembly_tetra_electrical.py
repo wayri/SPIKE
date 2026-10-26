@@ -8,9 +8,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_tetra_electrical import (
-    AssemblyTetraElectricalError, solve_assembly_tetra_electrical,
-)
+from python.spike_core.solvers.power_integrity.dc.assembly_tetra_electrical import AssemblyTetraElectricalError, solve_assembly_tetra_electrical
 from tests.python.test_assembly_tetra_thermal import contact_request, cube, faces_at
 
 
@@ -226,10 +224,10 @@ class AssemblyTetraElectricalTests(unittest.TestCase):
 
     def test_bounded_iteration_failure_and_condition_screen(self):
         raw = request(cube(2))
-        with patch("python.spike_core.assembly_tetra_electrical.cg", return_value=(np.zeros(9), 1)):
+        with patch("python.spike_core.solvers.power_integrity.dc.assembly_tetra_electrical.cg", return_value=(np.zeros(9), 1)):
             with self.assertRaisesRegex(AssemblyTetraElectricalError, "CG"):
                 solve_assembly_tetra_electrical(raw)
-        with patch("python.spike_core.assembly_tetra_electrical.np.linalg.eigvalsh", return_value=np.array([1e-20, 1.])):
+        with patch("python.spike_core.solvers.power_integrity.dc.assembly_tetra_electrical.np.linalg.eigvalsh", return_value=np.array([1e-20, 1.])):
             with self.assertRaises(AssemblyTetraElectricalError):
                 solve_assembly_tetra_electrical(raw)
 

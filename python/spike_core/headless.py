@@ -153,7 +153,7 @@ def run_request(request: dict[str, Any], timeout_seconds: float = 120,
                                    creationflags=(subprocess.CREATE_NO_WINDOW | 0x00000004) if windows_job else 0)
         if windows_job is not None:
             windows_job.assign(process)
-            from .sparselizard_process import _resume_windows_process
+            from .solvers.external_engines.sparselizard.sparselizard_process import _resume_windows_process
             _resume_windows_process(process)
     except (OSError, RuntimeError, KeyboardInterrupt) as exc:
         # Failed assignment leaves the worker suspended, unable to spawn.

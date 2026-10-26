@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core import assembly_airflow_runtime as airflow_runtime
+from python.spike_core.solvers.thermal_fluid.flow import assembly_airflow_runtime as airflow_runtime
 
 
 class AssemblyAirflowRuntimeTest(unittest.TestCase):

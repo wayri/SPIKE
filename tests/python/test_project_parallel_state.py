@@ -7,7 +7,7 @@ import zipfile
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.parallel_pool import _digest, run_parallel_batch
+from python.spike_core.solvers.execution.resources.parallel_pool import _digest, run_parallel_batch
 from python.spike_core.project_package import ProjectPackageError, _json_bytes, _sha256, read_project
 from python.spike_core.project_parallel_state import empty_parallel_state, validate_parallel_state
 from python.spike_core.service_project_handlers import handle_project_request
@@ -46,7 +46,7 @@ class ProjectParallelStateTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "first.spike"
             self.call("write_project_package", path=str(path), snapshot=self.snapshot())
-            with patch("python.spike_core.parallel_pool.run_parallel_batch", side_effect=AssertionError("must not execute")):
+            with patch("python.spike_core.solvers.execution.resources.parallel_pool.run_parallel_batch", side_effect=AssertionError("must not execute")):
                 opened = self.call("read_project_package", path=str(path))
                 self.assertEqual(opened["project"]["analysis"]["parallel_execution"], self.state())
                 self.assertEqual(opened["canonical"]["analyses"]["parallel_execution"], self.state())

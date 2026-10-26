@@ -21,9 +21,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from python.spike_core.sparselizard_process import (
-    SparseLizardAdapterError, run_adapter_process,
-)
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import SparseLizardAdapterError, run_adapter_process
 
 from .hdl_frontend import OsdiModuleManifest
 

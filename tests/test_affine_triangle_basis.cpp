@@ -4,9 +4,9 @@
 // build configured with tests enabled:
 // cmake --build <build-dir> --target test_affine_triangle_basis --config Release
 // ctest --test-dir <build-dir> -C Release -R ^test_affine_triangle_basis$ --output-on-failure
-#include "peec/affine_triangle_basis.hpp"
-#include "peec/affine_slab_inductance.hpp"
-#include "peec/volume_inductance.hpp"
+#include "solvers/power_integrity/peec/affine_triangle_basis.hpp"
+#include "solvers/power_integrity/peec/affine_slab_inductance.hpp"
+#include "solvers/power_integrity/peec/volume_inductance.hpp"
 
 #include <algorithm>
 #include <cmath>

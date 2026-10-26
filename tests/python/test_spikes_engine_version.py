@@ -45,7 +45,7 @@ class SpikesEngineVersionTests(unittest.TestCase):
         self.assertEqual(
             re.search(r'"([0-9.]+)-\$\{SPIKES_ENGINE_PRERELEASE\}"', cmake).group(1) + "-" + prerelease.group(1), ENGINE_VERSION,
         )
-        console = (ROOT / "src/spikes/console_main.cpp").read_text(encoding="utf-8")
+        console = (ROOT / "src/solvers/circuits/spikes/console_main.cpp").read_text(encoding="utf-8")
         self.assertIn('"spikes_console " SPIKES_ENGINE_VERSION', console)
         self.assertNotIn("0.3.0-alpha", console)
 

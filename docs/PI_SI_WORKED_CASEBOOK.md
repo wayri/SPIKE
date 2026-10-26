@@ -146,7 +146,7 @@ context, **not** normative compliance procedures. `assess_10gbe_evidence`
 uses SPIKE-authored inventory labels, never IEEE clause names:
 
 ```powershell
-& $py -c "from python.spike_core.si_ethernet_qualification import assess_10gbe_evidence; import json; print(json.dumps(assess_10gbe_evidence('10GBASE-KR', ['linear_nrz_10_3125_gbd_reference'], reference_rate_hz=10_312_500_000.0), indent=2))"
+& $py -c "from python.spike_core.solvers.signal_integrity.receivers.si_ethernet_qualification import assess_10gbe_evidence; import json; print(json.dumps(assess_10gbe_evidence('10GBASE-KR', ['linear_nrz_10_3125_gbd_reference'], reference_rate_hz=10_312_500_000.0), indent=2))"
 ```
 
 It returns `kr_linear_nrz_numerical_foundation` as exploratory scope,

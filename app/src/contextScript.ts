@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 export const CONTEXT_SCRIPT_EVENT = "spike-open-context-script";
 export const MAX_CONTEXT_BYTES = 240_000;
-export type ContextScript = { id: string; name: string; code: string };
+export type ContextScript = { id: string; name: string; code: string; workingDirectory?: string };
 export type ScriptContext = { kind: "selection" | "navigator" | "table" | "plot"; title: string; payload: unknown };
 
 /** Opens a draft only. No execution, source mutation or solver admission is implied. */

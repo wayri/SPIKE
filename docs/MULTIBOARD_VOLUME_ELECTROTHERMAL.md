@@ -69,7 +69,7 @@ preparation/execution/admission without adding arbitrary file writes.
 Worker validation failures retain `SPIKE-BE-IPC-E-0001`; project admission
 failures retain `SPIKE-BE-PACKAGE-E-0002`, with the diagnostic detail.
 
-`python/spike_core/multiboard_volume_electrothermal.py` owns
+`python/spike_core/solvers/thermal_fluid/electrothermal/multiboard_volume_electrothermal.py` owns
 `run_multiboard_volume_electrothermal(request, *, cancel_check=None)` and offline
 `verify_multiboard_volume_electrothermal_result(request, result)`.
 The adjacent setup module admits topology, bindings and limits before execution.

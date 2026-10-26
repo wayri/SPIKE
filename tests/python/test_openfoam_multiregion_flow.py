@@ -6,13 +6,13 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from python.spike_core.openfoam_multiregion import compile_multiregion_case, prepare_runnable_multiregion_case, MultiRegionOpenFoamError
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion import compile_multiregion_case, prepare_runnable_multiregion_case, MultiRegionOpenFoamError
 from tests.python.test_openfoam_multiregion import materialize_runnable_request, request
 
 
 class FanBoundaryTests(unittest.TestCase):
     def test_real_heated_duct_polymesh_preparation(self):
-        from python.spike_core.openfoam_fan_fixture import build_fan_heated_fixture
+        from python.spike_core.solvers.external_engines.openfoam.openfoam_fan_fixture import build_fan_heated_fixture
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory) / "fixture"
             result = build_fan_heated_fixture(root, divisions=2)

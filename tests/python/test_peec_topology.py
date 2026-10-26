@@ -6,9 +6,9 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
-from python.spike_core.peec_network import solve_port
-from python.spike_core.peec_matrices import TopologyResistanceSolver, embed_physical_inductance
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
+from python.spike_core.solvers.power_integrity.peec.peec_network import solve_port
+from python.spike_core.solvers.power_integrity.peec.peec_matrices import TopologyResistanceSolver, embed_physical_inductance
 
 
 def branch(identifier: str, kind: str, node_p: int, node_n: int) -> MeshBranch:

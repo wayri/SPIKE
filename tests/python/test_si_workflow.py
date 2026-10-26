@@ -5,11 +5,11 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.si_ibis import parse_ibis, reduce_ibis
-from python.spike_core.si_network_workflow import line_network, edit_network
-from python.spike_core.si_passives import KB, resolve_passive, resistor_noise
-from python.spike_core.si_workflow import REQUEST, run_si_workflow, workflow_catalog
-from python.spike_core.sparameters import NetworkData, parse_touchstone_text, touchstone_text
+from python.spike_core.solvers.signal_integrity.receivers.si_ibis import parse_ibis, reduce_ibis
+from python.spike_core.solvers.signal_integrity.networks.si_network_workflow import line_network, edit_network
+from python.spike_core.solvers.signal_integrity.receivers.si_passives import KB, resolve_passive, resistor_noise
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import REQUEST, run_si_workflow, workflow_catalog
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData, parse_touchstone_text, touchstone_text
 
 
 IBIS = """[IBIS Ver] 4.2

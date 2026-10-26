@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: Apache-2.0
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { File } from "node:buffer";
+import { webcrypto } from "node:crypto";
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import ts from "typescript";
+globalThis.crypto ??= webcrypto;
+const require = createRequire(import.meta.url);
+function load(name) {
+  const extension = /Content|Markdown/.test(name) ? "tsx" : "ts";
+  const source = readFileSync(new URL(`../src/${name}.${extension}`, import.meta.url), "utf8");
+  const module = { exports: {} };
+  new Function("require", "module", "exports", ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText)(dependency => dependency.startsWith("./") ? load(dependency.slice(2)) : require(dependency), module, module.exports);
+  return module.exports;
+}
+const api = load("assistantAttachments");
+const imageBytes = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWP4z8DwHwAFgAI/ScLbtAAAAABJRU5ErkJggg==", "base64");
+const image = await api.readAssistantAttachment(new File([imageBytes], "board.png", { type: "image/png" }));
+assert.equal(image.mimeType, "image/png");
+assert.equal(api.attachmentBytes(image), imageBytes.length);
+assert.equal(image.sha256, Buffer.from(await webcrypto.subtle.digest("SHA-256", imageBytes)).toString("hex"));
+const text = await api.readAssistantAttachment(new File(["R1 1 0 100\n"], "case.cir"));
+assert.equal(text.mimeType, "text/plain");
+await assert.rejects(api.readAssistantAttachment(new File(["<svg/>"], "fake.png", { type: "image/png" })), /does not match/);
+await assert.rejects(api.readAssistantAttachment(new File([new Uint8Array([0xff])], "bad.txt")), /encoded|encoding|valid/i);
+await assert.rejects(api.readAssistantAttachment(new File(["abc"], "audio.mp3", { type: "audio/mpeg" })), /not supported/);
+await assert.rejects(api.readAssistantAttachment(new File(["x".repeat(256 * 1024 + 1)], "big.txt")), /256 KiB/);
+assert.throws(() => api.checkAttachmentBudget(Array(5).fill(image)), /4 images/);
+assert.throws(() => api.checkAttachmentBudget(Array(9).fill(text)), /8 attachments/);
+const Content = load("AssistantMessageContent").default;
+const html = renderToStaticMarkup(React.createElement(Content, { message: { role: "assistant", content: "<script>alert(1)</script>\n\n![leak](https://example.org/private.png)\n\n| Value | Unit |\n| --- | --- |\n| 12 | V |\n\n```text\nsafe code\n```", attachments: [image] } }));
+assert.ok(!html.includes("<script>"));
+assert.ok(!html.includes('src="https:'));
+assert.match(html, /<table>/);
+assert.match(html, /<code>safe code<\/code>/);
+assert.match(html, /src="data:image\/png;base64,/);
+assert.match(html, /download="board.png"/);
+console.log("Assistant media UI: typed/hash-bound attachments, malformed/oversize rejection, budgets, safe rich response and image rendering passed.");

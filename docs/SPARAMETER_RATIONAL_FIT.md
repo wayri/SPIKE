@@ -8,7 +8,7 @@ certify the physical accuracy or causality of the source data.
 ## Workflow
 
 Call `fit_sparameter_rational(request)` from
-`python.spike_core.sparameter_rational`, or invoke the worker method of that
+`python.spike_core.solvers.signal_integrity.networks.sparameter_rational`, or invoke the worker method of that
 name with `params: {request: ...}`. The desktop script workspace can invoke
 the API. This stage does not insert the model automatically into a transient
 solver or introduce a dedicated desktop editor.

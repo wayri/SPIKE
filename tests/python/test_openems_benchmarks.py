@@ -2,15 +2,8 @@ from __future__ import annotations
 
 import unittest
 
-from python.spike_core.openems_benchmarks import (
-    _evaluate_patch_result,
-    evaluate_mesh_convergence,
-    patch_antenna_fixture,
-)
-from python.spike_core.openems_validation_evidence import (
-    load_openems_reference_evidence,
-    matching_openems_reference_evidence,
-)
+from python.spike_core.solvers.external_engines.openems.openems_benchmarks import _evaluate_patch_result, evaluate_mesh_convergence, patch_antenna_fixture
+from python.spike_core.solvers.external_engines.openems.openems_validation_evidence import load_openems_reference_evidence, matching_openems_reference_evidence
 
 
 class OpenEmsBenchmarkTests(unittest.TestCase):

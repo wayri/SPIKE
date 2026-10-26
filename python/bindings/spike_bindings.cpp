@@ -14,13 +14,13 @@
 #include <nanobind/eigen/dense.h>
 #include <nanobind/eigen/sparse.h>
 
-#include "geometry/planar_topology.hpp"
-#include "peec/peec_solver.hpp"
-#include "peec/volume_matrix.hpp"
-#include "peec/reference_plane_antipad_mesh_input.hpp"
-#include "peec/generalized_reference_plane_mesh_input.hpp"
-#include "peec/via_transition_mesh_input.hpp"
-#include "thermal/thermal_solver.hpp"
+#include "solvers/geometry_meshing/geometry/planar_topology.hpp"
+#include "solvers/power_integrity/peec/peec_solver.hpp"
+#include "solvers/power_integrity/peec/volume_matrix.hpp"
+#include "solvers/power_integrity/peec/reference_plane_antipad_mesh_input.hpp"
+#include "solvers/power_integrity/peec/generalized_reference_plane_mesh_input.hpp"
+#include "solvers/power_integrity/peec/via_transition_mesh_input.hpp"
+#include "solvers/thermal_fluid/thermal/thermal_solver.hpp"
 
 namespace nb = nanobind;
 using namespace nb::literals;

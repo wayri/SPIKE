@@ -431,3 +431,6 @@ python/spike_core/hybrid_owned_copper.py -text -eol
 scripts/check_ebrake_owned_dc.py -text -eol
 scripts/parity_owned_pad_gate.py -text -eol
 tests/python/test_hybrid_drilled_roundrect.py -text -eol
+
+# Native shell scripts must execute with Unix line endings.
+*.sh text eol=lf

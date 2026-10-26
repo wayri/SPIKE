@@ -7,6 +7,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 import { importTestTypescript } from "./import-test-typescript.mjs";
+import loadSolverSetupSteps from "./load-solver-setup-steps.mjs";
 
 const appRoot = resolve(import.meta.dirname, "..");
 const source = readFileSync(resolve(appRoot, "src", "InternalAirflowPanel.tsx"), "utf8");
@@ -17,12 +18,14 @@ const nodeRequire = createRequire(import.meta.url);
 const numericRange = await importTestTypescript("numericRange");
 
 function loadModule(reactDependency, worker) {
+  const solverSetupSteps = loadSolverSetupSteps(reactDependency);
   const loaded = { exports: {} };
   new Function("require", "module", "exports", compiled)(name => {
     if (name === "react") return reactDependency;
     if (name === "react/jsx-runtime") return nodeRequire("react/jsx-runtime");
     if (name === "./numericRange") return numericRange;
     if (name === "./workerBridge") return { runLocalWorker: worker };
+    if (name === "./SolverSetupSteps") return solverSetupSteps;
     if (name === "./InternalAirflowPanel.css") return {};
     return nodeRequire(name);
   }, loaded, loaded.exports);
@@ -78,6 +81,12 @@ assert.equal(staticModule.validInternalAirflowResult({ ...result, production_qua
 
 const completeMarkup = renderToStaticMarkup(React.createElement(InternalAirflowPanel, { workerAvailable: true, initialRequest: request, initialResult: result }));
 assert.match(completeMarkup, /Internal channel airflow/);
+assert.match(completeMarkup, /Internal airflow setup steps/);
+assert.match(completeMarkup, /Step 1 of 4/);
+assert.match(completeMarkup, /Channel geometry/);
+assert.match(completeMarkup, /hidden="" aria-label="Fluid and heat inputs"/);
+assert.match(completeMarkup, /hidden="" aria-label="Mesh inputs"/);
+assert.match(completeMarkup, /hidden="" aria-label="Review and run"/);
 assert.match(completeMarkup, /Laminar prescribed flow · turbulence model: none/);
 assert.match(completeMarkup, /does not solve a solid domain, turbulence, flow separation, fans, or enclosure-scale CFD/);
 assert.match(completeMarkup, /Temperature \(K\)/);
@@ -102,6 +111,7 @@ const pending = [];
 const statuses = [];
 const hookReact = {
   useEffect() {},
+  useId() { return "internal-airflow-setup-description"; },
   useRef(initial) {
     const index = refCursor++;
     if (!(index in refs)) refs[index] = { current: initial };

@@ -11,7 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 from python.spike_core.kicad_importer import import_kicad_design
-from python.spike_core.layered_board_thermal import solve_layered_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal import solve_layered_board_thermal
 from examples.sas_qualification.run_board_reference import digest, export_fields
 
 

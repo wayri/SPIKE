@@ -15,7 +15,7 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.benchmark_internal_mesher import fixture_corpus
-from python.spike_core import internal_tetra_generation as current
+from python.spike_core.solvers.geometry_meshing.preparation import internal_tetra_generation as current
 
 BASELINE_SHA256 = '773708649885455223e6543ad80fecddc274c9c7d1150515ba756c26926be1d5'
 
@@ -81,7 +81,7 @@ def run(baseline, samples=5):
             'execution': 'alternating order in one process; no process-RAM comparison',
             'platform': platform.platform(), 'python': sys.version,
             'baseline_sha256': BASELINE_SHA256,
-            'current_sha256': hashlib.sha256((ROOT/'python/spike_core/internal_tetra_generation.py').read_bytes()).hexdigest(),
+            'current_sha256': hashlib.sha256((ROOT/'python/spike_core/solvers/geometry_meshing/preparation/internal_tetra_generation.py').read_bytes()).hexdigest(),
             'driver_sha256': hashlib.sha256(Path(__file__).read_bytes()).hexdigest(), 'rows': rows}
 
 

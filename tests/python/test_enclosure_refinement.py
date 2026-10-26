@@ -6,11 +6,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.enclosure_refinement import (
-    EnclosureRefinementError,
-    build_enclosure_grid,
-    prolong_mac_fluxes,
-)
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_refinement import EnclosureRefinementError, build_enclosure_grid, prolong_mac_fluxes
 
 
 def request(**updates):

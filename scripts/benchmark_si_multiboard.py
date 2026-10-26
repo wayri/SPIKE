@@ -9,8 +9,8 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tests.python.test_si_multiboard import fixture
-from python.spike_core.si_multiboard import build_multiboard_network
-from python.spike_core.sparameters import touchstone_text
+from python.spike_core.solvers.signal_integrity.networks.si_multiboard import build_multiboard_network
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text
 
 
 def run_example(output):

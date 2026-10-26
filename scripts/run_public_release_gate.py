@@ -14,10 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.public_release_readiness import (  # noqa: E402
-    BLOCKED_EXTERNAL,
-    evaluate_public_release,
-)
+from python.spike_core.public_release_readiness import BLOCKED_EXTERNAL, evaluate_public_release
 
 
 def main(argv: list[str] | None = None) -> int:

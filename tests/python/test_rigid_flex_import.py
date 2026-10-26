@@ -4,9 +4,9 @@ import unittest
 from pathlib import Path
 
 from python.spike_core.contracts import AnalysisSpec
-from python.spike_core.geometry import extract_net_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.geometry import extract_net_geometry
 from python.spike_core.service import _design_from_kicad
-from python.spike_core.solver_geometry import build_solver_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.solver_geometry import build_solver_geometry
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.core.board_parser import KicadParser
 

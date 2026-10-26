@@ -5,13 +5,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.thermal_field_job import (
-    PLAN_CONTRACT,
-    REQUEST_CONTRACT,
-    ThermalFieldJobError,
-    execute_thermal_field_job,
-    plan_thermal_field_job,
-)
+from python.spike_core.solvers.thermal_fluid.heat.thermal_field_job import PLAN_CONTRACT, REQUEST_CONTRACT, ThermalFieldJobError, execute_thermal_field_job, plan_thermal_field_job
 from python.spike_core.thermal_qualification import QUALIFICATION_CONTRACT, required_qualification_gates
 from python.spike_core.service import handle
 

@@ -5,15 +5,15 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_tetra_thermal import run_assembly_tetra_thermal
-from python.spike_core.assembly_tetra_thermal_validation import AssemblyTetraThermalError, require
-from python.spike_core.tetra_aabb_candidates import overlapping_pairs
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal import run_assembly_tetra_thermal
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation import AssemblyTetraThermalError, require
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_aabb_candidates import overlapping_pairs
 from tests.python.test_assembly_tetra_thermal import cube, request
 
 
 class BulkThermalTests(unittest.TestCase):
     def test_bulk_transient_uniform_heat_capacity_reference(self):
-        from python.spike_core.assembly_tetra_transient import run_assembly_tetra_transient
+        from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient import run_assembly_tetra_transient
         from tests.python.test_assembly_tetra_transient import settings
         raw = request(cube(10))
         raw['boundaries'] = []
@@ -57,8 +57,8 @@ class BulkThermalTests(unittest.TestCase):
                                   ('MAX_HIERARCHY_VISITS', 'traversal budget'),
                                   ('MAX_COMPARISONS', 'comparison budget')]:
             with self.subTest(constant=constant), patch(
-                    'python.spike_core.assembly_tetra_thermal_validation.' + constant, 1), patch(
-                    'python.spike_core.assembly_tetra_thermal.coo_matrix') as sparse:
+                    'python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation.' + constant, 1), patch(
+                    'python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal.coo_matrix') as sparse:
                 with self.assertRaisesRegex(AssemblyTetraThermalError, message):
                     run_assembly_tetra_thermal(raw)
                 sparse.assert_not_called()
@@ -68,6 +68,6 @@ class BulkThermalTests(unittest.TestCase):
         raw['mesh']['cells'][-1]['vertices'][1] = raw['mesh']['cells'][-1]['vertices'][0]
         with self.assertRaisesRegex(AssemblyTetraThermalError, 'indices'):
             run_assembly_tetra_thermal(raw)
-        with patch('python.spike_core.assembly_tetra_thermal_validation.MAX_CELLS', 5):
+        with patch('python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation.MAX_CELLS', 5):
             with self.assertRaisesRegex(AssemblyTetraThermalError, 'resource budget'):
                 run_assembly_tetra_thermal(request())

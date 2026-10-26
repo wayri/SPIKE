@@ -1,0 +1,12 @@
+SPIKE planar converter topology and ideal native simulation example
+Original native symbols, illustrative footprints, schematic/board generation,
+routing glue, Studio example, and simulation inputs: Apache-2.0.
+
+The local full transformer assembly STEP was created from original geometric
+construction of the companion core and planar-winding demonstration. It is not
+an official TDK model. The N97/ELP32 material/product names identify the proposed
+core candidate only. Third-party stock header models are not bundled in it.
+
+No vendor MOSFET, gate-driver firmware, manufacturer compact model, native DLL,
+compiler or solver implementation is copied into this package. The KiCad checks
+do not establish 50W electrical, thermal, insulation or manufacturing readiness.

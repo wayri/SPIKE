@@ -9,11 +9,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.mcad_package_shape import (
-    McadPackageShapeError,
-    StepPackageShapePolicy,
-    extract_step_package_shape,
-)
+from python.spike_core.mcad_package_shape import McadPackageShapeError, StepPackageShapePolicy, extract_step_package_shape
 
 
 STEP = b"ISO-10303-21;\nHEADER;ENDSEC;DATA;ENDSEC;END-ISO-10303-21;\n"

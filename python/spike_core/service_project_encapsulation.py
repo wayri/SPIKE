@@ -4,10 +4,10 @@ import copy
 import hashlib
 from pathlib import Path
 
-from .assembly_field_study import export_assembly_field_study
-from .assembly_field_handoff import prepare_assembly_field_handoff
+from .solvers.execution.coupling.assembly_field_study import export_assembly_field_study
+from .solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
 from .multiboard_study import physical_assembly
-from .assembly_thermal_components import MATERIALS_KEY
+from .solvers.geometry_meshing.preparation.assembly_thermal_components import MATERIALS_KEY
 from .project_package import ProjectPackageError, write_spike_package
 from .service_project_assembly import _invalidate_saved_results
 from .service_project_assembly_field import _open_current_project

@@ -16,8 +16,8 @@ from scripts.parity_pisi_gate import bound, digest, names
 STAGE = "SI02-S07"
 MODULES = ("tests.python.test_rlgc_coupled_pair", "tests.python.test_rlgc_coupled_pair_contract")
 SOURCES = ("scripts/parity_coupled_pair_gate.py", "scripts/parity_pisi_gate.py",
-    "python/spike_core/rlgc_coupled_pair.py", "python/spike_core/rlgc_line_fields.py",
-    "python/spike_core/rlgc_line_network.py", "python/spike_core/sparameter_sampling.py",
+    "python/spike_core/solvers/signal_integrity/lines/rlgc_coupled_pair.py", "python/spike_core/solvers/signal_integrity/lines/rlgc_line_fields.py",
+    "python/spike_core/solvers/signal_integrity/lines/rlgc_line_network.py", "python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py",
     "python/spike_core/service.py", "python/spike_core/service_simulation_handlers.py",
     "python/spike_core/service_sparameter_processing.py", "python/spike_core/cli.py",
     "schemas/rlgc-coupled-pair-request-v1.schema.json", "schemas/rlgc-coupled-pair-result-v1.schema.json",

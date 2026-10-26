@@ -150,8 +150,8 @@
       "owner_role": "solid thermal",
       "depends_on": [],
       "primary_paths": [
-        "python/spike_core/assembly_tetra_transient.py",
-        "python/spike_core/calculix_transient.py",
+        "python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_transient.py",
+        "python/spike_core/solvers/external_engines/calculix/calculix_transient.py",
         "examples/converter/run_pwm_volume_validation.py"
       ],
       "instructions_and_completion_gates": "Owner: solid thermal. Record capacity matrix rule, integration rule, boundary\ndiscretization, timestep and material identity in both internal and external\nresults. Preserve the 0.351567 K fixture and its two independent discrete\noracles. Add a continuous manufactured thermal field and matched\ncoarse-to-fine studies: spatial subdivisions 2, 4, 8 and temporal steps\n0.04, 0.02, 0.01, 0.005 s, refining one axis while controlling the other.\n\nFirst decision: determine whether both formulations converge to the same\ncontinuum within the declared model. If yes, keep their native rules and\nreport discretization uncertainty; a comparison mode must not silently\nreplace production capacity. If no, isolate conservation, assembly,\nboundary or integration defects before editing a kernel. Completion:\npreserve the existing per-node cross-code gate, demonstrate decreasing\nindependent continuum error, and meet a proposed finest-field budget of\n0.01 K plus 1% of the local reference temperature rise for the new fixture.\nNo near-zero temperature-rise point may be judged by relative error alone.",
@@ -166,7 +166,7 @@
       "owner_role": "retained EM adapter",
       "depends_on": [],
       "primary_paths": [
-        "python/spike_core/assembly_em.py",
+        "python/spike_core/solvers/electromagnetics/fields/assembly_em.py",
         "extensions/openems_suite/retained_volume_driver.py",
         "scripts/validate_retained_assembly_em.py"
       ],
@@ -182,7 +182,7 @@
       "owner_role": "runtime orchestration",
       "depends_on": [],
       "primary_paths": [
-        "python/spike_core/gmsh_occ_mesher.py",
+        "python/spike_core/solvers/geometry_meshing/preparation/gmsh_occ_mesher.py",
         "scripts/validate_transient_thermal.py"
       ],
       "instructions_and_completion_gates": "Owner: runtime orchestration. Fix declared CAD/mesher environment selection\nand dependency preflight in the existing bounded child-process route. The\nisolated child must import its declared NumPy/native dependencies without\nad hoc injection from unrelated installations. Retain resolved interpreter,\ndependency versions and error diagnostics. Preserve the original failed run.\nCompletion: the retained STEP transient workflow passes in a fresh process\nwith no manual package-path override; a deliberately incomplete environment\nfails preflight with the missing dependency, while isolation and path admission\nchecks still pass.",
@@ -215,8 +215,8 @@
         "ACC05"
       ],
       "primary_paths": [
-        "src/spikes/transient_solver.cpp",
-        "src/spikes/transient_solver.hpp",
+        "src/solvers/circuits/spikes/transient_solver.cpp",
+        "src/solvers/circuits/spikes/transient_solver.hpp",
         "python/spikes/native_abi.py"
       ],
       "instructions_and_completion_gates": "Owner: SPIKES native transient. After ACC01, evaluate the current adaptive LTE\ncontroller across voltage and branch-current scales. Define tolerances for\neach physical quantity and state group, preserving existing ABI behavior or\nintroducing an explicitly versioned option. Do not compare volts, amperes and\ntemperature in an unscaled norm. Distinguish internal stepping from saved\nsampling and keep event breakpoints exact.\n\nCompletion: independent RC/RL/RLC and supported diode/switch cases meet the\npredeclared absolute-plus-relative budgets; rejected steps restore all state;\nsource breakpoints, persistent/batch equivalence and failure recovery pass.\nThe small-amplitude sweep must be re-run. Choose an adaptive preset only after\nits achieved error and cost are measured; do not merely tighten all defaults.",
@@ -234,8 +234,8 @@
         "ACC05"
       ],
       "primary_paths": [
-        "python/spike_core/thermal_accuracy.py",
-        "python/spike_core/assembly_tetra_transient.py"
+        "python/spike_core/solvers/thermal_fluid/heat/thermal_accuracy.py",
+        "python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_transient.py"
       ],
       "instructions_and_completion_gates": "Owner: thermal accuracy. Use the actual solved temperature rise, heat flux and\ncontact heat flow to drive convergence reports. Refine contacts, thin materials\nand heated regions as well as bulk volume. Extend `thermal_accuracy.py` beyond\nsuccessive-value change when an independent oracle is available. Use\nRichardson/GCI only with admissible smooth/asymptotic data; otherwise report\nunresolved error. Completion: exact slab/contact and nonuniform transient\nfixtures meet their frozen budgets, conserved watts/energy remain unchanged,\nand unresolved contact/mesh error blocks accuracy-qualified presentation.",
       "execution_evidence": []
@@ -271,8 +271,8 @@
         "ACC07"
       ],
       "primary_paths": [
-        "python/spike_core/pwm_volume_electrothermal.py",
-        "python/spike_core/multiboard_volume_electrothermal.py"
+        "python/spike_core/solvers/thermal_fluid/electrothermal/pwm_volume_electrothermal.py",
+        "python/spike_core/solvers/thermal_fluid/electrothermal/multiboard_volume_electrothermal.py"
       ],
       "instructions_and_completion_gates": "Owner: coupled orchestration. Extend PI/SI-volume and PWM-volume studies with\nstronger feedback, source/load changes and nonuniform heat maps. Retain\nunrelaxed temperature and per-device energy defects. Refine electrical step,\nthermal window, spatial mesh and coupling iteration separately. Compare\nagainst an independent monolithic ODE for a lumped case and a manufactured\nspatial case; an internal fine-run reference is labeled accordingly.\n\nCompletion: existing finest PWM gates (0.005 A, 0.002 V, 0.005 K) and energy\nledgers remain passed; a new refined target is half each error budget on the\nsame synthetic fixture. Rollback/cancellation publish only committed windows.\nExhausted iterations fail without hidden timestep or tolerance changes.",
       "execution_evidence": []
@@ -288,8 +288,8 @@
         "ACC05"
       ],
       "primary_paths": [
-        "src/peec/peec_solver.cpp",
-        "python/spike_core/hybrid_dc_solver.py"
+        "src/solvers/power_integrity/peec/peec_solver.cpp",
+        "python/spike_core/solvers/power_integrity/dc/hybrid_dc_solver.py"
       ],
       "instructions_and_completion_gates": "Owner: PEEC and geometry DC. Re-run sheet/contact/trace/via refinement and\ncompare full self/mutual matrices with independently derived compatible\nconductor references. Diagnose geometry/terminal bias behind the 2.5% sheet\nresult before changing discretization. Add mesh-aware endpoint/area checks.\n\nCompletion: proposed <=1% resistance error for the existing sheet case within\na declared mesh/resource budget, while trace/via unit invariants remain passed.\nFor C/G, begin with homogeneous coaxial/plate/multiconductor limits and explicit\nreference definitions. Do not promote single-reference capacitance to arbitrary\nelectrostatic accuracy. Independent field evidence is required by ACC11.",
       "execution_evidence": []
@@ -306,8 +306,8 @@
         "ACC10"
       ],
       "primary_paths": [
-        "python/spike_core/si_channel.py",
-        "python/spike_core/si_coupled_channel.py"
+        "python/spike_core/solvers/signal_integrity/channels/si_channel.py",
+        "python/spike_core/solvers/signal_integrity/channels/si_coupled_channel.py"
       ],
       "instructions_and_completion_gates": "Owner: SI and field qualification. Independently author a uniform two-port and\ncoupled four-port coupon with exact material/geometry/port data. Compare against\nan installed independent field solver and the analytical uniform limit.\nRecord reference impedance, calibration/de-embedding planes, wave convention\nand frequency grid. Compare Cartesian complex S, delay, Z0, crosstalk and loaded\nwaveforms; phase near nulls needs a separate mask.\n\nBefore execution, propose fixture budgets of <=0.02 maximum complex-S absolute\nerror and <=2% delay/Z0 error across the declared band. These are numerical\ntargets, not signal-integrity compliance. Completion: match geometry and\nreference planes, pass mesh/time convergence, and execute both coupons with\nall required ports. Admitted Cambridge wire measurements cannot supply absent\nfour-port entries or substitute for a matched PCB prediction.",
       "execution_evidence": []
@@ -325,8 +325,8 @@
         "ACC05"
       ],
       "primary_paths": [
-        "src/spikes/dc_solver.cpp",
-        "src/spikes/transient_solver.cpp",
+        "src/solvers/circuits/spikes/dc_solver.cpp",
+        "src/solvers/circuits/spikes/transient_solver.cpp",
         "python/spikes/competitive_benchmark.py"
       ],
       "instructions_and_completion_gates": "Owner: circuit models. Add same-model diode/BJT/MOS DC sweeps, AC poles/phase,\ncharge/transient and switching waveforms across voltages, currents, temperature\nand stiffness. Use ngspice and LTspice where the admitted equations/dialect\nmatch; include Xyce only when installed and the comparison is equivalent.\nPublish max and RMS waveform error at common physical times, event timing,\nKCL, source energy, dissipated heat and stored energy. Keep edge/model\napproximation errors distinct from integration error.\n\nCompletion: all predeclared case-specific gates pass on the supported model\nenvelope, nonconvergence is explicit, and the small-signal floors from ACC01\nare preserved. Extend PWM feedback beyond the winding only after bounded,\nreviewed temperature-dependent switch/device loss laws are admitted and every\nloss is counted once. No vendor/hardware model claim from ideal switches.",
@@ -383,8 +383,8 @@
         "ACC07"
       ],
       "primary_paths": [
-        "src/spikes/transient_solver.cpp",
-        "python/spike_core/retained_thermal_step.py"
+        "src/solvers/circuits/spikes/transient_solver.cpp",
+        "python/spike_core/solvers/thermal_fluid/heat/retained_thermal_step.py"
       ],
       "instructions_and_completion_gates": "Owner: numerical performance. After each numerical envelope is established,\nmeasure matched cases with two warmups and at least seven runs, recording\nmedian/p95 wall time, peak process memory, threads, hardware and accuracy.\nUse small, medium and large declared problems and distinguish cold process\nstartup, assembly/factorization, stepping and postprocessing. Isolate benchmark\nprocesses; the concurrent exploratory timings are not speed rankings.\n\nProfile before optimizing. Reuse topology/sparsity and factorizations only when\ntemperature, nonlinear state, timestep and material dependencies permit it.\nProposed first optimization gate: >=20% median-time reduction on the explicitly\nprofiled bottleneck case, no weakened accuracy/conservation gate, no new memory\nlimit violation, and no >10% median regression on the frozen neighboring corpus.\nIf the target fails, retain the result instead of broadening the favorable case.",
       "execution_evidence": []
@@ -402,8 +402,8 @@
         "ACC11"
       ],
       "primary_paths": [
-        "python/spike_core/assembly_em.py",
-        "python/spike_core/assembly_electrothermal.py"
+        "python/spike_core/solvers/electromagnetics/fields/assembly_em.py",
+        "python/spike_core/solvers/thermal_fluid/electrothermal/assembly_electrothermal.py"
       ],
       "instructions_and_completion_gates": "Owner: coupling architecture and field adapters. Start with one-way EM-to-thermal\ntransfer for an independently authored stationary lossy coupon. Define physical\ntime-averaged watts, peak/RMS normalization, occurrence/cell identity, conservative\nloss deposition and admissible materials. Require actually resolved conductor\nand dielectric losses from ACC08; rendered E/H magnitude is not heat.\n\nCompletion for the first step: integrated field loss matches transferred thermal\nwatts within a proposed 0.1% mapping budget and passes the independent loss oracle.\nOnly then add temperature-dependent conductivity/permittivity and bounded\ntwo-way iteration with rollback and mesh/field/thermal error checks. A general\nfull-wave plus nonlinear SPICE plus thermal route needs a separate reviewed\ncoupling contract and independent combined oracle before implementation.\nDo not equate stationary planar magnetic heating with this capability.",
       "execution_evidence": []

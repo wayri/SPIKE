@@ -1,4 +1,15 @@
 # Build artifacts
+# Unpublished solver research remains local in either historical or grouped layout.
+/src/solvers/optics/
+/src/solvers/particles/
+/src/solvers/electron_optics/
+/src/solvers/electron-optics/
+/src/solvers/reference_physics/
+/python/spike_core/solvers/optics/
+/python/spike_core/solvers/particles/
+/python/spike_core/solvers/electron_optics/
+/python/spike_core/solvers/electron-optics/
+/python/spike_core/solvers/reference_physics/
 build/
 /build-*/
 dist/
@@ -95,3 +106,25 @@ docs/_build/
 /.vite/
 /em_help_staging/
 **/fltk.org/fltk.prefs
+
+# Private native reference research. Keep the existing tracked Optycal product
+# workflow public; these paths are deliberately narrow publication exclusions.
+/src/optics/
+/src/particles/
+/src/electron_optics/
+/src/electron-optics/
+/tests/test_native_optics*.cpp
+/tests/test_native_particle*.cpp
+/tests/test_*electron_optics*
+/docs/validation/NATIVE_OPTICS*
+/docs/validation/NATIVE_PARTICLE*
+/docs/validation/*ELECTRON_OPTICS*
+/docs/OPTICS_PHOTONICS_MATERIALS_PLAN.md
+/docs/GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md
+/docs/CHARGED_PARTICLE_VACUUM_PLAN.md
+/docs/ELECTRON_OPTICS*
+/docs/solvers/reference-physics/
+/docs/solvers/electron-optics/
+/python/spike_core/electron_optics*.py
+/python/spike_core/electron_optics/
+/python/spike_core/electron-optics/

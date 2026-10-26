@@ -18,11 +18,11 @@ STAGE = "SI01-S01"
 MODULES = ("tests.python.test_si_candidate_study", "tests.python.test_si_candidate_study_contract")
 SOURCES = (
     "scripts/parity_si_candidate_gate.py", "scripts/parity_pisi_gate.py",
-    "python/spike_core/si_candidate_study.py", "python/spike_core/si_workflow.py",
-    "python/spike_core/si_network_workflow.py", "python/spike_core/si_passives.py",
-    "python/spike_core/si_ibis.py", "python/spike_core/si_workflow_resonance.py",
-    "python/spike_core/si_symbol_clock.py", "python/spike_core/si_clock_recovery.py",
-    "python/spike_core/si_channel.py", "python/spike_core/sparameters.py", "python/spike_core/si_impedance.py",
+    "python/spike_core/solvers/signal_integrity/networks/si_candidate_study.py", "python/spike_core/solvers/signal_integrity/receivers/si_workflow.py",
+    "python/spike_core/solvers/signal_integrity/networks/si_network_workflow.py", "python/spike_core/solvers/signal_integrity/receivers/si_passives.py",
+    "python/spike_core/solvers/signal_integrity/receivers/si_ibis.py", "python/spike_core/solvers/signal_integrity/receivers/si_workflow_resonance.py",
+    "python/spike_core/solvers/signal_integrity/receivers/si_symbol_clock.py", "python/spike_core/solvers/signal_integrity/receivers/si_clock_recovery.py",
+    "python/spike_core/solvers/signal_integrity/channels/si_channel.py", "python/spike_core/solvers/signal_integrity/networks/sparameters.py", "python/spike_core/solvers/signal_integrity/channels/si_impedance.py",
     "python/spike_core/cli.py", "python/spike_core/service.py",
     "python/spike_core/service_simulation_handlers.py", "python/spike_core/service_sparameter_processing.py",
     "tests/python/test_si_candidate_study.py", "tests/python/test_si_candidate_study_contract.py",

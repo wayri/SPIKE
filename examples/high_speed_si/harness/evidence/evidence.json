@@ -19,9 +19,9 @@
   },
   "source_sha256": {
     "examples/high_speed_si/harness/run_interboard_harness.py": "e1045d1eeb3d637d6924f0d4dd26501be42f7b390a8ad084b709deb878b5496e",
-    "python/spike_core/harness_pi.py": "f0ec054df567acedf04c6bcccf3b76e80038243cb5fbc06f4d043067ddd6b93e",
-    "python/spike_core/harness_rlgc_geometry.py": "56b056ce9855f4c37d45a3d64731f6e15169449e1263eda873a9e7e567114ac9",
-    "python/spike_core/harness_mtl.py": "bca2ee6766ca5599c67ee1e231a371dfb5e9aebd7a5e44502c45d5010c79ed03"
+    "python/spike_core/solvers/signal_integrity/lines/harness_pi.py": "f0ec054df567acedf04c6bcccf3b76e80038243cb5fbc06f4d043067ddd6b93e",
+    "python/spike_core/solvers/signal_integrity/lines/harness_rlgc_geometry.py": "56b056ce9855f4c37d45a3d64731f6e15169449e1263eda873a9e7e567114ac9",
+    "python/spike_core/solvers/signal_integrity/lines/harness_mtl.py": "bca2ee6766ca5599c67ee1e231a371dfb5e9aebd7a5e44502c45d5010c79ed03"
   },
   "runtime": {
     "python": "3.12.9",

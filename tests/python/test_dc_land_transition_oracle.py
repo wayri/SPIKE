@@ -10,7 +10,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.dc_land_transition import solve_land_transition
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition import solve_land_transition
 
 
 CONTRACT = "spike/dc-land-transition-request/v1"

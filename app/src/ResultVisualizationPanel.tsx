@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import DataTable from "./DataTable";
 import SourceCapacityResults from "./SourceCapacityResults";
 import SavedAssemblyResults from "./SavedAssemblyResults";
@@ -16,10 +16,11 @@ import { buildDcReview } from "./dcReview";
 import { sourceLoadReview } from "./sourceLoadReview";
 import PiPdnReview from "./PiPdnReview";
 import { viaStressMapSvg } from "./viaStressMap";
-import { resultDatumLayers, resultLayerMatchesSelection } from "./resultLayerSelection";
+import { resultLayerMatchesSelection } from "./resultLayerSelection";
 import { numericExtent } from "./numericRange";
 import SavedFramePlaybackControls from "./SavedFramePlaybackControls";
 import type { AnimationExportRequest } from "./animationExport";
+import { resultLayerInventory, resultScalarPresentation } from "./resultScalarPresentation";
 
 const modes: { id: ResultViewMode; label: string; icon: typeof Activity }[] = [
   { id: "geometry", label: "Geometry", icon: Eye },
@@ -77,7 +78,7 @@ export default function ResultVisualizationPanel({
   const [candidateMountMohm, setCandidateMountMohm] = useState("0");
   const [candidateMountNh, setCandidateMountNh] = useState("0");
   const [candidatePortId, setCandidatePortId] = useState("");
-  const nets = [...new Set(Object.values(board?.nets ?? {}).filter(Boolean))].sort();
+  const nets = useMemo(() => [...new Set(Object.values(board?.nets ?? {}).filter(Boolean))].sort(), [board]);
   const visibleModes = modes.filter(mode => domain === "pi"
     ? !["electric_field", "magnetic_field"].includes(mode.id)
     : !["voltage", "voltage_drop", "current", "current_density", "power_loss", "via_stress"].includes(mode.id));
@@ -90,19 +91,19 @@ export default function ResultVisualizationPanel({
     if (visibleModes.some(mode => mode.id === visualization.mode)) return;
     update({ mode: result?.mesh.length ? "mesh" : "geometry" });
   }, [domain]);
-  const selectedGeometry = selected ? {
+  const selectedGeometry = useMemo(() => selected ? {
     tracks: board?.tracks.filter(item => item.net === selected) ?? [],
     zones: board?.zones.filter(item => item.net === selected) ?? [],
     vias: board?.vias.filter(item => item.net === selected) ?? [],
     pads: board?.pads.filter(item => item.net === selected) ?? [],
-  } : { tracks: [], zones: [], vias: [], pads: [] };
+  } : { tracks: [], zones: [], vias: [], pads: [] }, [board, selected]);
   const geometryCount = Object.values(selectedGeometry).reduce((sum, items) => sum + items.length, 0);
-  const geometryLayers = [...new Set([
+  const geometryLayers = useMemo(() => [...new Set([
     ...selectedGeometry.tracks.map(item => item.layer),
     ...selectedGeometry.zones.map(item => item.layer),
     ...selectedGeometry.vias.flatMap(item => item.layers.some(layer => layer === "*.Cu" || layer === "F&B.Cu") ? board?.layers ?? [] : item.layers),
     ...selectedGeometry.pads.flatMap(item => item.layers.some(layer => layer === "*.Cu" || layer === "F&B.Cu") ? board?.layers ?? [] : item.layers),
-  ].filter(layer => Boolean(layer) && Boolean(board?.layers.includes(layer))))];
+  ].filter(layer => Boolean(layer) && Boolean(board?.layers.includes(layer))))], [board, selectedGeometry]);
   const toggleList = (selector: string) =>
     [...(panel.current?.querySelectorAll<HTMLInputElement>(selector) ?? [])].filter(input => input.checked).map(input => input.value);
   const selectedParasitic = result?.parasitics.find(item => item.net === selected) ?? result?.parasitics[0];
@@ -146,16 +147,10 @@ export default function ResultVisualizationPanel({
         ? piOperatingImpedance
         : [];
   const boardLayers = board?.layers ?? [];
-  const resultLayers = [...new Set([
-    ...rawScalarSamples.flatMap(sample => resultDatumLayers(sample.layer, boardLayers)),
-    ...(result?.mesh ?? []).flatMap(cell => resultDatumLayers(cell.layer, boardLayers)),
-    ...(result?.vector_fields.current_density ?? []).flatMap(sample => resultDatumLayers(sample.layer, boardLayers)),
-    ...(result?.vector_fields.electric_field ?? []).flatMap(sample => resultDatumLayers(sample.layer, boardLayers)),
-    ...(result?.vector_fields.magnetic_field ?? []).flatMap(sample => resultDatumLayers(sample.layer, boardLayers)),
-  ].filter(layer => Boolean(layer) && layer !== "through"))]
-    .sort((left, right) => (board?.layers.indexOf(left) ?? 999) - (board?.layers.indexOf(right) ?? 999));
+  const resultLayers = resultLayerInventory(result, rawScalarSamples, boardLayers);
   const layerSelected = (layer?: string) => resultLayerMatchesSelection(layer, visualization.visibleResultLayers, boardLayers);
-  const scalarSamples = rawScalarSamples.filter(sample => layerSelected(sample.layer));
+  const scalarPresentation = resultScalarPresentation(rawScalarSamples, visualization.visibleResultLayers, boardLayers);
+  const scalarSamples = scalarPresentation.samples;
   const activeCount = visualization.mode === "geometry" ? geometryCount
     : visualization.mode === "mesh" ? result?.mesh.filter(cell => layerSelected(cell.layer)).length
     : visualization.mode === "impedance" ? (domain === "pi" ? scalarSamples.length : selectedImpedanceNetwork?.points.length ?? (siParasiticsAvailable ? 1 : 0))
@@ -171,11 +166,7 @@ export default function ResultVisualizationPanel({
         : [...selected, layer];
     update({ visibleResultLayers: next.length === resultLayers.length ? [] : next });
   };
-  const values = scalarSamples.map(sample => sample.value).filter(Number.isFinite).sort((a, b) => a - b);
-  const minimum = values[0];
-  const maximum = values.length ? values[values.length - 1] : undefined;
-  const mean = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : undefined;
-  const p95 = values.length ? values[Math.min(values.length - 1, Math.floor(values.length * 0.95))] : undefined;
+  const { minimum, maximum, mean, p95 } = scalarPresentation;
   const unit = visualization.mode === "current_density" || visualization.mode === "via_stress" ? "A/mm2"
     : visualization.mode === "current" ? "A"
       : visualization.mode === "power_loss" ? "W"
@@ -184,7 +175,7 @@ export default function ResultVisualizationPanel({
   const displayValue = (value: number | undefined) => value === undefined
     ? "-"
     : `${(visualization.mode === "voltage_drop" ? value * 1000 : value).toPrecision(6)} ${unit}`;
-  const hotspots = [...scalarSamples].sort((a, b) => b.value - a.value).slice(0, 12);
+  const hotspots = scalarPresentation.hotspots;
   const impedancePoints = selectedImpedanceNetwork?.points ?? [];
   const selectedImpedanceIndex = impedancePoints.length
     ? impedancePoints.reduce((best, point, index) => {
@@ -203,12 +194,14 @@ export default function ResultVisualizationPanel({
       : `${result.mode.toUpperCase()} / ${result.model_status}`;
   const frameCount = sourceResult?.time_series.frames.length ?? 0;
   const transientSummary = sourceResult?.summary ?? {};
-  const engineeringAnalytics = buildResultEngineeringAnalytics(result?.status === "preview" ? null : result, densityLimitAMm2, {
+  const engineeringAnalytics = useMemo(() => buildResultEngineeringAnalytics(result?.status === "preview" ? null : result, densityLimitAMm2, {
     ambientTemperatureC: visualization.fusingAmbientC,
     faultDurationS: visualization.fusingDurationS,
-  });
-  const dcReview = domain === "pi" ? buildDcReview(result, selected || null, visualization.visibleResultLayers, dropLimitMv ?? null, densityLimitAMm2) : null;
-  const terminalReview = domain === "pi" ? sourceLoadReview(result, selected || null, dropLimitMv ?? null) : null;
+  }), [result, densityLimitAMm2, visualization.fusingAmbientC, visualization.fusingDurationS]);
+  const dcReview = useMemo(() => domain === "pi" ? buildDcReview(result, selected || null, visualization.visibleResultLayers, dropLimitMv ?? null, densityLimitAMm2) : null,
+    [domain, result, selected, visualization.visibleResultLayers, dropLimitMv, densityLimitAMm2]);
+  const terminalReview = useMemo(() => domain === "pi" ? sourceLoadReview(result, selected || null, dropLimitMv ?? null) : null,
+    [domain, result, selected, dropLimitMv]);
   const vectorMode = ["current", "current_density", "voltage", "voltage_drop", "power_loss"].includes(visualization.mode)
     ? Boolean(result?.vector_fields.current_density.length)
     : visualization.mode === "electric_field" ? Boolean(result?.vector_fields.electric_field.length)

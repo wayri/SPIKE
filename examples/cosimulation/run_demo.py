@@ -5,8 +5,8 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from python.spike_core.cosimulation import run_cosimulation
-from python.spike_core.digital_twin import compare_digital_twin
+from python.spike_core.solvers.execution.coupling.cosimulation import run_cosimulation
+from python.spike_core.solvers.execution.coupling.digital_twin import compare_digital_twin
 
 
 def run_demo():

@@ -23,23 +23,20 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from examples.assembly_field.run_multiboard_volume import request
-from python.spike_core.calculix_runtime import probe_calculix_runtime
-from python.spike_core.multiboard_volume_electrothermal import (
-    run_multiboard_volume_electrothermal,
-    verify_multiboard_volume_electrothermal_result,
-)
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
+from python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal import run_multiboard_volume_electrothermal, verify_multiboard_volume_electrothermal_result
 
 CONTRACT = "spike/thermal-coupling-benchmark/v1"
 SOURCE_PATHS = (
     "examples/assembly_field/run_multiboard_volume.py",
-    "python/spike_core/multiboard_volume_electrothermal.py",
-    "python/spike_core/multiboard_volume_electrothermal_setup.py",
-    "python/spike_core/multiboard_volume_electrical_admission.py",
-    "python/spike_core/native_mna.py",
-    "python/spike_core/assembly_field_thermal.py",
-    "python/spike_core/assembly_tetra_thermal.py",
-    "python/spike_core/calculix_thermal.py",
-    "python/spike_core/calculix_runtime.py",
+    "python/spike_core/solvers/thermal_fluid/electrothermal/multiboard_volume_electrothermal.py",
+    "python/spike_core/solvers/thermal_fluid/electrothermal/multiboard_volume_electrothermal_setup.py",
+    "python/spike_core/solvers/power_integrity/dc/multiboard_volume_electrical_admission.py",
+    "python/spike_core/solvers/circuits/models/native_mna.py",
+    "python/spike_core/solvers/execution/coupling/assembly_field_thermal.py",
+    "python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_thermal.py",
+    "python/spike_core/solvers/external_engines/calculix/calculix_thermal.py",
+    "python/spike_core/solvers/external_engines/calculix/calculix_runtime.py",
     "scripts/validate_transient_thermal.py",
     "scripts/benchmark_thermal_coupling_accuracy.py",
 )

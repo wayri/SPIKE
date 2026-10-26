@@ -7,9 +7,9 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.dc_annular_stack import solve_annular_stack
-from python.spike_core.dc_annular_source import solve_source_annular_stack
-from python.spike_core.dc_annular_evidence import validate_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_stack import solve_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_source import solve_source_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_evidence import validate_annular_stack
 
 
 def main():

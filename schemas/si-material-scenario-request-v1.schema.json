@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/si-material-scenario-request/v1",
+  "title": "Explicit source-bound SI conductivity preparation; no imported defaults",
+  "type": "object", "additionalProperties": false,
+  "required": ["contract", "design_digest_sha256", "source_digest", "material_overrides"],
+  "properties": {
+    "contract": {"const": "spike/si-material-scenario-request/v1"},
+    "design_digest_sha256": {"$ref": "#/$defs/digest"},
+    "source_digest": {"$ref": "#/$defs/digest"},
+    "material_overrides": {
+      "type": "array", "minItems": 1, "maxItems": 256,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["material_id", "material_type", "conductivity_s_per_m", "provenance"],
+        "properties": {
+          "material_id": {"$ref": "#/$defs/text"},
+          "material_type": {"enum": ["conductor", "copper"]},
+          "conductivity_s_per_m": {"type": "number", "exclusiveMinimum": 0, "maximum": 1000000000000},
+          "provenance": {
+            "type": "object", "additionalProperties": false,
+            "required": ["source", "model", "temperature_k", "assumption_status"],
+            "properties": {
+              "source": {"$ref": "#/$defs/text"}, "model": {"$ref": "#/$defs/text"},
+              "temperature_k": {"type": "number", "exclusiveMinimum": 0, "maximum": 100000},
+              "assumption_status": {"enum": ["assumed", "reported", "measured"]}
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "text": {"type": "string", "minLength": 1, "maxLength": 1024}
+  }
+}

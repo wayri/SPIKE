@@ -12,14 +12,11 @@ from unittest.mock import patch
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import MeshBranch, build_hybrid_mesh, nearest_mesh_node
-from python.spike_core.peec_plugin import _connected_component
-from python.spike_core.peec_volume_adapter import (
-    VolumeMatrices, VolumeResistanceOverlay, extract_volume_matrices,
-    retry_nonpassive_legacy,
-)
-from python.spike_core.quasistatic_capacitance import zone_pad_mesh_dependence_issue
-from python.spike_core.transient_peec import solve_peec_rl_transient
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import MeshBranch, build_hybrid_mesh, nearest_mesh_node
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import _connected_component
+from python.spike_core.solvers.power_integrity.peec.peec_volume_adapter import VolumeMatrices, VolumeResistanceOverlay, extract_volume_matrices, retry_nonpassive_legacy
+from python.spike_core.solvers.power_integrity.pdn.quasistatic_capacitance import zone_pad_mesh_dependence_issue
+from python.spike_core.solvers.power_integrity.peec.transient_peec import solve_peec_rl_transient
 from python.spike_core.service import _design_from_kicad
 
 try:
@@ -44,7 +41,7 @@ class VolumeAdapterTests(unittest.TestCase):
     def test_retry_uses_unmodified_positive_volume_matrix(self):
         matrix = np.array([[1.0, 0.2], [0.2, 1.0]]) * 1e-9
         volume = VolumeMatrices(matrix, np.eye(2), {"basis_count": 2})
-        with patch('python.spike_core.peec_volume_adapter.extract_volume_matrices',
+        with patch('python.spike_core.solvers.power_integrity.peec.peec_volume_adapter.extract_volume_matrices',
                    return_value=volume) as extract:
             returned, admitted, quality, error = retry_nonpassive_legacy(
                 object(), SpiDeR(), [_track("a"), _track("b")], 2, [0, 1])

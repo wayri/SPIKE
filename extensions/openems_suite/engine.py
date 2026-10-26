@@ -42,7 +42,7 @@ from .openems_validation import (
 from .openems_validation_evidence import matching_openems_reference_evidence
 from .runtime import openems_install_root as _openems_install_root
 from .runtime import openems_python as _openems_python
-from python.spike_core.solver_geometry import build_solver_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.solver_geometry import build_solver_geometry
 
 
 ENGINE_CATALOG_CONTRACT = "spike/external-engine-catalog/v1"

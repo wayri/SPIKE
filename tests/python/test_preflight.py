@@ -2,12 +2,12 @@ import unittest
 from math import hypot
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.dc_result_utils import stratified_sample_records
-from python.spike_core.hybrid_mesh import build_hybrid_mesh, nearest_mesh_node
-from python.spike_core.meshing import MeshingOptions, _edges
+from python.spike_core.solvers.power_integrity.dc.dc_result_utils import stratified_sample_records
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh, nearest_mesh_node
+from python.spike_core.solvers.geometry_meshing.preparation.meshing import MeshingOptions, _edges
 from python.spike_core.preflight import build_mesh_preview, preflight_analysis
 from python.spike_core.solver_plugins import default_solver_registry
-from python.spike_core.peec_plugin import native_available
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import native_available
 
 
 class PreflightTests(unittest.TestCase):

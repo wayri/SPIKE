@@ -11,9 +11,9 @@ import numpy as np
 from scipy.sparse import csr_matrix
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_dc_solver import solve_hybrid_dc
-from python.spike_core.dc_terminal_validation import build_source_to_load_evidence, terminal_copper_weights
-from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
+from python.spike_core.solvers.power_integrity.dc.hybrid_dc_solver import solve_hybrid_dc
+from python.spike_core.solvers.power_integrity.dc.dc_terminal_validation import build_source_to_load_evidence, terminal_copper_weights
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
 from python.spike_core.kicad_importer import import_kicad_design
 
 
@@ -115,7 +115,7 @@ class HybridDCTerminalValidationTests(unittest.TestCase):
                                 "contact_resistance_ohm": resistance}],
                         options={"require_exact_terminal_geometry": True},
                     )
-                    with patch("python.spike_core.hybrid_dc_solver.build_hybrid_mesh",
+                    with patch("python.spike_core.solvers.power_integrity.dc.hybrid_dc_solver.build_hybrid_mesh",
                                return_value=self._parallel_contact_mesh(split)):
                         result = solve_hybrid_dc(SpiDeR(), spec)
                     self.assertEqual(result.status, "completed")
@@ -163,7 +163,7 @@ class HybridDCTerminalValidationTests(unittest.TestCase):
                     "geometry_anchor": {"type": "pad", "id": "load-pad"}}],
             options={"require_exact_terminal_geometry": True},
         )
-        with patch("python.spike_core.hybrid_dc_solver.build_hybrid_mesh", return_value=mesh):
+        with patch("python.spike_core.solvers.power_integrity.dc.hybrid_dc_solver.build_hybrid_mesh", return_value=mesh):
             result = solve_hybrid_dc(SpiDeR(), spec)
         expected = 13 / 24
         self.assertEqual(result.status, "completed")

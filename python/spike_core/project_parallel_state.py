@@ -9,7 +9,7 @@ import math
 import re
 from typing import Any, Callable
 
-from .parallel_pool import _digest, validate_batch
+from .solvers.execution.resources.parallel_pool import _digest, validate_batch
 
 CONTRACT = "spike/parallel-workspace/v1"
 REFERENCE = "spike/state-artifact-reference/v1"

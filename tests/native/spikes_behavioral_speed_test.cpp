@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Original correctness, concurrency, allocation, and performance qualification.
-#include "spikes/behavioral_expression.hpp"
+#include "solvers/circuits/spikes/behavioral_expression.hpp"
 
 #include <algorithm>
 #include <array>

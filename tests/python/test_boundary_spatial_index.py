@@ -7,18 +7,8 @@ import random
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.boundary_spatial_index import (
-    BoundarySpatialIndex,
-    BoundarySpatialIndexError,
-    MAX_INDEX_EDGES,
-    canonical_edge,
-    conservative_edge_bounds,
-    tolerance_query_bounds,
-)
-from python.spike_core.source_filled_boundary import (
-    _distance_to_edge,
-    prepare_source_filled_boundary,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.boundary_spatial_index import BoundarySpatialIndex, BoundarySpatialIndexError, MAX_INDEX_EDGES, canonical_edge, conservative_edge_bounds, tolerance_query_bounds
+from python.spike_core.solvers.power_integrity.dc.source_filled_boundary import _distance_to_edge, prepare_source_filled_boundary
 
 
 def bridged_annulus(scale=1.0, offset=(0.0, 0.0), angle=0.0):
@@ -107,6 +97,10 @@ class BoundarySpatialIndexTests(unittest.TestCase):
         self.assertEqual(
             domain.query_edges((-inf, -inf, inf, inf)), domain.edges,
         )
+        self.assertEqual(
+            domain.query_indexed_edges((-inf, -inf, inf, inf)),
+            tuple(enumerate(domain.edges)),
+        )
         generator = random.Random(99173)
         for _ in range(300):
             point = (generator.uniform(-4, 4), generator.uniform(-4, 4))
@@ -164,7 +158,7 @@ class BoundarySpatialIndexTests(unittest.TestCase):
         edge = ((0.0, 0.0), (1.0, 1.0))
         with (
             patch(
-                "python.spike_core.boundary_spatial_index.MAX_INDEX_EDGES", 1
+                "python.spike_core.solvers.geometry_meshing.preparation.boundary_spatial_index.MAX_INDEX_EDGES", 1
             ),
             self.assertRaises(BoundarySpatialIndexError),
         ):

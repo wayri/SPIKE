@@ -17,6 +17,27 @@ TEMPLATE = ROOT / "standalone/spikes_project"
 CONTRACT = "spikes/standalone-source-manifest/v1"
 ZIP_TIMESTAMP = (2026, 1, 1, 0, 0, 0)
 
+# Minimal first-party boundary used by python.spikes. Keep this explicit: the
+# standalone archive must not acquire the whole SPIKE application/solver tree.
+STANDALONE_SPIKE_CORE_MODULES = (
+    "python/spike_core/contracts.py",
+    "python/spike_core/compute_policy.py",
+    "python/spike_core/spice_netlist_safety.py",
+    "python/spike_core/spikes_runtime.py",
+    "python/spike_core/solvers/execution/resources/acceleration.py",
+    "python/spike_core/solvers/execution/resources/gpu_acceleration.py",
+    "python/spike_core/solvers/circuits/models/native_mna.py",
+    "python/spike_core/solvers/circuits/models/native_source_waveforms.py",
+    "python/spike_core/solvers/external_engines/circuits/ngspice_plugin.py",
+    "python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py",
+)
+STANDALONE_EXCLUDED_TESTS = {
+    "test_spikes_engine_version.py",
+    "test_spikes_release_verifier.py",
+    "test_spikes_standalone_packaging.py",
+    "test_spikes_worker_runtime.py",
+}
+
 
 def current_engine_version() -> str:
     """Read the canonical engine version without importing runtime dependencies."""
@@ -53,6 +74,22 @@ def copy_tree(source: Path, target: Path) -> None:
         copy_file(item, target / item.relative_to(source))
 
 
+def copy_standalone_python_boundary(package: Path) -> None:
+    """Copy the explicit SPIKE-core closure and its package initializers."""
+
+    copied_initializers: set[Path] = set()
+    for relative_name in STANDALONE_SPIKE_CORE_MODULES:
+        relative = Path(relative_name)
+        copy_file(ROOT / relative, package / relative)
+        parent = relative.parent
+        while parent != Path("python/spike_core"):
+            initializer = parent / "__init__.py"
+            if initializer not in copied_initializers:
+                copy_file(ROOT / initializer, package / initializer)
+                copied_initializers.add(initializer)
+            parent = parent.parent
+
+
 def build(version: str, output_root: Path) -> tuple[Path, Path, Path]:
     if not version or len(version) > 64 or any(
         character not in "0123456789.-abcdefghijklmnopqrstuvwxyz" for character in version.lower()
@@ -71,19 +108,16 @@ def build(version: str, output_root: Path) -> tuple[Path, Path, Path]:
     copy_tree(ROOT / 'scripts/studio_packaging', package / 'scripts/studio_packaging')
     copy_file(ROOT / 'scripts/build_spikes_studio_package.py', package / 'scripts/build_spikes_studio_package.py')
     copy_tree(ROOT / 'licenses', package / 'licenses')
-    copy_tree(ROOT / "src/spikes", package / "engine/src/spikes")
+    copy_tree(
+        ROOT / "src/solvers/circuits/spikes",
+        package / "engine/src/solvers/circuits/spikes",
+    )
     copy_tree(ROOT / "python/spikes", package / "python/spikes")
     copy_file(ROOT / "python/__init__.py", package / "python/__init__.py")
-    # SPIKES' released Python reference analyses still use a small historical
-    # `python.spike_core` namespace.  Package only the numerical/process modules
-    # they actually consume; the standalone template supplies minimal package,
-    # runtime-location, and solver-manifest shims so no PCB/UI service is pulled
-    # into this project.
-    for name in (
-        "acceleration.py", "native_mna.py", "contracts.py", "ngspice_plugin.py",
-        "spice_netlist_safety.py", "sparselizard_process.py",
-    ):
-        copy_file(ROOT / "python/spike_core" / name, package / "python/spike_core" / name)
+    # Package only the numerical/process closure used by python.spikes. The
+    # template supplies the minimal runtime/manifest boundary and public flat
+    # compatibility shims; no PCB, project, UI, or service tree is copied.
+    copy_standalone_python_boundary(package)
     copy_tree(ROOT / "examples/spikes", package / "examples/spikes")
     copy_tree(ROOT / "benchmarks/public_equal_model", package / "benchmarks/public_equal_model")
     copy_tree(ROOT / "benchmarks/public_application", package / "benchmarks/public_application")
@@ -100,13 +134,8 @@ def build(version: str, output_root: Path) -> tuple[Path, Path, Path]:
               package / "docs/validation/NATIVE_GPIO_PAD_20261019.md")
     copy_file(ROOT / "docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md",
               package / "docs/validation/NATIVE_GPIO_EDGE_COUPLING_20261019.md")
-    integration_only_tests = {
-        "test_spikes_engine_version.py",
-        "test_spikes_release_verifier.py",
-        "test_spikes_worker_runtime.py",
-    }
     for test in sorted((ROOT / "tests/python").glob("test_spikes*.py")):
-        if test.name in integration_only_tests:
+        if test.name in STANDALONE_EXCLUDED_TESTS:
             continue
         copy_file(test, package / "tests/python" / test.name)
 

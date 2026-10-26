@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from scripts.probe_marble_contact_loss import probe
-from python.spike_core.hybrid_mesh import _interior_polygon_point
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _interior_polygon_point
 
 
 class MarbleContactLossProbeTests(unittest.TestCase):

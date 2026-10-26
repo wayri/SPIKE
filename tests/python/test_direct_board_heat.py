@@ -8,9 +8,9 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.board_thermal import _pad_boundary_polygon, run_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.board_thermal import _pad_boundary_polygon, run_board_thermal
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.layered_board_thermal import MAX_DIRECT_CONTACT_WEIGHTS
+from python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal import MAX_DIRECT_CONTACT_WEIGHTS
 
 
 def design():
@@ -151,8 +151,8 @@ class DirectBoardHeatTests(unittest.TestCase):
                                       "contact_mode": "pads"}]
         # Four overlaps per land: fail inside the second land, before collecting
         # its weights or visiting the remaining eight duplicate physical lands.
-        with patch("python.spike_core.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 5):
-            with patch("python.spike_core.board_thermal._pad_boundary_polygon", wraps=_pad_boundary_polygon) as geometry:
+        with patch("python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 5):
+            with patch("python.spike_core.solvers.thermal_fluid.heat.board_thermal._pad_boundary_polygon", wraps=_pad_boundary_polygon) as geometry:
                 result = run_board_thermal(board, req)
         self.assertEqual(result["status"], "blocked")
         self.assertIn("overlap-weight budget", result["issues"][0]["message"])
@@ -164,9 +164,9 @@ class DirectBoardHeatTests(unittest.TestCase):
                        "at": [5, 5], "size": [10, 10], "layers": ["F.Cu", "B.Cu"]}]
         req["board_heat_sources"] = [{"id": "Q1-loss", "component_ref": "Q1", "power_w": .1,
                                       "contact_mode": "pads"}]
-        with patch("python.spike_core.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 8):
+        with patch("python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 8):
             self.solved(req, board)
-        with patch("python.spike_core.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 7):
+        with patch("python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 7):
             result = run_board_thermal(board, req)
         self.assertEqual(result["status"], "blocked")
         self.assertIn("overlap-weight budget", result["issues"][0]["message"])
@@ -180,9 +180,9 @@ class DirectBoardHeatTests(unittest.TestCase):
                     "contact_mode": "square", "contact_size_mm": 10}]
         for order in (sources, list(reversed(sources))):
             req["board_heat_sources"] = order
-            with patch("python.spike_core.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 8):
+            with patch("python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 8):
                 self.solved(req, board)
-            with patch("python.spike_core.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 7):
+            with patch("python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal.MAX_DIRECT_CONTACT_WEIGHTS", 7):
                 result = run_board_thermal(board, req)
             self.assertEqual(result["status"], "blocked")
             self.assertIn("overlap-weight budget", result["issues"][0]["message"])

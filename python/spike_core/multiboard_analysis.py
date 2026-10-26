@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import copy
 from dataclasses import asdict
 from math import isfinite
 from typing import Any, Dict, Iterable, Mapping, Sequence
@@ -162,6 +163,7 @@ def plan_multiboard_analysis(raw: Mapping[str, Any]) -> Dict[str, Any]:
 
     issues: list[Dict[str, Any]] = []
     boards: list[Dict[str, Any]] = []
+    design_summaries: dict[str, Dict[str, Any]] = {}
     for board in sorted(assembly.boards, key=lambda item: item.id):
         if board.id not in selected_set:
             continue
@@ -173,7 +175,10 @@ def plan_multiboard_analysis(raw: Mapping[str, Any]) -> Dict[str, Any]:
                 "message": f"Board {board.id} references unavailable design {board.design_id}.",
             })
             continue
-        summary = _design_summary(design)
+        summary = design_summaries.get(board.design_id)
+        if summary is None:
+            summary = _design_summary(design)
+            design_summaries[board.design_id] = summary
         if summary["copper_layers"] < 1 or summary["copper_layers"] > MAX_COPPER_LAYERS:
             issues.append({
                 "code": "MULTIBOARD_LAYER_LIMIT", "severity": "error", "entity_id": board.id,
@@ -206,7 +211,9 @@ def plan_multiboard_analysis(raw: Mapping[str, Any]) -> Dict[str, Any]:
             "namespace": f"{assembly.assembly_id}/{board.id}",
             "frame_id": board.frame.frame_id,
             "transform": list(board.frame.transform),
-            **summary,
+            # Cache the scan, but keep mutable summary lists independent in
+            # every returned occurrence just as the uncached planner did.
+            **copy.deepcopy(summary),
         })
 
     harnesses: list[Dict[str, Any]] = []

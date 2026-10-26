@@ -10,10 +10,8 @@ from jsonschema import Draft202012Validator
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.via_transition_geometry import AntipadSpec, build_via_transition_geometry
-from python.spike_core.via_transition_mesh import (
-    ViaTransitionMeshError, build_via_transition_mesh, validate_via_transition_mesh,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_geometry import AntipadSpec, build_via_transition_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.via_transition_mesh import ViaTransitionMeshError, build_via_transition_mesh, validate_via_transition_mesh
 
 
 ROOT = Path(__file__).resolve().parents[2]

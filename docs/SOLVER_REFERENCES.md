@@ -248,7 +248,7 @@ A. E. Ruehli (1974), *Equivalent Circuit Models for Three-Dimensional
 Multiconductor Systems*, IEEE Transactions on Microwave Theory and Techniques,
 22(3), 216-221. [DOI:10.1109/TMTT.1974.1128204](https://doi.org/10.1109/TMTT.1974.1128204).
 **Recorded method lineage:** explicitly named in
-[peec_solver.hpp](../src/peec/peec_solver.hpp). The kernel's partial-element
+[peec_solver.hpp](../src/solvers/power_integrity/peec/peec_solver.hpp). The kernel's partial-element
 formulation is not evidence that all retarded, radiation or arbitrary-geometry
 variants of PEEC are implemented. The DOI locator was added in this audit;
 the original code comment records author/title/year, not a paper access log.
@@ -259,8 +259,8 @@ E. B. Rosa and F. W. Grover (1912), *Formulas and tables for the calculation of
 mutual and self-inductance (Revised)*, NBS Bulletin 8(1).
 [NIST catalog](https://www.nist.gov/nist-research-library/nbs-bulletin-volume-8),
 [DOI:10.6028/bulletin.185](https://doi.org/10.6028/bulletin.185).
-**Recorded analytical lineage:** [kernel](../src/peec/peec_solver.cpp) and
-[benchmark](../python/spike_core/benchmarks.py) name the reference. The benchmark
+**Recorded analytical lineage:** [kernel](../src/solvers/power_integrity/peec/peec_solver.cpp) and
+[benchmark](../python/spike_core/solvers/power_integrity/dc/benchmarks.py) name the reference. The benchmark
 independently evaluates the admitted rectangular-conductor expression; neither
 that formula nor a positive diagonal validates an arbitrary mutual-L matrix.
 
@@ -293,7 +293,7 @@ K. Kurokawa (1965), *Power Waves and the Scattering Matrix*,
 [DOI:10.1109/TMTT.1965.1125964](https://doi.org/10.1109/TMTT.1965.1125964).
 [NIST comments on complex-reference network conversions](https://www.nist.gov/publications/comments-conversions-between-s-z-y-h-abcd-and-t-parameters-which-are-valid-complex).
 **Recorded convention guidance:** [geometry-derived SI](GEOMETRY_DERIVED_SI_CHANNEL.md)
-and [S-parameters](../python/spike_core/sparameters.py). Declare the wave convention
+and [S-parameters](../python/spike_core/solvers/signal_integrity/networks/sparameters.py). Declare the wave convention
 and reference impedances before applying passivity or renormalization criteria.
 The four-excitation solve S*A=B is independently derived linear algebra, not
 copied implementation or a claimed result from these papers.
@@ -340,9 +340,9 @@ IEEE reference implementation is imported by this documentation.
 ### R9 - Resonance terminology and independent ringdown derivation
 
 [MIT 6.101 resonance handout](https://web.mit.edu/6.101/www/s2019/handouts/L02_4.pdf)
-is named in [si_resonance.py](../python/spike_core/si_resonance.py).
+is named in [si_resonance.py](../python/spike_core/solvers/signal_integrity/receivers/si_resonance.py).
 [Harminv documentation](https://github.com/NanoComp/harminv) is named in
-[si_ringdown.py](../python/spike_core/si_ringdown.py) for complex-frequency/Q
+[si_ringdown.py](../python/spike_core/solvers/signal_integrity/receivers/si_ringdown.py) for complex-frequency/Q
 terminology. **Convention references:** SPIKE's AR(2) fit/reconstruction is its
 own bounded implementation, not Harminv code or the Harminv algorithm. Loaded
 decay is not automatically intrinsic Q; an invisible second mode is not excluded
@@ -353,9 +353,9 @@ by a good scalar fit.
 [openEMS documentation](https://docs.openems.de/) and its
 [patch-antenna example](https://docs.openems.de/python/openEMS/Tutorials/Simple_Patch_Antenna.html)
 are recorded in [external-engine adapter](../python/spike_core/external_engines.py)
-and [benchmark adapter](../python/spike_core/openems_benchmarks.py).
+and [benchmark adapter](../python/spike_core/solvers/external_engines/openems/openems_benchmarks.py).
 [Meep near-to-far documentation](https://meep.readthedocs.io/en/master/Python_User_Interface/#near-to-far-field-spectra)
-is cited in [Huygens transform](../python/spike_core/huygens_far_field.py).
+is cited in [Huygens transform](../python/spike_core/solvers/electromagnetics/fields/huygens_far_field.py).
 **External engine/API or convention references**, not claims of copying those
 solvers. Record the installed binary version separately from a moving docs URL.
 The 2026-09-20 openEMS documentation landing page advertises a newer revision
@@ -378,7 +378,7 @@ for those implementations in this audit.
 [OpenFOAM Boussinesq documentation](https://doc.openfoam.com/2212/tools/processing/models/thermophysical/equation-of-state/rtm/Boussinesq/),
 [turbulence documentation](https://doc.openfoam.com/2606/tools/processing/models/turbulence/),
 and the official API links recorded in [fan/CHT qualification](FAN_CHT_QUALIFICATION.md)
-and [flow diagnostics](../python/spike_core/openfoam_flow_diagnostics.py).
+and [flow diagnostics](../python/spike_core/solvers/external_engines/openfoam/openfoam_flow_diagnostics.py).
 **External runtime configuration guidance**. Mixed documentation versions must
 not be treated as one pinned solver version. Energy balance, startup energy,
 mesh/time-step convergence, buoyancy/turbulence applicability and measurements

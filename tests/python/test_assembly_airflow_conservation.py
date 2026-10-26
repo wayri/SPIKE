@@ -7,14 +7,16 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.assembly_airflow import prepare_airflow_case, run_assembly_airflow
-from python.spike_core.assembly_airflow_admission import admit_airflow_mesh
+from python.spike_core.solvers.thermal_fluid.flow.assembly_airflow import prepare_airflow_case, run_assembly_airflow
+from python.spike_core.solvers.thermal_fluid.flow.assembly_airflow_admission import admit_airflow_mesh
 from tests.python.test_assembly_airflow import request
 from tests.python.test_assembly_tetra_thermal import cube
 
 
 def fixture(n=2):
     job = request()
+    # Budget the resulting four-hex-per-tet CFD mesh at every refinement.
+    job['geometry']['mesh'].update(max_cells=20000, max_vertices=20000)
     shape = job['geometry']['solids'][0]['shape']
     shape['outer_mm'] = [[0, 0], [.5, 0], [.5, 1], [0, 1]]
     job['geometry']['air_domain'] = {**copy.deepcopy(shape),
@@ -84,14 +86,29 @@ class AirflowSourceConservationTests(unittest.TestCase):
     def test_nonconverged_native_result_retains_failure_and_source_evidence(self):
         job, mesh = fixture()
         with tempfile.TemporaryDirectory() as directory, \
-             patch('python.spike_core.assembly_airflow.run_air_mesh', return_value=mesh), \
-             patch('python.spike_core.assembly_airflow.run_multiregion_case',
+             patch('python.spike_core.solvers.thermal_fluid.flow.assembly_airflow.run_air_mesh', return_value=mesh), \
+             patch('python.spike_core.solvers.thermal_fluid.flow.assembly_airflow.run_multiregion_case',
                    return_value={'status': 'failed_to_converge', 'fields': {}}):
             result = run_assembly_airflow(job, Path(directory) / 'run')
             self.assertEqual(result['status'], 'failed_to_converge')
             self.assertEqual(result['fields'], {})
             self.assertFalse(result['production_qualified'])
             self.assertAlmostEqual(result['source_coupling']['sources'][0]['integrated_power_w'], 3.25)
+
+    def test_completed_forced_run_publishes_native_field_volume(self):
+        job, mesh = fixture()
+        job.update(mode='forced', flow_rate_m3_s=1e-6,
+                   inlet={'axis': 0, 'coordinate_mm': 0}, outlet={'axis': 0, 'coordinate_mm': 1})
+        native = {'status': 'completed', 'fields': {'velocity_m_s': {'samples': []}}}
+        volume = {'contract': 'spike/field-volume-view/v1', 'frames': []}
+        with tempfile.TemporaryDirectory() as directory, \
+             patch('python.spike_core.solvers.thermal_fluid.flow.assembly_airflow.run_air_mesh', return_value=mesh), \
+             patch('python.spike_core.solvers.thermal_fluid.flow.assembly_airflow.prepare_airflow_case', return_value={'status': 'prepared_runnable_case', 'source_coupling': {}}), \
+             patch('python.spike_core.solvers.thermal_fluid.flow.assembly_airflow.run_multiregion_case', return_value=native), \
+             patch('python.spike_core.solvers.external_engines.openfoam.openfoam_streamline_export.export_forced_airflow_field_volume', return_value=volume) as export:
+            result = run_assembly_airflow(job, Path(directory) / 'run')
+        self.assertIs(result['flow_field_volume'], volume)
+        self.assertEqual(export.call_args.kwargs['seed_line_mm'][0][0], .02)
 
 
 if __name__ == '__main__':

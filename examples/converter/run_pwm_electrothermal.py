@@ -13,7 +13,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.pwm_electrothermal import REQUEST, run_pwm_electrothermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.pwm_electrothermal import REQUEST, run_pwm_electrothermal
 
 
 def main():
@@ -38,7 +38,7 @@ def main():
         summaries.append({"maximum_step_s": dt, "endpoint": result["windows"][-1],
                           "quality": result["quality"], "energy": result["energy"],
                           "library_sha256": result["runtime"]["library_sha256"]})
-    sources = ["python/spike_core/pwm_electrothermal.py", "src/spikes/transient_solver.cpp", "src/spikes/transient_session.cpp",
+    sources = ["python/spike_core/solvers/thermal_fluid/electrothermal/pwm_electrothermal.py", "src/solvers/circuits/spikes/transient_solver.cpp", "src/solvers/circuits/spikes/transient_session.cpp",
                "tests/test_spikes_pwm_electrothermal.cpp", "tests/python/test_pwm_electrothermal.py",
                "schemas/pwm-electrothermal-request-v1.schema.json", "schemas/pwm-electrothermal-result-v1.schema.json",
                "examples/converter/run_pwm_electrothermal.py"]

@@ -1,0 +1,130 @@
+{
+  "status": "passed",
+  "native_projects": [
+    {
+      "project": "01-pcb-temperature/01-ebrake-transient/01-ebrake-transient.spike",
+      "manifest_payload_sha256": "6c91a5f310031b418b065347c11d4167f051be9e55088844f0f7cf1044f8aedf",
+      "native_readback": "passed",
+      "saved_frames": 16,
+      "steady_energy_error_w": -7.442935157087049e-13,
+      "maximum_step_energy_error_w": 7.880501806667439e-13
+    },
+    {
+      "project": "01-pcb-temperature/02-ebrake-transient-virtual-sink/02-ebrake-transient-virtual-sink.spike",
+      "manifest_payload_sha256": "23db2d0566ecc5a335515fd91784a596245508d08ec3971eb25ec7a4b3f69e9a",
+      "native_readback": "passed",
+      "saved_frames": 16,
+      "steady_energy_error_w": -4.1744385725905886e-13,
+      "maximum_step_energy_error_w": 4.228423167162987e-13
+    },
+    {
+      "project": "02-case-heatsink/case-contact.spike",
+      "manifest_payload_sha256": "263d817f9a846777846f2cb266bae1f98462334fa393819a3944ba5bf8bde0a3",
+      "native_readback": "passed"
+    },
+    {
+      "project": "02-case-heatsink/poor-contact.spike",
+      "manifest_payload_sha256": "9b9ae02e70320f6450ae05d3ff3cdbcdc8fb4b4790d10239bcb9087582420833",
+      "native_readback": "passed"
+    },
+    {
+      "project": "03-pi-si-arduino-cc-by-sa/arduino-r4-relay-shield.spike",
+      "manifest_payload_sha256": "c97a5f20f5ff0cd418d0a64dfbee3952a33424c3228142753998108bc368c904",
+      "native_readback": "passed"
+    },
+    {
+      "project": "05-em-machines/electromagnet-air.spike",
+      "manifest_payload_sha256": "ece403314db9d1d8040a4550012e6bb95192d5ada7c262eec8a2df709c4fef60",
+      "native_readback": "passed"
+    },
+    {
+      "project": "05-em-machines/electromagnet.spike",
+      "manifest_payload_sha256": "3698414a3fca1eb83e17d5a58b9ed2b13def5e15104b95b581c73991046424e4",
+      "native_readback": "passed"
+    },
+    {
+      "project": "05-em-machines/motor.spike",
+      "manifest_payload_sha256": "48dd64639c170f6999711ad2f8261fae3f1a344e634ad5d34a7aaa851c7a8782",
+      "native_readback": "passed"
+    },
+    {
+      "project": "05-em-machines/planar_pm_fem.spike",
+      "manifest_payload_sha256": "9c79da1d7b50a3ecf7714fb430054e450986660f6a318d4c83ab4729f8bee796",
+      "native_readback": "passed"
+    },
+    {
+      "project": "05-em-machines/planar_solenoid_fem.spike",
+      "manifest_payload_sha256": "a673c0ea0b9c0d3e3e8defbe9f2d077d0f14263a001bee13f495d6efa329f04c",
+      "native_readback": "passed"
+    }
+  ],
+  "current_method_source_hashes": [
+    {
+      "source": "docs/NUMERICAL_METHOD_EVIDENCE.md",
+      "sha256": "99ca282883401f5addc37f9375780e402dd0b2a99fddefc3d5c03fb158d70d55"
+    },
+    {
+      "source": "docs/ASSEMBLY_THERMAL_TRANSIENT.md",
+      "sha256": "352169d43a61f33f173eacb1e30c6c528ba0fa3ac01ed10c852d3c4cfbeb5d58"
+    },
+    {
+      "source": "docs/THERMAL_USER_GUIDE.md",
+      "sha256": "022d6b79351b861cb9f175da322d5346700717b7547e90d36297e4bae9e338eb"
+    },
+    {
+      "source": "docs/MAGNETIC_MACHINE_STUDIES.md",
+      "sha256": "f05ba926554e26e30cca79194ca95c2bbe0b464e941b3a746f6ab0908aff8c36"
+    },
+    {
+      "source": "docs/MAGNETIC_THERMAL.md",
+      "sha256": "048de57d8c4c837388fe11c47817693774da9124f02a19dce8ff8640162afe4f"
+    },
+    {
+      "source": "docs/EM_MACHINES.md",
+      "sha256": "6de96a9cf31018b3df792fa12afb1895b5ce592cdfd06b1eb297582be6b2b003"
+    },
+    {
+      "source": "docs/NATIVE_CFD.md",
+      "sha256": "3a4e6117d2e37dc11373de4ceef00d17facaa67c6614b4dec0b8b96d59f2d392"
+    },
+    {
+      "source": "docs/INTERNAL_AIRFLOW.md",
+      "sha256": "f4a94d50322523bd5dc52781fd97bad53af7db27746f26e2ae7376bd8ced9bc8"
+    },
+    {
+      "source": "python/spike_core/board_thermal.py",
+      "sha256": "09e4105095ab3b220fcbe009c9dc6aa6244279a1c29402f76178a2ef22b07d64"
+    },
+    {
+      "source": "python/spike_core/layered_board_thermal.py",
+      "sha256": "92b39f1b45d79616b760ad7344951345e9600d2f191a346e88d8611fb9138ef9"
+    },
+    {
+      "source": "python/spike_core/assembly_field_transient.py",
+      "sha256": "12b3e21287a5746a0a5607c4dc30e6d878c0a43426128da6e0cdec222e6e5005"
+    },
+    {
+      "source": "python/spike_core/assembly_tetra_transient.py",
+      "sha256": "4591e7ec75d27023163ce746d4fb46a159fe52d0c726304dd6b48f5a7cca2133"
+    },
+    {
+      "source": "python/spike_core/magnetic_machine_study.py",
+      "sha256": "f06616d1812c145a9154886c88489746920ca787bea45647f7418cc73c613f49"
+    },
+    {
+      "source": "python/spike_core/magnetic_thermal.py",
+      "sha256": "38e48c52ab3da438cd1125f53852adca0ae96a0c6186c3a02e342b251a5b894a"
+    },
+    {
+      "source": "python/spike_core/native_airflow.py",
+      "sha256": "5ddca2cd04d3884fa3bbedc500cbac3bc4bc1456e2abf1ad3aa04caa22864df2"
+    },
+    {
+      "source": "python/spike_core/laminar_channel_cht.py",
+      "sha256": "a7349180ca2763790c25acc7adc265440a9690866151035b44130764eca2745d"
+    }
+  ],
+  "desktop_interaction": "not_performed",
+  "no_new_physics_implementation": true,
+  "production_qualified": false
+}

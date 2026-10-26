@@ -10,10 +10,10 @@ def handle_structural_request(method, params, *, request_id=None):
         if not isinstance(params, dict) or set(params) != {'request'}:
             raise ValueError('STRUCTURAL_FIELDS: exact request required')
         if method == 'run_assembly_tetra_structural':
-            from .assembly_tetra_structural import run_assembly_tetra_structural
+            from .solvers.mechanics.elasticity.assembly_tetra_structural import run_assembly_tetra_structural
             result = run_assembly_tetra_structural(params['request'])
         else:
-            from .assembly_thermomechanical import run_assembly_thermomechanical
+            from .solvers.mechanics.elasticity.assembly_thermomechanical import run_assembly_thermomechanical
             result = run_assembly_thermomechanical(params['request'])
         return {'ok': True, 'result': result}
     except (ValueError, TypeError, KeyError, OverflowError) as exc:

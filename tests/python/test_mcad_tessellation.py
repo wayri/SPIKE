@@ -5,11 +5,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.mcad_tessellation import (
-    McadTessellationError,
-    StepTessellationPolicy,
-    tessellate_step_to_glb,
-)
+from python.spike_core.mcad_tessellation import McadTessellationError, StepTessellationPolicy, tessellate_step_to_glb
 
 
 STEP_BYTES = b"ISO-10303-21;\nHEADER;\nENDSEC;\nDATA;\nENDSEC;\nEND-ISO-10303-21;\n"

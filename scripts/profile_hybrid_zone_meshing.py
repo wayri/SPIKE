@@ -25,18 +25,9 @@ from typing import Callable
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.hybrid_mesh import (  # noqa: E402
-    _clean_polygon,
-    _clip_polygon_to_rect,
-    _clip_polygon_to_rect_fragments,
-    _normalize_filled_zone_polygon,
-    _point_in_polygon,
-    _polygon_area,
-    _segments,
-    _triangulate_polygon,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _clean_polygon, _clip_polygon_to_rect, _clip_polygon_to_rect_fragments, _normalize_filled_zone_polygon, _point_in_polygon, _polygon_area, _segments, _triangulate_polygon
 from python.spike_core.contracts import AnalysisSpec, SpiDeR  # noqa: E402
-import python.spike_core.hybrid_mesh as hybrid_mesh_module  # noqa: E402
+import python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh as hybrid_mesh_module  # noqa: E402
 
 
 Point2D = tuple[float, float]

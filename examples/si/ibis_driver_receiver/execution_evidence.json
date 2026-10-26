@@ -1,0 +1,106 @@
+{
+  "contract": "spike/ibis-original-execution-evidence/v1",
+  "license": "Apache-2.0",
+  "date": "2026-10-25",
+  "model_status": "experimental",
+  "production_qualified": false,
+  "source_sha256": "ef484b4c15a02a4ec34863b2444dcc5b40a13dcfe7b05586de1aa6071a07d18d",
+  "runtime_sha256": "86c9ea5f645ca919e305639fa7bdb522355364c424d14e197f1ade617feb3453",
+  "runtime_version": null,
+  "limits": {
+    "timeout_seconds": 30,
+    "memory_limit_mib": 512,
+    "output_bytes": 4194304
+  },
+  "coarse": {
+    "status": "completed",
+    "sample_count": 1389,
+    "stop_time_s": 1.5e-08,
+    "request_sha256": "9394803e3219ee4c374dc997a70cf1f5366f7a1ba7737154df69f76c96db5db0",
+    "compile_sha256": "e76ee4705396f93b7f22b0a84c099b7e7b3c2eb23eb11d42d243a37698ffad08",
+    "raw_sha256": "59e5b420a8475269763ea804cfb61d54cb63eb52a02a1a72baec85c07df04402",
+    "engine_log_sha256": "81f90e41045f40c043486d52c9d4c52ba72607a9f94c2c7db532a88f3c2af31a",
+    "elapsed_seconds": 0.40600000001722947,
+    "returncode": 0,
+    "os_enforcement": "windows_job_object",
+    "probe_ranges": {
+      "driver_pad_v": [
+        -0.0009143777378971646,
+        0.9992826557240767
+      ],
+      "receiver_pad_v": [
+        -0.0009588618436626826,
+        1.000850737500741
+      ],
+      "driver_die_v": [
+        -0.0006528526375444179,
+        0.9992786776644145
+      ],
+      "receiver_die_v": [
+        -0.000835222903390333,
+        1.000786034291169
+      ],
+      "driver_current_a": [
+        -0.01006101297175643,
+        0.01006101370843648
+      ]
+    }
+  },
+  "refined": {
+    "status": "completed",
+    "sample_count": 2057,
+    "stop_time_s": 1.5e-08,
+    "request_sha256": "7048b13e3b664a867311def4e1664ae947734b0cfa0d03cae96a70bec42e31d6",
+    "compile_sha256": "4dcaf52a73fd763a296fe624740cf0a5f26f746a56364d602c0ba77666e8c861",
+    "raw_sha256": "bea940d27e163a3449e8516bad429db6301d81bb1d3f731972156bd1bef821ef",
+    "engine_log_sha256": "162cc04c68a367f7bf73982613bb98dc1b33b3e6100469adcf6209f219213f7e",
+    "elapsed_seconds": 0.0779999999795109,
+    "returncode": 0,
+    "os_enforcement": "windows_job_object",
+    "probe_ranges": {
+      "driver_pad_v": [
+        -0.001041584186349597,
+        0.9992823972399068
+      ],
+      "receiver_pad_v": [
+        -0.0009879920835471187,
+        1.000829318763531
+      ],
+      "driver_die_v": [
+        -0.0007324511678467145,
+        0.999278589453482
+      ],
+      "receiver_die_v": [
+        -0.0008269866750926688,
+        1.000800859633033
+      ],
+      "driver_current_a": [
+        -0.01006110206960553,
+        0.01006675835635651
+      ]
+    }
+  },
+  "refinement": {
+    "coarse_step_s": 2e-11,
+    "refined_step_s": 1e-11,
+    "coarse_samples": 1389,
+    "refined_samples": 2057,
+    "max_abs_probe_delta": {
+      "driver_pad_v": 0.0006984001263095063,
+      "receiver_pad_v": 0.0006865561396283137,
+      "driver_die_v": 0.0005152086228161767,
+      "receiver_die_v": 0.00038561956634297623,
+      "driver_current_a": 1.4636654025895318e-05
+    }
+  },
+  "convergence": {
+    "voltage_difference_limit_v": 0.0005,
+    "all_voltage_probes_pass": false,
+    "driver_pad_v_pass": false,
+    "receiver_pad_v_pass": false,
+    "driver_die_v_pass": false,
+    "receiver_die_v_pass": true,
+    "status": "open"
+  },
+  "qualification": "Two tiny supervised native executions completed. The strict 0.5 mV voltage refinement criterion was not met for every probe; convergence qualification remains open. No measured device accuracy or external fixture replay claim."
+}

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from .owned_spice_process import capability_manifest as owned_spice_process_capability
+from .solvers.external_engines.circuits.owned_spice_process import capability_manifest as owned_spice_process_capability
 from .layout_scoring_process import capability_manifest as layout_scoring_process_capability
 
 

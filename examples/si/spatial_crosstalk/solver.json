@@ -1,0 +1,256 @@
+{
+  "pair_request": {
+    "contract": "spike/rlgc-coupled-pair-request/v1",
+    "conductor_ids": [
+      "aggressor-net",
+      "victim-net"
+    ],
+    "modes": {
+      "even": {
+        "contract": "spike/rlgc-line-network-request/v1",
+        "length_m": 0.08,
+        "reference_impedance_ohm": 50.0,
+        "inductance_h_per_m": 3.5e-07,
+        "capacitance_f_per_m": 8e-11,
+        "samples": [
+          {
+            "frequency_hz": 20000000.0,
+            "resistance_ohm_per_m": 4.0,
+            "conductance_s_per_m": 0.0005
+          },
+          {
+            "frequency_hz": 300000000.0,
+            "resistance_ohm_per_m": 4.0,
+            "conductance_s_per_m": 0.0005
+          },
+          {
+            "frequency_hz": 1000000000.0,
+            "resistance_ohm_per_m": 4.0,
+            "conductance_s_per_m": 0.0005
+          }
+        ]
+      },
+      "odd": {
+        "contract": "spike/rlgc-line-network-request/v1",
+        "length_m": 0.08,
+        "reference_impedance_ohm": 50.0,
+        "inductance_h_per_m": 2.5e-07,
+        "capacitance_f_per_m": 1.2e-10,
+        "samples": [
+          {
+            "frequency_hz": 20000000.0,
+            "resistance_ohm_per_m": 7.0,
+            "conductance_s_per_m": 0.0007
+          },
+          {
+            "frequency_hz": 300000000.0,
+            "resistance_ohm_per_m": 7.0,
+            "conductance_s_per_m": 0.0007
+          },
+          {
+            "frequency_hz": 1000000000.0,
+            "resistance_ohm_per_m": 7.0,
+            "conductance_s_per_m": 0.0007
+          }
+        ]
+      }
+    },
+    "excitations": [
+      {
+        "frequency_hz": 20000000.0,
+        "incident_waves": [
+          {
+            "real": 1.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          }
+        ]
+      },
+      {
+        "frequency_hz": 300000000.0,
+        "incident_waves": [
+          {
+            "real": 1.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          }
+        ]
+      },
+      {
+        "frequency_hz": 1000000000.0,
+        "incident_waves": [
+          {
+            "real": 1.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          },
+          {
+            "real": 0.0,
+            "imag": 0.0
+          }
+        ]
+      }
+    ],
+    "probes": [
+      {
+        "id": "sample-0",
+        "fractional_position": 0.0
+      },
+      {
+        "id": "sample-1",
+        "fractional_position": 0.03225806451612903
+      },
+      {
+        "id": "sample-2",
+        "fractional_position": 0.06451612903225806
+      },
+      {
+        "id": "sample-3",
+        "fractional_position": 0.0967741935483871
+      },
+      {
+        "id": "sample-4",
+        "fractional_position": 0.12903225806451613
+      },
+      {
+        "id": "sample-5",
+        "fractional_position": 0.16129032258064516
+      },
+      {
+        "id": "sample-6",
+        "fractional_position": 0.1935483870967742
+      },
+      {
+        "id": "sample-7",
+        "fractional_position": 0.22580645161290322
+      },
+      {
+        "id": "sample-8",
+        "fractional_position": 0.25806451612903225
+      },
+      {
+        "id": "sample-9",
+        "fractional_position": 0.2903225806451613
+      },
+      {
+        "id": "sample-10",
+        "fractional_position": 0.3225806451612903
+      },
+      {
+        "id": "sample-11",
+        "fractional_position": 0.3548387096774194
+      },
+      {
+        "id": "sample-12",
+        "fractional_position": 0.3870967741935484
+      },
+      {
+        "id": "sample-13",
+        "fractional_position": 0.41935483870967744
+      },
+      {
+        "id": "sample-14",
+        "fractional_position": 0.45161290322580644
+      },
+      {
+        "id": "sample-15",
+        "fractional_position": 0.4838709677419355
+      },
+      {
+        "id": "sample-16",
+        "fractional_position": 0.5161290322580645
+      },
+      {
+        "id": "sample-17",
+        "fractional_position": 0.5483870967741935
+      },
+      {
+        "id": "sample-18",
+        "fractional_position": 0.5806451612903226
+      },
+      {
+        "id": "sample-19",
+        "fractional_position": 0.6129032258064516
+      },
+      {
+        "id": "sample-20",
+        "fractional_position": 0.6451612903225806
+      },
+      {
+        "id": "sample-21",
+        "fractional_position": 0.6774193548387096
+      },
+      {
+        "id": "sample-22",
+        "fractional_position": 0.7096774193548387
+      },
+      {
+        "id": "sample-23",
+        "fractional_position": 0.7419354838709677
+      },
+      {
+        "id": "sample-24",
+        "fractional_position": 0.7741935483870968
+      },
+      {
+        "id": "sample-25",
+        "fractional_position": 0.8064516129032258
+      },
+      {
+        "id": "sample-26",
+        "fractional_position": 0.8387096774193549
+      },
+      {
+        "id": "sample-27",
+        "fractional_position": 0.8709677419354839
+      },
+      {
+        "id": "sample-28",
+        "fractional_position": 0.9032258064516129
+      },
+      {
+        "id": "sample-29",
+        "fractional_position": 0.9354838709677419
+      },
+      {
+        "id": "sample-30",
+        "fractional_position": 0.967741935483871
+      },
+      {
+        "id": "sample-31",
+        "fractional_position": 1.0
+      }
+    ]
+  },
+  "aggressor_segment_id": "aggressor-stroke",
+  "victim_segment_id": "victim-stroke"
+}

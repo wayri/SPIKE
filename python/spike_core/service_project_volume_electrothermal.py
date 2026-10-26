@@ -12,8 +12,7 @@ STUDY_KEY = 'assembly_volume_electrothermal'
 
 
 def _admit(record, assembly):
-    from .multiboard_volume_electrothermal import (
-        prepare_multiboard_volume_electrothermal, verify_multiboard_volume_electrothermal_result)
+    from .solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal import prepare_multiboard_volume_electrothermal, verify_multiboard_volume_electrothermal_result
     if not isinstance(record, dict) or set(record) != {'request', 'result'}:
         raise ProjectPackageError('VOLUME_COUPLING_RECORD: request and nullable result required')
     prepared = prepare_multiboard_volume_electrothermal(record['request'])

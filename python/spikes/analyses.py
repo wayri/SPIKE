@@ -16,11 +16,11 @@ from dataclasses import dataclass
 from typing import Any, Mapping, Sequence
 
 try:
-    from python.spike_core.native_mna import run_native_mna
+    from python.spike_core.solvers.circuits.models.native_mna import run_native_mna
 except ModuleNotFoundError as exc:
     if exc.name != "python":
         raise
-    from spike_core.native_mna import run_native_mna  # type: ignore[no-redef]
+    from spike_core.solvers.circuits.models.native_mna import run_native_mna  # type: ignore[no-redef]
 
 from .contracts import CircuitProject, ProbeDescriptor, RESULT_CONTRACT
 from .runner import native_request
@@ -259,7 +259,7 @@ def run_ac_analysis(project: CircuitProject, sweep: AcSweep, excitation: AcExcit
             "adapter": "python.spikes.analyses",
             "source_sha256": project.source_sha256,
             "ac_engine": {
-                "implementation": "python.spike_core.native_mna",
+                "implementation": "python.spike_core.solvers.circuits.models.native_mna",
                 "formulation": "linear_complex_modified_nodal_analysis",
                 "owned_cpp_ac": False,
                 "nonlinear_bias_linearization": False,

@@ -1,5 +1,9 @@
+import { boardThermalFieldVolume } from "./boardThermalFieldVolume";
+import { showFieldInMainViewport } from "./mainFieldViewport";
+import { useGuidedRunAdapter } from "./useGuidedRunAdapter";
+import SolverSetupSteps, { SolverSetupPanel } from "./SolverSetupSteps";
 // SPDX-License-Identifier: Apache-2.0
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import DataTable from "./DataTable";
 import PlotlyChart from "./PlotlyChart";
 import type { ParsedBoard } from "./boardParser";
@@ -126,6 +130,7 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
   }));
   const [virtualHeatsinks, setVirtualHeatsinks] = useState<VirtualHeatsink[]>(() => savedRequest?.virtual_heatsinks ?? []);
   const [transientEnabled, setTransientEnabled] = useState(Boolean(savedRequest?.transient));
+  const [setupStep, setSetupStep] = useState("domain");
   const [transientSettings, setTransientSettings] = useState<TransientInput>(() => savedRequest?.transient ?? { end_time_s: 60, time_step_s: 10, output_stride: 1, copper_volumetric_heat_capacity_j_m3k: 3.45e6, dielectric_volumetric_heat_capacity_j_m3k: 1.4e6 });
   const [result, setResult] = useState<BoardResult | null>(savedRequest && validBoardThermalResult(savedResult, savedRequest) ? savedResult : null);
   const [resultKey, setResultKey] = useState(requestKey(savedRequest ?? null));
@@ -151,24 +156,25 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
   const changeSetting = (key: "conductivity_w_mk" | "thickness_mm" | "convection_top_w_m2k" | "convection_bottom_w_m2k" | "grid_step_mm" | "dielectric_conductivity_w_mk" | "copper_conductivity_w_mk" | "via_plating_thickness_mm" | "fuzzy_sigma_mm", value: string) => setSettings(current => ({ ...current, [key]: value === "" ? NaN : Number(value) }));
   const changeRow = (ref: string, patch: Partial<Row>) => setRows(current => current.map(row => row.component_ref === ref ? { ...row, ...patch } : row));
   const changeHeatsink = (id: string, patch: Partial<VirtualHeatsink>) => setVirtualHeatsinks(current => current.map(sink => sink.id === id ? { ...sink, ...patch } : sink));
-  const inputError = () => {
-    if (![...request.components, ...(request.board_heat_sources ?? [])].some(row => row.power_w > 0)) return "Select at least one board part with positive power.";
-    if (explicitGrid && (!board || !Array.isArray(settings.x_edges_mm) || !Array.isArray(settings.y_edges_mm) || !boardThermalViewportGrid({ contract: "spike/board-thermal-result/v1", status: "completed", grid: { origin_mm: [board.bounds.minX, board.bounds.minY], shape: [gridX, gridY], x_edges_mm: settings.x_edges_mm, y_edges_mm: settings.y_edges_mm, temperatures_c: Array(Math.max(0, Math.min(8192, cellsPerLayer))).fill(0), order: "x-fast" } }) || settings.x_edges_mm.slice(-1)[0] !== board.bounds.maxX || settings.y_edges_mm.slice(-1)[0] !== board.bounds.maxY)) return "Local grid must have valid full-board physical edges within the cell budget.";
-    if (settings.model === "layered" && !stack.complete) return "Layered mode needs an imported physical stackup with positive thickness for every copper and dielectric layer. Choose plate mode or import a complete stackup.";
-    if (virtualHeatsinks.length && settings.model !== "layered") return "Virtual board heatsinks need the layered model and an imported physical stackup.";
-    if (transientEnabled && settings.model !== "layered") return "Spatial board transient needs the layered model and an imported physical stackup.";
-    if (transientEnabled) { const { end_time_s, time_step_s, output_stride, copper_volumetric_heat_capacity_j_m3k, dielectric_volumetric_heat_capacity_j_m3k } = transientSettings; const steps = end_time_s / time_step_s; if (![end_time_s, time_step_s, copper_volumetric_heat_capacity_j_m3k, dielectric_volumetric_heat_capacity_j_m3k].every(value => finite(value) && value > 0) || !Number.isInteger(output_stride) || output_stride < 1 || !Number.isInteger(steps) || steps < 1 || steps > 240 || 1 + Math.ceil(steps / output_stride) > 24 || cellsPerLayer * stack.layers.length * (1 + Math.ceil(steps / output_stride)) > 500000) return "Transient board run needs positive time and heat capacities, an integer number of 1–240 steps, and at most 24 frames / 500,000 saved temperature values. Increase output stride or grid step."; }
-    if (virtualHeatsinks.length > 16 || virtualHeatsinks.some(sink => ![sink.x_mm, sink.y_mm, sink.width_mm, sink.height_mm, sink.interface_resistance_k_w, sink.sink_to_ambient_k_w].every(finite) || sink.width_mm <= 0 || sink.height_mm <= 0 || sink.interface_resistance_k_w < 0 || sink.sink_to_ambient_k_w <= 0 || !board || sink.x_mm - sink.width_mm / 2 < board.bounds.minX || sink.x_mm + sink.width_mm / 2 > board.bounds.maxX || sink.y_mm - sink.height_mm / 2 < board.bounds.minY || sink.y_mm + sink.height_mm / 2 > board.bounds.maxY)) return "Each virtual heatsink needs a footprint inside the board, nonnegative interface K/W, and positive sink-to-ambient K/W (16 maximum).";
-    if (cellsPerLayer > 8192) return `Grid estimate is ${cellsPerLayer} cells per layer, above the 8,192-cell limit. Increase grid step.`;
+  const inputIssue = (): { detail: string; route: string } | null => {
+    if (![...request.components, ...(request.board_heat_sources ?? [])].some(row => row.power_w > 0)) return { detail: "Select at least one board part with positive power.", route: "loads" };
+    if (explicitGrid && (!board || !Array.isArray(settings.x_edges_mm) || !Array.isArray(settings.y_edges_mm) || !boardThermalViewportGrid({ contract: "spike/board-thermal-result/v1", status: "completed", grid: { origin_mm: [board.bounds.minX, board.bounds.minY], shape: [gridX, gridY], x_edges_mm: settings.x_edges_mm, y_edges_mm: settings.y_edges_mm, temperatures_c: Array(Math.max(0, Math.min(8192, cellsPerLayer))).fill(0), order: "x-fast" } }) || settings.x_edges_mm.slice(-1)[0] !== board.bounds.maxX || settings.y_edges_mm.slice(-1)[0] !== board.bounds.maxY)) return { detail: "Local grid must have valid full-board physical edges within the cell budget.", route: "solver" };
+    if (settings.model === "layered" && !stack.complete) return { detail: "Layered mode needs an imported physical stackup with positive thickness for every copper and dielectric layer. Choose plate mode or import a complete stackup.", route: "domain" };
+    if (virtualHeatsinks.length && settings.model !== "layered") return { detail: "Virtual board heatsinks need the layered model and an imported physical stackup.", route: "domain" };
+    if (transientEnabled && settings.model !== "layered") return { detail: "Spatial board transient needs the layered model and an imported physical stackup.", route: "domain" };
+    if (transientEnabled) { const { end_time_s, time_step_s, output_stride, copper_volumetric_heat_capacity_j_m3k, dielectric_volumetric_heat_capacity_j_m3k } = transientSettings; const steps = end_time_s / time_step_s; if (![end_time_s, time_step_s, copper_volumetric_heat_capacity_j_m3k, dielectric_volumetric_heat_capacity_j_m3k].every(value => finite(value) && value > 0) || !Number.isInteger(output_stride) || output_stride < 1 || !Number.isInteger(steps) || steps < 1 || steps > 240 || 1 + Math.ceil(steps / output_stride) > 24 || cellsPerLayer * stack.layers.length * (1 + Math.ceil(steps / output_stride)) > 500000) return { detail: "Transient board run needs positive time and heat capacities, an integer number of 1–240 steps, and at most 24 frames / 500,000 saved temperature values. Increase output stride or grid step.", route: "solver" }; }
+    if (virtualHeatsinks.length > 16 || virtualHeatsinks.some(sink => ![sink.x_mm, sink.y_mm, sink.width_mm, sink.height_mm, sink.interface_resistance_k_w, sink.sink_to_ambient_k_w].every(finite) || sink.width_mm <= 0 || sink.height_mm <= 0 || sink.interface_resistance_k_w < 0 || sink.sink_to_ambient_k_w <= 0 || !board || sink.x_mm - sink.width_mm / 2 < board.bounds.minX || sink.x_mm + sink.width_mm / 2 > board.bounds.maxX || sink.y_mm - sink.height_mm / 2 < board.bounds.minY || sink.y_mm + sink.height_mm / 2 > board.bounds.maxY)) return { detail: "Each virtual heatsink needs a footprint inside the board, nonnegative interface K/W, and positive sink-to-ambient K/W (16 maximum).", route: "loads" };
+    if (cellsPerLayer > 8192) return { detail: `Grid estimate is ${cellsPerLayer} cells per layer, above the 8,192-cell limit. Increase grid step.`, route: "solver" };
     const withoutPads = request.components.find(row => row.contact_mode === "pads" && !counts.has(row.component_ref));
-    if (withoutPads) return `${withoutPads.component_ref} has no eligible imported copper pads. Choose square contact or import pads for this part.`;
-    if (settings.model === "layered" && finite(settings.thickness_mm) && Math.abs(settings.thickness_mm - stack.thicknessMm) > 0.05 * stack.thicknessMm) return `Board thickness must agree with imported physical stackup thickness ${formatted(stack.thicknessMm, 3)} mm within 5%.`;
-    if (settings.model === "layered" && (![settings.dielectric_conductivity_w_mk, settings.copper_conductivity_w_mk].every(value => finite(value) && value > 0) || settings.include_vias && (!finite(settings.via_plating_thickness_mm) || settings.via_plating_thickness_mm <= 0) || !finite(settings.fuzzy_sigma_mm) || settings.fuzzy_sigma_mm < 0)) return "For layered board mode, enter positive dielectric and copper conductivity, positive via plating thickness when vias are included, and nonnegative spread sigma.";
-    if (settings.model === "plate" && (!finite(settings.conductivity_w_mk) || settings.conductivity_w_mk <= 0)) return "Enter positive effective board conductivity for plate mode.";
+    if (withoutPads) return { detail: `${withoutPads.component_ref} has no eligible imported copper pads. Choose square contact or import pads for this part.`, route: "loads" };
+    if (settings.model === "layered" && finite(settings.thickness_mm) && Math.abs(settings.thickness_mm - stack.thicknessMm) > 0.05 * stack.thicknessMm) return { detail: `Board thickness must agree with imported physical stackup thickness ${formatted(stack.thicknessMm, 3)} mm within 5%.`, route: "domain" };
+    if (settings.model === "layered" && (![settings.dielectric_conductivity_w_mk, settings.copper_conductivity_w_mk].every(value => finite(value) && value > 0) || settings.include_vias && (!finite(settings.via_plating_thickness_mm) || settings.via_plating_thickness_mm <= 0) || !finite(settings.fuzzy_sigma_mm) || settings.fuzzy_sigma_mm < 0)) return { detail: "For layered board mode, enter positive dielectric and copper conductivity, positive via plating thickness when vias are included, and nonnegative spread sigma.", route: "domain" };
+    if (settings.model === "plate" && (!finite(settings.conductivity_w_mk) || settings.conductivity_w_mk <= 0)) return { detail: "Enter positive effective board conductivity for plate mode.", route: "domain" };
     const effectiveConvection = [...(settings.convection_top_grid_w_m2k ?? [settings.convection_top_w_m2k]), ...(settings.convection_bottom_grid_w_m2k ?? [settings.convection_bottom_w_m2k])];
-    if (![settings.thickness_mm, ...(explicitGrid ? [] : [settings.grid_step_mm])].every(value => finite(value) && value > 0) || ![settings.convection_top_w_m2k, settings.convection_bottom_w_m2k].every(value => finite(value) && value >= 0) || !effectiveConvection.some(value => finite(value) && value > 0) || !finite(ambientC) || ambientC < -273.15 || request.components.some(row => !finite(row.power_w) || row.power_w < 0 || !finite(row.r_junction_case_k_w) || row.r_junction_case_k_w <= 0 || !finite(row.r_case_board_k_w) || row.r_case_board_k_w <= 0 || row.contact_mode === "square" && (!finite(row.contact_size_mm) || Number(row.contact_size_mm) <= 0))) return "Enter positive thickness, grid step or valid local edges, resistances, and square contact size where selected; nonnegative power and convection with at least one positive convection value; and valid ambient temperature.";
-    return "";
+    if (![settings.thickness_mm, ...(explicitGrid ? [] : [settings.grid_step_mm])].every(value => finite(value) && value > 0) || ![settings.convection_top_w_m2k, settings.convection_bottom_w_m2k].every(value => finite(value) && value >= 0) || !effectiveConvection.some(value => finite(value) && value > 0) || !finite(ambientC) || ambientC < -273.15 || request.components.some(row => !finite(row.power_w) || row.power_w < 0 || !finite(row.r_junction_case_k_w) || row.r_junction_case_k_w <= 0 || !finite(row.r_case_board_k_w) || row.r_case_board_k_w <= 0 || row.contact_mode === "square" && (!finite(row.contact_size_mm) || Number(row.contact_size_mm) <= 0))) return { detail: "Enter positive thickness, grid step or valid local edges, resistances, and square contact size where selected; nonnegative power and convection with at least one positive convection value; and valid ambient temperature.", route: request.components.some(row => !finite(row.power_w) || row.power_w < 0 || !finite(row.r_junction_case_k_w) || row.r_junction_case_k_w <= 0 || !finite(row.r_case_board_k_w) || row.r_case_board_k_w <= 0 || row.contact_mode === "square" && (!finite(row.contact_size_mm) || Number(row.contact_size_mm) <= 0)) ? "loads" : "solver" };
+    return null;
   };
+  const inputError = () => inputIssue()?.detail ?? "";
   const run = async () => {
     setError("");
     if (!design || !board) { setError("Import a PCB design before running the board model."); return; }
@@ -183,10 +189,37 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
       const next = response.result as BoardResult | undefined;
       if (!response.ok || !validBoardThermalResult(next, request)) throw new Error(response.error ?? "The board thermal worker returned an invalid result.");
       setResult(next); setResultKey(inputKey); setPlaying(false); setFrameIndex(next.transient?.length ? next.transient.length - 1 : -1); onSave(request, next);
+      const volume = boardThermalFieldVolume(next); if (volume) showFieldInMainViewport(volume);
       onStatus(next.status === "completed" ? `Approximate ${settings.model === "layered" ? "layered" : "2D plate"} board thermal run completed` : next.issues?.[0]?.message ?? next.message ?? "Board thermal run was blocked");
     } catch (cause) { const message = cause instanceof Error ? cause.message : "Board thermal run failed"; setError(message); onStatus(message); }
     finally { setBusy(false); }
   };
+  const setupRoot = useRef<HTMLDivElement>(null);
+  const requestBoardRun = useGuidedRunAdapter({
+    id: "thermal-board", context: { key: `thermal-board:${String(design?.design_id ?? "active-board")}`, revision: requestKey({ design, board, sourceText, request, workerAvailable }), workspace: "Thermal", title: "Board thermal model" },
+    check: async () => {
+      if (busy || !workerAvailable) return { requirements: [{ id: "board-thermal-runtime", title: busy ? "Wait for the active thermal operation" : "Open SPIKE desktop", detail: busy ? "Finish the active board thermal operation before starting another run." : "The local desktop worker is required to run the board thermal model.", severity: "blocker", route: "review" }] };
+      if (!design || !board) return { requirements: [{ id: "board-thermal-design", title: "Import a PCB design", detail: "Import a PCB design before running the board model.", severity: "blocker", route: "domain" }] };
+      const issue = inputIssue();
+      return { requirements: issue ? [{ id: "board-thermal-input", title: "Review board thermal inputs", detail: issue.detail, severity: "blocker", route: issue.route }] : [], summary: "Board-grid inputs checked locally. The existing worker retains final geometry, assembly admission and solver validation." };
+    },
+    fix: requirement => {
+      setSetupStep(requirement.route ?? "review"); setError(requirement.detail);
+      const root = setupRoot.current;
+      if (!root) return;
+      root.ownerDocument.defaultView?.requestAnimationFrame(() => {
+        const target = root.querySelector<HTMLElement>('section:not([hidden]) input, section:not([hidden]) select, section:not([hidden]) button');
+        (target ?? root).scrollIntoView({ block: "nearest" }); (target ?? root).focus({ preventScroll: true });
+      });
+    },
+    run: async (_context, signal) => { if (!signal.aborted) await run(); },
+    tutorSteps: [
+      { id: "domain", title: "Choose board and materials", detail: "Review plate or imported layered stack geometry and enter justified thermal properties.", route: "domain" },
+      { id: "loads", title: "Define heat and contacts", detail: "Select powered parts and enter thermal resistances and pad or square contacts. Add virtual sinks only when applicable.", route: "loads" },
+      { id: "solver", title: "Review grid and boundary paths", detail: "Set board resolution, convection and optional transient heat capacities and time controls. No package materials or heat paths are inferred.", route: "solver" },
+      { id: "review", title: "Check and run", detail: "Check the current draft, run the existing admitted approximate board solver, and inspect its diagnostics and heat balance.", route: "review" },
+    ],
+  });
   const grid = result?.status === "completed" && resultKey === inputKey ? result.grid : undefined;
   const [nx, ny] = grid?.shape ?? [0, 0];
   const layerGrids = result?.status === "completed" && resultKey === inputKey && Array.isArray(result.layer_grids) ? result.layer_grids : [];
@@ -206,16 +239,27 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
   const extent = plotReady ? numericExtent(values) : { minimum: 0, maximum: 0 };
   const minimum = transientFrames.length ? Math.min(ambientC, result?.summary?.minimum_board_temperature_c ?? extent.minimum) : extent.minimum;
   const maximum = transientFrames.length ? Math.max(result?.summary?.maximum_board_temperature_c ?? extent.maximum, result?.summary?.transient_peak_board_temperature_c ?? extent.maximum) : extent.maximum;
-  return <div className="wizard-section board-thermal-section" data-guide="thermal-board-setup">
+  return <div ref={setupRoot} tabIndex={-1} className="wizard-section board-thermal-section" data-guide="thermal-board-setup">
     <label>{settings.model === "layered" ? "LAYERED BOARD THERMAL" : "2D BOARD THERMAL"} · APPROXIMATE</label>
     <p className="thermal-table-note">Enter measured or justified board and component properties. Imported copper pads locate pad contacts; conductivity, convection, thermal resistance, and package heat flow are not inferred. Plate mode is a uniform 2D sheet. Layered mode is an approximate 3D stack discretization with optional imported copper/vias and Gaussian spread. Neither resolves package blocks, a tetrahedral mesh, airflow, or CFD.</p>
     <p className="thermal-table-note" role="status">3D model coverage: this board-grid solve has no meshed package solids. Case/junction values use the entered thermal resistances. For temperatures throughout real parts, retain closed STEP solids, assign materials and heat contacts, then solve a thermal volume study.</p>
     {onOpenSolidStudy && <button type="button" className="secondary-btn" title="Open the assembly workspace; use Coupled studies to retain component STEP solids, prepare the volume mesh and solve their temperatures" onClick={onOpenSolidStudy}>3D parts and volume thermal study</button>}
+    <SolverSetupSteps label="Board thermal setup steps" current={setupStep} onChange={setSetupStep} steps={[
+      { id: "domain", label: "Board and materials", description: "Import board geometry and review the approximate plate or layered model and material properties." },
+      { id: "loads", label: "Heat and contacts", description: "Select components and enter justified power, thermal resistances and contact assumptions." },
+      { id: "solver", label: "Grid and time", description: "Review grid resolution, convection and optional transient controls. Compare finer grids for resolution sensitivity." },
+      { id: "review", label: "Review and run", description: "Save inputs or run the existing admitted board thermal model. Validation errors identify inputs to correct." },
+    ]} />
+    <SolverSetupPanel active={setupStep === "domain"} label="Thermal board and materials">
     <div className="board-thermal-settings"><label>Board model<span><select aria-label="Board thermal model" value={settings.model} onChange={event => setSettings(current => ({ ...current, model: event.target.value as BoardModel }))}><option value="plate">Uniform 2D plate</option><option value="layered" disabled={!stack.complete}>Layered 3D stack (approximate)</option></select></span></label></div>
     {!stack.complete && <p className="thermal-table-note">Layered mode is unavailable: import an ordered physical stackup with positive thickness for each copper and dielectric layer.</p>}
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "solver"} label="Thermal grid and time">
     <div className="board-thermal-settings">{([
       ["thickness_mm", "Board thickness", "mm"], ["convection_top_w_m2k", "Top convection", "W/(m²·K)"], ["convection_bottom_w_m2k", "Bottom convection", "W/(m²·K)"], ["grid_step_mm", "Grid step", "mm"],
     ] as const).map(([key, label, unit]) => <label key={key}>{label}<span><input type="number" min={key.startsWith("convection_") ? "0" : "0.001"} step="any" value={Number.isNaN(settings[key]) ? "" : settings[key]} onChange={event => changeSetting(key, event.target.value)} /> {unit}</span></label>)}</div>
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "domain"} label="Thermal material properties">
     {settings.model === "plate" ? <div className="board-thermal-settings"><label>Effective board conductivity<span><input aria-label="Board conductivity" type="number" min="0.001" step="any" value={Number.isNaN(settings.conductivity_w_mk) ? "" : settings.conductivity_w_mk} onChange={event => changeSetting("conductivity_w_mk", event.target.value)} /> W/(m·K)</span></label></div> : <>
       <p className="thermal-table-note">Layer thicknesses come from the imported stackup; entered board thickness must agree with that stack. Feature switches control sampled copper occupancy and spreading. Pad contact mode still uses imported pads for case-to-board injection when copper layer spreading is off. Spread sigma of 0 leaves sampled copper coverage unsmoothed; a positive value blurs each layer's coverage.</p>
       <div className="board-thermal-settings">{([
@@ -226,19 +270,31 @@ export default function BoardThermalPanel({ board, design, sourceText, ambientC,
         ["include_copper", "Copper layers"], ["include_vias", "Vias"], ["include_tracks", "Tracks"], ["include_pads", "Pads"], ["include_zones", "Zones"],
       ] as const).map(([key, label]) => <label key={key}><span><input aria-label={`Include ${label}`} type="checkbox" checked={settings[key]} onChange={event => setSettings(current => ({ ...current, [key]: event.target.checked }))} /> {label}</span></label>)}</div>
     </>}
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "solver"} label="Thermal grid and transient controls">
     {board && <p className="thermal-table-note">Grid estimate: {gridX > 0 && gridY > 0 ? `${gridX} × ${gridY} = ${cellsPerLayer} cells per layer` : "enter a positive grid step"}{settings.model === "layered" ? ` · ${stack.layers.length} depth layers · imported physical thickness ${formatted(stack.thicknessMm, 3)} mm` : ""}.{cellsPerLayer > 8192 ? " Exceeds the 8,192-cell limit; increase grid step." : ""}</p>}
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "loads"} label="Thermal virtual heatsinks">
     {settings.model === "layered" && <div className="wizard-section"><div className="thermal-section-heading"><label>VIRTUAL BOARD HEATSINKS</label><span>{virtualHeatsinks.length}</span><button type="button" disabled={!board || virtualHeatsinks.length >= 16} onClick={() => { if (!board) return; const width = board.bounds.maxX - board.bounds.minX; const height = board.bounds.maxY - board.bounds.minY; setVirtualHeatsinks(current => [...current, { id: `HS${Date.now()}`, face: "top", x_mm: (board.bounds.minX + board.bounds.maxX) / 2, y_mm: (board.bounds.minY + board.bounds.maxY) / 2, width_mm: Math.min(20, width / 4), height_mm: Math.min(20, height / 4), interface_resistance_k_w: 1, sink_to_ambient_k_w: 10 }]); }}>Add virtual heatsink</button></div>
       <p className="thermal-table-note">A rectangular contact on the top or bottom face feeds an isothermal mathematical sink. Interface K/W and sink-to-ambient K/W are explicit assumptions; fins, airflow, and 3D heatsink geometry are not solved. Existing assembly/CFD heatsink shapes do not automatically affect this board run.</p>
       {virtualHeatsinks.length > 0 && <div className="thermal-table-scroll"><DataTable label="Virtual heatsinks" className="thermal-input-table thermal-spreadsheet"><thead><tr><th>ID</th><th>Face</th><th>Center X mm</th><th>Center Y mm</th><th>Width mm</th><th>Height mm</th><th>Interface K/W</th><th>Sink–ambient K/W</th><th /></tr></thead><tbody>{virtualHeatsinks.map(sink => <tr key={sink.id}><td>{sink.id}</td><td><select aria-label={`${sink.id} face`} value={sink.face} onChange={event => changeHeatsink(sink.id, { face: event.target.value as VirtualHeatsink["face"] })}><option value="top">Top</option><option value="bottom">Bottom</option></select></td>{(["x_mm", "y_mm", "width_mm", "height_mm", "interface_resistance_k_w", "sink_to_ambient_k_w"] as const).map(key => <td key={key}><input aria-label={`${sink.id} ${key}`} type="number" step="any" value={Number.isNaN(sink[key]) ? "" : sink[key]} onChange={event => changeHeatsink(sink.id, { [key]: event.target.value === "" ? NaN : Number(event.target.value) })} /></td>)}<td><button type="button" onClick={() => setVirtualHeatsinks(current => current.filter(item => item.id !== sink.id))}>Remove</button></td></tr>)}</tbody></DataTable></div>}</div>}
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "solver"} label="Thermal transient controls">
     {settings.model === "layered" && <div className="wizard-section"><label><input aria-label="Solve transient board field" type="checkbox" checked={transientEnabled} onChange={event => setTransientEnabled(event.target.checked)} /> SOLVE TRANSIENT BOARD FIELD</label><p className="thermal-table-note">Constant assigned power starts at ambient. Enter reviewed volumetric heat capacities; the displayed animation uses saved backward-Euler board cells, not interpolated steady maps. Part case/junction values in the table remain steady-state estimates.</p>{transientEnabled && <div className="board-thermal-settings">{([
       ["end_time_s", "End time", "s"], ["time_step_s", "Time step", "s"], ["output_stride", "Save every N steps", "steps"], ["copper_volumetric_heat_capacity_j_m3k", "Copper volumetric capacity", "J/(m³·K)"], ["dielectric_volumetric_heat_capacity_j_m3k", "Dielectric volumetric capacity", "J/(m³·K)"],
     ] as const).map(([key, label, unit]) => <label key={key}>{label}<span><input aria-label={label} type="number" min={key === "output_stride" ? "1" : "0.000001"} step={key === "output_stride" ? "1" : "any"} value={Number.isNaN(transientSettings[key]) ? "" : transientSettings[key]} onChange={event => setTransientSettings(current => ({ ...current, [key]: event.target.value === "" ? NaN : Number(event.target.value) }))} /> {unit}</span></label>)}</div>}</div>}
     {unresolvedPads.length > 0 && <p className="thermal-table-note" role="status">Pad contact resolution warning: {unresolvedPads.join(", ")} has a pad narrower than the grid step. BGA/QFN contacts may be underresolved; use a finer step and compare results.</p>}
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "loads"} label="Thermal heat and contacts">
     <p className="thermal-table-note">Ambient: {formatted(ambientC)} °C. Select board references, enter power and thermal resistances, then choose imported pad contacts or an explicit square fallback.</p>
     <div className="thermal-native-results board-thermal-parts"><DataTable label="Board thermal component inputs"><thead><tr><th>Use</th><th>Reference</th><th>Power W</th><th>Junction–case K/W</th><th>Case–board K/W</th><th>Board contact</th><th>Imported pads</th><th>Square width mm</th></tr></thead><tbody>{rows.map(row => <tr key={row.component_ref}><td><input aria-label={`Use ${row.component_ref}`} type="checkbox" checked={row.selected} onChange={event => changeRow(row.component_ref, { selected: event.target.checked })} /></td><td>{row.component_ref}</td>{(["power_w", "r_junction_case_k_w", "r_case_board_k_w"] as const).map(key => <td key={key}><input aria-label={`${row.component_ref} ${key}`} type="number" min="0" step="any" value={Number.isNaN(row[key]) ? "" : row[key]} onChange={event => changeRow(row.component_ref, { [key]: event.target.value === "" ? NaN : Number(event.target.value) })} /></td>)}<td><select aria-label={`${row.component_ref} contact mode`} value={row.contact_mode} onChange={event => changeRow(row.component_ref, { contact_mode: event.target.value as ContactMode })}><option value="pads">Imported pads</option><option value="square">Square fallback</option></select></td><td>{counts.get(row.component_ref) ?? 0}</td><td><input aria-label={`${row.component_ref} contact_size_mm`} type="number" min="0" step="any" disabled={row.contact_mode === "pads"} value={Number.isNaN(row.contact_size_mm) ? "" : row.contact_size_mm} onChange={event => changeRow(row.component_ref, { contact_size_mm: event.target.value === "" ? NaN : Number(event.target.value) })} /></td></tr>)}</tbody></DataTable></div>
     {!board && <p className="thermal-table-note">Import a board to choose component references.</p>}
-    <div className="thermal-native-actions"><button className="run-btn" disabled={busy || !workerAvailable || !board || !design} onClick={() => void run()}>{busy ? "Running board model" : "Run board thermal"}</button><button className="secondary-btn" disabled={busy} onClick={() => { const invalid = inputError(); if (invalid) setError(invalid); else { setError(""); onSave(request, null); } }}>Save board inputs</button></div>
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "review" || busy} label="Thermal review and run">
+    <p className="thermal-table-note">Review {rows.filter(row => row.selected).length} selected component(s), {formatted(ambientC)} C ambient and {cellsPerLayer} cells per layer. Run validates all inputs and preserves admission checks.</p>
+    <div className="thermal-native-actions"><button className="run-btn" disabled={busy || !workerAvailable || !board || !design} onClick={requestBoardRun}>{busy ? "Running board model" : "Run board thermal"}</button><button className="secondary-btn" disabled={busy} onClick={() => { const invalid = inputError(); if (invalid) setError(invalid); else { setError(""); onSave(request, null); } }}>Save board inputs</button></div>
     {!workerAvailable && <p className="thermal-table-note">The desktop worker is unavailable.</p>}
+    </SolverSetupPanel>
     {error && <div className="thermal-validation invalid" role="alert">{error}</div>}
     {result && resultKey !== inputKey && <div className="thermal-validation invalid">Board inputs changed. Rerun to update the map and part temperatures.</div>}
     {result && resultKey === inputKey && <div className={`thermal-validation ${result.status === "completed" ? "valid" : "invalid"}`}><b>Board run · {result.status} · {result.model_status}</b>{result.issues?.map((issue, index) => <small key={index}>{issue.severity}: {issue.message}</small>)}{result.message && <small>{result.message}</small>}</div>}

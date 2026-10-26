@@ -9,10 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.normalized_source_codec import (
-    NORMALIZED_SOURCE_WRAPPER,
-    decode_normalized_source,
-)
+from python.spike_core.normalized_source_codec import NORMALIZED_SOURCE_WRAPPER, decode_normalized_source
 from python.spike_core.project_package import PackageReadResult
 from python.spike_core.service_project_handlers import handle_project_request
 from python.spike_core.spider_v2 import SpiDeRV2

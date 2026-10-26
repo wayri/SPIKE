@@ -9,8 +9,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.cfd_tetra_mesh import admit_cfd_tetra_mesh
-from python.spike_core.cfd_tetra_energy import CONTRACT, solve_cfd_tetra_energy
+from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_mesh import admit_cfd_tetra_mesh
+from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_energy import CONTRACT, solve_cfd_tetra_energy
 from tests.python.test_cfd_tetra_stokes import box_mesh
 
 
@@ -204,7 +204,7 @@ class TetraEnergyTests(unittest.TestCase):
             result = solve_cfd_tetra_energy(request, cancel_check=callback)
             self.assertEqual(result["status"], "cancelled")
             self.assertNotIn("fields", result)
-        with patch("python.spike_core.cfd_tetra_energy.MAX_FIELD_BYTES", 1):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_energy.MAX_FIELD_BYTES", 1):
             result = solve_cfd_tetra_energy(request)
         self.assertEqual(result["status"], "blocked")
         self.assertNotIn("fields", result)
@@ -259,7 +259,7 @@ class TetraEnergyTests(unittest.TestCase):
         self.assertGreater(np.max(abs(np.asarray(result["fields"]["face_advective_heat_flow_w"]))), 1000.)
         self.assertGreater(result["diagnostics"]["factor_nonzeros"], 0)
         for name, limit in (("MAX_FACTOR_NONZEROS", 1), ("MAX_SECONDS", -1.)):
-            with patch("python.spike_core.cfd_tetra_energy."+name, limit):
+            with patch("python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_energy."+name, limit):
                 failed = solve_cfd_tetra_energy(request)
             self.assertEqual(failed["status"], "blocked", failed)
             self.assertNotIn("fields", failed)

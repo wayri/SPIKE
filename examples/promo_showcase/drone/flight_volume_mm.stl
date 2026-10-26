@@ -1,0 +1,86 @@
+solid flight_volume_mm_geometry_only
+ facet normal 0.0 0.0 -1.0
+  outer loop
+   vertex -1000.0 -1000.0 0.0
+   vertex 1000.0 1000.0 0.0
+   vertex 1000.0 -1000.0 0.0
+  endloop
+ endfacet
+ facet normal 0.0 0.0 -1.0
+  outer loop
+   vertex -1000.0 -1000.0 0.0
+   vertex -1000.0 1000.0 0.0
+   vertex 1000.0 1000.0 0.0
+  endloop
+ endfacet
+ facet normal 0.0 0.0 1.0
+  outer loop
+   vertex -1000.0 -1000.0 1500.0
+   vertex 1000.0 -1000.0 1500.0
+   vertex 1000.0 1000.0 1500.0
+  endloop
+ endfacet
+ facet normal 0.0 0.0 1.0
+  outer loop
+   vertex -1000.0 -1000.0 1500.0
+   vertex 1000.0 1000.0 1500.0
+   vertex -1000.0 1000.0 1500.0
+  endloop
+ endfacet
+ facet normal 0.0 -1.0 0.0
+  outer loop
+   vertex -1000.0 -1000.0 0.0
+   vertex 1000.0 -1000.0 0.0
+   vertex 1000.0 -1000.0 1500.0
+  endloop
+ endfacet
+ facet normal 0.0 -1.0 0.0
+  outer loop
+   vertex -1000.0 -1000.0 0.0
+   vertex 1000.0 -1000.0 1500.0
+   vertex -1000.0 -1000.0 1500.0
+  endloop
+ endfacet
+ facet normal 1.0 0.0 0.0
+  outer loop
+   vertex 1000.0 -1000.0 0.0
+   vertex 1000.0 1000.0 0.0
+   vertex 1000.0 1000.0 1500.0
+  endloop
+ endfacet
+ facet normal 1.0 0.0 0.0
+  outer loop
+   vertex 1000.0 -1000.0 0.0
+   vertex 1000.0 1000.0 1500.0
+   vertex 1000.0 -1000.0 1500.0
+  endloop
+ endfacet
+ facet normal 0.0 1.0 0.0
+  outer loop
+   vertex 1000.0 1000.0 0.0
+   vertex -1000.0 1000.0 0.0
+   vertex -1000.0 1000.0 1500.0
+  endloop
+ endfacet
+ facet normal 0.0 1.0 -0.0
+  outer loop
+   vertex 1000.0 1000.0 0.0
+   vertex -1000.0 1000.0 1500.0
+   vertex 1000.0 1000.0 1500.0
+  endloop
+ endfacet
+ facet normal -1.0 0.0 0.0
+  outer loop
+   vertex -1000.0 1000.0 0.0
+   vertex -1000.0 -1000.0 0.0
+   vertex -1000.0 -1000.0 1500.0
+  endloop
+ endfacet
+ facet normal -1.0 0.0 0.0
+  outer loop
+   vertex -1000.0 1000.0 0.0
+   vertex -1000.0 -1000.0 1500.0
+   vertex -1000.0 1000.0 1500.0
+  endloop
+ endfacet
+endsolid flight_volume_mm_geometry_only

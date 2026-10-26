@@ -7,6 +7,29 @@ const authoritativeStudyOmission = (path: readonly string[], key: string): boole
 /** Preserve future fields while replacing the fields the current UI edits. */
 export function mergeProjectSnapshot(retained: unknown, updated: unknown, path: readonly string[] = []): any {
   if (updated === undefined) return retained;
+  // Endpoint requests and spatial source candidates are authoritative snapshots;
+  // merging removed source fields back from an older save would change the run.
+  if (path.join(".") === "analysis.si.deployment_workspaces") return structuredClone(updated);
+  // A newly identified analysis owns its whole result. Old raw fields must not
+  // survive under a rerun's normalized arrays and provenance.
+  if (path.join(".") === "analysis.latest_result" && updated && typeof updated === "object" && !Array.isArray(updated)
+      && typeof (updated as Record<string, unknown>).analysis_id === "string"
+      && (updated as Record<string, unknown>).analysis_id !== (retained as Record<string, unknown> | null)?.analysis_id) {
+    return structuredClone(updated);
+  }
+
+  // A saved case/run owns its complete setup. Restoring deleted request keys
+  // from the prior snapshot would silently change its physical definition.
+  if (path.includes("studies") && ["cases", "runs"].includes(path[path.length - 2])
+      && (path[path.length - 1] === "settings" || path[path.length - 1] === "scenario")) {
+    return structuredClone(updated);
+  }
+  // A new geometry capture is authoritative. Merging an older field_snapshots
+  // key into a rerun that returned no spatial fields would forge its provenance.
+  if (path.join(".") === "analysis.propulsion_pod_three_phase.result" && updated && typeof updated === "object"
+      && !Array.isArray(updated) && (updated as Record<string, unknown>).contract === "spike/geometry-propulsion-loop-result/v1") {
+    return structuredClone(updated);
+  }
   if (Array.isArray(updated)) {
     const old = Array.isArray(retained) ? retained : [];
     const identity = (item: any) => item && typeof item === 'object' && !Array.isArray(item)
@@ -50,6 +73,7 @@ export function withoutSavedResults(snapshot: Record<string, any>): Record<strin
     }
   }
   if (copy.analysis) {
+    if (copy.analysis.propulsion_pod_three_phase) copy.analysis.propulsion_pod_three_phase.result = null;
     if (copy.analysis.retained_assembly_em) copy.analysis.retained_assembly_em.result = null;
     if (copy.analysis.engineering_review) {
       copy.analysis.engineering_review.result = null;
@@ -66,7 +90,12 @@ export function withoutSavedResults(snapshot: Record<string, any>): Record<strin
     copy.analysis.active_result = null;
     copy.analysis.result_history = [];
     copy.analysis.pdn_review = null;
-    if (copy.analysis.si) copy.analysis.si.latest_channel_result = null;
+    if (copy.analysis.si) {
+      copy.analysis.si.latest_channel_result = null;
+      const workspaces = copy.analysis.si.deployment_workspaces;
+      if (workspaces?.ibis) { workspaces.ibis.result = null; workspaces.ibis.resultRequest = null; }
+      if (workspaces?.spatial) { workspaces.spatial.candidate = null; workspaces.spatial.fileName = ""; }
+    }
   }
   if (copy.emi) {
     copy.emi.preflight = null;
@@ -120,6 +149,7 @@ export function createResultPackage(projectSnapshot: Record<string, any>, visual
   const analysis = projectSnapshot.analysis ?? {};
   const coupledStudies = projectSnapshot.assembly_ir?.extensions?.['spike.multiboard-studies'];
   const hasResults = analysis.latest_result || analysis.result_history?.length || analysis.si?.latest_channel_result
+    || analysis.si?.deployment_workspaces?.ibis?.result || analysis.si?.deployment_workspaces?.spatial?.candidate
     || projectSnapshot.emi?.field_result || projectSnapshot.emi?.screening || projectSnapshot.thermal?.scenario?.result
     || projectSnapshot.thermal?.scenario?.field_result
     || projectSnapshot.thermal?.scenario?.board_thermal_result

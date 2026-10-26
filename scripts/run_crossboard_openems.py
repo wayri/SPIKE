@@ -17,10 +17,10 @@ import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openems_assembly_geometry import compile_assembly_geometry
+from python.spike_core.solvers.external_engines.openems.openems_assembly_geometry import compile_assembly_geometry
 from python.spike_core.external_engines import _run_isolated_python
 from python.spike_core.runtime_locations import openems_python, openems_install_root
-from python.spike_core.crossboard_mesh import plan_crossboard_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.crossboard_mesh import plan_crossboard_mesh
 
 
 def fixture(gap_mm):
@@ -142,9 +142,9 @@ def main():
     if args.plan_only:
         print(json.dumps(plan,indent=2));return 0
     output=args.output.resolve();output.mkdir(parents=True,exist_ok=False)
-    module=ROOT/'python/spike_core/openems_assembly_geometry.py'
-    normalization_module=ROOT/'python/spike_core/multi_excitation_network.py'
-    mesh_module=ROOT/'python/spike_core/crossboard_mesh.py'
+    module=ROOT/'python/spike_core/solvers/external_engines/openems/openems_assembly_geometry.py'
+    normalization_module=ROOT/'python/spike_core/solvers/electromagnetics/fields/multi_excitation_network.py'
+    mesh_module=ROOT/'python/spike_core/solvers/geometry_meshing/preparation/crossboard_mesh.py'
     source='\n'.join(p.read_text(encoding='utf-8') for p in (module,normalization_module,mesh_module))
     before={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (module,normalization_module,mesh_module,Path(__file__))}
     # Trusted source snapshot plus serialized data; never execute user text.

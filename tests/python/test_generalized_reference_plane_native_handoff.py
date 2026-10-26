@@ -8,13 +8,8 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 
 from tests.python import test_reference_plane_antipad_mesh_v2 as fixtures
-from python.spike_core.generalized_reference_plane_native_handoff import (
-    GeneralizedReferencePlaneNativeHandoffError,
-    build_generalized_reference_plane_native_handoff,
-)
-from python.spike_core.reference_plane_antipad_mesh_v2 import (
-    build_reference_plane_antipad_mesh_v2,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.generalized_reference_plane_native_handoff import GeneralizedReferencePlaneNativeHandoffError, build_generalized_reference_plane_native_handoff
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_mesh_v2 import build_reference_plane_antipad_mesh_v2
 
 
 class GeneralizedReferencePlaneNativeHandoffTests(unittest.TestCase):

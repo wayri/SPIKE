@@ -22,9 +22,9 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(ROOT))
 
 from python.spike_core.external_engines import _run_isolated_python
-from python.spike_core.openems_assembly_geometry import compile_assembly_geometry
+from python.spike_core.solvers.external_engines.openems.openems_assembly_geometry import compile_assembly_geometry
 from python.spike_core.runtime_locations import openems_install_root, openems_python
-from python.spike_core.crossboard_mesh import plan_crossboard_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.crossboard_mesh import plan_crossboard_mesh
 from scripts.run_crossboard_openems import fixture
 
 FREQUENCIES_HZ = [0.5e9, 1.5e9, 2.5e9]
@@ -244,7 +244,7 @@ def main() -> int:
         parser.error("output must be below examples/high_speed_si/field")
     output.mkdir(parents=True, exist_ok=False)
     modules = [ROOT / "extensions/openems_suite/openems_assembly_geometry.py",
-               ROOT / "python/spike_core/crossboard_mesh.py"]
+               ROOT / "python/spike_core/solvers/geometry_meshing/preparation/crossboard_mesh.py"]
     source = "\n".join(path.read_text(encoding="utf-8") for path in modules)
     tracked = [*modules, ROOT / "scripts/run_crossboard_openems.py", Path(__file__)]
     source_hashes = {str(path.relative_to(ROOT)): digest(path) for path in tracked}

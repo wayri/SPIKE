@@ -11,17 +11,17 @@ import unittest
 from unittest.mock import patch
 import numpy as np
 
-from python.spike_core.assembly_thermal_components import promote_thermal_components
-from python.spike_core.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
-from python.spike_core.assembly_thermal_autolink import discover_assembly_thermal_links, autolink_assembly_thermal_contacts
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_components import promote_thermal_components
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_autolink import discover_assembly_thermal_links, autolink_assembly_thermal_contacts
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
 from tests.python.test_assembly_thermal_meshing import fixture, has_runtime, runtime
 from tests.python.test_thermal_component_promotion import pure_fixture
 
 
 class JointMeshAdmissionTests(unittest.TestCase):
     def test_original_finite_face_not_only_infinite_plane_is_required(self):
-        from python.spike_core.assembly_thermal_joint_geometry import verify_joint_source_interfaces
+        from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_joint_geometry import verify_joint_source_interfaces
         center, normal = np.array([.5, .5, 0.]), np.array([0., 0., 1.])
         edges = [(np.array(start), np.array(inward)) for start, inward in (
             ([0., 0., 0.], [1., 0., 0.]), ([1., 0., 0.], [-1., 0., 0.]),
@@ -118,8 +118,8 @@ class RealJointMeshTests(unittest.TestCase):
         self.assertAlmostEqual(internal['occurrence_temperatures'][part]['minimum_k'], 400-100*125/300, places=6)
         self.assertAlmostEqual(sum(c['left_to_right_heat_w'] for c in internal['field_result']['contacts']), -1/3, places=8)
         self.assertLess(abs(internal['field_result']['heat_balance']['imbalance_w']), 1e-8)
-        from python.spike_core.calculix_runtime import probe_calculix_runtime
-        from python.spike_core.calculix_thermal import run_calculix_thermal
+        from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
+        from python.spike_core.solvers.external_engines.calculix.calculix_thermal import run_calculix_thermal
         if not probe_calculix_runtime()['available']:
             self.skipTest('Internal real Gmsh/contact oracle passed; separately installed CalculiX unavailable')
         external = run_calculix_thermal(geometry, linked, {'threads': 1, 'timeout_seconds': 60})

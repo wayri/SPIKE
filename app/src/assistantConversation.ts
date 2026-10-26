@@ -3,11 +3,13 @@ import { assistantSystemPrompt, assistantToolCatalog, validateAssistantToolCall 
 
 export type AssistantProvider = "openai" | "anthropic" | "lmstudio" | "ollama";
 export type AssistantRole = "user" | "assistant" | "tool";
+export type AssistantAttachment = { id: string; name: string; mimeType: string; dataUrl: string; sha256: string };
 export type AssistantMessage = {
   role: AssistantRole;
   content: string;
   tool_call_id?: string;
   name?: string;
+  attachments?: AssistantAttachment[];
 };
 export type AssistantToolCall = { id: string; name: string; arguments: Record<string, unknown> };
 export type AssistantReply = AssistantMessage & { tool_calls?: AssistantToolCall[] };
@@ -139,6 +141,7 @@ export async function runAssistantConversation(options: ConversationOptions): Pr
   } : undefined;
   const messages = [...options.messages, ...(contextMessage ? [contextMessage] : [])];
   let toolCount = 0;
+  const failedRequests = new Map<string, string>();
   const catalog = assistantToolCatalog as readonly ToolEntry[];
   const tools = options.shareProjectContext ? catalog.map(({ name, description, parameters }) => ({ name, description, parameters })) : [];
 
@@ -165,6 +168,7 @@ export async function runAssistantConversation(options: ConversationOptions): Pr
     }
     checkCancelled(options.signal);
     const raw = objectValue(payload.message);
+    if (raw.attachments !== undefined) throw new Error("This provider transport does not support assistant media output.");
     const reply: AssistantReply = {
       role: "assistant",
       content: typeof raw.content === "string" ? raw.content : "",
@@ -172,7 +176,6 @@ export async function runAssistantConversation(options: ConversationOptions): Pr
         const item = objectValue(call);
         if (typeof item.id !== "string" || typeof item.name !== "string") throw new Error(`Malformed tool call ${index + 1}.`);
         const args = assertToolArguments(item.name, item.arguments);
-        if (catalog.some(candidate => candidate.name === item.name)) validateAssistantToolCall(item.name, args);
         return { id: item.id, name: item.name, arguments: args };
       }) : [],
     };
@@ -180,10 +183,12 @@ export async function runAssistantConversation(options: ConversationOptions): Pr
     if (!reply.tool_calls?.length) return contextMessage ? messages.filter(message => message !== contextMessage) : messages;
     toolCount += reply.tool_calls.length;
     if (toolCount > ASSISTANT_MAX_TOOL_CALLS) throw new Error(`Assistant exceeded the ${ASSISTANT_MAX_TOOL_CALLS}-tool-call limit.`);
+    let appliedRevision: string | undefined;
 
     for (const call of reply.tool_calls) {
       checkCancelled(options.signal);
       const tool = catalog.find(candidate => candidate.name === call.name);
+      const requestKey = `${call.name}:${jsonText(call.arguments)}`;
       let state: ConversationEvidence["state"] = "completed";
       let output: unknown;
       if (!tool) {
@@ -192,11 +197,15 @@ export async function runAssistantConversation(options: ConversationOptions): Pr
       } else if (!options.shareProjectContext) {
         state = "blocked";
         output = { ok: false, error: "Project context sharing is disabled, so SPIKE tools are unavailable." };
-      } else if (options.getRevision() !== requestRevision) {
+      } else if (failedRequests.has(requestKey)) {
+        state = "blocked";
+        output = { ok: false, error: "This identical request already failed in this turn. Correct its arguments or ask the user for the missing input.", previousError: failedRequests.get(requestKey) };
+      } else if (options.getRevision() !== requestRevision && !(tool.effect === "read" && options.getRevision() === appliedRevision)) {
         state = "blocked";
         output = { ok: false, error: "The project changed after the assistant request. The assistant must inspect the current revision and plan again." };
       } else {
         try {
+          validateAssistantToolCall(call.name, call.arguments);
           if (tool.effect === "edit" || tool.effect === "run") {
             const revision = options.getRevision();
             const accepted = await options.review({ id: call.id, name: tool.name, description: tool.description, effect: tool.effect, arguments: call.arguments, revision });
@@ -209,6 +218,9 @@ export async function runAssistantConversation(options: ConversationOptions): Pr
               output = { ok: false, error: "The project changed after review. Ask the user to review the action again." };
             } else {
               output = await options.onCommand(tool.command, call.arguments);
+              // Reads can verify this approved action's resulting revision.
+              // Further mutations still require a new model plan.
+              appliedRevision = options.getRevision();
             }
           } else {
             output = await options.onCommand(tool.command, call.arguments);
@@ -216,6 +228,7 @@ export async function runAssistantConversation(options: ConversationOptions): Pr
         } catch (error) {
           state = "failed";
           output = { ok: false, error: error instanceof Error ? error.message : String(error) };
+          failedRequests.set(requestKey, jsonText(output));
         }
       }
       const detail = jsonText(output);

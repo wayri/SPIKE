@@ -5,7 +5,7 @@ import json
 import sys
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from examples.rlgc_line_network.run_line import request as line_request
-from python.spike_core.rlgc_line_fields import run_rlgc_line_fields
+from python.spike_core.solvers.signal_integrity.lines.rlgc_line_fields import run_rlgc_line_fields
 
 
 def request():

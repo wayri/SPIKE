@@ -1,5 +1,5 @@
-#include "spikes/dc_solver.hpp"
-#include "spikes/osdi_device.hpp"
+#include "solvers/circuits/spikes/dc_solver.hpp"
+#include "solvers/circuits/spikes/osdi_device.hpp"
 
 #include <algorithm>
 #include <array>

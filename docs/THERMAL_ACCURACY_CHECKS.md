@@ -58,5 +58,5 @@ has a single free tetrahedral temperature with exact semidiscrete decay
 exact insulated heating, invalid tolerances and cancellation. Units are Kelvin
 for temperatures/differences, seconds for time, joules for energy.
 
-Implementation: `python/spike_core/thermal_accuracy.py`; regression:
+Implementation: `python/spike_core/solvers/thermal_fluid/heat/thermal_accuracy.py`; regression:
 `tests/python/test_thermal_accuracy.py`.

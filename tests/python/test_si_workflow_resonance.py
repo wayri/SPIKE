@@ -3,8 +3,8 @@
 import copy
 import unittest
 import numpy as np
-from python.spike_core.si_workflow import run_si_workflow,REQUEST
-from python.spike_core.sparameters import touchstone_text
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import run_si_workflow, REQUEST
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text
 from tests.python.test_si_resonance import fixture
 
 

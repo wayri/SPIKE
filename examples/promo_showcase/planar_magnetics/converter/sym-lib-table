@@ -1,0 +1,4 @@
+(sym_lib_table
+ (version 7)
+ (lib (name "Carrier") (type "KiCad") (uri "${KIPRJMOD}/Carrier.kicad_sym") (options "") (descr "Original abstract topology symbols"))
+)

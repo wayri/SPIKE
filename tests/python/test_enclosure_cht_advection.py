@@ -32,7 +32,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.enclosure_cht import solve_enclosure_cht
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_cht import solve_enclosure_cht
 from tests.python.test_enclosure_cht import fixture
 from tests.python.test_enclosure_laminar import exact_fields
 

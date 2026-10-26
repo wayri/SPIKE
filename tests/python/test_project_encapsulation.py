@@ -11,7 +11,7 @@ from tests.python.test_project_assembly_field import _payload, MODEL_ARTIFACT
 from python.spike_core.project_package import read_project, write_spike_package, ProjectPackageError
 from python.spike_core.service_project_thermal_mesh import run_assembly_thermal_mesh_in_project, _artifact_reader
 from python.spike_core.service_project_encapsulation import retain_generated_encapsulation
-from python.spike_core.assembly_thermal_meshing import run_assembly_thermal_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import run_assembly_thermal_mesh
 from python.spike_core.service_project_assembly_field import _assembly_identity, read_assembly_field_study_in_project
 from python.spike_core.multiboard_study import physical_assembly
 
@@ -50,7 +50,7 @@ class ProjectEncapsulationTests(unittest.TestCase):
             study=read_assembly_field_study_in_project(identity,application_version='test')
             self.assertEqual(study['state'],'current')
             self.assertEqual(study['record']['request'],result['request'])
-            from python.spike_core.assembly_thermal_components import MATERIALS_KEY
+            from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_components import MATERIALS_KEY
             self.assertEqual(opened.payload['assembly_ir']['extensions'][MATERIALS_KEY]['resin'],params['assignments']['materials'][1])
             setup=opened.payload['analyses']['assembly_thermal_mesh_setup']
             self.assertNotIn('encapsulation',setup)

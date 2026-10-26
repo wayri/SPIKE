@@ -1,0 +1,52 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI07-S04",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "d5ca375c71a9987dab8bcf13419973a487dbcc2ba9257a5009777ceb80f15e05",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_terminated.py": "31c599aa724d4ba3e7f7e2b16ad9eb4d5908f69a90f09ba88906cc847952300c",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_transient.py": "2c015bba7b10da5128b36fae181ad4dc0fb906578f355d2788a0e555708c67c6",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_rational.py": "38aa973543767f69bfb0eb5c92905ea1835900258e2aff8a812fce80176e1e55",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "6dd4f3efc7b6119fe5b9ca1868619381fc1e89fc6c1d0b8c5e357cda18b628cd",
+    "python/spike_core/service_simulation_handlers.py": "14e3b49268177b438d719790303a9258fe81bfbc33a45c76ad9bd5cc36bc6c8c",
+    "tests/python/test_sparameter_terminated.py": "fb8c53d0f6842ba1665b7c9cd8ac9a04c36324f80961367a8a19117004fb0a93",
+    "tests/python/test_sparameter_terminated_contract.py": "9a6307c5b42d2fb460d6b3829d1585e94fecdd153deda031eb12ed9b1b0b4226",
+    "schemas/sparameter-rational-fit-request-v1.schema.json": "268bf209ca7a54887481a21b05b218c6f0ecf3fa8e44c9dd1b47011f000533c3",
+    "schemas/sparameter-rational-fit-result-v1.schema.json": "f75c0c2b53f0749275cb21c5f6e412097d00c1594f3010b34cf7a02225e65f7b",
+    "schemas/terminated-network-transient-request-v1.schema.json": "a56e65942c70b98a515cc947803535853f9291cdaccffb6de6bd7f246945c29c",
+    "schemas/terminated-network-transient-result-v1.schema.json": "e1cc7c9fd566709e456952bf8dd9beb12fae6241acb6ef40dc45e796b34f5c4c",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_capacitive_terminated.py": "79ef7a59ac435b912bdfc3c0b7e21f9b03719919f73617c657103f6e0a922f46",
+    "tests/python/test_sparameter_capacitive_terminated.py": "d0cbf351c92438def3026146368b5f3089d882da6b4f0b89ad425b35c7fd4c1f",
+    "tests/python/test_sparameter_capacitive_contract.py": "7655e7eb62c5fa64261ee52bb0d4ca5eb16dbe058e34adfd6bf203d4d799b9f5",
+    "tests/python/test_sparameter_transient.py": "1df980055b8e28d39dffb65161aab9801c9c09977305d0a04e2bbb696c1d09df",
+    "examples/capacitive_network_transient/run_rc.py": "1862521a601960005d621c8833537e89237ee3e3c0f25e2bf9e17b8909a11120",
+    "schemas/capacitive-network-transient-request-v1.schema.json": "493acb4d2f6998d54b7fdbd52f79f923ba2eeddd1f0863a4c31899f6e41b9900",
+    "schemas/capacitive-network-transient-result-v1.schema.json": "9dac6c4bf9b22b1744dca80c0bfba09191c530c02a40144e9f324a5986194ebd",
+    "docs/CAPACITIVE_NETWORK_TRANSIENT.md": "c53c4f3002a78d52a04bae086ac30de3fb9570a17dad51bbcc4016b8035fde8f"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_example_runs_and_public_contracts_are_registered",
+      "tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_worker_and_schema_fail_closed_on_unsupported_capacitive_boundaries",
+      "tests.python.test_sparameter_capacitive_contract.CapacitiveContractTests.test_worker_rc_source_split_energy_power_and_original_provenance",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_active_stable_singular_unstable_marginal_and_extremes",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_analytic_parallel_rlc_damping_current_split_and_energy_balance",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_invalid_preflight_total_state_limits_and_cancellation",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_mixed_two_port_coupling_source_order_and_ideal_resistor_row",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_pwl_physical_state_reference_and_output_grid_invariance",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_reference_impedance_and_physical_time_scaling",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_resistor_network_rc_step_and_initial_current_split",
+      "tests.python.test_sparameter_capacitive_terminated.CapacitiveTests.test_two_shunt_capacitors_coupled_conductance_and_source_order"
+    ],
+    "run": 11,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI07-S04-migration-replay-20261025.log",
+  "log_sha256": "d34ccbb79a525dd0aa8930ee624c3fd39a61cf9ffbdc5fd8b6e395472e1db415"
+}

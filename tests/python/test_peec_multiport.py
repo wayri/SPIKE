@@ -4,13 +4,9 @@ from unittest.mock import patch
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
-from python.spike_core.peec_plugin import (
-    _solve_shared_reference_port_matrix,
-    native_available,
-    solve_peec_2_5d,
-)
-from python.spike_core.peec_network import extract_pdn_multiport
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import _solve_shared_reference_port_matrix, native_available, solve_peec_2_5d
+from python.spike_core.solvers.power_integrity.peec.peec_network import extract_pdn_multiport
 
 
 class SharedReferenceMatrixTests(unittest.TestCase):
@@ -77,7 +73,7 @@ class SharedReferenceMatrixTests(unittest.TestCase):
 
         matrices = [np.array([[2., 0.], [0., 1.]], dtype=complex),
                     np.array([[2., 0.], [0., -0.01]], dtype=complex)]
-        with patch("python.spike_core.peec_network.solve_shared_reference_port_matrix",
+        with patch("python.spike_core.solvers.power_integrity.peec.peec_network.solve_shared_reference_port_matrix",
                    side_effect=[(matrix, {"relative_residual": 0., "condition_number": None})
                                 for matrix in matrices]):
             result, issues = extract_pdn_multiport(

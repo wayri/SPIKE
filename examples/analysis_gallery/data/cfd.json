@@ -40,11 +40,11 @@
         "sha256": "5d7b42b5b2b7bf122e46617f5f5d6dd393fb5aa00198f399da7f8683daba784a"
       },
       {
-        "path": "python/spike_core/native_airflow.py",
+        "path": "python/spike_core/solvers/thermal_fluid/flow/native_airflow.py",
         "sha256": "5ddca2cd04d3884fa3bbedc500cbac3bc4bc1456e2abf1ad3aa04caa22864df2"
       },
       {
-        "path": "src/airflow/main.cpp",
+        "path": "src/solvers/thermal_fluid/airflow/main.cpp",
         "sha256": "0969e29aa12fc6416e95bebe5932c86097198f290935ea48f1fa08cfe74dc031"
       }
     ]

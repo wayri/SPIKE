@@ -22,11 +22,11 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 import numpy as np
 import scipy
-from python.spike_core.benchmarks import run_solver_benchmarks
-from python.spike_core.native_mna import run_native_mna
-from python.spike_core.si_channel import uniform_rlgc_network
-from python.spike_core.structured_solid_thermal import solve_structured_solid_thermal
-from python.spike_core.structured_electrothermal import solve_structured_electrothermal
+from python.spike_core.solvers.power_integrity.dc.benchmarks import run_solver_benchmarks
+from python.spike_core.solvers.circuits.models.native_mna import run_native_mna
+from python.spike_core.solvers.signal_integrity.channels.si_channel import uniform_rlgc_network
+from python.spike_core.solvers.thermal_fluid.heat.structured_solid_thermal import solve_structured_solid_thermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.structured_electrothermal import solve_structured_electrothermal
 
 def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
@@ -121,7 +121,7 @@ def flatten(suite):
 
 def channel_cht_probe():
     from tests.python.test_laminar_channel_cht import fixture
-    from python.spike_core.laminar_channel_cht import solve_laminar_channel_cht
+    from python.spike_core.solvers.thermal_fluid.flow.laminar_channel_cht import solve_laminar_channel_cht
     result=solve_laminar_channel_cht(fixture(nf=16,nx=32))
     require(result["status"]=="completed",result)
     exact=.02*.1*.01**3/(12*1.8e-5)
@@ -133,7 +133,7 @@ def channel_cht_probe():
 
 def huygens_probe():
     from tests.python.test_huygens_far_field import dipole_request,K,ETA
-    from python.spike_core.huygens_far_field import huygens_far_field
+    from python.spike_core.solvers.electromagnetics.fields.huygens_far_field import huygens_far_field
     result=huygens_far_field(**dipole_request(24))
     exact=np.array([0.,0.,-1j*K*ETA/(4*np.pi)])
     error=float(np.linalg.norm(result["electric_amplitude_v"][0]-exact)/np.linalg.norm(exact))

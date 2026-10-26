@@ -6,14 +6,10 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.calculix_runtime import probe_calculix_runtime
-from python.spike_core.calculix_transient import (
-    compile_calculix_transient_deck, parse_calculix_temperature_history, run_calculix_transient,
-    run_calculix_field_transient, verify_calculix_field_transient_result,
-    compare_thermal_transient_results, compare_transient_fields,
-)
-from python.spike_core.assembly_tetra_transient import run_assembly_tetra_transient
-from python.spike_core.assembly_field_transient import run_assembly_field_transient
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
+from python.spike_core.solvers.external_engines.calculix.calculix_transient import compile_calculix_transient_deck, parse_calculix_temperature_history, run_calculix_transient, run_calculix_field_transient, verify_calculix_field_transient_result, compare_thermal_transient_results, compare_transient_fields
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient import run_assembly_tetra_transient
+from python.spike_core.solvers.execution.coupling.assembly_field_transient import run_assembly_field_transient
 from python.spike_core.multiboard_identity import canonical_json_digest
 from tests.python.test_assembly_tetra_thermal import cube, request, boundary, faces_at, contact_request
 from tests.python.test_assembly_field_handoff import fixture
@@ -112,7 +108,7 @@ class CalculixTransientExecutableTests(unittest.TestCase):
 
     def test_one_point_capacity_explains_dc3d4_difference(self):
         # Independent original integration oracle: N_i=1/4 at the centroid.
-        from python.spike_core.assembly_tetra_thermal_validation import validate_request
+        from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation import validate_request
         raw, transient = sine_case(2, .2)
         transient['output_interval_s'] = .2
         data = validate_request(raw)

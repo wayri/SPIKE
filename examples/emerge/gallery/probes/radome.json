@@ -1,0 +1,274 @@
+{
+  "contract": "spike/emerge-gallery-probes/v1",
+  "example_id": "radome",
+  "result_path": "examples/emerge/gui_workflow/radome_admitted_result.json",
+  "model_status": "unvalidated",
+  "interpolation_performed_by_gallery": false,
+  "samples": [
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 0,
+      "frequency_hz": 3000000000.0,
+      "source_pointer": "/networks/s_parameters/values/0",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.8150419190442947,
+            0.35312998563194725
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 1,
+      "frequency_hz": 3199999999.9999995,
+      "source_pointer": "/networks/s_parameters/values/1",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.785313418982927,
+            -0.16787675486020293
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 2,
+      "frequency_hz": 3400000000.0000005,
+      "source_pointer": "/networks/s_parameters/values/2",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.053213237988233256,
+            -0.627193602706033
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 3,
+      "frequency_hz": 3600000000.0,
+      "source_pointer": "/networks/s_parameters/values/3",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            -0.6609599026967476,
+            0.14439185090005696
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 4,
+      "frequency_hz": 3800000000.0,
+      "source_pointer": "/networks/s_parameters/values/4",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            -0.272018099904917,
+            0.7884118371005244
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 5,
+      "frequency_hz": 3999999999.9999995,
+      "source_pointer": "/networks/s_parameters/values/5",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.17377103261002597,
+            0.8874794921798831
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 6,
+      "frequency_hz": 4200000000.0,
+      "source_pointer": "/networks/s_parameters/values/6",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.4791609377998445,
+            0.8042614029047286
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 0,
+      "sample_index": 3,
+      "frequency_hz": 3000000000.0,
+      "theta_deg": 0.0,
+      "phi_deg": 45.0,
+      "source_pointer": "/fields/radiation/patterns_3d/0",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        -0.8469752161861355,
+        4.418374047032863
+      ],
+      "e_phi_v_m": [
+        0.8451700532513506,
+        -4.4372484393628895
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 1,
+      "sample_index": 0,
+      "frequency_hz": 3199999999.9999995,
+      "theta_deg": 0.0,
+      "phi_deg": 0.0,
+      "source_pointer": "/fields/radiation/patterns_3d/1",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        1.7306181455121872,
+        8.727480880480304
+      ],
+      "e_phi_v_m": [
+        -0.005941785147963563,
+        -0.03448199229718907
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 2,
+      "sample_index": 1,
+      "frequency_hz": 3400000000.0000005,
+      "theta_deg": 0.0,
+      "phi_deg": 15.0,
+      "source_pointer": "/fields/radiation/patterns_3d/2",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        8.49217806841616,
+        7.945089886827735
+      ],
+      "e_phi_v_m": [
+        -2.320955943752689,
+        -1.9335009574235786
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 3,
+      "sample_index": 0,
+      "frequency_hz": 3600000000.0,
+      "theta_deg": 0.0,
+      "phi_deg": 0.0,
+      "source_pointer": "/fields/radiation/patterns_3d/3",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        11.194164214531364,
+        -0.46221293554813975
+      ],
+      "e_phi_v_m": [
+        0.054802512300252904,
+        0.014035600906890239
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 4,
+      "sample_index": 3,
+      "frequency_hz": 3800000000.0,
+      "theta_deg": 0.0,
+      "phi_deg": 45.0,
+      "source_pointer": "/fields/radiation/patterns_3d/4",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        4.66342624082426,
+        -3.0969328632852187
+      ],
+      "e_phi_v_m": [
+        -4.625124400073212,
+        3.0698992610689584
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 5,
+      "sample_index": 0,
+      "frequency_hz": 3999999999.9999995,
+      "theta_deg": 0.0,
+      "phi_deg": 0.0,
+      "source_pointer": "/fields/radiation/patterns_3d/5",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        3.33725709134958,
+        -4.417136444816807
+      ],
+      "e_phi_v_m": [
+        0.009342214291563955,
+        -0.02295664306651923
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 6,
+      "sample_index": 37,
+      "frequency_hz": 4200000000.0,
+      "theta_deg": 15.0,
+      "phi_deg": 180.0,
+      "source_pointer": "/fields/radiation/patterns_3d/6",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        2.7650753620229627,
+        -3.097229807068842
+      ],
+      "e_phi_v_m": [
+        0.02204551623317068,
+        -0.026057094034700426
+      ]
+    }
+  ],
+  "recipes": [
+    "Choose a saved frequency and receive/excited port for a complex S sample.",
+    "Select a stored angular-grid point; no angular interpolation or realized-gain inference.",
+    "For near-field planes, select a valid coordinate and inspect complex E/H components."
+  ],
+  "status": "retained_result",
+  "result_sha256": "b4357d9723b6cc96041496cdcc93e62194331ab67fca10712c2d50c57cc31ff4",
+  "analysis_id": "emerge-8d01b282-b523-4d8c-98f7-bbbcb4488e96",
+  "network_metadata": {
+    "contract": "spike/emerge-s-parameters/v1",
+    "frequencies_hz": [
+      3000000000.0,
+      3199999999.9999995,
+      3400000000.0000005,
+      3600000000.0,
+      3800000000.0,
+      3999999999.9999995,
+      4200000000.0
+    ],
+    "ports": [
+      "P1"
+    ],
+    "reference_impedance_ohm": 50.0,
+    "matrix_order": "values[frequency][receive_port][excited_port]"
+  },
+  "radiation_normalization": "each cut and sphere independently peak-normalized to 0 dB",
+  "nearfield_metadata": {}
+}

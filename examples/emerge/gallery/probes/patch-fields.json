@@ -1,0 +1,202 @@
+{
+  "contract": "spike/emerge-gallery-probes/v1",
+  "example_id": "patch-fields",
+  "result_path": "examples/emerge/gui_workflow/patch_fields_admitted_result.json",
+  "model_status": "unvalidated",
+  "interpolation_performed_by_gallery": false,
+  "samples": [
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 0,
+      "frequency_hz": 3400000000.0000005,
+      "source_pointer": "/networks/s_parameters/values/0",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            0.09021795573451925,
+            -0.4854643673528625
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "s_parameter_matrix",
+      "frequency_index": 1,
+      "frequency_hz": 3600000000.0,
+      "source_pointer": "/networks/s_parameters/values/1",
+      "unit": "dimensionless_complex",
+      "value": [
+        [
+          [
+            -0.5400666505142774,
+            0.1254168096367929
+          ]
+        ]
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 0,
+      "sample_index": 0,
+      "frequency_hz": 3400000000.0000005,
+      "theta_deg": 0.0,
+      "phi_deg": 0.0,
+      "source_pointer": "/fields/radiation/patterns_3d/0",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        7.551943098605946,
+        6.5858421784612196
+      ],
+      "e_phi_v_m": [
+        0.062210236381980685,
+        -0.13205975744222712
+      ]
+    },
+    {
+      "kind": "angular_grid_sample",
+      "frequency_index": 1,
+      "sample_index": 11,
+      "frequency_hz": 3600000000.0,
+      "theta_deg": 0.0,
+      "phi_deg": 165.0,
+      "source_pointer": "/fields/radiation/patterns_3d/1",
+      "selection": "first maximum stored relative amplitude; pole azimuth is degenerate",
+      "relative_amplitude_db": 0.0,
+      "e_theta_v_m": [
+        -8.885434728256085,
+        -0.017740219102598515
+      ],
+      "e_phi_v_m": [
+        -2.326905782975256,
+        0.04781940483802792
+      ]
+    },
+    {
+      "kind": "nearfield_coordinate_sample",
+      "plane_index": 0,
+      "sample_index": 0,
+      "source_pointer": "/fields/nearfield/planes/0",
+      "selection": "first valid stored coordinate; no resampling",
+      "frequency_hz": 3400000000.0000005,
+      "coordinate_mm": [
+        100.0,
+        100.0,
+        1.0
+      ],
+      "e_v_m": [
+        [
+          257.0952532535184,
+          60.19654462769364
+        ],
+        [
+          298.09148351532843,
+          235.7650840566989
+        ],
+        [
+          -371.40660062902714,
+          -459.6223327244047
+        ]
+      ],
+      "h_a_m": [
+        [
+          0.17768993553193604,
+          0.16900568905378083
+        ],
+        [
+          0.23228877473259082,
+          -0.33591734199405454
+        ],
+        [
+          -0.017890935112470974,
+          -0.4915433721730052
+        ]
+      ],
+      "valid": true
+    },
+    {
+      "kind": "nearfield_coordinate_sample",
+      "plane_index": 1,
+      "sample_index": 0,
+      "source_pointer": "/fields/nearfield/planes/1",
+      "selection": "first valid stored coordinate; no resampling",
+      "frequency_hz": 3600000000.0,
+      "coordinate_mm": [
+        100.0,
+        100.0,
+        1.0
+      ],
+      "e_v_m": [
+        [
+          173.87362283475775,
+          -115.9611534087259
+        ],
+        [
+          306.3595390633906,
+          -28.67948827932059
+        ],
+        [
+          -470.91107901977125,
+          -76.23611705334469
+        ]
+      ],
+      "h_a_m": [
+        [
+          0.07404329722136604,
+          0.018533955285056247
+        ],
+        [
+          -0.2173804644221731,
+          -0.33681009177227766
+        ],
+        [
+          -0.3601650932589423,
+          -0.2532332578919885
+        ]
+      ],
+      "valid": true
+    }
+  ],
+  "recipes": [
+    "Choose a saved frequency and receive/excited port for a complex S sample.",
+    "Select a stored angular-grid point; no angular interpolation or realized-gain inference.",
+    "For near-field planes, select a valid coordinate and inspect complex E/H components."
+  ],
+  "status": "retained_result",
+  "result_sha256": "9504f23a0f2d8e43314c3ae9a84cf962310b7eb654df2d77d2ceddb67842c76e",
+  "analysis_id": "emerge-ed13a74e-6262-494e-a0d4-ddd77574aec1",
+  "network_metadata": {
+    "contract": "spike/emerge-s-parameters/v1",
+    "frequencies_hz": [
+      3400000000.0000005,
+      3600000000.0
+    ],
+    "ports": [
+      "P1"
+    ],
+    "reference_impedance_ohm": 50.0,
+    "matrix_order": "values[frequency][receive_port][excited_port]"
+  },
+  "radiation_normalization": "each cut and sphere independently peak-normalized to 0 dB",
+  "nearfield_metadata": {
+    "contract": "spike/emerge-nearfield-plane/v1",
+    "frequencies_hz": [
+      3400000000.0000005,
+      3600000000.0
+    ],
+    "excitation_port": "P1",
+    "excitation_ports": [
+      "P1"
+    ],
+    "excitation_coefficients": [
+      [
+        1.0,
+        0.0
+      ]
+    ],
+    "excitation_normalization": "EMerge port coefficient convention; no voltage or power calibration claimed",
+    "sample_order": "y-major, x-minor",
+    "source": "EMerge solved FEM complex fields interpolated at explicit coordinates"
+  }
+}

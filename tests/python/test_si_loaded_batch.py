@@ -2,9 +2,9 @@
 # Copyright (c) 2026 SigHarmonic
 import unittest
 import numpy as np
-from python.spike_core.sparameters import NetworkData
-from python.spike_core.si_workflow import _loaded_response
-from python.spike_core.si_passives import KB
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import _loaded_response
+from python.spike_core.solvers.signal_integrity.receivers.si_passives import KB
 
 
 class LoadedBatchTests(unittest.TestCase):

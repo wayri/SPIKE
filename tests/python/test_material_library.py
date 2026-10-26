@@ -6,10 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from python.spike_core.material_library import (
-    MaterialError, load_catalog, material_digest, material_snapshot,
-    project_scalar_properties, validate_material, validate_snapshot,
-)
+from python.spike_core.material_library import MaterialError, load_catalog, material_digest, material_snapshot, project_scalar_properties, validate_material, validate_snapshot
 
 
 class MaterialLibraryTests(unittest.TestCase):

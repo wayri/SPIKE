@@ -20,12 +20,10 @@ sys.path.insert(0, str(ROOT))
 import numpy as np  # noqa: E402
 
 from python.spike_core.contracts import AnalysisSpec  # noqa: E402
-from python.spike_core.hybrid_mesh import (  # noqa: E402
-    TOPOLOGY_ONLY_BRANCH_KINDS, build_hybrid_mesh, nearest_mesh_node,
-)
-from python.spike_core.peec_network import solve_port  # noqa: E402
-from python.spike_core.peec_plugin import _connected_component  # noqa: E402
-from python.spike_core.peec_volume_resistance import assemble_overlap_resistance  # noqa: E402
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import TOPOLOGY_ONLY_BRANCH_KINDS, build_hybrid_mesh, nearest_mesh_node
+from python.spike_core.solvers.power_integrity.peec.peec_network import solve_port  # noqa: E402
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import _connected_component  # noqa: E402
+from python.spike_core.solvers.power_integrity.peec.peec_volume_resistance import assemble_overlap_resistance  # noqa: E402
 from python.spike_core.service import _design_from_kicad  # noqa: E402
 
 

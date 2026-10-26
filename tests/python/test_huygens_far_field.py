@@ -4,7 +4,7 @@
 import unittest
 import numpy as np
 
-from python.spike_core.huygens_far_field import box_samples, huygens_far_field, FarFieldError
+from python.spike_core.solvers.electromagnetics.fields.huygens_far_field import box_samples, huygens_far_field, FarFieldError
 
 MU = 4e-7 * np.pi
 EPS = 8.8541878128e-12

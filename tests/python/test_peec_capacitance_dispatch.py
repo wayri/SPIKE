@@ -6,7 +6,7 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.peec_capacitance_dispatch import estimate_branch_capacitance
+from python.spike_core.solvers.power_integrity.peec.peec_capacitance_dispatch import estimate_branch_capacitance
 
 
 class CapacitanceDispatchTests(unittest.TestCase):
@@ -14,9 +14,9 @@ class CapacitanceDispatchTests(unittest.TestCase):
         design = SpiDeR()
         legacy_spec = AnalysisSpec(mode="ac")
         volume_spec = AnalysisSpec(mode="ac", options={"peec_volume_extraction": "enabled"})
-        with patch("python.spike_core.quasistatic_capacitance.estimate_branch_capacitance",
+        with patch("python.spike_core.solvers.power_integrity.pdn.quasistatic_capacitance.estimate_branch_capacitance",
                    return_value="legacy") as legacy, patch(
-                   "python.spike_core.quasistatic_copper_area.estimate_branch_capacitance",
+                   "python.spike_core.solvers.power_integrity.pdn.quasistatic_copper_area.estimate_branch_capacitance",
                    return_value="source-area") as source_area:
             self.assertEqual(estimate_branch_capacitance(design, legacy_spec, []), "legacy")
             self.assertEqual(estimate_branch_capacitance(design, volume_spec, []), "source-area")

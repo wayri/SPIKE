@@ -75,8 +75,8 @@ with optional `timeout_s` and `memory_limit_mb`. Preparation does not execute a
 mesher. No shell, script, executable or dependency-path override is accepted.
 
 Python callers use `prepare_pcb_volume_mesh(request)` from
-`python.spike_core.pcb_volume_mesh`, then `run_occ_case(prepared['job'], new_directory)`
-from `python.spike_core.gmsh_occ_runtime`. The development runtime currently needs
+`python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_mesh`, then `run_occ_case(prepared['job'], new_directory)`
+from `python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime`. The development runtime currently needs
 Windows CPython 3.11 and its admitted Gmsh 4.15.2 entry artifacts. Probe before
 execution; an unavailable runtime is not replaced by a fabricated mesh.
 The complete JSON-line service also needs the ordinary SPIKE worker dependencies.

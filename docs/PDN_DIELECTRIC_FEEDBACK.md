@@ -6,7 +6,7 @@ with temperature according to explicit supplied laws. Permittivity, loss tangent
 and thermal conductivity remain fixed. No material law is inferred from its name.
 
 Call `run_pdn_dielectric_feedback(request)` in
-`python/spike_core/pdn_dielectric_feedback.py`, or the worker method with exactly
+`python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_feedback.py`, or the worker method with exactly
 `{request: ...}`. The request contract is
 `spike/pdn-dielectric-feedback-request/v1`, containing `base_request` (the existing
 one-way request), `conductivity_laws` and `iteration`.

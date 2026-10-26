@@ -7,7 +7,7 @@ document orders the remaining work; it does not promote planned capabilities.
 ## Ownership and acceptance
 
 `python/spikes/` owns deck contracts, parsing and reference orchestration;
-`src/spikes/` owns the internal numerical kernel. The separate SPIKES Studio
+`src/solvers/circuits/spikes/` owns the internal numerical kernel. The separate SPIKES Studio
 editor lives in `standalone/spikes_project/studio/python/spikes_studio/`.
 The SPIKE desktop SPICE workbench is a separate integration surface.
 

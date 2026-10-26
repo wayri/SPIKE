@@ -7,13 +7,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.openfoam_polymesh import (
-    OpenFoamPolyMeshError,
-    REQUEST_CONTRACT,
-    RESULT_CONTRACT,
-    compile_polymesh,
-    write_polymesh,
-)
+from python.spike_core.solvers.external_engines.openfoam.openfoam_polymesh import OpenFoamPolyMeshError, REQUEST_CONTRACT, RESULT_CONTRACT, compile_polymesh, write_polymesh
 
 
 ROOT = Path(__file__).resolve().parents[2]

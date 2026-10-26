@@ -5,10 +5,10 @@ from pathlib import Path
 import unittest
 from tests.python import test_si_protocol_test_runner as runner_fixture
 from tests.python import test_si_channel as channel_fixture
-from python.spike_core.si_protocol_test_runner import run_si_protocol_test_suite, SiProtocolTestRunnerError
-from python.spike_core.si_protocol_eye_mask import validate_lane_mask, run_lane_mask
-from python.spike_core.si_eye_mask_profiles import standard_eye_mask
-from python.spike_core.si_eye_mask import evaluate_eye_mask
+from python.spike_core.solvers.signal_integrity.receivers.si_protocol_test_runner import run_si_protocol_test_suite, SiProtocolTestRunnerError
+from python.spike_core.solvers.signal_integrity.receivers.si_protocol_eye_mask import validate_lane_mask, run_lane_mask
+from python.spike_core.solvers.signal_integrity.receivers.si_eye_mask_profiles import standard_eye_mask
+from python.spike_core.solvers.signal_integrity.receivers.si_eye_mask import evaluate_eye_mask
 
 
 def custom_mask(y):

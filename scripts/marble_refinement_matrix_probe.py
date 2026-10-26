@@ -17,12 +17,9 @@ sys.path.insert(0, str(ROOT))
 
 import numpy as np  # noqa: E402
 from python.spike_core.contracts import AnalysisSpec  # noqa: E402
-from python.spike_core.hybrid_mesh import (  # noqa: E402
-    TOPOLOGY_ONLY_BRANCH_KINDS,
-    build_hybrid_mesh,
-)
-from python.spike_core.peec_plugin import native  # noqa: E402
-from python.spike_core.peec_volume_adapter import extract_volume_matrices  # noqa: E402
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import TOPOLOGY_ONLY_BRANCH_KINDS, build_hybrid_mesh
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import native  # noqa: E402
+from python.spike_core.solvers.power_integrity.peec.peec_volume_adapter import extract_volume_matrices  # noqa: E402
 from python.spike_core.service import _design_from_kicad  # noqa: E402
 
 

@@ -1,12 +1,8 @@
 import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.pi_path import PI_PATH_CONTRACT
-from python.spike_core.pi_path_circuit import (
-    COMPILE_CONTRACT,
-    compile_pi_path_to_native_mna,
-    run_pi_path_native_mna,
-)
+from python.spike_core.solvers.power_integrity.dc.pi_path import PI_PATH_CONTRACT
+from python.spike_core.solvers.power_integrity.dc.pi_path_circuit import COMPILE_CONTRACT, compile_pi_path_to_native_mna, run_pi_path_native_mna
 from python.spike_core.service import handle
 
 

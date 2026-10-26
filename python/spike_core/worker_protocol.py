@@ -57,7 +57,9 @@ def serve_json_lines(
             "duration_ms": round((time.perf_counter() - started) * 1000, 3),
             "worker_version": worker_version,
         }
-        sys.stdout.write(json.dumps(response, default=str) + "\n")
+        # Dense field responses contain millions of delimiters. The protocol
+        # carries JSON values, so formatting spaces only add encoding/IPC bytes.
+        sys.stdout.write(json.dumps(response, default=str, separators=(",", ":")) + "\n")
         sys.stdout.flush()
     return 0
 

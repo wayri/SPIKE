@@ -9,7 +9,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from examples.rlgc_terminated_pair.run_pair import request
-from python.spike_core import rlgc_terminated_pair as terminated
+from python.spike_core.solvers.signal_integrity.lines import rlgc_terminated_pair as terminated
 
 
 def value(z):

@@ -12,11 +12,7 @@ from jsonschema import Draft202012Validator, ValidationError
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.spike_core.spider_v2_schema import content_digest
 from python.spike_core.kicad_importer import import_kicad_design
-from python.spike_core.zone_pad_connection_evidence import (
-    MAX_SERIALIZED_BYTES,
-    build_zone_pad_connection_evidence,
-    validate_zone_pad_connection_evidence,
-)
+from python.spike_core.solvers.power_integrity.dc.zone_pad_connection_evidence import MAX_SERIALIZED_BYTES, build_zone_pad_connection_evidence, validate_zone_pad_connection_evidence
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -152,7 +148,7 @@ class ZonePadConnectionEvidenceTests(unittest.TestCase):
         """The resource gate admits Marble-scale source fills, but not unbounded input."""
         self.assertEqual(MAX_SERIALIZED_BYTES, 128 * 1024 * 1024)
         with patch(
-            "python.spike_core.zone_pad_connection_evidence._canonical_digest_and_size",
+            "python.spike_core.solvers.power_integrity.dc.zone_pad_connection_evidence._canonical_digest_and_size",
             return_value=("a" * 64, MAX_SERIALIZED_BYTES + 1),
         ):
             with self.assertRaisesRegex(ValueError, "128 MiB"):

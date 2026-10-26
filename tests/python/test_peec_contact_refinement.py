@@ -5,8 +5,8 @@
 import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.peec_conforming_mesh import build_conforming_mesh
-from python.spike_core.peec_conforming_dc import assemble_conforming_dc, solve_conforming_dc
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_mesh import build_conforming_mesh
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import assemble_conforming_dc, solve_conforming_dc
 
 try:
     import shapely  # noqa: F401

@@ -1,4 +1,4 @@
-#include "spikes/c_api.h"
+#include "solvers/circuits/spikes/c_api.h"
 
 #include <cassert>
 #include <cmath>

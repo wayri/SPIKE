@@ -12,6 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import ctypes
 import hashlib
+import math
 import os
 from pathlib import Path
 import signal
@@ -20,12 +21,8 @@ import sys
 import time
 from typing import Callable, Sequence
 
-from .owned_spice_process import (
-    PROCESS_RESULT_CONTRACT,
-    _atomic_publish,
-    _normalized_job_relative,
-    _reject_reparse_components,
-)
+from .solvers.external_engines.circuits.owned_spice_process import PROCESS_RESULT_CONTRACT, _atomic_publish, _normalized_job_relative, _reject_reparse_components
+from .spikes_runtime import _library_name
 
 
 MAX_TIMEOUT_SECONDS = 86_400
@@ -39,6 +36,20 @@ class SupervisionResult:
     returncode: int
     elapsed_seconds: float
     os_enforcement: str
+
+
+class SupervisorInitializationError(RuntimeError):
+    """Required POSIX launch setup failed; Popen does not expose its syscall error."""
+
+    def __init__(self, platform: str, timeout_seconds: float, memory_limit_mib: int):
+        self.platform = platform
+        self.timeout_seconds = timeout_seconds
+        self.memory_limit_mib = memory_limit_mib
+        super().__init__(
+            f"Supervisor initialization failed on {platform}; required enforcement "
+            f"was not established for the requested {memory_limit_mib} MiB and "
+            f"{timeout_seconds} second budgets."
+        )
 
 
 def sha256_file(path: Path) -> str:
@@ -89,6 +100,7 @@ def _validate_budget(timeout_seconds: float, memory_limit_mib: int) -> None:
         or not isinstance(timeout_seconds, (int, float))
         or timeout_seconds <= 0
         or timeout_seconds > MAX_TIMEOUT_SECONDS
+        or not math.isfinite(timeout_seconds)
     ):
         raise ValueError("timeout_seconds is outside the admitted range")
     if (
@@ -98,6 +110,31 @@ def _validate_budget(timeout_seconds: float, memory_limit_mib: int) -> None:
         or memory_limit_mib > MAX_MEMORY_MIB
     ):
         raise ValueError("memory_limit_mib is outside the admitted range")
+
+
+def _terminate_posix_group(process: subprocess.Popen) -> None:
+    """Terminate a group whose leader is still owned and unreaped, then reap it."""
+    try:
+        os.killpg(process.pid, signal.SIGTERM)
+    except ProcessLookupError:
+        process.wait()
+        return
+    deadline = time.monotonic() + 0.5
+    while True:
+        # Keep the leader unreaped until the last group signal. Its reserved
+        # PID prevents this numeric process-group ID from being reused.
+        try:
+            os.killpg(process.pid, 0)
+        except ProcessLookupError:
+            break
+        if time.monotonic() >= deadline:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            break
+        time.sleep(0.02)
+    process.wait()
 
 
 def _supervise_posix(
@@ -117,32 +154,33 @@ def _supervise_posix(
         if hasattr(resource, "RLIMIT_CORE"):
             resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
 
-    process = subprocess.Popen(
-        [str(program), *arguments], cwd=cwd, shell=False, close_fds=True,
-        start_new_session=True, preexec_fn=limits,
-    )
+    try:
+        process = subprocess.Popen(
+            [str(program), *arguments], cwd=cwd, shell=False, close_fds=True,
+            start_new_session=True, preexec_fn=limits,
+        )
+    except subprocess.SubprocessError as error:
+        # Preserve Popen's exception without guessing which setup call failed.
+        raise SupervisorInitializationError(
+            sys.platform, timeout_seconds, memory_limit_mib,
+        ) from error
     deadline = time.monotonic() + timeout_seconds
     status = "completed"
     while process.poll() is None:
-        if cancelled():
-            status = "cancelled"
-            break
-        if time.monotonic() >= deadline:
-            status = "timeout"
-            break
-        time.sleep(0.02)
+        try:
+            if cancelled():
+                status = "cancelled"
+                break
+            if time.monotonic() >= deadline:
+                status = "timeout"
+                break
+            time.sleep(0.02)
+        except BaseException:
+            # The last poll returned None, so this leader has not been reaped.
+            _terminate_posix_group(process)
+            raise
     if status != "completed":
-        try:
-            os.killpg(process.pid, signal.SIGTERM)
-        except ProcessLookupError:
-            pass
-        try:
-            process.wait(timeout=0.5)
-        except subprocess.TimeoutExpired:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
+        _terminate_posix_group(process)
     return status, process.wait()
 
 
@@ -338,7 +376,7 @@ def run_circuit_worker(
     """Admit identities and supervise the worker's fixed four-argument ABI."""
 
     worker_name = "spike-circuit-worker.exe" if os.name == "nt" else "spike-circuit-worker"
-    library_name = "spikes_c_api.dll" if os.name == "nt" else "libspikes_c_api.so"
+    library_name = _library_name()
     worker = _regular_identity(worker_executable, worker_name, worker_sha256)
     _regular_identity(library_path, library_name, library_sha256)
     root = job_root.resolve(strict=True)
@@ -352,11 +390,31 @@ def run_circuit_worker(
     result_path = root / result_relative
     if not request_path.is_file():
         raise ValueError("admitted circuit request is not a regular file")
-    outcome = supervise_process(
-        worker, ["--request", request, "--result", result], cwd=root,
-        timeout_seconds=timeout_seconds, memory_limit_mib=memory_limit_mib,
-        cancelled=cancelled,
-    )
+    try:
+        outcome = supervise_process(
+            worker, ["--request", request, "--result", result], cwd=root,
+            timeout_seconds=timeout_seconds, memory_limit_mib=memory_limit_mib,
+            cancelled=cancelled,
+        )
+    except SupervisorInitializationError as error:
+        _atomic_publish(result_path, {
+            "contract": PROCESS_RESULT_CONTRACT,
+            "status": "failed",
+            "validation_state": "experimental",
+            "circuit": None,
+            "issues": [{"code": "SPIKE-BE-SPICE-E-0057", "severity": "error",
+                        "message": str(error)}],
+            "provenance": {
+                "supervisor": "python.spike_core.circuit_worker_supervisor",
+                "supervisor_initialization_failed": True,
+                "enforcement_established": False,
+                "complete_process_tree_termination_requested": False,
+                "platform": error.platform,
+                "requested_timeout_seconds": error.timeout_seconds,
+                "requested_memory_limit_mib": error.memory_limit_mib,
+            },
+        })
+        raise
     if outcome.status == "cancelled":
         _terminal_result(result_path, "cancelled", "SPIKE-BE-SPICE-E-0055", "circuit job cancelled")
     elif outcome.status == "timeout":

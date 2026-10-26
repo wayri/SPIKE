@@ -7,8 +7,8 @@ from unittest.mock import patch
 import numpy as np
 
 from scripts.benchmark_si_crosstalk import independent_modal_s, line_fixture
-from python.spike_core.si_channel import SiChannelError
-from python.spike_core.si_coupled_channel import multiconductor_rlgc_network
+from python.spike_core.solvers.signal_integrity.channels.si_channel import SiChannelError
+from python.spike_core.solvers.signal_integrity.channels.si_coupled_channel import multiconductor_rlgc_network
 
 
 class SiRlgcLossAdmissionTests(unittest.TestCase):
@@ -19,7 +19,7 @@ class SiRlgcLossAdmissionTests(unittest.TestCase):
                 extraction["rlgc_per_m"]["conductor_loss"] = model
             original = deepcopy(extraction)
             frequencies = [0., 5e8, 1e9]
-            with patch("python.spike_core.si_coupled_channel.trace_impedance",
+            with patch("python.spike_core.solvers.signal_integrity.channels.si_coupled_channel.trace_impedance",
                        side_effect=AssertionError("No geometric loss is authorized")):
                 network = multiconductor_rlgc_network(extraction, frequencies, 50.)
             np.testing.assert_allclose(network.s_parameters(), independent_modal_s(extraction, frequencies),

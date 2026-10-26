@@ -1,0 +1,52 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI07-S03",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "d5ca375c71a9987dab8bcf13419973a487dbcc2ba9257a5009777ceb80f15e05",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_terminated.py": "31c599aa724d4ba3e7f7e2b16ad9eb4d5908f69a90f09ba88906cc847952300c",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_transient.py": "2c015bba7b10da5128b36fae181ad4dc0fb906578f355d2788a0e555708c67c6",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_rational.py": "38aa973543767f69bfb0eb5c92905ea1835900258e2aff8a812fce80176e1e55",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "6dd4f3efc7b6119fe5b9ca1868619381fc1e89fc6c1d0b8c5e357cda18b628cd",
+    "python/spike_core/service_simulation_handlers.py": "14e3b49268177b438d719790303a9258fe81bfbc33a45c76ad9bd5cc36bc6c8c",
+    "tests/python/test_sparameter_terminated.py": "fb8c53d0f6842ba1665b7c9cd8ac9a04c36324f80961367a8a19117004fb0a93",
+    "tests/python/test_sparameter_terminated_contract.py": "9a6307c5b42d2fb460d6b3829d1585e94fecdd153deda031eb12ed9b1b0b4226",
+    "schemas/sparameter-rational-fit-request-v1.schema.json": "268bf209ca7a54887481a21b05b218c6f0ecf3fa8e44c9dd1b47011f000533c3",
+    "schemas/sparameter-rational-fit-result-v1.schema.json": "f75c0c2b53f0749275cb21c5f6e412097d00c1594f3010b34cf7a02225e65f7b",
+    "schemas/terminated-network-transient-request-v1.schema.json": "a56e65942c70b98a515cc947803535853f9291cdaccffb6de6bd7f246945c29c",
+    "schemas/terminated-network-transient-result-v1.schema.json": "e1cc7c9fd566709e456952bf8dd9beb12fae6241acb6ef40dc45e796b34f5c4c",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_inductive_terminated.py": "6e1c5b65fe9b8fb67709173d5c2f08e8adbb9f712fff006b314f4f4a28b4ce15",
+    "tests/python/test_sparameter_inductive_terminated.py": "81726d146f518d51502894c3fe3cf4f0f9f507b683112a69e953416055fb5d6e",
+    "tests/python/test_sparameter_inductive_contract.py": "0e9935e4f32c266ee90d79218e8a3e89bed0ce98ae29eb4d2d4319a23f5c80cc",
+    "tests/python/test_sparameter_transient.py": "1df980055b8e28d39dffb65161aab9801c9c09977305d0a04e2bbb696c1d09df",
+    "examples/inductive_network_transient/run_rlc.py": "6c00f27b04962024ac38865c58b6ec9d69b6f970eadb4cd0831e43cf4463264b",
+    "schemas/inductive-network-transient-request-v1.schema.json": "1960c5faa59c65ce54694424784a5653567ac90d7b0c176eb3ee996237e911c0",
+    "schemas/inductive-network-transient-result-v1.schema.json": "2348c1e08ee795474a07bd6e5b0e5d9f4c87d050a426b7e03859a9a9ba102c4e",
+    "docs/INDUCTIVE_NETWORK_TRANSIENT.md": "131c1b2f33105647d74efd9be728058f7cef61ee71fb7b741927abe66b533885"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_inductive_contract.InductiveContractTests.test_actual_worker_rlc_voltage_current_derivative_energy_and_lineage",
+      "tests.python.test_sparameter_inductive_contract.InductiveContractTests.test_example_executes_and_schema_catalog_registers_both_contracts",
+      "tests.python.test_sparameter_inductive_contract.InductiveContractTests.test_worker_rejects_invalid_boundary_and_does_not_return_partial_result",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_analytic_under_critical_overdamped_rlc_and_termination_energy",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_invalid_preflight_limits_and_cancel",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_mixed_coupled_through_ports_and_source_order",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_physical_rlc_invariant_under_reference_impedance_encoding",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_pwl_signed_source_physical_state_reference_and_grid_invariance",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_rlc_time_units_scaling_and_stable_active_network",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_singular_unstable_marginal_and_precision_refusals",
+      "tests.python.test_sparameter_inductive_terminated.InductiveTests.test_two_simultaneous_inductors_coupled_capacitance_physical_reference"
+    ],
+    "run": 11,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI07-S03-migration-replay-20261025.log",
+  "log_sha256": "bd436b69a62a7d856aa6ba1d31842eb3aedd9ef80f0d6fc159765b4981afa082"
+}

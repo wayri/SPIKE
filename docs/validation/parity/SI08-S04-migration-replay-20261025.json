@@ -1,0 +1,40 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI08-S04",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "d5ca375c71a9987dab8bcf13419973a487dbcc2ba9257a5009777ceb80f15e05",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_rational.py": "38aa973543767f69bfb0eb5c92905ea1835900258e2aff8a812fce80176e1e55",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "python/spike_core/service_sparameter_processing.py": "6dd4f3efc7b6119fe5b9ca1868619381fc1e89fc6c1d0b8c5e357cda18b628cd",
+    "python/spike_core/service_simulation_handlers.py": "14e3b49268177b438d719790303a9258fe81bfbc33a45c76ad9bd5cc36bc6c8c",
+    "tests/python/test_sparameter_rational.py": "320557698af592dc9b0245c1960eab1b9fa3d11607b8d06bd77a2e178acf79b4",
+    "tests/python/test_sparameter_rational_contract.py": "0fe7f03a6c20b9d10ef7425d392a03f9efb67403a687d4105d3c4cbc4aa8c567",
+    "schemas/sparameter-rational-fit-request-v1.schema.json": "268bf209ca7a54887481a21b05b218c6f0ecf3fa8e44c9dd1b47011f000533c3",
+    "schemas/sparameter-rational-fit-result-v1.schema.json": "f75c0c2b53f0749275cb21c5f6e412097d00c1594f3010b34cf7a02225e65f7b"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_active_nonreciprocal_zero_source_and_numeric_scales",
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_cancellation_after_solve_discards_model",
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_known_real_rc_coefficients_source_identity_and_sample_reconstruction",
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_missing_pole_and_anti_causal_source_fail_sample_error",
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_rad_per_second_pole_order_and_common_frequency_scaling",
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_rank_condition_and_corrupted_least_squares_failures",
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_state_step_and_independent_numerical_impulse_transform",
+      "tests.python.test_sparameter_rational.SParameterRationalTests.test_strict_dc_physical_scalars_shapes_and_resources",
+      "tests.python.test_sparameter_rational_contract.RationalContractTests.test_active_nonreciprocal_model_is_retained",
+      "tests.python.test_sparameter_rational_contract.RationalContractTests.test_actual_worker_schema_coefficients_source_and_error_limit",
+      "tests.python.test_sparameter_rational_contract.RationalContractTests.test_worker_rejects_bad_pole_dc_unknown_and_inaccurate_fit"
+    ],
+    "run": 11,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI08-S04-migration-replay-20261025.log",
+  "log_sha256": "764e78575772af67f49912de24766b130528c375ff3fbab3ddd23105159dc6e7"
+}

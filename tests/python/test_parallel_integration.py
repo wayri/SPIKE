@@ -8,7 +8,7 @@ import sys
 import unittest
 
 from jsonschema import Draft202012Validator
-from python.spike_core.parallel_pool import validate_batch
+from python.spike_core.solvers.execution.resources.parallel_pool import validate_batch
 
 
 class ParallelIntegrationTests(unittest.TestCase):
@@ -27,7 +27,7 @@ class ParallelIntegrationTests(unittest.TestCase):
 
     def test_source_packaged_child_entry_and_frozen_command_prefix(self):
         from unittest.mock import patch
-        from python.spike_core.parallel_pool import _command
+        from python.spike_core.solvers.execution.resources.parallel_pool import _command
         with patch.object(sys, 'frozen', True, create=True):
             self.assertEqual(_command(), [sys.executable, '--parallel-child'])
         request = json.loads(Path('examples/parallel/harness-batch.json').read_text())['jobs'][0]

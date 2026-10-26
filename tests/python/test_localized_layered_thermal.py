@@ -11,9 +11,9 @@ import numpy as np
 from scipy.sparse.linalg import spsolve
 from scipy.sparse import csr_matrix
 
-from python.spike_core.board_thermal import _pad_contacts, run_board_thermal
+from python.spike_core.solvers.thermal_fluid.heat.board_thermal import _pad_contacts, run_board_thermal
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.thermal_grid import rectangle_weights, transfer_coverage
+from python.spike_core.solvers.thermal_fluid.heat.thermal_grid import rectangle_weights, transfer_coverage
 
 
 def design():
@@ -102,7 +102,7 @@ class LocalizedLayeredThermalTests(unittest.TestCase):
         def capture(matrix, rhs):
             captured.update(matrix=matrix, rhs=rhs)
             return spsolve(matrix, rhs)
-        with patch("python.spike_core.layered_board_thermal.spsolve", side_effect=capture):
+        with patch("python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal.spsolve", side_effect=capture):
             self.solved(req)
         matrix = captured["matrix"]
         # k=1, top dz=.1mm, y shared face=2mm, center distance=(1+3)/2mm.
@@ -129,7 +129,7 @@ class LocalizedLayeredThermalTests(unittest.TestCase):
         for included in (False, True):
             req = explicit(request())
             req["board"]["include_vias"] = included
-            with patch("python.spike_core.layered_board_thermal.spsolve", side_effect=capture):
+            with patch("python.spike_core.solvers.thermal_fluid.heat.layered_board_thermal.spsolve", side_effect=capture):
                 self.solved(req, board)
         difference = matrices[1] - matrices[0]
         expected = 100 * math.pi * (0.5 * 0.02 + 0.02**2) * 1e-6 / 0.00045

@@ -39,7 +39,7 @@ sys.dont_write_bytecode = True
 DEFAULT_OUTPUT = ROOT / "output" / "internal-mesher-benchmark-20261012"
 BENCHMARK_SOURCE = Path(__file__).resolve()
 BENCHMARK_TEST_SOURCE = ROOT / "tests" / "python" / "test_internal_mesher_benchmark.py"
-INTERNAL_SOURCE = ROOT / "python" / "spike_core" / "internal_tetra_generation.py"
+INTERNAL_SOURCE = ROOT / 'python/spike_core/solvers/geometry_meshing/preparation/internal_tetra_generation.py'
 BASELINE_SOURCE_SNAPSHOT = DEFAULT_OUTPUT / "baseline-internal_tetra_generation.py"
 GMSH_API = Path("C:/msys64/ucrt64/lib/gmsh.py")
 GMSH_DLL = Path("C:/msys64/ucrt64/bin/libgmsh.dll")
@@ -336,11 +336,11 @@ def _prepare_backend(name: str):
         execute = lambda points: module.generate_tetra_mesh(points)
         version = "spike-internal-tetra-v1-baseline-" + _sha_file(BASELINE_SOURCE_SNAPSHOT)[:12]
     elif name == "internal_kernel":
-        from python.spike_core.internal_tetra_generation import generate_tetra_mesh
+        from python.spike_core.solvers.geometry_meshing.preparation.internal_tetra_generation import generate_tetra_mesh
         execute = lambda points: generate_tetra_mesh(points)
         version = "spike-internal-tetra-v1"
     elif name == "internal_fullrun":
-        from python.spike_core.internal_meshing_engine import run_internal_meshing
+        from python.spike_core.solvers.geometry_meshing.preparation.internal_meshing_engine import run_internal_meshing
         def execute(points):
             request = {"contract": "spike/internal-mesh-request/v1", "operation": "generate",
                        "parameters": {"points": points, "optimize": False}}
@@ -585,8 +585,8 @@ def capture_baseline(output: Path) -> Path:
         if path.exists():
             raise FileExistsError(f"refusing to overwrite baseline artifact: {path}")
     source_before = _sha_file(INTERNAL_SOURCE)
-    from python.spike_core.internal_tetra_generation import generate_tetra_mesh
-    from python.spike_core.internal_meshing_engine import run_internal_meshing
+    from python.spike_core.solvers.geometry_meshing.preparation.internal_tetra_generation import generate_tetra_mesh
+    from python.spike_core.solvers.geometry_meshing.preparation.internal_meshing_engine import run_internal_meshing
     snapshots = []
     for fixture in fixture_corpus():
         item = {"fixture": fixture["id"], "points_sha256": fixture["points_sha256"]}
@@ -640,7 +640,7 @@ def materialize_baseline_source_from_head(output: Path) -> Path:
     if not evidence.is_file():
         raise FileNotFoundError("baseline evidence is unavailable")
     expected = json.loads(evidence.read_text(encoding="utf-8"))["internal_source_sha256"]
-    process = subprocess.run(["git", "show", "HEAD:python/spike_core/internal_tetra_generation.py"],
+    process = subprocess.run(["git", "show", "HEAD:python/spike_core/solvers/geometry_meshing/preparation/internal_tetra_generation.py"],
                              cwd=ROOT, capture_output=True)
     if process.returncode != 0:
         raise RuntimeError("unable to read the clean baseline source from Git HEAD")
@@ -658,8 +658,8 @@ def compare_current_to_baseline(output: Path) -> Path:
         raise FileExistsError(f"refusing to overwrite equivalence evidence: {target}")
     baseline = json.loads(baseline_path.read_text(encoding="utf-8"))
     expected = {item["fixture"]: item for item in baseline["snapshots"]}
-    from python.spike_core.internal_tetra_generation import generate_tetra_mesh
-    from python.spike_core.internal_meshing_engine import run_internal_meshing
+    from python.spike_core.solvers.geometry_meshing.preparation.internal_tetra_generation import generate_tetra_mesh
+    from python.spike_core.solvers.geometry_meshing.preparation.internal_meshing_engine import run_internal_meshing
     rows = []
     for fixture in fixture_corpus():
         for backend in ("kernel", "fullrun_optimize_false"):

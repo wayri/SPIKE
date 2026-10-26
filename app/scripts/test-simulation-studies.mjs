@@ -56,6 +56,15 @@ assert.equal(study.cases[1].runs[0].facts.modelStatus, "experimental");
 assert.equal(study.cases[1].runs[0].facts.designId, undefined, "workspace settings do not become claimed result provenance");
 assert.deepEqual(study.cases[1].runs[0].scenario, { ambientC: -20 });
 assert.deepEqual(study.cases[1].runs[0].settings, { designId: "design-a", tolerance: 1e-5 });
+const unchangedCapture = structuredClone(study.cases[1]);
+study = updateStudyCase(study, unchangedCapture.id, {
+  mode: unchangedCapture.mode, type: unchangedCapture.type,
+  scenario: structuredClone(unchangedCapture.scenario), settings: { tolerance: 1e-5, designId: "design-a" },
+});
+assert.deepEqual(study.cases[1].resultSnapshot, unchangedCapture.resultSnapshot, "saving semantically unchanged setup preserves its result");
+assert.deepEqual(study.cases[1].runs, unchangedCapture.runs, "unchanged save does not invent another capture");
+study = updateStudyCase(study, unchangedCapture.id, { name: "Renamed capture", notes: "Display annotation" });
+assert.deepEqual(study.cases[1].resultSnapshot, unchangedCapture.resultSnapshot, "presentation edits preserve results");
 study = updateStudyCase(study, study.cases[1].id, { settings: { tolerance: 1e-6 } });
 assert.equal(study.cases[1].resultSnapshot, undefined);
 assert.equal(study.cases[1].runs.length, 1, "setup edits retain immutable recorded runs");

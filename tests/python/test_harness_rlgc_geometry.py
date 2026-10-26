@@ -7,9 +7,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.harness_rlgc_geometry import (
-    CONTRACT, EPSILON0, MU0, _internal_impedance, extract_parallel_round_rlgc,
-)
+from python.spike_core.solvers.signal_integrity.lines.harness_rlgc_geometry import CONTRACT, EPSILON0, MU0, _internal_impedance, extract_parallel_round_rlgc
 
 
 def fixture():

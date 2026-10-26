@@ -1,14 +1,7 @@
 import copy
 import unittest
 
-from python.spike_core.capability_ledger import (
-    CAPABILITY_LEDGER_CONTRACT,
-    CapabilityLedgerError,
-    native_capability_ledger,
-    release_ready_workflows,
-    validate_capability_ledger,
-    workflow_capability,
-)
+from python.spike_core.capability_ledger import CAPABILITY_LEDGER_CONTRACT, CapabilityLedgerError, native_capability_ledger, release_ready_workflows, validate_capability_ledger, workflow_capability
 
 
 class CapabilityLedgerTests(unittest.TestCase):

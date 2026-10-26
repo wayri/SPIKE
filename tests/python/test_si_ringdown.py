@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SigHarmonic
 import unittest
 import numpy as np
-from python.spike_core.si_ringdown import qualify_ringdown, qualify_ringdown_convergence
+from python.spike_core.solvers.signal_integrity.receivers.si_ringdown import qualify_ringdown, qualify_ringdown_convergence
 
 
 class RingdownTests(unittest.TestCase):

@@ -9,17 +9,9 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.openfoam import prepare_case
-from python.spike_core.openfoam_multiregion import (
-    CASE_CONTRACT,
-    REQUEST_CONTRACT,
-    MultiRegionOpenFoamError,
-    compile_multiregion_case,
-    poly_mesh_digest,
-    prepare_multiregion_case,
-    prepare_runnable_multiregion_case,
-)
-from python.spike_core.thermal import ThermalScenario
+from python.spike_core.solvers.external_engines.openfoam.openfoam import prepare_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion import CASE_CONTRACT, REQUEST_CONTRACT, MultiRegionOpenFoamError, compile_multiregion_case, poly_mesh_digest, prepare_multiregion_case, prepare_runnable_multiregion_case
+from python.spike_core.solvers.thermal_fluid.heat.thermal import ThermalScenario
 from python.spike_core.service import handle
 
 

@@ -15,8 +15,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from python.spike_core.extension_analysis_results import admit_analysis_result, design_binding
-from python.spike_core.si_workflow import REQUEST, run_si_workflow
-from python.spike_core.sparameters import touchstone_text
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import REQUEST, run_si_workflow
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text
 
 DC_CAVEAT = ("ILLUSTRATIVE DC-ASSUMED, BANDLIMITED EYE: FEM has no DC sample. A separate "
              "derived scenario adds an ideal zero-delay disjoint PEC through matrix at DC "

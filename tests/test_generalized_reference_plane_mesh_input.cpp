@@ -1,4 +1,4 @@
-#include "peec/generalized_reference_plane_mesh_input.hpp"
+#include "solvers/power_integrity/peec/generalized_reference_plane_mesh_input.hpp"
 
 #include <array>
 #include <cassert>

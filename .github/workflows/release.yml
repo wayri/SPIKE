@@ -34,6 +34,7 @@ jobs:
           python-version: '3.12'
       - name: Architecture and publication checks
         run: |
+          python scripts/check_private_research.py
           python scripts/check_architecture.py
           python -m unittest discover -s tests/python -p test_release_automation.py -v
       - name: Verify workflow publication actor

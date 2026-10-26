@@ -2,8 +2,8 @@
 """Independent planar thermal conservation, field, and coupling oracles."""
 import unittest
 import numpy as np
-from python.spike_core.magnetic_fem import MU0
-from python.spike_core.magnetic_thermal import solve_thermal_step,simulate_magnetic_thermal
+from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import MU0
+from python.spike_core.solvers.electromagnetics.machines.magnetic_thermal import solve_thermal_step, simulate_magnetic_thermal
 
 
 def grid(n):

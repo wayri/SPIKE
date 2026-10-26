@@ -2,8 +2,8 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisResult, AnalysisSpec, SpiDeR, ValidationIssue
-from python.spike_core.field_circuit_cosim import FIELD_REQUEST_CONTRACT, FIELD_RESULT_CONTRACT
-from python.spike_core.peec_field_provider import NativePeecFieldReductionProvider
+from python.spike_core.solvers.execution.coupling.field_circuit_cosim import FIELD_REQUEST_CONTRACT, FIELD_RESULT_CONTRACT
+from python.spike_core.solvers.power_integrity.peec.peec_field_provider import NativePeecFieldReductionProvider
 
 
 def spec():
@@ -52,7 +52,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "stable analysis_id"):
             NativePeecFieldReductionProvider(SpiDeR(), AnalysisSpec(mode="ac"))
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_maps_exact_reviewed_network_without_changing_topology(self, solve):
         solve.return_value = extraction_result()
         result = NativePeecFieldReductionProvider(SpiDeR(), spec())(field_request())
@@ -67,7 +67,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         }])
         self.assertFalse(result["diagnostics"]["circuit_state_feedback"])
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_rejects_completed_extraction_with_unsupported_capacitance(self, solve):
         solve.return_value = extraction_result()
         network = solve.return_value.networks["parasitics"][0]
@@ -78,7 +78,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "capacitance_f.*unsupported"):
             provider(field_request())
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_rejects_nonphysical_rlcg_values(self, solve):
         provider = NativePeecFieldReductionProvider(SpiDeR(), spec())
         for value in (-1.0, float("nan"), float("inf"), True):
@@ -88,7 +88,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "resistance_ohm.*finite"):
                     provider(field_request())
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_preserves_explicit_numeric_zero(self, solve):
         solve.return_value = extraction_result()
         network = solve.return_value.networks["parasitics"][0]
@@ -99,7 +99,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         self.assertEqual(result["parasitics"][0]["capacitance_f"], 0.0)
         self.assertEqual(result["parasitics"][0]["conductance_s"], 0.0)
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_rejects_missing_or_unsupported_rlcg_values(self, solve):
         provider = NativePeecFieldReductionProvider(SpiDeR(), spec())
         for parameter in (
@@ -126,7 +126,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, "PEEC_CAPACITANCE_UNSUPPORTED"):
             provider(field_request())
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_rejects_result_net_or_endpoint_identity_changes(self, solve):
         solve.return_value = extraction_result()
         provider = NativePeecFieldReductionProvider(SpiDeR(), spec())
@@ -135,7 +135,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "endpoint identity changed"):
             provider(field_request(source_mesh_nodes=[10, 99]))
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_requires_exact_reviewed_mesh_endpoint_identity(self, solve):
         solve.return_value = extraction_result()
         provider = NativePeecFieldReductionProvider(SpiDeR(), spec())
@@ -154,7 +154,7 @@ class NativePeecFieldProviderTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "invalid mesh endpoint"):
             provider(field_request(source_mesh_nodes=[10, 1]))
 
-    @patch("python.spike_core.peec_field_provider.solve_peec_2_5d")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_field_provider.solve_peec_2_5d")
     def test_rejects_failed_extraction_and_missing_provenance(self, solve):
         provider = NativePeecFieldReductionProvider(SpiDeR(), spec())
         solve.return_value = AnalysisResult(

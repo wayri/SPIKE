@@ -12,17 +12,7 @@ from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import AssemblyIRV1, SpiDeRV2
 from python.spike_core.geometry_arrow import canonical_geometry_rows
 from python.spike_core import project_model_artifacts
-from python.spike_core.project_package import (
-    PackageLimits,
-    ProjectPackageError,
-    build_package_members,
-    migrate_legacy_payload,
-    read_geometry_arrow_artifact,
-    read_project,
-    read_spike_package,
-    read_visual_model_artifacts,
-    write_spike_package,
-)
+from python.spike_core.project_package import PackageLimits, ProjectPackageError, build_package_members, migrate_legacy_payload, read_geometry_arrow_artifact, read_project, read_spike_package, read_visual_model_artifacts, write_spike_package
 from python.spike_core.project_model_artifacts import read_project_source_artifact, read_step_model_artifact
 from python.spike_core.project_package_auth import validate_targeted_manifest_signature
 

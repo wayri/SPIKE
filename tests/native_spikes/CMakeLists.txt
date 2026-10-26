@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(OpenMP)
 get_filename_component(SPIKES_ROOT "${CMAKE_CURRENT_LIST_DIR}/../.." ABSOLUTE)
-set(SPIKES_SRC "${SPIKES_ROOT}/src/spikes")
+set(SPIKES_SRC "${SPIKES_ROOT}/src/solvers/circuits/spikes")
 set(SPIKES_TRANSIENT_SOURCE "${SPIKES_SRC}/transient_solver.cpp" CACHE FILEPATH
     "Transient implementation to compile (allows controlled numerical experiments)")
 add_library(spikes_core STATIC

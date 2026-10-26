@@ -2,12 +2,7 @@
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.owned_spice_workspace import (
-    REQUEST_CONTRACT,
-    RESULT_CONTRACT,
-    run_owned_spice_workspace,
-    validate_owned_spice_workspace_request,
-)
+from python.spike_core.owned_spice_workspace import REQUEST_CONTRACT, RESULT_CONTRACT, run_owned_spice_workspace, validate_owned_spice_workspace_request
 from python.spike_core.service import handle
 from tests.python.test_native_circuit_compiler import design, workspace
 

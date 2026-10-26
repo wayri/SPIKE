@@ -6,7 +6,7 @@ import tempfile
 import json
 from pathlib import Path
 from unittest.mock import patch
-from python.spike_core.openfoam_mesh_geometry_audit import audit_mesh_geometry, audit_polymesh_geometry
+from python.spike_core.solvers.external_engines.openfoam.openfoam_mesh_geometry_audit import audit_mesh_geometry, audit_polymesh_geometry
 
 
 def cube():
@@ -51,7 +51,7 @@ class GeometryAuditTests(unittest.TestCase):
         with self.assertRaises(ValueError): audit_mesh_geometry(mesh)
 
     def test_actual_polymesh_renderer_disables_skew_flux(self):
-        from python.spike_core import openfoam_fan_fixture as fixture
+        from python.spike_core.solvers.external_engines.openfoam import openfoam_fan_fixture as fixture
         original = fixture.write_polymesh
         def skew(neutral, output):
             for point in neutral['mesh']['vertices']:

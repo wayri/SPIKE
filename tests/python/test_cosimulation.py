@@ -3,7 +3,7 @@ from copy import deepcopy
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.cosimulation import run_cosimulation, default_adapters
+from python.spike_core.solvers.execution.coupling.cosimulation import run_cosimulation, default_adapters
 from python.spike_core.service_cosimulation import handle_cosimulation_request
 
 
@@ -78,11 +78,30 @@ class CosimulationTests(unittest.TestCase):
         self.assertEqual(len(result["frames"]), 2)
         self.assertIn("fixture failure", result["issues"][0]["message"])
 
+    def test_frames_and_custom_state_remain_isolated(self):
+        returned = []
+        class Stateful:
+            version = "test"
+            def validate(self, participant, steps): pass
+            def step(self, participant, inputs, state, tick, time_s, step_s):
+                state = {"ticks": []} if state is None else state
+                state["ticks"].append(tick)
+                values = {"y": float(tick)}
+                returned.append(values)
+                return values, state
+        adapters = default_adapters(); adapters["gain"] = Stateful()
+        result = run_cosimulation(request(), adapters=adapters)
+        returned[0]["y"] = 999.0
+        self.assertEqual([frame["outputs"]["load"]["y"] for frame in result["frames"]],
+                         [0.0, 1.0, 2.0, 3.0])
+        self.assertEqual(len({id(frame["outputs"]) for frame in result["frames"]}), 4)
+        self.assertEqual(len({id(frame["outputs"]["load"]) for frame in result["frames"]}), 4)
+
     def test_cancellation_and_timeout_before_commit(self):
         result = run_cosimulation(request(), cancelled=lambda: True)
         self.assertEqual(result["status"], "cancelled")
         self.assertEqual(result["completed_steps"], 0)
-        with patch("python.spike_core.cosimulation.time.monotonic", side_effect=[0, 61]):
+        with patch("python.spike_core.solvers.execution.coupling.cosimulation.time.monotonic", side_effect=[0, 61]):
             result = run_cosimulation(request(), timeout_s=60)
         self.assertEqual(result["status"], "timed_out")
         self.assertEqual(result["completed_steps"], 0)
@@ -153,7 +172,7 @@ class CosimulationTests(unittest.TestCase):
 
     def test_cancellation_after_staging_and_byte_admission(self):
         # Callback checkpoints: before first, before second, before commit.
-        with patch("python.spike_core.cosimulation.time.monotonic", return_value=0):
+        with patch("python.spike_core.solvers.execution.coupling.cosimulation.time.monotonic", return_value=0):
             checks = iter([False, False, True])
             result = run_cosimulation(request(), cancelled=lambda: next(checks))
         self.assertEqual(result["status"], "cancelled")

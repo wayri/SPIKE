@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SigHarmonic
 import unittest
 import numpy as np
-from python.spike_core.multi_excitation_network import solve_multi_excitation
+from python.spike_core.solvers.electromagnetics.fields.multi_excitation_network import solve_multi_excitation
 
 
 class MultiExcitationTests(unittest.TestCase):

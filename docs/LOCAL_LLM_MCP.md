@@ -1,5 +1,9 @@
 # Local LLM control with MCP
 
+For the built-in conversation, begin with the [Assistant user guide](ASSISTANT_USER_GUIDE.md).
+It explains what chat can actually execute and when to use imports, the Python
+workspace or an external agent. This page covers external MCP and runner setup.
+
 
 Integrated desktop chat: [SPIKE Assistant](INTEGRATED_ASSISTANT.md), including provider consent, reviewed tools and assembly workflows.
 Harness automation uses `spike_run_harness_pi`, `spike_run_harness_si` and
@@ -118,6 +122,11 @@ python scripts/spike_local_chat.py --provider lmstudio --model YOUR_LOCAL_MODEL 
 ```
 
 Omit the prompt for an interactive session. The default endpoints are `http://127.0.0.1:11434` for Ollama and `http://127.0.0.1:1234` for LM Studio. `--endpoint` accepts only a loopback HTTP origin with a port. The client sends the MCP tool schemas to the local model and executes only tools in SPIKE's allowlist. It caps each prompt at eight tool rounds and sixteen calls. It does not download models or start provider services.
+
+Incomplete provider turns, empty text-only replies and malformed LM Studio
+tool-call identifiers are errors. A tool call beyond the round limit is rejected
+before execution. LM Studio's null content on a tool-call message is supported.
+These transport checks do not establish a model's engineering competence.
 
 The newly built packaged worker also supports `spike-worker.exe --local-chat --provider ollama` (or `lmstudio`) with the same options. This provides offline linking without a source checkout once that worker artifact is rebuilt.
 

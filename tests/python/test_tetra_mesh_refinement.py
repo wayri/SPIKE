@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import unittest
 
-from python.spike_core.tetra_mesh_refinement import refine_tetra_mesh, TetraRefinementError
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_refinement import refine_tetra_mesh, TetraRefinementError
 
 
 def mesh_pair():
@@ -53,7 +53,7 @@ class TetraRefinementTests(unittest.TestCase):
     def test_openfoam_converter_handoff(self):
         # Synthetic converter admission fixture only. Production refinement
         # returns production_qualified=False; this flag is not promoted by it.
-        from python.spike_core.openfoam_polymesh import compile_polymesh
+        from python.spike_core.solvers.external_engines.openfoam.openfoam_polymesh import compile_polymesh
         mesh,boundary = mesh_pair()
         result = refine_tetra_mesh(mesh,[[0,1]],boundary)
         refined = result['mesh']

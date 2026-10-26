@@ -9,11 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.beta_runtime_readiness import (
-    BetaReadinessError,
-    build_readiness_report,
-    inspect_circuit_package,
-)
+from python.spike_core.beta_runtime_readiness import BetaReadinessError, build_readiness_report, inspect_circuit_package
 
 
 ROOT = Path(__file__).resolve().parents[2]

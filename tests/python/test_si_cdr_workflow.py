@@ -6,8 +6,8 @@ import unittest
 from unittest.mock import patch
 
 from tests.python.test_si_exact_clock import through
-from python.spike_core.si_workflow import run_si_workflow
-from python.spike_core.si_clock_recovery import recover_nrz_clock
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import run_si_workflow
+from python.spike_core.solvers.signal_integrity.receivers.si_clock_recovery import recover_nrz_clock
 
 
 def request():
@@ -28,7 +28,7 @@ class CdrWorkflowTests(unittest.TestCase):
         self.assertFalse(report["production_qualified"])
 
     def test_full_waveform_not_decimated_export_reaches_cdr(self):
-        with patch("python.spike_core.si_workflow.recover_nrz_clock", wraps=recover_nrz_clock) as recovery:
+        with patch("python.spike_core.solvers.signal_integrity.receivers.si_workflow.recover_nrz_clock", wraps=recover_nrz_clock) as recovery:
             result = run_si_workflow(request())
         rx = result["time_domain"]["receivers"][0]
         self.assertEqual(result["time_domain"]["status"], "completed")

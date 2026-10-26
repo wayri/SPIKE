@@ -11,7 +11,7 @@ import itertools
 import unittest
 from unittest.mock import Mock, patch
 
-from python.spike_core.gmsh_occ_mesher import OccMeshingError, build_occ_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_mesher import OccMeshingError, build_occ_mesh
 
 
 def _request():
@@ -71,7 +71,7 @@ def _api(missing_second, empty_type_record=False):
 @unittest.skipUnless(importlib.util.find_spec('shapely'), 'Optional Shapely runtime unavailable')
 class OccFragmentCoverageTests(unittest.TestCase):
     def test_complete_fixture_has_mesh_cells_for_both_cad_fragments(self):
-        with patch('python.spike_core.gmsh_occ_mesher._solid', side_effect=[1, 2]):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_mesher._solid', side_effect=[1, 2]):
             result = build_occ_mesh(_api(missing_second=False), _request())
         self.assertEqual(result['status'], 'completed')
         self.assertTrue(result['whole_model_retained'])
@@ -83,7 +83,7 @@ class OccFragmentCoverageTests(unittest.TestCase):
     def test_positive_cad_fragment_without_tetrahedra_is_rejected(self):
         for empty_type_record in (False, True):
             with self.subTest(empty_type_record=empty_type_record):
-                with patch('python.spike_core.gmsh_occ_mesher._solid', side_effect=[1, 2]):
+                with patch('python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_mesher._solid', side_effect=[1, 2]):
                     with self.assertRaisesRegex(OccMeshingError, '(?i)fragment|coverage|source'):
                         build_occ_mesh(_api(missing_second=True, empty_type_record=empty_type_record),
                                        _request())

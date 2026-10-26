@@ -8,7 +8,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'python'))
-from spike_core.su2_airflow import cavity_mesh, parse_su2_cavity, run_su2_airflow, validate_su2_request
+from python.spike_core.solvers.external_engines.su2.su2_airflow import cavity_mesh, parse_su2_cavity, run_su2_airflow, validate_su2_request
 
 
 class Su2AirflowTests(unittest.TestCase):
@@ -77,7 +77,7 @@ class Su2AirflowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaisesRegex(ValueError, 'SU2_UNAVAILABLE'):
                 run_su2_airflow({}, executable=Path(directory)/'missing')
-            with patch('spike_core.su2_airflow.find_su2', return_value=Path(sys.executable)):
+            with patch('python.spike_core.solvers.external_engines.su2.su2_airflow.find_su2', return_value=Path(sys.executable)):
                 with self.assertRaisesRegex(RuntimeError, 'SU2_CANCELLED'):
                     run_su2_airflow({}, cancel_check=lambda: True)
 
@@ -90,7 +90,7 @@ class Su2AirflowTests(unittest.TestCase):
                 (options['cwd'] / 'cavity.cfg').write_text('changed input')
                 return {'return_code': 0, 'stdout': '', 'stderr': ''}
 
-            with patch('spike_core.su2_airflow.run_adapter_process', side_effect=changed_input):
+            with patch('python.spike_core.solvers.external_engines.su2.su2_airflow.run_adapter_process', side_effect=changed_input):
                 with self.assertRaisesRegex(RuntimeError, 'SU2_INPUT_CHANGED'):
                     run_su2_airflow({'cells': 8}, executable=executable, output_root=directory)
 

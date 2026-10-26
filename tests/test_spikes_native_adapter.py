@@ -4,14 +4,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.spikes_native_adapter import (
-    SpikesNativeAdapterError,
-    capability_manifest,
-    map_result_bundle,
-    prepare_job_envelope,
-    probe_runtime_capabilities,
-    resolve_runtime_executable,
-)
+from python.spike_core.solvers.circuits.models.spikes_native_adapter import SpikesNativeAdapterError, capability_manifest, map_result_bundle, prepare_job_envelope, probe_runtime_capabilities, resolve_runtime_executable
 
 
 class SpikesNativeAdapterTests(unittest.TestCase):
@@ -61,9 +54,9 @@ class SpikesNativeAdapterTests(unittest.TestCase):
             return Completed()
 
         with patch(
-            "python.spike_core.spikes_native_adapter.resolve_runtime_executable",
+            "python.spike_core.solvers.circuits.models.spikes_native_adapter.resolve_runtime_executable",
             return_value=str(Path(__file__).resolve()),
-        ), patch("python.spike_core.spikes_native_adapter.subprocess.run", side_effect=fake_run):
+        ), patch("python.spike_core.solvers.circuits.models.spikes_native_adapter.subprocess.run", side_effect=fake_run):
             result = probe_runtime_capabilities()
         self.assertEqual(result["status"], "available")
         self.assertFalse(result["product_physics_eligible"])
@@ -89,9 +82,9 @@ class SpikesNativeAdapterTests(unittest.TestCase):
             return Completed()
 
         with patch(
-            "python.spike_core.spikes_native_adapter.resolve_runtime_executable",
+            "python.spike_core.solvers.circuits.models.spikes_native_adapter.resolve_runtime_executable",
             return_value=str(Path(__file__).resolve()),
-        ), patch("python.spike_core.spikes_native_adapter.subprocess.run", side_effect=fake_run):
+        ), patch("python.spike_core.solvers.circuits.models.spikes_native_adapter.subprocess.run", side_effect=fake_run):
             result = probe_runtime_capabilities()
         self.assertEqual(result["status"], "available")
         self.assertEqual(result["manifest"]["mpi"], "none")
@@ -107,9 +100,9 @@ class SpikesNativeAdapterTests(unittest.TestCase):
             return Completed()
 
         with patch(
-            "python.spike_core.spikes_native_adapter.resolve_runtime_executable",
+            "python.spike_core.solvers.circuits.models.spikes_native_adapter.resolve_runtime_executable",
             return_value=str(Path(__file__).resolve()),
-        ), patch("python.spike_core.spikes_native_adapter.subprocess.run", side_effect=fake_duplicate):
+        ), patch("python.spike_core.solvers.circuits.models.spikes_native_adapter.subprocess.run", side_effect=fake_duplicate):
             rejected = probe_runtime_capabilities()
         self.assertEqual(rejected["status"], "incompatible")
 
@@ -124,9 +117,9 @@ class SpikesNativeAdapterTests(unittest.TestCase):
             return Completed()
 
         with patch(
-            "python.spike_core.spikes_native_adapter.resolve_runtime_executable",
+            "python.spike_core.solvers.circuits.models.spikes_native_adapter.resolve_runtime_executable",
             return_value=str(Path(__file__).resolve()),
-        ), patch("python.spike_core.spikes_native_adapter.subprocess.run", side_effect=fake_run):
+        ), patch("python.spike_core.solvers.circuits.models.spikes_native_adapter.subprocess.run", side_effect=fake_run):
             result = probe_runtime_capabilities()
         self.assertEqual(result["status"], "incompatible")
         self.assertFalse(result["product_physics_eligible"])

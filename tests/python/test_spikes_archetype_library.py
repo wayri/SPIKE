@@ -4,7 +4,7 @@ import math
 import unittest
 from io import StringIO
 
-from python.spike_core.native_mna import REQUEST_CONTRACT, run_native_mna
+from python.spike_core.solvers.circuits.models.native_mna import REQUEST_CONTRACT, run_native_mna
 from python.spikes.cli import EXIT_INPUT, EXIT_OK, main
 from python.spikes.library import (
     BUILTIN_LIBRARY,

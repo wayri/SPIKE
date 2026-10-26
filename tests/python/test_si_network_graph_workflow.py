@@ -9,9 +9,9 @@ from unittest.mock import patch
 import numpy as np
 from jsonschema import Draft202012Validator
 from referencing import Registry,Resource
-from python.spike_core.si_workflow import REQUEST,run_si_workflow
-from python.spike_core.si_network_graph import build_network_graph
-from python.spike_core.si_crosstalk import analyze_crosstalk
+from python.spike_core.solvers.signal_integrity.receivers.si_workflow import REQUEST, run_si_workflow
+from python.spike_core.solvers.signal_integrity.networks.si_network_graph import build_network_graph
+from python.spike_core.solvers.signal_integrity.receivers.si_crosstalk import analyze_crosstalk
 from tests.python.test_si_network_graph import graph_fixture
 
 ROOT=Path(__file__).resolve().parents[2]
@@ -73,9 +73,9 @@ class NetworkGraphWorkflowTests(unittest.TestCase):
     def test_budget_and_nonfinite_reject_before_acquisition(self):
         for value in (float("nan"),float("inf"),-1.,True):
             raw=graph_fixture();raw["reference_impedance_ohm"]=value
-            with patch("python.spike_core.si_network_graph.acquire_network") as acquire:
+            with patch("python.spike_core.solvers.signal_integrity.networks.si_network_graph.acquire_network") as acquire:
                 with self.assertRaises(ValueError):build_network_graph(raw)
                 acquire.assert_not_called()
-        with patch("python.spike_core.si_network_graph.MAX_DENSE_WORK",1),patch("python.spike_core.si_network_graph.acquire_network") as acquire:
+        with patch("python.spike_core.solvers.signal_integrity.networks.si_network_graph.MAX_DENSE_WORK",1),patch("python.spike_core.solvers.signal_integrity.networks.si_network_graph.acquire_network") as acquire:
             with self.assertRaisesRegex(ValueError,"budget"):build_network_graph(graph_fixture())
             acquire.assert_not_called()

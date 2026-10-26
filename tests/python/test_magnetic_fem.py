@@ -2,9 +2,7 @@
 """Independently authored exact-field and constitutive checks."""
 import unittest
 import numpy as np
-from python.spike_core.magnetic_fem import (
-    MU0, MagneticMaterial, PlanarMagneticOperator, solve_magnetostatic,
-)
+from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import MU0, MagneticMaterial, PlanarMagneticOperator, solve_magnetostatic
 
 
 def square(n):
@@ -142,7 +140,7 @@ class MagneticFemTests(unittest.TestCase):
 
 class EddyCurrentTests(unittest.TestCase):
     def test_fourier_backward_euler_spatial_refinement(self):
-        from python.spike_core.magnetic_fem import solve_eddy_current_step
+        from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import solve_eddy_current_step
         errors=[]
         for n in (4,8,16):
             q=request(n)
@@ -162,7 +160,7 @@ class EddyCurrentTests(unittest.TestCase):
 
     def test_independent_semidiscrete_exponential_time_refinement(self):
         from scipy.linalg import eigh
-        from python.spike_core.magnetic_fem import solve_eddy_current_step
+        from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import solve_eddy_current_step
         q=request(5)
         q["materials"]={"air":{"mu_r":1/MU0,"conductivity_s_m":1.0}}
         nodes=np.asarray(q["nodes_m"]); n=len(nodes)
@@ -193,7 +191,7 @@ class EddyCurrentTests(unittest.TestCase):
         self.assertTrue(all(1.65<a/b<2.1 for a,b in zip(errors[:-1],errors[1:])),errors)
 
     def test_gauge_shift_has_no_induced_current_or_heat(self):
-        from python.spike_core.magnetic_fem import solve_eddy_current_step
+        from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import solve_eddy_current_step
         q=request(4)
         q["materials"]={"air":{"mu_r":1.0,"conductivity_s_m":5e7}}
         old=[0.001*y for x,y in q["nodes_m"]]
@@ -205,7 +203,7 @@ class EddyCurrentTests(unittest.TestCase):
         self.assertAlmostEqual(result["region_electric_offset_v_per_m"]["air"],.2,places=11)
 
     def test_eddy_rejects_absent_conductivity_and_bad_state(self):
-        from python.spike_core.magnetic_fem import solve_eddy_current_step
+        from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import solve_eddy_current_step
         q=request()
         with self.assertRaisesRegex(ValueError,"conductive"):
             solve_eddy_current_step(**q,previous_a_wb_per_m=[0.0]*len(q["nodes_m"]),time_step_s=.1)

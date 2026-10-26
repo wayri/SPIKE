@@ -30,15 +30,15 @@ from examples.assembly_field.run_electrothermal import setup_coupled
 from examples.assembly_field.run_examples import setup as thermal_setup
 from examples.pdn_dielectric_thermal.run_slab import setup as dielectric_setup
 from examples.rlgc_line_fields.run_line import request as rlgc_request
-from python.spike_core.assembly_electrothermal import run_assembly_electrothermal
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal
-from python.spike_core.huygens_far_field import huygens_far_field
-from python.spike_core.laminar_channel_cht import solve_laminar_channel_cht
-from python.spike_core.multiboard_circuit import run_multiboard_circuit
-from python.spike_core.multiboard_thermal import run_multiboard_thermal
-from python.spike_core.native_airflow import detect_native_airflow, run_native_cavity
-from python.spike_core.pdn_dielectric_ac import extract_pdn_dielectric_ac
-from python.spike_core.rlgc_line_fields import run_rlgc_line_fields
+from python.spike_core.solvers.thermal_fluid.electrothermal.assembly_electrothermal import run_assembly_electrothermal
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal
+from python.spike_core.solvers.electromagnetics.fields.huygens_far_field import huygens_far_field
+from python.spike_core.solvers.thermal_fluid.flow.laminar_channel_cht import solve_laminar_channel_cht
+from python.spike_core.solvers.circuits.models.multiboard_circuit import run_multiboard_circuit
+from python.spike_core.solvers.thermal_fluid.heat.multiboard_thermal import run_multiboard_thermal
+from python.spike_core.solvers.thermal_fluid.flow.native_airflow import detect_native_airflow, run_native_cavity
+from python.spike_core.solvers.power_integrity.pdn.pdn_dielectric_ac import extract_pdn_dielectric_ac
+from python.spike_core.solvers.signal_integrity.lines.rlgc_line_fields import run_rlgc_line_fields
 from tests.python.test_multiboard_circuit import fixture as multiboard_circuit_fixture
 from tests.python.test_multiboard_thermal import request as multiboard_thermal_fixture
 
@@ -159,7 +159,7 @@ def generate_pi() -> dict[str, object]:
     footer(fig)
     save(fig, "pi-dielectric-admittance")
     record = base_record("pi", "Retained dielectric electroquasistatic sweep", result["model_status"],
-        result["limitations"], ("examples/pdn_dielectric_thermal/run_slab.py", "python/spike_core/pdn_dielectric_ac.py"), request, result)
+        result["limitations"], ("examples/pdn_dielectric_thermal/run_slab.py", "python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_ac.py"), request, result)
     record.update(units={"frequency_hz": "Hz", "conductance_s": "S", "susceptance_s": "S",
                          "impedance_magnitude_ohm": "ohm", "equivalent_capacitance_f": "F"},
                   metrics={"mesh_nodes": result["diagnostics"]["nodes"], "mesh_cells": result["diagnostics"]["cells"],
@@ -201,7 +201,7 @@ def generate_si() -> dict[str, object]:
     record = base_record("si", "Coherent two-end supplied RLGC line", result["model_status"],
         ["Supplied uniform RLGC only; no geometry extraction or broadband causal material law.",
          "No DC fields, thermal deposition, or measured qualification."],
-        ("examples/rlgc_line_fields/run_line.py", "examples/rlgc_line_network/run_line.py", "python/spike_core/rlgc_line_fields.py"), request, result)
+        ("examples/rlgc_line_fields/run_line.py", "examples/rlgc_line_network/run_line.py", "python/spike_core/solvers/signal_integrity/lines/rlgc_line_fields.py"), request, result)
     record.update(units={"frequency_hz": "Hz", "position_m": "m", "transported_power_w": "W",
                          "total_loss_w_per_m": "W/m", "s21_db": "dB"},
                   metrics={"maximum_absolute_power_balance_residual_w": max(balances), "line_length_m": length}, series=rows)
@@ -238,7 +238,7 @@ def generate_em() -> dict[str, object]:
               "The original dipole boundary fixture is synthetic and analytically generated.",
               "No total radiated power, directivity, geometry extraction, or compliance verdict is inferred."]
     record = base_record("em", "Closed-box Huygens far field cut", "postprocessor_only", limits,
-        ("examples/em/huygens_dipole_request.json", "scripts/run_huygens_far_field.py", "python/spike_core/huygens_far_field.py"),
+        ("examples/em/huygens_dipole_request.json", "scripts/run_huygens_far_field.py", "python/spike_core/solvers/electromagnetics/fields/huygens_far_field.py"),
         request, result_summary)
     record.update(units={"angle_deg": "degree", "radiation_intensity_w_per_sr": "W/sr", "relative_intensity_db": "dB"},
                   metrics={"surface_samples": result["surface_samples"], "direction_count": len(rows),
@@ -273,7 +273,7 @@ def generate_thermal() -> dict[str, object]:
     save(fig, "thermal-two-solid-conduction")
     heat = result["field_result"]["heat_balance"]
     record = base_record("thermal", "Two-solid steady P1 conduction", result["model_status"], result["limitations"],
-        ("examples/assembly_field/run_examples.py", "python/spike_core/assembly_field_thermal.py", "python/spike_core/assembly_tetra_thermal.py"),
+        ("examples/assembly_field/run_examples.py", "python/spike_core/solvers/execution/coupling/assembly_field_thermal.py", "python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_thermal.py"),
         {"handoff": request, "problem": problem}, result)
     record.update(units={"x_m": "m", "temperature_k": "K"},
                   metrics={"minimum_temperature_k": min(temperatures), "maximum_temperature_k": max(temperatures),
@@ -302,7 +302,7 @@ def generate_hybrid() -> dict[str, object]:
     footer(fig)
     save(fig, "hybrid-electrothermal-convergence")
     record = base_record("hybrid_multisolve", "DC conduction and steady thermal feedback", result["model_status"], result["limitations"],
-        ("examples/assembly_field/run_electrothermal.py", "python/spike_core/assembly_electrothermal.py"), request, result)
+        ("examples/assembly_field/run_electrothermal.py", "python/spike_core/solvers/thermal_fluid/electrothermal/assembly_electrothermal.py"), request, result)
     record.update(units={"unrelaxed_temperature_defect_k": "K", "deposited_heat_w": "W",
                          "power_relative_defect": "dimensionless"},
                   metrics={"iterations": len(rows), "final_temperature_defect_k": rows[-1]["unrelaxed_temperature_defect_k"],
@@ -344,7 +344,7 @@ def generate_cfd() -> dict[str, object]:
              "horizontal_v_m_s": center["v_over_lid"][index] * request["lid_velocity_m_s"]} for index in range(19)]
     limits = result["limitations"]
     record = base_record("cfd", "Native Re=100 lid-driven cavity", result["model_status"], limits,
-        ("scripts/run_cfd.py", "python/spike_core/native_airflow.py", "src/airflow/main.cpp"), request, result)
+        ("scripts/run_cfd.py", "python/spike_core/solvers/thermal_fluid/flow/native_airflow.py", "src/solvers/thermal_fluid/airflow/main.cpp"), request, result)
     record["provenance"]["native_executable"] = {"path": str(Path(availability["executable"]).relative_to(ROOT)).replace("\\", "/"),
                                                     "sha256": result["provenance"]["executable_sha256"]}
     record.update(units={"coordinate_fraction": "dimensionless", "vertical_u_m_s": "m/s", "horizontal_v_m_s": "m/s"},
@@ -389,7 +389,7 @@ def generate_cht() -> dict[str, object]:
             for index in range(nx)]
     qualification = result["qualification"]
     record = base_record("cht", "Bounded conjugate laminar channel", qualification["state"], qualification["limitations"],
-        ("examples/thermal/laminar_channel_cht_request.json", "scripts/run_structured_solid_thermal.py", "python/spike_core/laminar_channel_cht.py"),
+        ("examples/thermal/laminar_channel_cht_request.json", "scripts/run_structured_solid_thermal.py", "python/spike_core/solvers/thermal_fluid/flow/laminar_channel_cht.py"),
         request, result)
     record.update(units={"x_m": "m", "temperature": "K", "velocity": "m/s"},
                   metrics={"reynolds": result["reynolds"], "flow_m3_s": result["flow_m3_s"],
@@ -447,7 +447,7 @@ def generate_multiboard() -> dict[str, object]:
               "Board identity and coupling execute, but neither result qualifies hardware."]
     record = base_record("multiboard", "Two-board harness and thermal contact", "mixed_experimental_approximate", limits,
         ("tests/python/test_multiboard_circuit.py", "tests/python/test_multiboard_thermal.py",
-         "python/spike_core/multiboard_circuit.py", "python/spike_core/multiboard_thermal.py", "scripts/build_multiboard_acceptance.py"),
+         "python/spike_core/solvers/circuits/models/multiboard_circuit.py", "python/spike_core/solvers/thermal_fluid/heat/multiboard_thermal.py", "scripts/build_multiboard_acceptance.py"),
         request_summary, result_summary)
     record.update(units={"frequency_hz": "Hz", "board_b_load_voltage_magnitude_v": "V",
                          "board_b_load_voltage_phase_deg": "degree", "contact_conductance_w_per_k": "W/K",

@@ -4,11 +4,7 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, ValidationError
 
-from python.spike_core.si_protocol_suites import (
-    SiProtocolSuiteError,
-    plan_si_protocol_analysis,
-    validate_si_protocol_suite,
-)
+from python.spike_core.solvers.signal_integrity.receivers.si_protocol_suites import SiProtocolSuiteError, plan_si_protocol_analysis, validate_si_protocol_suite
 from python.spike_core.service import handle
 
 

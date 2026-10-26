@@ -4,7 +4,7 @@
 Independent derivation: integrate the channel charge proportional to (Vgs-Vto-v)
 from v=0 to min(Vds,Vgs-Vto). The resulting current is KP*(u*d-d*d/2)
 in triode or KP*u*u/2 in saturation, multiplied by (1+LAMBDA*Vds).
-This matches the owned Level-1 channel in src/spikes/dc_solver.cpp for W/L=1,
+This matches the owned Level-1 channel in src/solvers/circuits/spikes/dc_solver.cpp for W/L=1,
 bulk tied to source, GAMMA=0. A fixed 1e-12 S native off conductance is included.
 The analytic parameter Jacobian is continuous across the triode/saturation
 boundary. No external implementation, dataset, or copyrighted oracle is used.

@@ -19,18 +19,18 @@ import scipy
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.enclosure_cht_v2 import REQUEST, solve_enclosure_cht_v2
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_cht_v2 import REQUEST, solve_enclosure_cht_v2
 
 
 CONTRACT = "spike/enclosure-cht-v2-benchmark/v1"
 FACES = ("x_min", "x_max", "y_min", "y_max", "z_min", "z_max")
 SOURCES = (
-    "python/spike_core/enclosure_cht_v2.py",
-    "python/spike_core/enclosure_cht.py",
-    "python/spike_core/enclosure_rectilinear_momentum.py",
-    "python/spike_core/enclosure_stokes.py",
-    "python/spike_core/enclosure_energy.py",
-    "python/spike_core/enclosure_refinement.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_cht_v2.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_cht.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_rectilinear_momentum.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_stokes.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_energy.py",
+    "python/spike_core/solvers/thermal_fluid/flow/enclosure_refinement.py",
     "schemas/enclosure-cht-request-v2.schema.json",
     "schemas/enclosure-cht-result-v2.schema.json",
     "scripts/benchmark_enclosure_cht_v2.py",

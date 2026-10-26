@@ -9,10 +9,10 @@ import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
 from tests.python.test_si_network_graph import graph_fixture
-from python.spike_core.si_network_graph import build_network_graph
-from python.spike_core.si_network_workflow import line_network
-from python.spike_core.si_crosstalk import analyze_crosstalk
-from python.spike_core.sparameters import touchstone_text
+from python.spike_core.solvers.signal_integrity.networks.si_network_graph import build_network_graph
+from python.spike_core.solvers.signal_integrity.networks.si_network_workflow import line_network
+from python.spike_core.solvers.signal_integrity.receivers.si_crosstalk import analyze_crosstalk
+from python.spike_core.solvers.signal_integrity.networks.sparameters import touchstone_text
 
 
 def run(output):

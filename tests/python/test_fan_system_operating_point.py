@@ -5,10 +5,7 @@ import copy
 import math
 import unittest
 
-from python.spike_core.fan_system_operating_point import (
-    REQUEST_CONTRACT, FanSystemOperatingPointError, curve_digest,
-    solve_fan_system_operating_point,
-)
+from python.spike_core.solvers.thermal_fluid.flow.fan_system_operating_point import REQUEST_CONTRACT, FanSystemOperatingPointError, curve_digest, solve_fan_system_operating_point
 
 
 def source():

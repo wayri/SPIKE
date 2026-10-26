@@ -4,7 +4,7 @@ from collections import Counter
 from pathlib import Path
 
 from python.spike_core.service import _design_from_kicad, handle, validate_design
-from python.spike_core.peec_plugin import native_available
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import native_available
 from python.spike_core.contracts import AnalysisSpec
 from python.spike_core.convergence import run_mesh_convergence
 from python.spike_core.solver_plugins import default_solver_registry

@@ -26,7 +26,7 @@ def request():
 
 
 if __name__=='__main__':
-    from python.spike_core.sparameter_inductive_terminated import run_inductive_network_transient
+    from python.spike_core.solvers.signal_integrity.networks.sparameter_inductive_terminated import run_inductive_network_transient
     result=run_inductive_network_transient(request())
     print(json.dumps({'contract':result['contract'],'model_status':result['model_status'],
                       'production_qualified':result['production_qualified'],

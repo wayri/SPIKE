@@ -38,7 +38,7 @@ session = export_mcad_session({"project_path":str(project), "expected_manifest_p
 (output / "two-boards-session.json").write_text(json.dumps(session, indent=2), encoding="utf-8")
 if args.freecad:
     from python.spike_core.mcad_tessellation import _freecad_path
-    from python.spike_core.sparselizard_process import run_adapter_process
+    from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
     script = f'''import sys, json
 sys.path.insert(0, {str(ROOT / 'integrations/freecad/SPIKEWorkbench')!r})
 import FreeCAD as App

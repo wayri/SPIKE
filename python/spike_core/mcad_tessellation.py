@@ -20,7 +20,7 @@ from typing import Any, Dict
 from .dependencies import dependency_status
 from .importers import ImportPolicy
 from .mcad_importer import McadImportError, validate_step_mcad_artifact, validate_visual_mcad_artifact
-from .sparselizard_process import SparseLizardAdapterError, run_adapter_process
+from .solvers.external_engines.sparselizard.sparselizard_process import SparseLizardAdapterError, run_adapter_process
 
 
 STEP_TESSELLATION_CONTRACT = "spike/mcad-step-tessellation/v1"

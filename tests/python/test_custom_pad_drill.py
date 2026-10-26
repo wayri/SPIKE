@@ -17,10 +17,10 @@ from referencing import Registry, Resource
 from python.core.board_parser import KicadParser
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.hybrid_mesh import _polygon_is_contained_in, build_hybrid_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _polygon_is_contained_in, build_hybrid_mesh
 from python.spike_core.kicad_importer import import_kicad_design
-from python.spike_core.mesh_ownership import audit_dc_conductor_volume_ownership
-from python.spike_core.meshing import VOLUME_3D, build_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.mesh_ownership import audit_dc_conductor_volume_ownership
+from python.spike_core.solvers.geometry_meshing.preparation.meshing import VOLUME_3D, build_mesh
 
 
 _SQUARE = ((-2.0, -1.5), (2.0, -1.5), (2.0, 1.5), (-2.0, 1.5))

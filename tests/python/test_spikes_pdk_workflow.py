@@ -71,7 +71,7 @@ class PdkWorkflowTests(unittest.TestCase):
     def test_actual_compiled_backend_on_synthetic_not_foundry_model(self):
         from unittest.mock import patch
         prepared=prepare(self.config)
-        with patch('python.spike_core.ngspice_plugin._find_ngspice',return_value=os.environ['SPIKES_TEST_NGSPICE']):
+        with patch('python.spike_core.solvers.external_engines.circuits.ngspice_plugin._find_ngspice',return_value=os.environ['SPIKES_TEST_NGSPICE']):
             result=run(prepared,approval_sha256=prepared['approval_sha256'])
         self.assertEqual(result['status'],'completed',result.get('issues'))
         self.assertFalse(result['provenance']['pdk_qualification'])

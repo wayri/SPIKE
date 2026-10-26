@@ -11,8 +11,8 @@ import numpy as np
 from scipy.integrate import quad
 from scipy.linalg import expm
 
-from python.spike_core import rlgc_line_cascade as cascade
-from python.spike_core.rlgc_line_fields import run_rlgc_line_fields
+from python.spike_core.solvers.signal_integrity.lines import rlgc_line_cascade as cascade
+from python.spike_core.solvers.signal_integrity.lines.rlgc_line_fields import run_rlgc_line_fields
 from tests.python.test_rlgc_line_fields import pair, value
 from tests.python.test_rlgc_line_network import request as line_request
 

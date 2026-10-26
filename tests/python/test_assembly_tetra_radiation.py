@@ -5,10 +5,10 @@ import math
 import unittest
 from unittest.mock import patch
 import numpy as np
-from python.spike_core.assembly_tetra_radiation import SIGMA, radiation_operator
-from python.spike_core.assembly_tetra_thermal import run_assembly_tetra_thermal, AssemblyTetraThermalError
-from python.spike_core.assembly_field_thermal import run_assembly_field_thermal, verify_assembly_field_result
-from python.spike_core.assembly_field_study import export_assembly_field_study, import_assembly_field_study
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_radiation import SIGMA, radiation_operator
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal import run_assembly_tetra_thermal, AssemblyTetraThermalError
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal, verify_assembly_field_result
+from python.spike_core.solvers.execution.coupling.assembly_field_study import export_assembly_field_study, import_assembly_field_study
 from tests.python.test_assembly_tetra_thermal import cube, request, boundary, faces_at
 from tests.python.test_assembly_field_handoff import fixture
 
@@ -91,7 +91,7 @@ class RadiationTests(unittest.TestCase):
             with self.subTest(field=field,value=value), self.assertRaises(AssemblyTetraThermalError):
                 run_assembly_tetra_thermal(raw)
         raw,_=slab()
-        with patch('python.spike_core.assembly_tetra_radiation.MAX_NEWTON_ITERATIONS',0):
+        with patch('python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_radiation.MAX_NEWTON_ITERATIONS',0):
             with self.assertRaisesRegex(AssemblyTetraThermalError,'Newton iteration'):
                 run_assembly_tetra_thermal(raw)
         for b in raw['boundaries']:

@@ -7,13 +7,7 @@ import json
 import math
 import unittest
 
-from python.spike_core.coupled_surface_exchange import (
-    MAX_CONTROL_BYTES,
-    MIN_AREA_M2,
-    coupled_surface_context_digest,
-    parse_coupled_surface_exchange_json,
-    transfer_coupled_surface_exchange,
-)
+from python.spike_core.solvers.execution.coupling.coupled_surface_exchange import MAX_CONTROL_BYTES, MIN_AREA_M2, coupled_surface_context_digest, parse_coupled_surface_exchange_json, transfer_coupled_surface_exchange
 
 
 def _patch(participant, patch, digest, faces):

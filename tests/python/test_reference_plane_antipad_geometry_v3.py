@@ -10,15 +10,8 @@ from jsonschema import Draft202012Validator, ValidationError
 
 from tests.python import test_via_transition_geometry as fixtures
 from python.spike_core.spider_v2_schema import ZoneBoundaryRing, ZoneBoundarySegment
-from python.spike_core.planar_curve_tessellation import (
-    PlanarCurveTessellationError,
-    flatten_zone_boundaries,
-)
-from python.spike_core.reference_plane_antipad_geometry_v3 import (
-    ReferencePlaneAntipadGeometryV3Error,
-    build_reference_plane_antipad_geometry_v3,
-    validate_reference_plane_antipad_geometry_v3,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.planar_curve_tessellation import PlanarCurveTessellationError, flatten_zone_boundaries
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_geometry_v3 import ReferencePlaneAntipadGeometryV3Error, build_reference_plane_antipad_geometry_v3, validate_reference_plane_antipad_geometry_v3
 
 
 ROOT = Path(__file__).resolve().parents[2]

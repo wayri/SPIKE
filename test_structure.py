@@ -93,10 +93,10 @@ def main():
     # C++ Kernel
     print(f"\n{BOLD}C++ Kernel:{RESET}")
     cpp_files = [
-        ("src/peec/peec_solver.hpp", "PEEC solver header"),
-        ("src/peec/peec_solver.cpp", "PEEC solver implementation"),
-        ("src/thermal/thermal_solver.hpp", "Thermal solver header"),
-        ("src/thermal/thermal_solver.cpp", "Thermal solver implementation"),
+        ("src/solvers/power_integrity/peec/peec_solver.hpp", "PEEC solver header"),
+        ("src/solvers/power_integrity/peec/peec_solver.cpp", "PEEC solver implementation"),
+        ("src/solvers/thermal_fluid/thermal/thermal_solver.hpp", "Thermal solver header"),
+        ("src/solvers/thermal_fluid/thermal/thermal_solver.cpp", "Thermal solver implementation"),
         ("src/math/sparse_solver.hpp", "Math utilities header"),
     ]
     for filename, desc in cpp_files:
@@ -122,8 +122,8 @@ def main():
     print(f"\n{BOLD}Directory Structure:{RESET}")
     directories = [
         ("src", "C++ source directory"),
-        ("src/peec", "PEEC solver directory"),
-        ("src/thermal", "Thermal solver directory"),
+        ("src/solvers/power_integrity/peec", "PEEC solver directory"),
+        ("src/solvers/thermal_fluid/thermal", "Thermal solver directory"),
         ("src/math", "Math utilities directory"),
         ("python", "Python package directory"),
         ("python/gui", "GUI subpackage directory"),

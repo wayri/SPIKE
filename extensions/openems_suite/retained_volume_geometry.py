@@ -19,7 +19,7 @@ import itertools
 import math
 from collections import defaultdict
 
-from python.spike_core.assembly_field_handoff import bounded_json, field_resource_limits
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import bounded_json, field_resource_limits
 from python.spike_core.multiboard_identity import canonical_json_digest
 
 CONTRACT = 'spike/openems-retained-volume-geometry/v1'

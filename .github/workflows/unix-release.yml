@@ -12,10 +12,18 @@ on:
         type: choice
         default: all
         options: [all, linux, macos]
+      diagnostics:
+        description: Run bounded resource-limit diagnostics only
+        type: boolean
+        default: false
 permissions:
   contents: read
 jobs:
+  diagnose:
+    if: inputs.diagnostics == true
+    uses: ./.github/workflows/posix-limit-diagnostics.yml
   build:
+    if: inputs.diagnostics != true
     strategy:
       fail-fast: false
       matrix:
@@ -47,6 +55,8 @@ jobs:
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: app/src-tauri -> target
+      - name: Check private research publication boundary
+        run: python scripts/check_private_research.py
       - name: Linux dependencies
         if: runner.os == 'Linux'
         run: |
@@ -60,6 +70,12 @@ jobs:
       - name: Build and verify worker and desktop
         shell: bash
         run: bash scripts/build_unix_release.sh
+      - name: Record native build identity
+        shell: bash
+        run: |
+          mkdir -p build/qualification
+          python -c 'import json,platform; from pathlib import Path; from scripts.release_automation import version,ROOT; Path("build/qualification/platform.json").write_text(json.dumps({"version":version(ROOT),"system":platform.system(),"machine":platform.machine(),"platform":platform.platform(),"python":platform.python_version()},indent=2)+"\n")'
+          git rev-parse HEAD > build/qualification/source-commit.txt
       - name: Package and verify installed CLI
         run: python scripts/package_unix_release.py
       - name: Linux desktop startup
@@ -79,6 +95,7 @@ jobs:
           hdiutil attach dist-release/*.dmg -nobrowse -mountpoint "$RUNNER_TEMP/spike-dmg"
           ditto "$RUNNER_TEMP/spike-dmg/SPIKE.app" "$RUNNER_TEMP/spike-install/SPIKE.app"
           python scripts/verify_packaged_cli.py -- "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/MacOS/spike"
+          python scripts/verify_unix_release_payload.py --resources "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/Resources" --output build/qualification/macos-installed-payload.json
           python scripts/smoke_desktop_package.py "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/MacOS/spike-desktop"
           ditto "$RUNNER_TEMP/spike-dmg/SPIKE.app" "$RUNNER_TEMP/spike-install/SPIKE.app"
           python scripts/verify_packaged_cli.py -- "$RUNNER_TEMP/spike-install/SPIKE.app/Contents/MacOS/spike"
@@ -91,3 +108,11 @@ jobs:
           path: dist-release/*
           if-no-files-found: error
           retention-days: 14
+      - name: Retain native qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualification-${{ matrix.os }}
+          path: build/qualification/*
+          if-no-files-found: warn
+          retention-days: 30

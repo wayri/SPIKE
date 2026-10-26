@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.enclosure_cht import REQUEST, solve_enclosure_cht
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_cht import REQUEST, solve_enclosure_cht
 
 
 def material(name="fluid", phase="fluid", conductivity=1., capacity=1.):
@@ -62,7 +62,7 @@ class EnclosureChtTests(unittest.TestCase):
             self.assertGreater(math.log(first/second)/math.log(ratio), 1.8)
 
     def test_rejected_publication_never_leaks_accepted_fields(self):
-        from python.spike_core import enclosure_cht
+        from python.spike_core.solvers.thermal_fluid.flow import enclosure_cht
         original = enclosure_cht._snapshot
 
         def reject_result(value, **kwargs):

@@ -1,6 +1,8 @@
+import { defaultResultVisualization } from "./analysisResults";
 // SPDX-License-Identifier: Apache-2.0
+import ViewportLayerSelector from "./ViewportLayerSelector";
 import { createPortal } from "react-dom";
-import { Layers3, SlidersHorizontal, X } from "./icons";
+import { SlidersHorizontal, X } from "./icons";
 import { useEffect, useMemo, useRef, useState } from "react";
 import BoardViewport, { type BoardObject, type SelectionFilter } from "./BoardViewport";
 import type { Viewport2DState, Viewport3DCameraState } from "./workspaceState";
@@ -27,11 +29,13 @@ export default function ScopedWorkspaceView({ snapshot, viewport, connected = tr
   const [selectionFilter, setSelectionFilter] = useState<SelectionFilter>(initial?.selectionFilter ?? "all");
   const [selected, setSelected] = useState<BoardObject | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(initial?.selectedObjectId ?? null);
+  const [translucent,setTranslucent]=useState(false);
   const [navigationMode, setNavigationMode] = useState<"orbit" | "pan">("orbit");
   const [context, setContext] = useState<{x:number;y:number}|null>(null);
   const [layersOpen, setLayersOpen] = useState(false);
   const [actionError, setActionError] = useState("");
   const [cameraCommand, setCameraCommand] = useState("");
+  const [pendingReset, setPendingReset] = useState<{ occurrenceId: string; revision: string } | null>(null);
   const camera = useRef<Viewport3DCameraState | undefined>(initial?.camera3d);
   const layout = useRef<Viewport2DState | undefined>(initial?.layout2d);
   const lastPresentation = useRef<WorkspaceViewPresentation>({
@@ -52,7 +56,17 @@ export default function ScopedWorkspaceView({ snapshot, viewport, connected = tr
     ? (viewport?.assemblyModels ?? []).filter(model => model.partId === scope.partId) : viewport?.assemblyModels ?? [], [scope, viewport]);
   const layers = occurrenceId ? snapshot.layerVisibility[occurrenceId] ?? EMPTY : EMPTY;
   const opacity = occurrenceId ? snapshot.layerOpacity[occurrenceId] ?? EMPTY_OPACITY : EMPTY_OPACITY;
+  const showNetNames = occurrenceId ? snapshot.assemblyNetNameVisibility?.[occurrenceId] ?? snapshot.showNetNames ?? false : false;
   const layerNames = useMemo(() => [...new Set([...Object.keys(layers), ...Object.keys(opacity)])].sort(), [layers, opacity]);
+  useEffect(() => {
+    if (!pendingReset) return;
+    if (!connected || actionError || pendingReset.occurrenceId !== occurrenceId) { setPendingReset(null); return; }
+    if (snapshot.revision === pendingReset.revision || Object.values(opacity).some(value => value !== 1)
+      || (snapshot.assemblyZoneDisplay?.[pendingReset.occurrenceId] ?? snapshot.zoneDisplay ?? "filled") !== "filled") return;
+    // Refit after the owner's default visibility/opacity snapshot arrives, so
+    // geometry revealed by Reset is included even across a native view bridge.
+    setCameraCommand(`reset-view-${Date.now()}`); setPendingReset(null);
+  }, [pendingReset, connected, actionError, occurrenceId, snapshot.revision, snapshot.assemblyZoneDisplay, snapshot.zoneDisplay, opacity]);
   const dispatch = (action: WorkspaceViewAction) => Promise.resolve().then(() => actionRef.current(action)).catch(cause => setActionError(cause instanceof Error ? cause.message : String(cause)));
   const emit = (action: WorkspaceViewAction) => { if (connected) void dispatch(action); };
   const publishPresentation = (next?: Partial<WorkspaceViewPresentation>) => {
@@ -87,11 +101,11 @@ export default function ScopedWorkspaceView({ snapshot, viewport, connected = tr
   };
   const command = (name: string) => setCameraCommand(`${name}:${crypto.randomUUID()}`);
 
-  const essentials = <ViewportEssentialTools viewMode={viewMode} navigationMode={navigationMode} selectionFilter={selectionFilter} onMode={changeMode} onNavigation={setNavigationMode} onFilter={changeFilter} onCamera={command}/>;
+  const essentials = <ViewportEssentialTools viewMode={viewMode} navigationMode={navigationMode} selectionFilter={selectionFilter} onMode={changeMode} onNavigation={setNavigationMode} onFilter={changeFilter} onCamera={command} translucent={translucent} onTranslucent={()=>setTranslucent(value=>!value)} hasGeometry={Boolean(activeBoard||snapshot.targetBoards.length)}/>;
   const toolbar = <header className="workspace-view-toolbar">
       {essentials}
       <button type="button" disabled={!connected} onClick={() => emit({ type: "open-analysis", domain: snapshot.analysisDomain ?? "results", ...(occurrenceId ? { occurrenceId } : { partId: scope.kind === "assembly-part" ? scope.partId : undefined }) })} className="spike-control--icon" aria-label="Analysis setup" title="Analysis setup"><SlidersHorizontal size={15}/></button>
-      {occurrenceId && layerNames.length > 0 && <button type="button" className="spike-control--icon" aria-label="Layer visibility" title="Layer visibility" aria-expanded={layersOpen} onClick={()=>setLayersOpen(value=>!value)}><Layers3 size={15}/></button>}
+
       <span title={scope.kind === "board-occurrence" ? scope.occurrenceId : scope.partId}>{snapshot.descriptor.title}</span>
     </header>;
   if (!snapshot.valid) return <section className="workspace-view-invalid" role="status"><b>View unavailable</b><span>{snapshot.invalidReason ?? "This assembly scope no longer exists in the active project."}</span></section>;
@@ -104,10 +118,22 @@ export default function ScopedWorkspaceView({ snapshot, viewport, connected = tr
       <input aria-label={`${layer} opacity`} type="range" min="0" max="1" step="0.05" value={opacity[layer] ?? 1} disabled={!connected} onChange={event => emit({ type: "layer-opacity", occurrenceId, layer, value: Number(event.target.value) })}/>
       <button type="button" disabled={!connected} onClick={() => emit({ type: "layer-focus", occurrenceId, layer })}>Focus</button>
     </div>)}</section>}
-    <div className="workspace-view-stage">{!viewport ? <div className="workspace-view-loading" role="status">Preparing scoped board graphics…</div> : <BoardViewport
-      viewportBackground={appearance.viewportBackground} showWorldGrid={appearance.viewportGrid} renderingQuality={appearance.renderQuality} antialiasing={appearance.antialiasing} maximumFps={appearance.maximumFps}
-      board={activeBoard} viewMode={viewMode} visibleLayers={layers} layerOpacity={opacity} layerSeparation={0}
-      showVias showModels showSmdModels showThtModels showNetNames={false}
+    <div className="workspace-view-stage">      <ViewportLayerSelector board={occurrenceId ? { id: occurrenceId, name: snapshot.descriptor.title, layers: layerNames, visibility: layers, opacity } : null}
+        selectedBoardIds={occurrenceId ? [occurrenceId] : []} disabled={!connected}
+        zoneDisplay={occurrenceId ? snapshot.assemblyZoneDisplay?.[occurrenceId] ?? snapshot.zoneDisplay ?? "filled" : "filled"}
+        onZoneDisplay={(boardId, value) => emit({ type: "zone-display", occurrenceId: boardId, value })}
+        onResetView={boardId => { if (!connected) return; setActionError(""); setPendingReset({ occurrenceId: boardId, revision: snapshot.revision }); emit({ type: "reset-view", occurrenceId: boardId }); command("reset-view"); }}
+        onOpacity={(boardId, layer, value) => emit({ type: "layer-opacity", occurrenceId: boardId, layer, value })}
+        onAllOpacity={(boardId, value) => emit({ type: "layer-opacity-all", occurrenceId: boardId, value })}
+        onToggle={(boardId, layer) => { emit({ type: "layer-visibility", occurrenceId: boardId, layer, value: layers[layer] === false }); emit({ type: "layer-focus", occurrenceId: boardId, layer: "All" }); }}
+        onShowAll={boardId => { emit({ type: "layer-focus", occurrenceId: boardId, layer: "All" }); for (const layer of layerNames) emit({ type: "layer-visibility", occurrenceId: boardId, layer, value: true }); }}
+        showNetNames={showNetNames} onShowNetNames={(boardId, value) => emit({ type: "net-names", occurrenceId: boardId, value })}
+        onManage={() => setLayersOpen(value => !value)}/>
+{!viewport ? <div className="workspace-view-loading" role="status">Preparing scoped board graphics…</div> : <BoardViewport
+      viewportBackground={appearance.viewportBackground} showWorldGrid={appearance.viewportGrid} showOriginAxes={appearance.viewportOriginAxes} renderingQuality={appearance.renderQuality} antialiasing={appearance.antialiasing} maximumFps={appearance.maximumFps}
+      resultVisualization={{...defaultResultVisualization(),sceneMode:translucent?"translucent":"opaque",translucentScene:translucent}} board={activeBoard} viewMode={viewMode} visibleLayers={layers} layerOpacity={opacity} layerSeparation={0}
+      showVias showModels showSmdModels showThtModels showNetNames={showNetNames} assemblyNetNameVisibility={snapshot.assemblyNetNameVisibility}
+      zoneDisplay={snapshot.zoneDisplay} assemblyZoneDisplay={snapshot.assemblyZoneDisplay}
       assemblyModels={scopedModels} virtualBoards={snapshot.targetBoards} assemblyBoardDesigns={viewport.boards}
       assemblyLayerVisibility={snapshot.layerVisibility} assemblyLayerOpacity={snapshot.layerOpacity} assemblyLayerFocus={snapshot.layerFocus}
       onAssemblyLayerFocus={(boardId, layer) => emit({ type: "layer-focus", occurrenceId: boardId, layer })}

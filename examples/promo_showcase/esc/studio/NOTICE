@@ -1,0 +1,14 @@
+Original SPIKE ESC teaching examples — Apache-2.0
+
+The back-EMF sensing and current-sensing decks, generated native project layouts,
+dashboards and preparation/check script are original SPIKE material.
+
+gate_miller_ringing.cir, two_wheeler_dashboard.spksch, ev_current_controller.c
+and ev_motor_plant.cir are copied unchanged from
+examples/spikes/advanced_systems/ in this repository. Their original scope and
+limitations remain applicable. Generated gate_miller_ringing.spksch adds native
+graphical wiring, saved probes and dashboard scopes using existing Studio APIs.
+
+No VESC design, manufacturer model, vendor firmware, compiler or native library
+is copied into this directory. These examples do not claim VESC endorsement.
+See LICENSE and source-provenance.json.

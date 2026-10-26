@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.enclosure_stokes import solve_enclosure_stokes
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_stokes import solve_enclosure_stokes
 
 
 def sha(path):

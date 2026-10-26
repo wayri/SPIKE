@@ -26,6 +26,14 @@ root; a compatible native runtime is required for native cases.
 | CHT | [Laminar channel request](thermal/laminar_channel_cht_request.json) and [SU2 CHT guide](../docs/SU2_CHT.md) | Solid/fluid temperatures, transferred heat and energy closure; reduced/native channel and external adapters are distinct. |
 | Multiboard | [Curated board assemblies](multiboard/README.md) and [interboard harness](high_speed_si/harness/README.md) | Instance IDs, connector mapping, supply/return topology, reduced PI/SI/Thermal results and interconnect parameters. |
 
+## EMerge EM projects and probing
+
+Use the [EMerge project gallery](emerge/gallery/README.md) for four saved-result
+projects and a multilayer/two-port setup. The [illustrated EM guide](../docs/EMERGE_EXAMPLES.md)
+shows radiation, S-parameters, complex E/H probing, exports and the broader
+filter/waveguide/antenna study map. Source binding and unvalidated status remain
+explicit; packaging does not execute a solver or qualify an arbitrary board.
+
 ## Board and circuit walkthroughs
 
 - [ESP32](esp32/README.md): public board source, historical viewport captures and

@@ -9,9 +9,9 @@ from unittest.mock import patch
 
 from python.spike_core.extension_analysis_results import design_binding
 from python.spike_core.extensions import ExtensionManifest
-from python.spike_core.gmsh_extension_api import execute
-from python.spike_core.gmsh_extension_mesh import admit_gmsh_mesh
-from python.spike_core.gmsh_extension_runtime import dispatch
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_extension_api import execute
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_extension_mesh import admit_gmsh_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_extension_runtime import dispatch
 
 
 def request(contribution='gmsh-prepare-pcb'):
@@ -56,12 +56,12 @@ class GmshExtensionTests(unittest.TestCase):
                      lambda r:r['context']['parameters']['request']['model']['board'].update(outer_mm=[[0,0],[2,2],[2,0],[0,2]])]
         for mutate in mutations:
             data = request('gmsh-mesh-pcb'); mutate(data)
-            with patch('python.spike_core.gmsh_occ_runtime.run_occ_case') as run:
+            with patch('python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime.run_occ_case') as run:
                 with self.assertRaises(ValueError): execute(data)
                 run.assert_not_called()
 
     def test_missing_runtime_returns_probe_diagnostic(self):
-        with patch('python.spike_core.gmsh_occ_runtime.verify_installation',side_effect=ValueError('missing entry artifacts')):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime.verify_installation',side_effect=ValueError('missing entry artifacts')):
             result = execute({'contribution_id':'gmsh-probe','context':{'parameters':{}}})
         self.assertFalse(result['data']['available'])
         self.assertEqual(result['data']['physics_solvers'], [])

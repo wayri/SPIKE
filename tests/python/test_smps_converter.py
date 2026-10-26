@@ -7,9 +7,7 @@ import math
 from pathlib import Path
 import unittest
 
-from python.spike_core.smps_converter import (
-    REQUEST_CONTRACT, SmpsConverterError, _phase, evaluate_smps_converter,
-)
+from python.spike_core.solvers.circuits.models.smps_converter import REQUEST_CONTRACT, SmpsConverterError, _phase, evaluate_smps_converter
 
 
 def request(topology="synchronous_buck", losses=False):

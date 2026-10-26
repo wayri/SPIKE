@@ -9,10 +9,8 @@ from unittest.mock import patch
 import numpy as np
 from scipy.integrate import quad
 
-from python.spike_core.enclosure_flow_analysis import (
-    CONTRACT, RESULT_CONTRACT, _cell_data, _velocity, analyze_enclosure_flow,
-)
-from python.spike_core.enclosure_refinement import build_enclosure_grid
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_flow_analysis import CONTRACT, RESULT_CONTRACT, _cell_data, _velocity, analyze_enclosure_flow
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_refinement import build_enclosure_grid
 
 
 def fixture(n=2, refined=False, psi=None):
@@ -220,7 +218,7 @@ class FlowAnalysisTests(unittest.TestCase):
         result = analyze_enclosure_flow(request, cancel_check=cancel_after_work)
         self.assertEqual(result["status"], "cancelled")
         self.assertNotIn("streamlines", result)
-        with patch("python.spike_core.enclosure_flow_analysis.time.monotonic", side_effect=[0., 100.]):
+        with patch("python.spike_core.solvers.thermal_fluid.flow.enclosure_flow_analysis.time.monotonic", side_effect=[0., 100.]):
             self.assertBlocked(request, "runtime")
 
     def assertBlocked(self, request, reason=None):

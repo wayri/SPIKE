@@ -11,6 +11,16 @@ the normal analysis history. The primary workflow is GUI setup, readable
 Python preview, contained solve, result visualization, sample probing and
 engineering-report export.
 
+## Example project library
+
+Open **EMerge example projects, fields and probes** from command search or the
+setup's example button. The [illustrated guide](../../docs/EMERGE_EXAMPLES.md)
+and [native projects](../../examples/emerge/gallery/README.md) cover retained
+patch/radome radiation, complex E/H planes, the licensed ESP32 surrogate and
+an original multilayer two-port setup. Historical result bindings remain
+unchanged; setup-only cases have no invented numerical result. Opening a
+project does not run the extension.
+
 ## GUI model, script and results
 
 In the EMI or HF/SI EMerge panel, choose nets and pad pairs, then expand the
@@ -257,3 +267,12 @@ a seven-frequency KiCad antenna fixture completed with EMerge 3.0.0a19;
 those runs establish execution, not physical accuracy. A knowledgeable human
 must review numerical behavior before release. EMerge's license and runtime
 dependencies require separate review before redistribution.
+
+An experimental internal [sampled circuit and resistor-thermal bridge](../../docs/EMERGE_COSIMULATION.md)
+now preserves bound EMerge networks for owned AC/rational consumers. It requires
+explicit RMS power-wave and terminal/reference-plane declarations. Only known
+external series-resistor heat maps to retained thermal cells; radiation or
+unclassified EM power is not heat. Fresh field calibration, EM-body heating,
+live SPICE execution and general feedback remain pending. The current release
+source adds explicit worker/CLI routes and a draft export plus guarded Python
+Workspace runners; it does not advertise general qualified EM/thermal coupling.

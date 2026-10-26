@@ -24,7 +24,7 @@ class ProjectAirflowTests(unittest.TestCase):
                       'assignments': {}, 'mesh_options': {}, 'request': request}
             native = {'status': 'completed', 'fields': {'temperature_k': {'samples': []}}}
             with patch('python.spike_core.service_project_airflow._geometry', return_value=(solids, {'body': {}}, {})), \
-                 patch('python.spike_core.assembly_airflow.run_assembly_airflow', return_value=native):
+                 patch('python.spike_core.solvers.thermal_fluid.flow.assembly_airflow.run_assembly_airflow', return_value=native):
                 result = run_in_project(params, application_version='test')
                 identity = {key: params[key] for key in ('project_path', 'expected_manifest_payload_sha256')}
                 identity['expected_manifest_payload_sha256'] = result['manifest']['manifest_payload_sha256']

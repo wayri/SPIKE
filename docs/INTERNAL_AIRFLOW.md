@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Internal laminar channel airflow and temperature
 
-`python/spike_core/internal_airflow.py` implements an original, bounded,
+`python/spike_core/solvers/thermal_fluid/flow/internal_airflow.py` implements an original, bounded,
 experimental parallel-plate channel model. It computes fully developed laminar
 velocity analytically and solves the air-temperature field with transverse
 finite volumes and axial upwind marching. It runs inside SPIKE's Python worker

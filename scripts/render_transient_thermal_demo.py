@@ -22,8 +22,8 @@ def render(source: Path, output: Path) -> dict:
     from mpl_toolkits.mplot3d.art3d import Poly3DCollection
     import numpy as np
     from PIL import Image
-    from python.spike_core.assembly_field_thermal import verify_assembly_field_result
-    from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
+    from python.spike_core.solvers.execution.coupling.assembly_field_thermal import verify_assembly_field_result
+    from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
 
     geometry = json.loads((source / "geometry.json").read_text(encoding="utf-8"))
     problem = json.loads((source / "problem.json").read_text(encoding="utf-8"))

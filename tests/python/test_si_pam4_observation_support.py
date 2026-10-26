@@ -11,8 +11,8 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.si_pam4_eye import SiPam4EyeError, pam4_eye
-from python.spike_core.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.receivers.si_pam4_eye import SiPam4EyeError, pam4_eye
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
 
 
 def delayed_channel(delay_samples):

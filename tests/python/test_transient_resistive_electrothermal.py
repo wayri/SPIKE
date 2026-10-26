@@ -7,9 +7,7 @@ import unittest
 from copy import deepcopy
 from unittest.mock import patch
 
-from python.spike_core.transient_resistive_electrothermal import (
-    CONTRACT, run_transient_resistive_electrothermal,
-)
+from python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal import CONTRACT, run_transient_resistive_electrothermal
 
 
 def request(alpha=0.0, dt=0.1, end=2.0):
@@ -148,21 +146,21 @@ class TransientResistiveElectrothermalTests(unittest.TestCase):
         self.blocked(value, "NONCONVERGENCE")
 
     def test_independent_conservation_check_rejects_corrupted_kernel_output(self):
-        from python.spike_core.thermal_network import estimate_lumped_thermal_network
-        from python.spike_core.native_mna import run_native_mna
+        from python.spike_core.solvers.thermal_fluid.heat.thermal_network import estimate_lumped_thermal_network
+        from python.spike_core.solvers.circuits.models.native_mna import run_native_mna
         def corrupted_thermal(scenario):
             result = estimate_lumped_thermal_network(scenario)
             result["transient"][-1]["temperatures_c"]["body"] += 1.0
             return result
         value = request()
         value["iteration"].update(max_iterations=2, temperature_tolerance_k=10.0)
-        with patch("python.spike_core.transient_resistive_electrothermal.estimate_lumped_thermal_network", side_effect=corrupted_thermal):
+        with patch("python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.estimate_lumped_thermal_network", side_effect=corrupted_thermal):
             self.blocked(value, "NONCONVERGENCE")
         def corrupted_electrical(circuit):
             result = run_native_mna(circuit)
             result["data"]["element_power_w"]["I"] += 0.5
             return result
-        with patch("python.spike_core.transient_resistive_electrothermal.run_native_mna", side_effect=corrupted_electrical):
+        with patch("python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.run_native_mna", side_effect=corrupted_electrical):
             self.blocked(request(), "ELECTRICAL_BALANCE")
 
     def test_voltage_drive_reaches_closed_form_temperature_and_derates_current(self):
@@ -212,11 +210,11 @@ class TransientResistiveElectrothermalTests(unittest.TestCase):
         result = run_transient_resistive_electrothermal(request(), cancel_check=lambda: True)
         self.assertEqual(result["status"], "cancelled")
         self.assertEqual(result["samples"], [])
-        with patch("python.spike_core.transient_resistive_electrothermal.time.monotonic", side_effect=(0.0, 200.0)):
+        with patch("python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.time.monotonic", side_effect=(0.0, 200.0)):
             self.blocked(request(), "TIMEOUT")
 
     def test_missing_or_unexpected_thermal_nodes_are_structured_failures(self):
-        from python.spike_core.thermal_network import estimate_lumped_thermal_network
+        from python.spike_core.solvers.thermal_fluid.heat.thermal_network import estimate_lumped_thermal_network
         for mutation in ("missing", "extra", "malformed"):
             def corrupt(scenario):
                 result = estimate_lumped_thermal_network(scenario)
@@ -228,11 +226,11 @@ class TransientResistiveElectrothermalTests(unittest.TestCase):
                 else:
                     result["transient"][-1]["temperatures_c"] = None
                 return result
-            with patch("python.spike_core.transient_resistive_electrothermal.estimate_lumped_thermal_network", side_effect=corrupt):
+            with patch("python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.estimate_lumped_thermal_network", side_effect=corrupt):
                 self.blocked(request(), "NUMERICAL_FAILURE")
 
     def test_malformed_native_data_cannot_escape_or_pass(self):
-        from python.spike_core.native_mna import run_native_mna
+        from python.spike_core.solvers.circuits.models.native_mna import run_native_mna
         for mutation in ("missing_data", "missing_power", "missing_diagnostics", "bad_collection"):
             def corrupt(circuit):
                 result = run_native_mna(circuit)
@@ -245,15 +243,15 @@ class TransientResistiveElectrothermalTests(unittest.TestCase):
                 else:
                     result["data"]["element_current_a"] = [1.0]
                 return result
-            with patch("python.spike_core.transient_resistive_electrothermal.run_native_mna", side_effect=corrupt):
+            with patch("python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.run_native_mna", side_effect=corrupt):
                 self.blocked(request(), "NUMERICAL_FAILURE")
 
     def test_serialized_input_and_output_caps_withhold_samples(self):
         value = request()
         input_size = len(json.dumps(value).encode("utf-8"))
-        with patch("python.spike_core.transient_resistive_electrothermal.MAX_JSON_BYTES", input_size - 1):
+        with patch("python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.MAX_JSON_BYTES", input_size - 1):
             self.blocked(value, "INPUT_BYTES")
-        with patch("python.spike_core.transient_resistive_electrothermal.MAX_JSON_BYTES", input_size + 100):
+        with patch("python.spike_core.solvers.thermal_fluid.electrothermal.transient_resistive_electrothermal.MAX_JSON_BYTES", input_size + 100):
             result = run_transient_resistive_electrothermal(value)
             self.assertEqual(result["status"], "blocked")
             self.assertEqual(result["issues"][0]["code"], "TRE_RESULT_BYTES")

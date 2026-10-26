@@ -1,10 +1,7 @@
 import unittest
 
 from python.spike_core.capability_ledger import native_capability_ledger
-from python.spike_core.pi_release_qualification import (
-    REQUIRED_PI_WORKFLOWS,
-    qualify_pi_release,
-)
+from python.spike_core.pi_release_qualification import REQUIRED_PI_WORKFLOWS, qualify_pi_release
 
 
 _BENCHMARK_IDS = {

@@ -10,12 +10,12 @@ import sys
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:sys.path.insert(0,str(ROOT))
-from python.spike_core.openfoam_multiregion_fixture import build_two_region_slab_fixture as build_slab_fixture
-from python.spike_core.openfoam_multiregion import prepare_runnable_multiregion_case
-from python.spike_core.openfoam_multiregion_execution import run_multiregion_case,load_verified_runnable_case
-from python.spike_core.openfoam_flow_energy_validation import read_numeric_history
-from python.spike_core.openfoam_buoyancy import density_at_temperature
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_fixture import build_two_region_slab_fixture as build_slab_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion import prepare_runnable_multiregion_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import run_multiregion_case, load_verified_runnable_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_flow_energy_validation import read_numeric_history
+from python.spike_core.solvers.external_engines.openfoam.openfoam_buoyancy import density_at_temperature
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 from scripts.fan_wsl_scratch import ScratchRunner
 
 
@@ -23,7 +23,7 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument("--output",type=Path,required=True)
     parser.add_argument("--end-time",type=float,default=.1);parser.add_argument("--divisions",type=int,default=4)
     args=parser.parse_args();args.output.mkdir(parents=True,exist_ok=False)
-    source_paths=list((ROOT/"python/spike_core").glob("openfoam*.py"))+[Path(__file__),ROOT/"scripts/fan_wsl_scratch.py"]
+    source_paths=list((ROOT/"python/spike_core").rglob("openfoam*.py"))+[Path(__file__),ROOT/"scripts/fan_wsl_scratch.py"]
     def hashes():return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
     before=hashes();report={"contract":"spike/buoyancy-control-study/v1","cases":{},"production_qualified":False,
         "scope":"small variable-density laminar CHT slab with horizontal gravity, no turbulence or independent field correlation", "source_hashes":before}

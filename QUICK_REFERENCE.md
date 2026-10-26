@@ -100,8 +100,8 @@ dir "%USERPROFILE%\Documents\KiCad\9.0\3rdparty\plugins\SPIKE"
 ### **Source Code**
 ```
 <SPIKE-checkout>\
-├── src\peec\peec_solver.cpp      # PEEC implementation
-├── src\peec\peec_solver.hpp      # PEEC interface
+├── src\solvers\power_integrity\peec\peec_solver.cpp      # PEEC implementation
+├── src\solvers\power_integrity\peec\peec_solver.hpp      # PEEC interface
 ├── tests\test_peec.cpp           # Unit tests
 └── CMakeLists.txt                # Build configuration
 ```
@@ -162,7 +162,7 @@ cmake --build build --config Release
 ### **C++ API**
 
 ```cpp
-#include "peec/peec_solver.hpp"
+#include "solvers/power_integrity/peec/peec_solver.hpp"
 
 using namespace spike::peec;
 

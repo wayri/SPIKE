@@ -47,7 +47,7 @@ export default function StudyNavigator(props: StudyNavigatorProps) {
             onOpen: () => props.onActivateCase(study.id, item),
           }] : []),
           ...item.runs.map((run, index) => ({
-            id: key("run", study.id, item.id, run.id), name: `Capture ${index + 1} - ${captureTime(run.capturedAt)}`,
+            id: key("run", study.id, item.id, run.id), name: `Capture ${index + 1} - ${captureTime(run.capturedAt)} (historical)`,
             detail: [run.caseType.toUpperCase(), run.mode, run.facts.status, run.facts.modelStatus, resultDetail(run.resultSnapshot, run.resultRef)].filter(Boolean).join(" / "),
             icon: hasEmbedded(run.resultSnapshot) || run.resultRef ? FileChartColumn : History,
             onOpen: () => props.onOpenRun(study.id, item, run),

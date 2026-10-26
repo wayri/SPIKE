@@ -7,7 +7,7 @@ from typing import Any, Dict, Iterable, List, Tuple
 
 from .contracts import AnalysisSpec, SpiDeR, ValidationIssue
 from .layers import copper_stack_profile
-from .meshing import build_mesh
+from .solvers.geometry_meshing.preparation.meshing import build_mesh
 
 
 Point = Tuple[float, float]
@@ -135,7 +135,7 @@ def build_mesh_preview(design: SpiDeR, spec: AnalysisSpec) -> Dict[str, Any]:
 
 
 def preflight_analysis(design: SpiDeR, spec: AnalysisSpec, solver_catalog: List[Dict[str, Any]]) -> Dict[str, Any]:
-    from .source_current_limits import CAPABILITY, current_limit_issues
+    from .solvers.power_integrity.dc.source_current_limits import CAPABILITY, current_limit_issues
     capacity_supported = any(
         item.get("state") in {"available", "experimental"}
         and (spec.solver_id == "auto" or item.get("id") == spec.solver_id)
@@ -298,7 +298,7 @@ def preflight_analysis(design: SpiDeR, spec: AnalysisSpec, solver_catalog: List[
         if not dielectrics:
             issues.append(ValidationIssue("DIELECTRIC_MODEL_REQUIRED", "error", "2.5D/HF analysis requires dielectric thickness and relative permittivity."))
     if spec.mode == "transient":
-        from .transient_peec import validate_transient_spec
+        from .solvers.power_integrity.peec.transient_peec import validate_transient_spec
 
         issues.extend(validate_transient_spec(spec))
 
@@ -349,7 +349,7 @@ def preflight_analysis(design: SpiDeR, spec: AnalysisSpec, solver_catalog: List[
     transient_summary: Dict[str, Any] = {}
     if spec.mode == "transient":
         try:
-            from .transient_peec import recommend_time_step_s, transient_settings
+            from .solvers.power_integrity.peec.transient_peec import recommend_time_step_s, transient_settings
 
             transient_value = transient_settings(spec)
             preview_nodes = max(int(mesh.get("node_count", 0)), 1)

@@ -3,7 +3,7 @@
 import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import _Builder
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _Builder
 
 
 class HybridPadZoneCouplingTests(unittest.TestCase):

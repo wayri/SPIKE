@@ -1,6 +1,6 @@
 {
   "contract": "spike/solver-blocks/v1",
-  "catalog_version": "0.4.0-alpha.1",
+  "catalog_version": "0.4.1",
   "packaging_mode": "bundled_all",
   "managed_downloads": false,
   "groups": [
@@ -194,7 +194,9 @@
         "external-calculix"
       ],
       "optional": [],
-      "capability_ids": [],
+      "capability_ids": [
+        "thermal-calculix"
+      ],
       "delivery": "bundled",
       "description": "Bundled bounded solid thermal adapter; separately admitted CalculiX runtime required."
     },
@@ -915,6 +917,227 @@
       "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
     },
     {
+      "id": "execution-propulsion-pod",
+      "name": "Controller, motor field and hover propeller benchmark",
+      "groups": [
+        "execution",
+        "circuits",
+        "electromagnetics"
+      ],
+      "requires": [
+        "circuit-native",
+        "em-magnetic",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "execution-propulsion-pod"
+      ],
+      "delivery": "bundled",
+      "description": "Experimental synthetic benchmark; optional Studio source runtime and C compiler must pass execution admission."
+    },
+    {
+      "id": "execution-propulsion-geometry",
+      "name": "Explicit geometry-port propulsion loop",
+      "groups": [
+        "execution",
+        "circuits",
+        "electromagnetics"
+      ],
+      "requires": [
+        "circuit-native",
+        "materials"
+      ],
+      "optional": [
+        "em-magnetic",
+        "cfd-tetra-cht"
+      ],
+      "capability_ids": [
+        "execution-propulsion-geometry"
+      ],
+      "delivery": "bundled",
+      "description": "Explicit immutable magnetic/CFD table composition; existing source, controller and table admission remain authoritative."
+    },
+    {
+      "id": "si-multiport-deembedding",
+      "name": "Supplied coupled multiport fixture removal",
+      "groups": [
+        "si"
+      ],
+      "requires": [
+        "si-networks"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "si-multiport-deembedding"
+      ],
+      "delivery": "bundled",
+      "description": "Experimental sampled network transformation; strict grids, named ports and conditioning gates retained."
+    },
+    {
+      "id": "si-pam3",
+      "name": "Generic sampled-FIR PAM3",
+      "groups": [
+        "si"
+      ],
+      "requires": [
+        "core"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "si-pam3"
+      ],
+      "delivery": "bundled",
+      "description": "Experimental supplied symbol/channel model; no protocol encoding, training or compliance qualification."
+    },
+    {
+      "id": "em-network-cosimulation",
+      "name": "Sampled EM network AC boundaries",
+      "groups": [
+        "electromagnetics",
+        "circuits"
+      ],
+      "requires": [
+        "si-networks"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-network-cosimulation"
+      ],
+      "delivery": "bundled",
+      "description": "Explicit supplied network and circuit boundaries; no field extraction or calibration inferred."
+    },
+    {
+      "id": "em-resistor-thermal",
+      "name": "AC resistor to retained solid heat coupling",
+      "groups": [
+        "electromagnetics",
+        "thermal"
+      ],
+      "requires": [
+        "em-network-cosimulation",
+        "thermal-solids"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-resistor-thermal"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "em-resistor-cht",
+      "name": "AC resistor to retained creeping CHT",
+      "groups": [
+        "electromagnetics",
+        "thermal",
+        "cht"
+      ],
+      "requires": [
+        "em-network-cosimulation",
+        "cfd-tetra-cht"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-resistor-cht"
+      ],
+      "delivery": "bundled",
+      "description": "Bundled workflow code; existing numerical status and runtime admission still apply."
+    },
+    {
+      "id": "em-spice-coupling",
+      "name": "Linear SPICE and sampled EM coupling",
+      "groups": [
+        "electromagnetics",
+        "circuits"
+      ],
+      "requires": [
+        "em-network-cosimulation",
+        "circuit-native"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-spice-coupling"
+      ],
+      "delivery": "bundled",
+      "description": "Bounded linear AC coupling; owned native runtime and network admission remain required."
+    },
+    {
+      "id": "em-body-heating",
+      "name": "Supplied EM field body heating",
+      "groups": [
+        "electromagnetics",
+        "thermal"
+      ],
+      "requires": [
+        "thermal-solids"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "em-body-heating"
+      ],
+      "delivery": "bundled",
+      "description": "Supplied state-bound fields and raw Poynting closure required; no field-engine qualification inferred."
+    },
+    {
+      "id": "cfd-tetra-cht",
+      "name": "Retained tetrahedral creeping CHT",
+      "groups": [
+        "cfd",
+        "cht",
+        "thermal"
+      ],
+      "requires": [
+        "mesh",
+        "materials",
+        "thermal-solids"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "cfd-tetra-cht"
+      ],
+      "delivery": "bundled",
+      "description": "Experimental executed creeping flow and conservative energy composition; no turbulence or production cooling qualification."
+    },
+    {
+      "id": "pi-ac-thermal-elastic",
+      "name": "Dielectric AC, heat and elasticity chain",
+      "groups": [
+        "pi",
+        "thermal",
+        "mechanics"
+      ],
+      "requires": [
+        "pi-dielectric-ac",
+        "mechanics-thermoelastic"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-ac-thermal-elastic"
+      ],
+      "delivery": "bundled",
+      "description": "Experimental same-mesh composition; child numerical gates and temperature provenance retained."
+    },
+    {
+      "id": "pi-board-volume-dc",
+      "name": "Offline conservative board-volume DC reference",
+      "groups": [
+        "pi",
+        "pcb"
+      ],
+      "requires": [
+        "pcb-adapter",
+        "mesh",
+        "materials"
+      ],
+      "optional": [],
+      "capability_ids": [
+        "pi-board-volume-dc"
+      ],
+      "delivery": "bundled",
+      "description": "Offline experimental RT0 reference APIs only; no production dispatch, full-board convergence or release qualification."
+    },
+    {
       "id": "execution-workers",
       "name": "Parallel jobs and enrolled remote workers",
       "groups": [
@@ -1311,6 +1534,18 @@
       "em-palace",
       "circuit-xyce",
       "execution-cosim",
+      "execution-propulsion-pod",
+      "execution-propulsion-geometry",
+      "si-multiport-deembedding",
+      "si-pam3",
+      "em-network-cosimulation",
+      "em-resistor-thermal",
+      "em-resistor-cht",
+      "em-spice-coupling",
+      "em-body-heating",
+      "cfd-tetra-cht",
+      "pi-ac-thermal-elastic",
+      "pi-board-volume-dc",
       "execution-workers",
       "execution-extensions",
       "em-emerge",
@@ -1390,6 +1625,18 @@
       "external-xyce",
       "circuit-xyce",
       "execution-cosim",
+      "execution-propulsion-pod",
+      "execution-propulsion-geometry",
+      "si-multiport-deembedding",
+      "si-pam3",
+      "em-network-cosimulation",
+      "em-resistor-thermal",
+      "cfd-tetra-cht",
+      "em-resistor-cht",
+      "em-spice-coupling",
+      "em-body-heating",
+      "pi-ac-thermal-elastic",
+      "pi-board-volume-dc",
       "execution-workers",
       "execution-extensions",
       "external-emerge",

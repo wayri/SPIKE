@@ -136,7 +136,7 @@ class PiSiGateTests(unittest.TestCase):
             if mutation=='status': receipt['status']='failed'
             elif mutation=='qualification': receipt['production_qualified']=True
             elif mutation=='stage': receipt['stage_id']='PI04-S01'
-            elif mutation=='source': receipt['sources']['python/spike_core/sparameter_modes.py']='0'*64
+            elif mutation=='source': receipt['sources']['python/spike_core/solvers/signal_integrity/networks/sparameter_modes.py']='0'*64
             elif mutation=='log': receipt['log']='../outside.log'
             elif mutation=='skip': receipt['tests']['skipped']=[receipt['tests']['names'][0]]
             elif mutation=='count': receipt['tests']['run']-=1

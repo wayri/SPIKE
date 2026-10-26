@@ -9,9 +9,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_tetra_thermal import (
-    AssemblyTetraThermalError, run_assembly_tetra_thermal,
-)
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal import AssemblyTetraThermalError, run_assembly_tetra_thermal
 
 
 def cube(n=1, origin=0, owner="solid", unit="m"):
@@ -192,7 +190,7 @@ class AssemblyTetraThermalTests(unittest.TestCase):
         for mutate in mutations:
             raw = request()
             mutate(raw)
-            with self.subTest(mutation=mutate), patch("python.spike_core.assembly_tetra_thermal.coo_matrix") as sparse:
+            with self.subTest(mutation=mutate), patch("python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal.coo_matrix") as sparse:
                 with self.assertRaises(AssemblyTetraThermalError):
                     run_assembly_tetra_thermal(raw)
                 sparse.assert_not_called()

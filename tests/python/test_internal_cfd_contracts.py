@@ -9,8 +9,8 @@ import tempfile
 import unittest
 
 from jsonschema import Draft202012Validator
-from python.spike_core.native_cht import REQUEST, executable_path, run_native_cht
-from python.spike_core.coupled_surface_exchange import transfer_coupled_surface_exchange
+from python.spike_core.solvers.thermal_fluid.flow.native_cht import REQUEST, executable_path, run_native_cht
+from python.spike_core.solvers.execution.coupling.coupled_surface_exchange import transfer_coupled_surface_exchange
 from tests.python.test_coupled_surface_exchange import request as exchange_fixture
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -79,6 +79,22 @@ class InternalCfdContractTests(unittest.TestCase):
         for change in ({"lid_velocity_m_s": 0}, {"max_flow_steps": 1}):
             result = run_native_cht({"contract": REQUEST, "n": 8, **change})
             validator("native-cht-result").validate(result)
+            if result["status"] == "converged":
+                self.assertIs(result["diagnostics"]["independent_momentum_verified"], True)
+                self.assertLessEqual(result["diagnostics"]["independent_momentum_residual_linf"],
+                                     result["diagnostics"]["independent_momentum_residual_limit"])
+                self.assertEqual(result["diagnostics"]["independent_momentum_arithmetic"],
+                                 "exact_rational_binary_inputs")
+                # Archived V1 results remain readable; absence is not verification.
+                archived = deepcopy(result)
+                for key in list(archived["diagnostics"]):
+                    if key.startswith("independent_momentum_"):
+                        del archived["diagnostics"][key]
+                validator("native-cht-result").validate(archived)
+                self.assertNotIn("independent_momentum_verified", archived["diagnostics"])
+                bad_diagnostic = deepcopy(result)
+                bad_diagnostic["diagnostics"]["independent_momentum_verified"] = False
+                self.assertFalse(validator("native-cht-result").is_valid(bad_diagnostic))
             bad = {**result, "production_qualified": True}
             self.assertFalse(validator("native-cht-result").is_valid(bad))
 

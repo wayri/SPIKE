@@ -1,11 +1,6 @@
 import unittest
 
-from python.spike_core.thermal_validation import (
-    Layer,
-    assess_mesh_convergence,
-    electrothermal_fixed_point_reference,
-    layered_conduction_reference,
-)
+from python.spike_core.thermal_validation import Layer, assess_mesh_convergence, electrothermal_fixed_point_reference, layered_conduction_reference
 
 
 class ThermalValidationTests(unittest.TestCase):

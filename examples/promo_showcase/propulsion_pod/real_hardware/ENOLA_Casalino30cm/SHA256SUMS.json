@@ -1,0 +1,77 @@
+[
+  {
+    "file": "00_Generalnfo.xlsx",
+    "sha256": "4db3b159427eb9f23c7c6a94b5369e02a173efae86984e22a2c3aee39f152e93",
+    "bytes": 17873
+  },
+  {
+    "file": "archive_selected_directory.json",
+    "sha256": "cf26bba5ab7fcc04c79e24a9c0abfae3b01b6d790a8200d51a04f4398286070f",
+    "bytes": 6742
+  },
+  {
+    "file": "Casalino_CAD.x_b",
+    "sha256": "f5dcea3d3c7f09af7f20781658c66fe683a82fa686db1a929c37d1bfffacece2",
+    "bytes": 313845
+  },
+  {
+    "file": "CASALINO_D30cm_pitch+5deg.stl",
+    "sha256": "4659b1f740d6e2ea30819b7a2ce3cdddd54703600ff0d0919d0529ff1db62afd",
+    "bytes": 1787284
+  },
+  {
+    "file": "CASALINO_D30cm_pitch-5deg.stl",
+    "sha256": "dc765e0e38e113fd5a48a8b689cae1017d7173eeecde9f1fba654f8a35bfa7b3",
+    "bytes": 1792484
+  },
+  {
+    "file": "Casalino_exp.csv",
+    "sha256": "71946f2846c9c5191fe4d220bae9f12860011ed7d79e597cfaedde9c511ad525",
+    "bytes": 1691
+  },
+  {
+    "file": "Casalino_SLA_exp_0deg.csv",
+    "sha256": "41b719f27e3b2571ebf08fc258389718b7822fa9bd801b0ad0b92201d7cecd22",
+    "bytes": 13309
+  },
+  {
+    "file": "Casalino_SLA_Pitch+5deg_exp_0_90_deg.csv",
+    "sha256": "d31b1de94e9dc8f91510a3fdd68aca0693ad71eecadfc8aac5b61107c0cee8d9",
+    "bytes": 63855
+  },
+  {
+    "file": "Casalino_SLA_Pitch-5deg_exp_0_90_deg.csv",
+    "sha256": "006e17a03c5a9449055358f36b4e6aefa6fdbc55d62459f3b41a8594a1a4166f",
+    "bytes": 53444
+  },
+  {
+    "file": "DATABASE_README.txt",
+    "sha256": "a17ea7117d4aa5d8405f16caa8a809ee00cd7390962218945150d0c7ec9eae7a",
+    "bytes": 1592
+  },
+  {
+    "file": "GEOMETRY_INSPECTION.json",
+    "sha256": "2d500f4b14932620c8ed028b2eab093438175b11c1ed3d269b2a7e38d2a14486",
+    "bytes": 1635
+  },
+  {
+    "file": "LICENSE_CC_BY_SA_4.0.txt",
+    "sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5",
+    "bytes": 20138
+  },
+  {
+    "file": "README.txt",
+    "sha256": "ab309ac83895ff3b2f1fd2a0ebe91b4a644c8688d34b5389e530198700b09e3f",
+    "bytes": 923
+  },
+  {
+    "file": "source-provenance.json",
+    "sha256": "81a6dc3496f3249d6920f9c2c9f13694c899f1b6c95869fb6fa0f3a4b1374e14",
+    "bytes": 763
+  },
+  {
+    "file": "ZENODO_RECORD_20111572.json",
+    "sha256": "ba1499c54e548e02043b87d90f94c3a2062d7d33250847dbf6065ab227fd4617",
+    "bytes": 5594
+  }
+]

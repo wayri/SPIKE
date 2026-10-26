@@ -17,10 +17,10 @@ import time
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.run_crossboard_openems import WORKER, fixture
-from python.spike_core.openems_assembly_geometry import compile_assembly_geometry
+from python.spike_core.solvers.external_engines.openems.openems_assembly_geometry import compile_assembly_geometry
 from python.spike_core.external_engines import _run_isolated_python
 from python.spike_core.runtime_locations import openems_python, openems_install_root
-from python.spike_core.crossboard_field_screen import screen_case
+from python.spike_core.solvers.electromagnetics.fields.crossboard_field_screen import screen_case
 
 
 def digest(path):
@@ -37,8 +37,8 @@ def main():
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=False)
     paths = [ROOT / "extensions/openems_suite/openems_assembly_geometry.py",
-             ROOT / "python/spike_core/multi_excitation_network.py",
-             ROOT / "python/spike_core/crossboard_mesh.py"]
+             ROOT / "python/spike_core/solvers/electromagnetics/fields/multi_excitation_network.py",
+             ROOT / "python/spike_core/solvers/geometry_meshing/preparation/crossboard_mesh.py"]
     source = "\n".join(path.read_text(encoding="utf-8") for path in paths)
     sources = {str(path.relative_to(ROOT)): digest(path) for path in [*paths, ROOT / "scripts/run_crossboard_openems.py", Path(__file__)]}
     raw = fixture(4)

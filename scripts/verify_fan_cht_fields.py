@@ -11,7 +11,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.openfoam import _parse_internal_field
+from python.spike_core.solvers.external_engines.openfoam.openfoam import _parse_internal_field
 
 
 def verify(case):

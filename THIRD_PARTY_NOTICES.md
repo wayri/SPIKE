@@ -1,5 +1,19 @@
 # Third-party notices and example sources
 
+## Local native WREN evaluation fixture
+
+The October 2026 SI diagnostic uses the CERN WREN-Ie native KiCad board from
+[wren-hw](https://gitlab.cern.ch/be-cem-edl/chronos/wren/wren-hw), commit
+`816b7598a89151a8250fa5fa945d2a0154669325`, path
+`hw/EDA-04968-V2-0/EDA-04968-V2-0.kicad_pcb`. Board SHA-256 is
+`f98009ba98a0f7b302fe7c0f48fa64016a856af7d3989d3f6b7082435f9b2b9b`.
+The WREN project identifies the hardware as CERN-OHL-W-2.0+; retain its upstream
+notices and applicable [official license](https://gitlab.com/ohwr/project/cernohl/-/blob/550e7d4f3e9f4288c7e04b05384c53e1fac44aa0/licence_texts/cern_ohl_w_v2.txt).
+These downloaded hardware artifacts remain in ignored local evaluation storage,
+not the SPIKE source distribution or installer. SPIKE's independently authored
+verifier does not relicense the board or grant redistribution approval.
+See [the bounded evidence](docs/validation/SI_BOARD_SCENARIOS_20261023.md).
+
 ## Optional SPIKES firmware runtime
 
 Renode 1.17.0 is an optional separately installed, unmodified upstream runtime,

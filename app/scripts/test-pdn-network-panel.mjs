@@ -32,7 +32,7 @@ assert.ok(source.includes("operation.current !== id"), "late responses must be d
 assert.ok(source.includes("version !== revision.current"), "setup edits must invalidate late results");
 assert.ok(source.includes("setResult(null)"), "editing retires stale curves");
 const root = resolve(".."), python = resolve(root, ".venv/Scripts/python.exe");
-const result = JSON.parse(execFileSync(python, ["-c", "import json,sys; from python.spike_core.pdn_network import evaluate_pdn_network; print(json.dumps(evaluate_pdn_network(json.load(sys.stdin)),allow_nan=False))"],
+const result = JSON.parse(execFileSync(python, ["-c", "import json,sys; from python.spike_core.solvers.power_integrity.pdn.pdn_network import evaluate_pdn_network; print(json.dumps(evaluate_pdn_network(json.load(sys.stdin)),allow_nan=False))"],
   { cwd: root, input: JSON.stringify(request), encoding: "utf8" }));
 assert.equal(result.contract, "spike/pdn-network-result/v1");
 assert.equal(result.reference, "AGND");
@@ -44,7 +44,7 @@ assert.equal(validPdnNetworkResult({ ...result, ac: [{ frequency_hz: 1, impedanc
 const nonfinite = structuredClone(result); nonfinite.ac[0].impedance_ohm[0][0].real = NaN;
 assert.equal(validPdnNetworkResult(nonfinite), false, "nonfinite curves rejected");
 assert.equal(validPdnNetworkResult({ ...result, ac: [null] }), false);
-const multiple = JSON.parse(execFileSync(python, ["-c", "import json; from tests.python.test_pdn_multiload_contract import shared_return_request; from python.spike_core.pdn_network import evaluate_pdn_network; print(json.dumps(evaluate_pdn_network(shared_return_request()),allow_nan=False))"],
+const multiple = JSON.parse(execFileSync(python, ["-c", "import json; from tests.python.test_pdn_multiload_contract import shared_return_request; from python.spike_core.solvers.power_integrity.pdn.pdn_network import evaluate_pdn_network; print(json.dumps(evaluate_pdn_network(shared_return_request()),allow_nan=False))"],
   { cwd: root, encoding: "utf8" }));
 assert.equal(validPdnNetworkResult(multiple), true, "actual simultaneous-load result admitted");
 assert.deepEqual(multiple.load_transient.load_port_ids, ["A", "B"]);

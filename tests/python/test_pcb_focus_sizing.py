@@ -5,12 +5,7 @@ import math
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.pcb_focus_sizing import (
-    PcbFocusSizingError,
-    assess_focus_mesh,
-    plan_focus_regions,
-    target_size_at,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.pcb_focus_sizing import PcbFocusSizingError, assess_focus_mesh, plan_focus_regions, target_size_at
 
 
 def prism(identifier, outer, z0=0, z1=.1):
@@ -245,19 +240,19 @@ class PcbFocusSizingTests(unittest.TestCase):
 
     def test_resource_caps_and_malformed_mesh_reject(self):
         solids, metadata = solid_fixture()
-        with patch('python.spike_core.pcb_focus_sizing.MAX_GENERATED_REGIONS', 1):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_focus_sizing.MAX_GENERATED_REGIONS', 1):
             with self.assertRaisesRegex(PcbFocusSizingError, 'budget'):
                 plan_focus_regions(solids, metadata, policy())
         two_regions = [{'id': str(index), 'bounds_mm': [[0, 0, 0], [1, 1, 1]],
                         'target_size_mm': .1} for index in range(2)]
-        with patch('python.spike_core.pcb_focus_sizing.MAX_MANUAL_REGIONS', 1):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_focus_sizing.MAX_MANUAL_REGIONS', 1):
             with self.assertRaisesRegex(PcbFocusSizingError, '4096'):
                 plan_focus_regions(solids, metadata, policy(net_names=[], regions=two_regions))
         focus = [{**region(), 'halo_mm': 0, 'growth_rate': 1}]
-        with patch('python.spike_core.pcb_focus_sizing.MAX_MESH_CELLS', 1):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_focus_sizing.MAX_MESH_CELLS', 1):
             with self.assertRaisesRegex(PcbFocusSizingError, 'budget'):
                 assess_focus_mesh(two_cell_mesh(), focus, 2)
-        with patch('python.spike_core.pcb_focus_sizing.MAX_ASSESSMENT_COMPARISONS', 0):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_focus_sizing.MAX_ASSESSMENT_COMPARISONS', 0):
             with self.assertRaisesRegex(PcbFocusSizingError, 'comparison budget'):
                 assess_focus_mesh(two_cell_mesh(), focus, 2)
         for mutation in (lambda m: m.update(units='inch'),

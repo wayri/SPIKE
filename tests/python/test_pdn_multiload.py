@@ -6,8 +6,8 @@ import math
 import unittest
 from unittest.mock import patch
 
-from python.spike_core import pdn_network
-from python.spike_core.pdn_network import PdnNetworkError, evaluate_pdn_network, validate_pdn_network
+from python.spike_core.solvers.power_integrity.pdn import pdn_network
+from python.spike_core.solvers.power_integrity.pdn.pdn_network import PdnNetworkError, evaluate_pdn_network, validate_pdn_network
 
 
 PERIOD = 1 / 1024

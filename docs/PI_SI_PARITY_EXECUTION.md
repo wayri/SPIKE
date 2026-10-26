@@ -62,14 +62,14 @@ claim of commercial-tool parity. The capability ledger retains detailed gaps.
 
 ## SI08-S01 API and derivation
 
-`python/spike_core/sparameter_modes.py` owns `mixed_mode_network`. A caller
+`python/spike_core/solvers/signal_integrity/networks/sparameter_modes.py` owns `mixed_mode_network`. A caller
 supplies a `NetworkData`, ordered zero-based `(positive, negative)` pairs, an
 ordered list of all unpaired ports and optional unique physical port names.
 The result contains a separate derived network and ordered physical mapping.
 
 ```python
-from python.spike_core.sparameters import read_touchstone
-from python.spike_core.sparameter_modes import mixed_mode_network
+from python.spike_core.solvers.signal_integrity.networks.sparameters import read_touchstone
+from python.spike_core.solvers.signal_integrity.networks.sparameter_modes import mixed_mode_network
 
 source = read_touchstone("measured.s4p")
 modes = mixed_mode_network(source, [(0, 2), (1, 3)])

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(SPIKE VERSION 0.4.0 LANGUAGES CXX)
+project(SPIKE VERSION 0.4.2 LANGUAGES CXX)
 
 set(SPIKES_ENGINE_PRERELEASE "beta.1" CACHE STRING
     "SPIKES engine prerelease identifier")
@@ -68,7 +68,7 @@ find_package(OpenMP REQUIRED)
 
 # PEEC Solver Library
 add_library(spike_peec STATIC
-    src/peec/peec_solver.cpp
+    src/solvers/power_integrity/peec/peec_solver.cpp
 )
 target_include_directories(spike_peec PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -85,7 +85,7 @@ endif()
 
 # Finite-volume inductance verification kernel. Deliberately isolated from the
 # legacy PEEC model until barrel geometry and overlap-aware bases are qualified.
-add_library(spike_peec_volume STATIC src/peec/volume_inductance.cpp)
+add_library(spike_peec_volume STATIC src/solvers/power_integrity/peec/volume_inductance.cpp)
 target_include_directories(spike_peec_volume PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 if(MSVC)
     target_compile_options(spike_peec_volume PRIVATE /W4 /WX /fp:strict)
@@ -93,8 +93,8 @@ else()
     target_compile_options(spike_peec_volume PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
 endif()
 add_library(spike_peec_volume_matrix STATIC
-    src/peec/volume_matrix.cpp
-    src/peec/annular_inductance.cpp)
+    src/solvers/power_integrity/peec/volume_matrix.cpp
+    src/solvers/power_integrity/peec/annular_inductance.cpp)
 target_include_directories(spike_peec_volume_matrix PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_link_libraries(spike_peec_volume_matrix PUBLIC spike_peec_volume Eigen3::Eigen)
 set_target_properties(spike_peec_volume spike_peec_volume_matrix PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -107,8 +107,8 @@ endif()
 # Isolated affine-prism verification kernel. It is not wired into the board
 # extractor until touching bases, contacts, and mixed annular terms are solved.
 add_library(spike_peec_affine_triangle STATIC
-    src/peec/affine_triangle_basis.cpp
-    src/peec/affine_slab_inductance.cpp)
+    src/solvers/power_integrity/peec/affine_triangle_basis.cpp
+    src/solvers/power_integrity/peec/affine_slab_inductance.cpp)
 target_include_directories(spike_peec_affine_triangle PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src)
 if(MSVC)
@@ -121,7 +121,7 @@ endif()
 # Experimental positive-Gram prescribed-current energy probe. It is not an
 # assembled PEEC solver and has no certified finite-domain quadrature error.
 add_library(spike_peec_spectral_energy STATIC
-    src/peec/sparse_magnetic_energy.cpp)
+    src/solvers/power_integrity/peec/sparse_magnetic_energy.cpp)
 target_include_directories(spike_peec_spectral_energy PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src)
 if(MSVC)
@@ -134,9 +134,9 @@ endif()
 # Strict typed geometry admission only. Keep this target independent of Eigen,
 # OpenMP, PEEC solver APIs, and legacy fast-math/ISA flags.
 add_library(spike_transition_handoff STATIC
-    src/peec/via_transition_mesh_input.cpp
-    src/peec/reference_plane_antipad_mesh_input.cpp
-    src/peec/generalized_reference_plane_mesh_input.cpp
+    src/solvers/power_integrity/peec/via_transition_mesh_input.cpp
+    src/solvers/power_integrity/peec/reference_plane_antipad_mesh_input.cpp
+    src/solvers/power_integrity/peec/generalized_reference_plane_mesh_input.cpp
 )
 target_include_directories(spike_transition_handoff PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -147,14 +147,14 @@ set_target_properties(spike_transition_handoff PROPERTIES
 
 # Solver-independent planar topology predicates and canonical source geometry.
 add_library(spike_geometry STATIC
-    src/geometry/planar_topology.cpp
-    src/geometry/constrained_triangulation.cpp)
+    src/solvers/geometry_meshing/geometry/planar_topology.cpp
+    src/solvers/geometry_meshing/geometry/constrained_triangulation.cpp)
 target_include_directories(spike_geometry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 set_target_properties(spike_geometry PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # Thermal FEM Library
 add_library(spike_thermal STATIC
-    src/thermal/thermal_solver.cpp
+    src/solvers/thermal_fluid/thermal/thermal_solver.cpp
 )
 target_include_directories(spike_thermal PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -181,21 +181,21 @@ target_link_libraries(spike_math INTERFACE
 # dense Phase-1 backend is a correctness oracle; sparse/nonlinear backends can
 # replace it without changing the public circuit API.
 add_library(spikes_core STATIC
-    src/spikes/smps_stability.cpp
-    src/spikes/dc_solver.cpp
-    src/spikes/io_pad.cpp
-    src/spikes/io_pad_events.cpp
-    src/spikes/peripheral_timing.cpp
-    src/spikes/peripheral_registers.cpp
-    src/spikes/osdi_device.cpp
-    src/spikes/transient_solver.cpp
-    src/spikes/transient_session.cpp
+    src/solvers/circuits/spikes/smps_stability.cpp
+    src/solvers/circuits/spikes/dc_solver.cpp
+    src/solvers/circuits/spikes/io_pad.cpp
+    src/solvers/circuits/spikes/io_pad_events.cpp
+    src/solvers/circuits/spikes/peripheral_timing.cpp
+    src/solvers/circuits/spikes/peripheral_registers.cpp
+    src/solvers/circuits/spikes/osdi_device.cpp
+    src/solvers/circuits/spikes/transient_solver.cpp
+    src/solvers/circuits/spikes/transient_session.cpp
 )
 if(MSVC)
-    set_source_files_properties(src/spikes/io_pad.cpp PROPERTIES
+    set_source_files_properties(src/solvers/circuits/spikes/io_pad.cpp PROPERTIES
         COMPILE_OPTIONS "/W4;/WX")
 else()
-    set_source_files_properties(src/spikes/io_pad.cpp PROPERTIES
+    set_source_files_properties(src/solvers/circuits/spikes/io_pad.cpp PROPERTIES
         COMPILE_OPTIONS "-Wall;-Wextra;-Werror")
 endif()
 target_link_libraries(spikes_core PRIVATE Eigen3::Eigen OpenMP::OpenMP_CXX)
@@ -205,9 +205,9 @@ target_include_directories(spikes_core PUBLIC
 set_target_properties(spikes_core PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 # Separate device-field subsystem; not a circuit compact-model substitute.
-add_library(spikes_tcad STATIC src/spikes/tcad_equilibrium.cpp)
+add_library(spikes_tcad STATIC src/solvers/circuits/spikes/tcad_equilibrium.cpp)
 target_include_directories(spikes_tcad PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
-add_executable(spikes_tcad_console src/spikes/tcad_console.cpp)
+add_executable(spikes_tcad_console src/solvers/circuits/spikes/tcad_console.cpp)
 target_link_libraries(spikes_tcad_console PRIVATE spikes_tcad)
 if(MSVC)
     target_compile_options(spikes_tcad PRIVATE /EHsc /fp:strict)
@@ -221,8 +221,8 @@ endif()
 # the numerical archive so Python, C dashboards, and HIL hosts can load one
 # versioned shared library without exposing C++ ABI types.
 add_library(spikes_c_api SHARED
-    src/spikes/c_api.cpp
-    src/spikes/peripheral_c_api.cpp
+    src/solvers/circuits/spikes/c_api.cpp
+    src/solvers/circuits/spikes/peripheral_c_api.cpp
 )
 
 target_include_directories(spikes_c_api PUBLIC
@@ -235,7 +235,7 @@ target_compile_definitions(spikes_c_api PUBLIC SPIKES_SHARED PRIVATE SPIKES_BUIL
 # This remains UI-toolkit independent so the later GUI can reuse the same
 # session, rolling-buffer, limit, and control semantics.
 add_library(spikes_dashboard STATIC
-    src/spikes/console_dashboard.cpp
+    src/solvers/circuits/spikes/console_dashboard.cpp
 )
 target_include_directories(spikes_dashboard PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -244,17 +244,17 @@ target_link_libraries(spikes_dashboard PUBLIC spikes_core)
 set_target_properties(spikes_dashboard PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_executable(spikes_console
-    src/spikes/console_main.cpp
+    src/solvers/circuits/spikes/console_main.cpp
 )
 target_link_libraries(spikes_console PRIVATE spikes_dashboard)
 target_compile_definitions(spikes_console PRIVATE
     SPIKES_ENGINE_VERSION="${SPIKES_ENGINE_VERSION}")
 
-add_executable(spikes_osdi_worker src/spikes/osdi_worker_main.cpp)
+add_executable(spikes_osdi_worker src/solvers/circuits/spikes/osdi_worker_main.cpp)
 target_link_libraries(spikes_osdi_worker PRIVATE spikes_core)
 
 add_executable(spikes_appcontainer_launcher
-    src/spikes/appcontainer_launcher.cpp)
+    src/solvers/circuits/spikes/appcontainer_launcher.cpp)
 if(WIN32)
     target_link_libraries(spikes_appcontainer_launcher PRIVATE userenv advapi32)
 endif()
@@ -292,20 +292,20 @@ install(TARGETS spike_peec spike_peec_volume spike_peec_volume_matrix spike_tran
     RUNTIME DESTINATION bin
 )
 install(FILES
-    src/peec/volume_inductance.hpp
-    src/peec/annular_inductance.hpp
-    src/peec/volume_matrix.hpp
-    src/peec/via_transition_mesh_input.hpp
-    src/peec/reference_plane_antipad_mesh_input.hpp
-    src/geometry/planar_topology.hpp
-    src/spikes/dc_solver.hpp
-    src/spikes/io_pad.hpp
-    src/spikes/io_pad_events.hpp
-    src/spikes/osdi_device.hpp
-    src/spikes/transient_solver.hpp
-    src/spikes/transient_session.hpp
-    src/spikes/console_dashboard.hpp
-    src/spikes/c_api.h
+    src/solvers/power_integrity/peec/volume_inductance.hpp
+    src/solvers/power_integrity/peec/annular_inductance.hpp
+    src/solvers/power_integrity/peec/volume_matrix.hpp
+    src/solvers/power_integrity/peec/via_transition_mesh_input.hpp
+    src/solvers/power_integrity/peec/reference_plane_antipad_mesh_input.hpp
+    src/solvers/geometry_meshing/geometry/planar_topology.hpp
+    src/solvers/circuits/spikes/dc_solver.hpp
+    src/solvers/circuits/spikes/io_pad.hpp
+    src/solvers/circuits/spikes/io_pad_events.hpp
+    src/solvers/circuits/spikes/osdi_device.hpp
+    src/solvers/circuits/spikes/transient_solver.hpp
+    src/solvers/circuits/spikes/transient_session.hpp
+    src/solvers/circuits/spikes/console_dashboard.hpp
+    src/solvers/circuits/spikes/c_api.h
     DESTINATION include/spikes
 )
 
@@ -313,9 +313,36 @@ install(FILES
 # Testing (Optional - will be expanded)
 # ============================================================================
 
+# Bounded SI source references remain separate from legacy fast-math kernels.
+add_library(spike_si_reference STATIC src/solvers/signal_integrity/si/transition_pi_cdr.cpp)
+target_include_directories(spike_si_reference PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(spike_si_reference PUBLIC cxx_std_20)
+if(MSVC)
+    target_compile_options(spike_si_reference PRIVATE /W4 /WX /permissive- /fp:strict)
+else()
+    target_compile_options(spike_si_reference PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+endif()
+
 option(BUILD_TESTING "Build tests" ON)
+option(SPIKE_BUILD_AMI_HOST "Build isolated trusted-development AMI ABI host" OFF)
+if(SPIKE_BUILD_AMI_HOST)
+    if(NOT WIN32 OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8 OR NOT MSVC)
+        message(FATAL_ERROR "AMI development admission currently requires MSVC Windows x64")
+    endif()
+    add_executable(spike-ami-host src/solvers/signal_integrity/si/ami_host_main.cpp)
+    set_property(TARGET spike-ami-host PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    target_compile_options(spike-ami-host PRIVATE /W4 /WX /permissive- /fp:strict)
+endif()
 if(BUILD_TESTING)
     enable_testing()
+    add_executable(test_si_transition_pi_cdr tests/test_si_transition_pi_cdr.cpp)
+    target_link_libraries(test_si_transition_pi_cdr PRIVATE spike_si_reference)
+    if(MSVC)
+        target_compile_options(test_si_transition_pi_cdr PRIVATE /W4 /WX /permissive- /fp:strict)
+    else()
+        target_compile_options(test_si_transition_pi_cdr PRIVATE -Wall -Wextra -Werror -fno-fast-math -ffp-contract=off)
+    endif()
+    add_test(NAME test_si_transition_pi_cdr COMMAND test_si_transition_pi_cdr)
     add_executable(test_spikes_digital_kernel tests/native/spikes_digital_kernel_test.cpp)
     target_include_directories(test_spikes_digital_kernel PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
     if(MSVC)

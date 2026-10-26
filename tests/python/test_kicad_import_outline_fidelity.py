@@ -6,7 +6,7 @@ import unittest
 from python.spike_core.board_outline_geometry import straight_outline_rings
 from python.spike_core.kicad_importer import import_kicad_design
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.assembly_thermal_meshing import _board_model
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import _board_model
 from python.spike_core.mcad_export_design import _rings_from_drawings
 
 ROOT = Path(__file__).resolve().parents[2]

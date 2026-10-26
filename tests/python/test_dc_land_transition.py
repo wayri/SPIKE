@@ -11,9 +11,9 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.dc_land_transition import solve_land_transition
-from python.spike_core.dc_land_transition_input import REQUEST, prepare
-from python.spike_core.dc_land_transition_evidence import validate_land_result
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition import solve_land_transition
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition_input import REQUEST, prepare
+from python.spike_core.solvers.power_integrity.dc.dc_land_transition_evidence import validate_land_result
 
 ROOT = Path(__file__).resolve().parents[2]
 

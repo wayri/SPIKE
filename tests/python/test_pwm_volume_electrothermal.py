@@ -9,9 +9,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.pwm_volume_electrothermal import (
-    REQUEST, DEVICES, run_pwm_volume_electrothermal, validate_pwm_volume_electrothermal,
-)
+from python.spike_core.solvers.thermal_fluid.electrothermal.pwm_volume_electrothermal import REQUEST, DEVICES, run_pwm_volume_electrothermal, validate_pwm_volume_electrothermal
 from tests.python.test_assembly_tetra_thermal import request, cube, contact_request
 
 
@@ -113,7 +111,7 @@ class NativeTests(unittest.TestCase):
         raw = volume_request(2)
         accepted = handle({'method': 'validate_pwm_volume_electrothermal', 'params': {'request': raw}})
         self.assertTrue(accepted['ok'], accepted)
-        from python.spike_core import pwm_volume_electrothermal as backend
+        from python.spike_core.solvers.thermal_fluid.electrothermal import pwm_volume_electrothermal as backend
         actual = backend.run_pwm_volume_electrothermal
         with patch.object(backend, 'run_pwm_volume_electrothermal', side_effect=lambda request, **kwargs: actual(request, library=self.library, **kwargs)):
             response = handle({'method': 'run_pwm_volume_electrothermal', 'params': {'request': raw}})

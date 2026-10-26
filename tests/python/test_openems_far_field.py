@@ -14,14 +14,9 @@ import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
 from python.spike_core.external_engines import prepare_openems_case
-from python.spike_core.openems_adapter_source import OPENEMS_DRIVER
+from python.spike_core.solvers.external_engines.openems.openems_adapter_source import OPENEMS_DRIVER
 from extensions.openems_suite.openems_mesh_policy import actual_grid_report, require_time_window
-from python.spike_core.openems_validation import (
-    FAR_FIELD_REQUEST_CONTRACT,
-    FAR_FIELD_RESULT_CONTRACT,
-    validate_far_field_request,
-    validate_normalized_result,
-)
+from python.spike_core.solvers.external_engines.openems.openems_validation import FAR_FIELD_REQUEST_CONTRACT, FAR_FIELD_RESULT_CONTRACT, validate_far_field_request, validate_normalized_result
 
 
 def _fixture_mesh() -> dict:

@@ -6,17 +6,8 @@ from math import cos, sin
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.filled_copper_path import (
-    FilledPathError,
-    prepare_filled_path,
-)
-from python.spike_core.source_filled_boundary import (
-    SourceFilledBoundary,
-    SourceFilledBoundaryBudgetError,
-    SourceFilledBoundaryCancelled,
-    SourceFilledBoundaryError,
-    prepare_source_filled_boundary,
-)
+from python.spike_core.solvers.power_integrity.dc.filled_copper_path import FilledPathError, prepare_filled_path
+from python.spike_core.solvers.power_integrity.dc.source_filled_boundary import SourceFilledBoundary, SourceFilledBoundaryBudgetError, SourceFilledBoundaryCancelled, SourceFilledBoundaryError, prepare_source_filled_boundary
 
 
 def bridge_through_hole_path():
@@ -89,7 +80,7 @@ class SourceFilledBoundaryTests(unittest.TestCase):
             prepare_source_filled_boundary(ambiguous)
         with (
             patch(
-                "python.spike_core.source_filled_boundary.MAX_SOURCE_VERTICES", 8
+                "python.spike_core.solvers.power_integrity.dc.source_filled_boundary.MAX_SOURCE_VERTICES", 8
             ),
             self.assertRaises(SourceFilledBoundaryBudgetError),
         ):

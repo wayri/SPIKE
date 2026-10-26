@@ -14,7 +14,7 @@
       "patternProperties": {"^(velocity_scale_m_s|actual_reynolds|kernel_reynolds|peclet|solid_k_ratio|lid)$": {"type": "number", "minimum": 0}}},
     "diagnostics": {"type": "object", "additionalProperties": false,
       "required": ["flow_steps", "thermal_iterations", "thermal_residual_linf", "balance_relative"],
-      "properties": {"interface_heat_flow_w": {"type": "object", "additionalProperties": false, "required": ["bottom", "top"], "properties": {"bottom": {"type": "number"}, "top": {"type": "number"}}}},
+      "properties": {"independent_momentum_residual_linf": {"type": "number", "minimum": 0}, "independent_momentum_residual_limit": {"type": "number", "exclusiveMinimum": 0}, "independent_momentum_verified": {"const": true}, "independent_momentum_arithmetic": {"const": "exact_rational_binary_inputs"}, "interface_heat_flow_w": {"type": "object", "additionalProperties": false, "required": ["bottom", "top"], "properties": {"bottom": {"type": "number"}, "top": {"type": "number"}}}},
       "patternProperties": {"^(flow_time|flow_dt|divergence_linf|steady_rate_linf|poisson_residual_linf|thermal_residual_linf|hot_flux|cold_flux|balance_raw|balance_relative|theta_min|theta_max|flow_steps|thermal_iterations|independent_thermal_residual_linf|hot_input_w|cold_output_w|raw_energy_balance_w|maximum_temperature_k|minimum_temperature_k)$": {"type": "number"}}},
     "fields": {"oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["thermal", "fluid"],
       "properties": {

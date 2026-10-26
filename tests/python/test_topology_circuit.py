@@ -2,11 +2,7 @@ import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
 from python.spike_core.service import handle
-from python.spike_core.topology_circuit import (
-    TOPOLOGY_CIRCUIT_CONTRACT,
-    bridge_topology_to_analysis_spec,
-    validate_topology_circuit,
-)
+from python.spike_core.solvers.circuits.models.topology_circuit import TOPOLOGY_CIRCUIT_CONTRACT, bridge_topology_to_analysis_spec, validate_topology_circuit
 
 
 def design() -> SpiDeR:

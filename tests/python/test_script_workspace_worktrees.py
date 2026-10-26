@@ -10,11 +10,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.script_workspace_files import (
-    GIT_WORKTREE_TIMEOUT_SECONDS,
-    MAX_GIT_OUTPUT_BYTES,
-    python_workspace_files,
-)
+from python.spike_core.script_workspace_files import GIT_WORKTREE_TIMEOUT_SECONDS, MAX_GIT_OUTPUT_BYTES, python_workspace_files
 
 
 class ScriptWorkspaceWorktreesTest(unittest.TestCase):

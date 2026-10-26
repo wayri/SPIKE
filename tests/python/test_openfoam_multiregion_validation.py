@@ -6,9 +6,9 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from python.spike_core.openfoam_multiregion_execution import RUNNABLE_CASE_CONTRACT, _digest
-from python.spike_core.openfoam_multiregion_validation import RECORD_CONTRACT, import_v2606_validation_evidence
-from python.spike_core.openfoam_multiregion_execution import MultiRegionExecutionError
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import RUNNABLE_CASE_CONTRACT, _digest
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_validation import RECORD_CONTRACT, import_v2606_validation_evidence
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import MultiRegionExecutionError
 
 
 def _case(root: Path) -> dict:

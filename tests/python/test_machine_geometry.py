@@ -5,13 +5,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.machine_geometry import (
-    CONTRACT,
-    MachineGeometryError,
-    build_pm_machine_mesh,
-    build_solenoid_mesh,
-    validate_machine_mesh,
-)
+from python.spike_core.solvers.electromagnetics.machines.machine_geometry import CONTRACT, MachineGeometryError, build_pm_machine_mesh, build_solenoid_mesh, validate_machine_mesh
 
 
 def region_areas(mesh):
@@ -232,8 +226,8 @@ class MachineGeometryTests(unittest.TestCase):
         self.assertFalse(after["meshing"]["moving_remesh"])
 
     def test_conforming_pm_actual_solve_torque_has_shrinking_refinement_difference(self):
-        from python.spike_core.magnetic_fem import solve_magnetostatic
-        from python.spike_core.magnetic_machine_study import maxwell_stress_integral
+        from python.spike_core.solvers.electromagnetics.machines.magnetic_fem import solve_magnetostatic
+        from python.spike_core.solvers.electromagnetics.machines.magnetic_machine_study import maxwell_stress_integral
 
         torques = []
         for edge in (0.002, 0.001, 0.0005):

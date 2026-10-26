@@ -5,7 +5,7 @@ import math
 from pathlib import Path
 import unittest
 
-from python.spike_core.multiboard_thermal import MultiboardThermalError, run_multiboard_thermal
+from python.spike_core.solvers.thermal_fluid.heat.multiboard_thermal import MultiboardThermalError, run_multiboard_thermal
 from python.spike_core.spider_v2 import AssemblyIRV1
 
 

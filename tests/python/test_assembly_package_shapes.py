@@ -12,12 +12,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from python.spike_core import project_model_artifacts
-from python.spike_core.assembly_package_shapes import (
-    AssemblyPackageShapeError,
-    canonicalize_assembly_package_shapes,
-    model_transform_sha256,
-    selector_inventory_sha256,
-)
+from python.spike_core.assembly_package_shapes import AssemblyPackageShapeError, canonicalize_assembly_package_shapes, model_transform_sha256, selector_inventory_sha256
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import AssemblyIRV1, SpiDeRV2
 from python.spike_core.spider_v2_schema import canonical_uuid

@@ -97,7 +97,7 @@ def _compare_vectors(native_times, native_values, reference_times, reference_val
 
 def _reference_case(executable, deck, table, signal, times, values, tolerance):
     from python.spike_core.contracts import AnalysisSpec, DesignIR
-    from python.spike_core.ngspice_plugin import NgspicePlugin
+    from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin
     plugin = NgspicePlugin()
     plugin.executable = str(executable)
     # Match the requested native step with a reference maximum step, without
@@ -184,7 +184,7 @@ def run_deck_qualification(library_path, *, repetitions=2, include_direct_abi=Fa
     if reference_executable:
         reference_identity = dict(executable_sha256=hashlib.sha256(reference_executable.read_bytes()).hexdigest())
         try:
-            from python.spike_core.ngspice_plugin import _version
+            from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import _version
             reference_identity["version"] = _version(str(reference_executable))
         except ImportError as exc:
             reference_identity.update(version="unavailable", dependency_error=str(exc))

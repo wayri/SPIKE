@@ -1,0 +1,53 @@
+{
+  "contract": "spike/ibis-behavioral-request/v1",
+  "driver": {
+    "text": "| SPDX-License-Identifier: Apache-2.0\n| Original SPIKE synthetic arithmetic fixture; no vendor data.\n| A 50 ohm signed CMOS driver, zero driver die capacitance, two\n| distinct resistive fixtures. Not representative of a commercial device.\n[IBIS Ver] 8.0\n[File Name] original_cmos.ibs\n[File Rev] 1.0\n[Component] OriginalFixture\n[Manufacturer] SPIKE\n[Package]\nR_pkg 0.1 0.05 0.2\nL_pkg 1n 0.5n 2n\nC_pkg 0.5p 0.25p 1p\n[Pin] signal_name model_name R_pin L_pin C_pin\n1 TX OriginalDriver NA NA NA\n2 RX OriginalReceiver NA NA NA\n[Model] OriginalDriver\nModel_type 3-state\nPolarity Non-Inverting\nEnable Active-High\nC_comp 0 0 0\n[Voltage Range] 1 1 1\n[Pullup]\n-2 0.04 0.04 0.04\n0 0 0 0\n2 -0.04 -0.04 -0.04\n[Pulldown]\n-2 -0.04 -0.04 -0.04\n0 0 0 0\n2 0.04 0.04 0.04\n[GND Clamp]\n-2 0 0 0\n2 0 0 0\n[POWER Clamp]\n-2 0 0 0\n2 0 0 0\n[Rising Waveform]\nR_fixture 50\nV_fixture 0\nV_fixture_min 0\nV_fixture_max 0\n0 0 0 0\n1n 0 0 0\n2n 0.25 0.25 0.25\n3n 0.5 0.5 0.5\n4n 0.5 0.5 0.5\n[Rising Waveform]\nR_fixture 50\nV_fixture 1\nV_fixture_min 1\nV_fixture_max 1\n0 0.5 0.5 0.5\n1n 0.5 0.5 0.5\n2n 0.75 0.75 0.75\n3n 1 1 1\n4n 1 1 1\n[Falling Waveform]\nR_fixture 50\nV_fixture 0\nV_fixture_min 0\nV_fixture_max 0\n0 0.5 0.5 0.5\n1n 0.5 0.5 0.5\n2n 0.25 0.25 0.25\n3n 0 0 0\n4n 0 0 0\n[Falling Waveform]\nR_fixture 50\nV_fixture 1\nV_fixture_min 1\nV_fixture_max 1\n0 1 1 1\n1n 1 1 1\n2n 0.75 0.75 0.75\n3n 0.5 0.5 0.5\n4n 0.5 0.5 0.5\n[Model] OriginalReceiver\nModel_type Input\nC_comp 1p 0.5p 2p\nVinl 0.3\nVinh 0.7\n[Voltage Range] 1 1 1\n[GND Clamp]\n-2 0 0 0\n2 0 0 0\n[POWER Clamp]\n-2 0 0 0\n2 0 0 0\n[End]\n",
+    "name": "original_cmos.ibs",
+    "model": "OriginalDriver",
+    "component": "OriginalFixture",
+    "pin": "1",
+    "corner": "typ",
+    "capacitance_corner": "typ",
+    "package_corner": "typ"
+  },
+  "receiver": {
+    "text": "| SPDX-License-Identifier: Apache-2.0\n| Original SPIKE synthetic arithmetic fixture; no vendor data.\n| A 50 ohm signed CMOS driver, zero driver die capacitance, two\n| distinct resistive fixtures. Not representative of a commercial device.\n[IBIS Ver] 8.0\n[File Name] original_cmos.ibs\n[File Rev] 1.0\n[Component] OriginalFixture\n[Manufacturer] SPIKE\n[Package]\nR_pkg 0.1 0.05 0.2\nL_pkg 1n 0.5n 2n\nC_pkg 0.5p 0.25p 1p\n[Pin] signal_name model_name R_pin L_pin C_pin\n1 TX OriginalDriver NA NA NA\n2 RX OriginalReceiver NA NA NA\n[Model] OriginalDriver\nModel_type 3-state\nPolarity Non-Inverting\nEnable Active-High\nC_comp 0 0 0\n[Voltage Range] 1 1 1\n[Pullup]\n-2 0.04 0.04 0.04\n0 0 0 0\n2 -0.04 -0.04 -0.04\n[Pulldown]\n-2 -0.04 -0.04 -0.04\n0 0 0 0\n2 0.04 0.04 0.04\n[GND Clamp]\n-2 0 0 0\n2 0 0 0\n[POWER Clamp]\n-2 0 0 0\n2 0 0 0\n[Rising Waveform]\nR_fixture 50\nV_fixture 0\nV_fixture_min 0\nV_fixture_max 0\n0 0 0 0\n1n 0 0 0\n2n 0.25 0.25 0.25\n3n 0.5 0.5 0.5\n4n 0.5 0.5 0.5\n[Rising Waveform]\nR_fixture 50\nV_fixture 1\nV_fixture_min 1\nV_fixture_max 1\n0 0.5 0.5 0.5\n1n 0.5 0.5 0.5\n2n 0.75 0.75 0.75\n3n 1 1 1\n4n 1 1 1\n[Falling Waveform]\nR_fixture 50\nV_fixture 0\nV_fixture_min 0\nV_fixture_max 0\n0 0.5 0.5 0.5\n1n 0.5 0.5 0.5\n2n 0.25 0.25 0.25\n3n 0 0 0\n4n 0 0 0\n[Falling Waveform]\nR_fixture 50\nV_fixture 1\nV_fixture_min 1\nV_fixture_max 1\n0 1 1 1\n1n 1 1 1\n2n 0.75 0.75 0.75\n3n 0.5 0.5 0.5\n4n 0.5 0.5 0.5\n[Model] OriginalReceiver\nModel_type Input\nC_comp 1p 0.5p 2p\nVinl 0.3\nVinh 0.7\n[Voltage Range] 1 1 1\n[GND Clamp]\n-2 0 0 0\n2 0 0 0\n[POWER Clamp]\n-2 0 0 0\n2 0 0 0\n[End]\n",
+    "name": "original_cmos.ibs",
+    "model": "OriginalReceiver",
+    "component": "OriginalFixture",
+    "pin": "2",
+    "corner": "typ",
+    "capacitance_corner": "typ",
+    "package_corner": "typ"
+  },
+  "stimulus": {
+    "initial_state": "low",
+    "transitions": [
+      {
+        "time_s": 1e-09,
+        "state": "high",
+        "waveform_indices": [
+          0,
+          1
+        ]
+      },
+      {
+        "time_s": 7e-09,
+        "state": "low",
+        "waveform_indices": [
+          2,
+          3
+        ]
+      }
+    ]
+  },
+  "interconnect": {
+    "kind": "lossless_tline",
+    "impedance_ohm": 50,
+    "delay_s": 1e-09
+  },
+  "analysis": {
+    "time_step_s": 2e-11,
+    "stop_time_s": 1.5e-08
+  }
+}

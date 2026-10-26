@@ -58,7 +58,7 @@ def read_assembly_thermal_mesh_setup(params):
                   layer.get("layer_type") in ("copper", "dielectric", "soldermask", "solder_mask", "paste")
                   or layer.get("extensions", {}).get("spike.v1.stackup")]
         boards.append({"design_id": did, "name": design.get("name", did), "layers": layers})
-    from .assembly_thermal_components import thermal_component_inventory, PROVENANCE_KEY, MATERIALS_KEY
+    from .solvers.geometry_meshing.preparation.assembly_thermal_components import thermal_component_inventory, PROVENANCE_KEY, MATERIALS_KEY
     return {"assembly": assembly, "boards": boards,
             "parts": [part for part in assembly.get("parts", []) if part.get("model_id")
                       or part.get("part_type") != "subassembly"],
@@ -72,8 +72,8 @@ def read_assembly_thermal_mesh_setup(params):
 def promote_thermal_components_in_project(params, *, application_version=''):
     if not isinstance(params, dict) or set(params) != IDENTITY_KEYS | {'selections', 'materials'}:
         raise ProjectPackageError('Component promotion requires project identity, explicit selections and reviewed materials.')
-    from .assembly_field_handoff import bounded_json
-    from .assembly_thermal_components import promote_thermal_components
+    from .solvers.execution.coupling.assembly_field_handoff import bounded_json
+    from .solvers.geometry_meshing.preparation.assembly_thermal_components import promote_thermal_components
     from .service_project_assembly import _invalidate_saved_results
     bounded_json(params)
     path, opened = _open_current_project(params, 'promoting retained STEP components', include_members=True)
@@ -107,7 +107,7 @@ def run_assembly_thermal_mesh_in_project(params, *, application_version=None):
     path, opened = _open_current_project(params, "generating thermal volumes", include_members=True)
     payload = copy.deepcopy(opened.payload)
     payload["assembly_ir"], _ = _assembly_identity(payload.get("assembly_ir"))
-    from .assembly_thermal_meshing import run_assembly_thermal_mesh
+    from .solvers.geometry_meshing.preparation.assembly_thermal_meshing import run_assembly_thermal_mesh
     with tempfile.TemporaryDirectory(prefix="spike-thermal-mesh-") as directory:
         result = run_assembly_thermal_mesh(payload, params["assignments"], params["mesh_options"],
                                           Path(directory) / "volumes", artifact_reader=_artifact_reader(path, opened))

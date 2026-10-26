@@ -34,7 +34,7 @@
         "sha256": "6f82811d161e9b2eb87f0b9d79d236dffcea0caa323c421b8ae793d8b494d54a"
       },
       {
-        "path": "python/spike_core/pdn_dielectric_ac.py",
+        "path": "python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_ac.py",
         "sha256": "06be9774d53d488a8ca7ee850c9b06c4903908f7fa4be9c2add00b860480af83"
       }
     ]

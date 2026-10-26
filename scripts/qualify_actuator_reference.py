@@ -12,7 +12,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
-from python.spike_core.actuator_force_map import CONTRACT, analyze_force_map
+from python.spike_core.solvers.electromagnetics.machines.actuator_force_map import CONTRACT, analyze_force_map
 
 
 def qualification_report():

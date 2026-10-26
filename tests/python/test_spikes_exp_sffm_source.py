@@ -9,7 +9,7 @@ from python.spikes.contracts import CircuitProject, ProbeDescriptor
 from python.spikes.native_runner import run_native_project
 from python.spikes.netlist import NetlistParseError, parse_netlist
 from python.spikes.runner import native_request, run_project
-from python.spike_core.native_mna import validate_native_mna_request
+from python.spike_core.solvers.circuits.models.native_mna import validate_native_mna_request
 
 
 ROOT = Path(__file__).resolve().parents[2]

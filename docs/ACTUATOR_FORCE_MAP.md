@@ -8,7 +8,7 @@ It is **not** an actuator field solver, motion integrator or production qualific
 No private native implementation is imported by this public module.
 
 ```powershell
-build/qualification-py311/Scripts/python.exe -m python.spike_core.actuator_force_map --request examples/actuator/voice-coil-force-map.json --result build/voice-coil-review.json
+build/qualification-py311/Scripts/python.exe -m python.spike_core.solvers.electromagnetics.machines.actuator_force_map --request examples/actuator/voice-coil-force-map.json --result build/voice-coil-review.json
 ```
 
 Other original examples are `examples/actuator/reluctance-force-map.json` and

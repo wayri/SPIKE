@@ -34,7 +34,7 @@
         "sha256": "e1aabd46b2e3970e9835425bade52df09053e6f5d7e1e5a0eb15a3c594c8d044"
       },
       {
-        "path": "python/spike_core/rlgc_line_fields.py",
+        "path": "python/spike_core/solvers/signal_integrity/lines/rlgc_line_fields.py",
         "sha256": "3724afa64878190ad6a3af6e260a5ad02a3f978a91d1fa39ab3be6201c587257"
       }
     ]

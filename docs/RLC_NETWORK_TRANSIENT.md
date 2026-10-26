@@ -14,7 +14,7 @@ states, measured broadband qualification and thermal integration remain open.
 ## Workflow and contract
 
 Call `run_rlc_network_transient(request)` from
-`python.spike_core.sparameter_rlc_terminated`, or invoke the same worker method
+`python.spike_core.solvers.signal_integrity.networks.sparameter_rlc_terminated`, or invoke the same worker method
 with exactly `params: {request: ...}`. The desktop script workspace can use this
 API; no dedicated boundary editor is added. Execute the original example:
 

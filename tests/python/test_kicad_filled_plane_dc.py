@@ -6,11 +6,8 @@ from pathlib import Path
 
 from python.spike_core.contracts import AnalysisSpec
 from python.spike_core.kicad_importer import import_kicad_design
-from python.spike_core.filled_copper_path import FilledCopperPath
-from python.spike_core.hybrid_mesh import (
-    _normalize_filled_zone_polygon, _polygon_area,
-    _polygon_is_contained_in, _segment_inside_polygon, build_hybrid_mesh,
-)
+from python.spike_core.solvers.power_integrity.dc.filled_copper_path import FilledCopperPath
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _normalize_filled_zone_polygon, _polygon_area, _polygon_is_contained_in, _segment_inside_polygon, build_hybrid_mesh
 from python.spike_core.solver_plugins import default_solver_registry
 
 

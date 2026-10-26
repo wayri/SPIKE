@@ -2,7 +2,7 @@
 // Copyright (c) 2026 SigHarmonic
 // Original switched-state equations and synthetic data; no external code used.
 // Behavioral synchronous PWM buck, NOT a qualified transistor/SPICE compact model.
-#include "spikes/transient_session.hpp"
+#include "solvers/circuits/spikes/transient_session.hpp"
 
 #include <algorithm>
 #include <array>

@@ -18,6 +18,7 @@ export type SpiceModel = {
   source?: string;
   parameters?: Record<string, unknown>;
   origin: "built_in" | "project" | "imported";
+  import_provenance?: { source_name: string; source_sha256: string; normalized_source_sha256: string; target_symbol: string; required_engine: string; source_locator?: string; license_note?: string; [key: string]: unknown };
 };
 export type SpicePinBinding = {
   model_pin: string;

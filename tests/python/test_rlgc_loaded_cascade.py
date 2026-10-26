@@ -8,7 +8,7 @@ import numpy as np
 from scipy.linalg import expm
 from numpy.polynomial.legendre import leggauss
 from examples.rlgc_loaded_cascade.run_loaded import request
-from python.spike_core import rlgc_loaded_cascade as loaded
+from python.spike_core.solvers.signal_integrity.lines import rlgc_loaded_cascade as loaded
 from tests.python.test_rlgc_coupled_cascade import physical_oracle as wave_oracle, value
 
 

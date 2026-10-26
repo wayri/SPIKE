@@ -3,11 +3,8 @@ import unittest
 import numpy as np
 
 from python.spike_core.contracts import AnalysisSpec
-from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
-from python.spike_core.loop_parasitics import (
-    extract_loop_parasitics,
-    solve_coupled_path_currents,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshBranch, MeshNode
+from python.spike_core.solvers.power_integrity.peec.loop_parasitics import extract_loop_parasitics, solve_coupled_path_currents
 
 
 def branch(identifier, node_p, node_n, y_mm, net):

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Standalone ABI regression; link against the rebuilt spikes_c_api library.
-#include "spikes/c_api.h"
+#include "solvers/circuits/spikes/c_api.h"
 #include <cmath>
 #include <iostream>
 #include <stdexcept>

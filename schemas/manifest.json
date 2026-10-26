@@ -1,6 +1,10 @@
 {
   "contract": "spike/schema-catalog/v1",
   "schemas": {
+    "spike/emerge-cosimulation-prepare-parameters/v1": "emerge-cosimulation-prepare-parameters-v1.schema.json",
+    "spike/em-network-ac-request/v1": "em-network-ac-request-v1.schema.json",
+    "spike/em-network-resistor-thermal-request/v1": "em-network-resistor-thermal-request-v1.schema.json",
+    "spike/em-network-resistor-cht-request/v1": "em-network-resistor-cht-request-v1.schema.json",
     "spike/rlgc-reactive-pair-request/v1": "rlgc-reactive-pair-request-v1.schema.json",
     "spike/rlgc-reactive-pair-result/v1": "rlgc-reactive-pair-result-v1.schema.json",
     "spike/rlgc-terminated-pair-request/v1": "rlgc-terminated-pair-request-v1.schema.json",
@@ -147,6 +151,14 @@
     "spike/rlgc-loaded-star-request/v1": "rlgc-loaded-star-request-v1.schema.json",
     "spike/rlgc-loaded-star-result/v1": "rlgc-loaded-star-result-v1.schema.json",
     "spike/part-limits/v1": "part-limits-v1.schema.json",
-    "spike/part-limit-report/v1": "part-limit-report-v1.schema.json"
+    "spike/part-limit-report/v1": "part-limit-report-v1.schema.json",
+    "spike/em-spice-coupling-request/v1": "em-spice-coupling-request-v1.schema.json",
+    "spike/em-body-heating-request/v1": "em-body-heating-request-v1.schema.json",
+    "spike/si-ami-package-request/v1": "si-ami-package-request-v1.schema.json",
+    "spike/si-pam3-request/v1": "si-pam3-request-v1.schema.json",
+    "spike/si-ami-execution-request/v1": "si-ami-execution-request-v1.schema.json",
+    "spike/si-material-scenario-request/v1": "si-material-scenario-request-v1.schema.json",
+    "spike/multiport-deembedding-request/v1": "multiport-deembedding-request-v1.schema.json",
+    "spike/multiport-deembedding-result/v1": "multiport-deembedding-result-v1.schema.json"
   }
 }

@@ -8,7 +8,7 @@ import numpy as np
 from scipy.linalg import expm
 from numpy.polynomial.legendre import leggauss
 from examples.rlgc_coupled_cascade.run_cascade import request
-from python.spike_core import rlgc_coupled_cascade as cascade
+from python.spike_core.solvers.signal_integrity.lines import rlgc_coupled_cascade as cascade
 
 
 def value(v):
@@ -101,7 +101,7 @@ class CoupledCascadeTests(unittest.TestCase):
                 self.assertAlmostEqual(x["power_balance"][key], y["power_balance"][key], delta=2e-12)
 
     def test_uncoupled_scalar_cascade_reduction(self):
-        from python.spike_core.rlgc_line_cascade import run_rlgc_line_cascade
+        from python.spike_core.solvers.signal_integrity.lines.rlgc_line_cascade import run_rlgc_line_cascade
         raw = request()
         for section in raw["sections"]: section["pair"]["modes"]["odd"] = deepcopy(section["pair"]["modes"]["even"])
         out = cascade.run_rlgc_coupled_cascade(raw)

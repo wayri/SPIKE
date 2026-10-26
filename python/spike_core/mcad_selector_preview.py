@@ -15,7 +15,7 @@ from typing import Any, Dict, Mapping, Sequence
 from .assembly_package_shapes import MAX_PREVIEW_SELECTORS, PACKAGE_SHAPE_SELECTOR_PREVIEW_V1, selector_inventory_sha256
 from .mcad_importer import McadImportError, validate_visual_mcad_artifact
 from .mcad_tessellation import _freecad_path
-from .sparselizard_process import SparseLizardAdapterError, run_adapter_process
+from .solvers.external_engines.sparselizard.sparselizard_process import SparseLizardAdapterError, run_adapter_process
 
 
 class McadSelectorPreviewError(RuntimeError):

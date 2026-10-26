@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from python import spike_peec_native
 from python.spike_core.contracts import AnalysisSpec
-from python.spike_core.peec_plugin import solve_peec_2_5d
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import solve_peec_2_5d
 
 
 SOURCES = {

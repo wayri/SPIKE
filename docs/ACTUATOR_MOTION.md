@@ -5,7 +5,7 @@
 The [request schema](../schemas/actuator-motion-v1.schema.json) defines the
 public shape. Runtime checks add finite arithmetic, uniqueness and stroke bounds.
 
-`python/spike_core/actuator_motion.py` executes a bounded one-dimensional
+`python/spike_core/solvers/electromagnetics/machines/actuator_motion.py` executes a bounded one-dimensional
 mechanical response from an admitted `spike/actuator-force-map/v1` request. It
 is useful for reproducible early-stage travel and energy studies. It is not a
 field solver, circuit solver, contact model, controller, or production-qualified
@@ -14,7 +14,7 @@ actuator simulation.
 Run a request with:
 
 ```powershell
-build/qualification-py311/Scripts/python.exe -m python.spike_core.actuator_motion --request examples/actuator/voice-coil-motion.json --result build/voice-coil-motion-result.json
+build/qualification-py311/Scripts/python.exe -m python.spike_core.solvers.electromagnetics.machines.actuator_motion --request examples/actuator/voice-coil-motion.json --result build/voice-coil-motion-result.json
 ```
 
 The `spike/actuator-motion/v1` request contains exactly these fields:

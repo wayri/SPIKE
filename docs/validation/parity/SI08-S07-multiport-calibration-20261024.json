@@ -1,0 +1,77 @@
+{
+  "contract": "spike/multiport-calibration-evidence/v1",
+  "stage_id": "SI08-S07",
+  "status": "passed",
+  "stage_complete": true,
+  "workflow": "offline_reference",
+  "family_complete": false,
+  "production_qualified": false,
+  "measurement_qualified": false,
+  "linearization_qualified": false,
+  "sources_before": {
+    "python/spike_core/multiport_calibration.py": "3ecc00321c4151950d96f6fdfd8bd94390afafd4f3b85beded75c14d310c98e1",
+    "python/spike_core/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "examples/multiport_calibration/run_calibration.py": "427490774fe550e20ce71641a5d61f32eb53cf42cd0a385b3e034e652d05dc49",
+    "tests/python/test_multiport_calibration.py": "77e9d911698b5a9cc35e7a73d1ddb332144b95fdb0321c0a8be9bcc7000d6271",
+    "tests/python/test_multiport_calibration_oracles.py": "34a5f3a89284e9c3361228daa448664c6ac8998f3b8f91b5d4fedfeb10fc19ed",
+    "scripts/verify_multiport_calibration.py": "0d476ebafa1bbb646ad186cac8f55de900d19b60d93256da0e653a1b5289ef98",
+    "scripts/verify_one_port_calibration.py": "169c87fbb94dbaf71f338769e7bff76f4833c925c7e70b2a7266a7d43ce6e3e8",
+    "tests/python/test_multiport_calibration_evidence.py": "91642fb384afbade745e3e97155852b6afb117ecd6c551a59a02f5c98cce67d8",
+    "docs/MULTIPORT_CALIBRATION.md": "d07829590f68fb46db5ab00f161bd645e39d9978ffd6306dc891834781ed5896",
+    "docs/validation/MULTIPORT_CALIBRATION_DERIVATION_20261024.md": "1f074b9dac59448367d65795499b529bf64983a06dfa20397a1f5e984c96d83d"
+  },
+  "sources_after": {
+    "python/spike_core/multiport_calibration.py": "3ecc00321c4151950d96f6fdfd8bd94390afafd4f3b85beded75c14d310c98e1",
+    "python/spike_core/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "examples/multiport_calibration/run_calibration.py": "427490774fe550e20ce71641a5d61f32eb53cf42cd0a385b3e034e652d05dc49",
+    "tests/python/test_multiport_calibration.py": "77e9d911698b5a9cc35e7a73d1ddb332144b95fdb0321c0a8be9bcc7000d6271",
+    "tests/python/test_multiport_calibration_oracles.py": "34a5f3a89284e9c3361228daa448664c6ac8998f3b8f91b5d4fedfeb10fc19ed",
+    "scripts/verify_multiport_calibration.py": "0d476ebafa1bbb646ad186cac8f55de900d19b60d93256da0e653a1b5289ef98",
+    "scripts/verify_one_port_calibration.py": "169c87fbb94dbaf71f338769e7bff76f4833c925c7e70b2a7266a7d43ce6e3e8",
+    "tests/python/test_multiport_calibration_evidence.py": "91642fb384afbade745e3e97155852b6afb117ecd6c551a59a02f5c98cce67d8",
+    "docs/MULTIPORT_CALIBRATION.md": "d07829590f68fb46db5ab00f161bd645e39d9978ffd6306dc891834781ed5896",
+    "docs/validation/MULTIPORT_CALIBRATION_DERIVATION_20261024.md": "1f074b9dac59448367d65795499b529bf64983a06dfa20397a1f5e984c96d83d"
+  },
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.2.6"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_actual_example_cli_preserves_existing_capture",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_atomic_late_unidentifiable_path_rejection",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_cancel_resource_and_callback_failures",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_error_box_interoperates_with_supplied_fixture_removal",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_example_recovery_and_all_source_arrays_are_independent",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_rank_deficient_covariance_and_diagnostic_only_redundant_data",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_rejects_indefinite_and_nonsymmetric_covariance",
+      "tests.python.test_multiport_calibration.MultiportCalibrationContractTests.test_strict_shapes_identities_wave_basis_and_covariance_basis",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_all_coordinates_and_dense_joint_covariance",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_coincident_standards_or_collapsed_tracking_at_last_frequency",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_coupling_feedback_and_dut_inverse_poles_at_last_frequency",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_gauge_scaling_and_reference_changes",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_missing_reference_paths_and_zero_gains",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_near_poles_cannot_hide_behind_small_condition_number",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_port_permutation_reorders_full_covariance",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_redundant_measurements_remain_diagnostic_only",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_source_snapshot_and_result_ownership",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_symmetric_nonlinear_small_noise_refinement",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_two_three_four_port_truth_and_independent_waves",
+      "tests.python.test_multiport_calibration_oracles.IndependentMultiportCalibrationTests.test_zero_and_rank_one_covariance"
+    ],
+    "run": 20,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": {
+    "path": "docs/validation/parity/SI08-S07-multiport-calibration-20261024.log",
+    "sha256": "0e787527388b59b9bb07f5df53f2eb7d7ce4009865aad1df4c9e9715c5ac96e5"
+  },
+  "capture": {
+    "path": "docs/validation/parity/SI08-S07-multiport-calibration-capture-20261024.json",
+    "sha256": "7afa570f0bc49dd228c1cec1bb73ba58523818d977dfde0ef449b6e09aae24d0"
+  }
+}

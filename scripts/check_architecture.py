@@ -91,8 +91,8 @@ LEGACY_LARGE_MODULES = {
     "app/src/BoardViewport.tsx",
     "app/src/LayoutViewport.tsx",
     "python/spike_core/cli.py",
-    "python/spike_core/hybrid_mesh.py",
-    "python/spike_core/transient_peec.py",
+    "python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py",
+    "python/spike_core/solvers/power_integrity/peec/transient_peec.py",
 }
 MAX_NEW_MODULE_LINES = 800
 

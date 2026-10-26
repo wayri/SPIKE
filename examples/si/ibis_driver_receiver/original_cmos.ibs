@@ -1,0 +1,89 @@
+| SPDX-License-Identifier: Apache-2.0
+| Original SPIKE synthetic arithmetic fixture; no vendor data.
+| A 50 ohm signed CMOS driver, zero driver die capacitance, two
+| distinct resistive fixtures. Not representative of a commercial device.
+[IBIS Ver] 8.0
+[File Name] original_cmos.ibs
+[File Rev] 1.0
+[Component] OriginalFixture
+[Manufacturer] SPIKE
+[Package]
+R_pkg 0.1 0.05 0.2
+L_pkg 1n 0.5n 2n
+C_pkg 0.5p 0.25p 1p
+[Pin] signal_name model_name R_pin L_pin C_pin
+1 TX OriginalDriver NA NA NA
+2 RX OriginalReceiver NA NA NA
+[Model] OriginalDriver
+Model_type 3-state
+Polarity Non-Inverting
+Enable Active-High
+C_comp 0 0 0
+[Voltage Range] 1 1 1
+[Pullup]
+-2 0.04 0.04 0.04
+0 0 0 0
+2 -0.04 -0.04 -0.04
+[Pulldown]
+-2 -0.04 -0.04 -0.04
+0 0 0 0
+2 0.04 0.04 0.04
+[GND Clamp]
+-2 0 0 0
+2 0 0 0
+[POWER Clamp]
+-2 0 0 0
+2 0 0 0
+[Rising Waveform]
+R_fixture 50
+V_fixture 0
+V_fixture_min 0
+V_fixture_max 0
+0 0 0 0
+1n 0 0 0
+2n 0.25 0.25 0.25
+3n 0.5 0.5 0.5
+4n 0.5 0.5 0.5
+[Rising Waveform]
+R_fixture 50
+V_fixture 1
+V_fixture_min 1
+V_fixture_max 1
+0 0.5 0.5 0.5
+1n 0.5 0.5 0.5
+2n 0.75 0.75 0.75
+3n 1 1 1
+4n 1 1 1
+[Falling Waveform]
+R_fixture 50
+V_fixture 0
+V_fixture_min 0
+V_fixture_max 0
+0 0.5 0.5 0.5
+1n 0.5 0.5 0.5
+2n 0.25 0.25 0.25
+3n 0 0 0
+4n 0 0 0
+[Falling Waveform]
+R_fixture 50
+V_fixture 1
+V_fixture_min 1
+V_fixture_max 1
+0 1 1 1
+1n 1 1 1
+2n 0.75 0.75 0.75
+3n 0.5 0.5 0.5
+4n 0.5 0.5 0.5
+[Model] OriginalReceiver
+Model_type Input
+C_comp 1p 0.5p 2p
+Vinl 0.3
+Vinh 0.7
+[Voltage Range] 1 1 1
+[GND Clamp]
+-2 0 0 0
+2 0 0 0
+[POWER Clamp]
+-2 0 0 0
+2 0 0 0
+[End]

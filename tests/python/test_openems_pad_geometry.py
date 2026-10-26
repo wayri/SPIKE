@@ -5,9 +5,9 @@ import ast
 import math
 import unittest
 
-from python.spike_core.openems_adapter_source import OPENEMS_DRIVER, pad_polygon
-from python.spike_core.openems_geometry_admission import screen_geometry
-from python.spike_core.openems_validation import _conductor_hits
+from python.spike_core.solvers.external_engines.openems.openems_adapter_source import OPENEMS_DRIVER, pad_polygon
+from python.spike_core.solvers.external_engines.openems.openems_geometry_admission import screen_geometry
+from python.spike_core.solvers.external_engines.openems.openems_validation import _conductor_hits
 from tests.python.test_openems_far_field import far_field_design, far_field_spec
 
 

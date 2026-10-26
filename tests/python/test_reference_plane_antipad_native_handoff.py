@@ -7,15 +7,9 @@ from pathlib import Path
 
 from jsonschema import Draft202012Validator, ValidationError
 
-from python.spike_core.reference_plane_antipad_geometry import build_reference_plane_antipad_geometry
-from python.spike_core.reference_plane_antipad_mesh import (
-    ReferencePlaneAntipadMeshError,
-    build_reference_plane_antipad_mesh,
-)
-from python.spike_core.reference_plane_antipad_native_handoff import (
-    ReferencePlaneAntipadNativeHandoffError,
-    build_native_reference_plane_antipad_handoff,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_geometry import build_reference_plane_antipad_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_mesh import ReferencePlaneAntipadMeshError, build_reference_plane_antipad_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_native_handoff import ReferencePlaneAntipadNativeHandoffError, build_native_reference_plane_antipad_handoff
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -73,7 +67,7 @@ class ReferencePlaneAntipadNativeHandoffTests(unittest.TestCase):
                 self.validator.validate(promoted)
 
     def test_missing_native_symbol_fails_closed(self) -> None:
-        import python.spike_core.reference_plane_antipad_native_handoff as module
+        import python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_native_handoff as module
 
         original = module._native
         module._native = lambda: object()

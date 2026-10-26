@@ -15,7 +15,7 @@ def admit_extension_mesh(raw: object, binding: dict, *, extension_id: str) -> di
     if not isinstance(raw, dict) or not isinstance(raw.get("contract"), str) or raw["contract"] not in MESH_CONTRACTS:
         raise ValueError("Unsupported extension mesh contract.")
     if raw["contract"] == "spike/gmsh-mesh/v1":
-        from .gmsh_extension_mesh import admit_gmsh_mesh
+        from .solvers.geometry_meshing.preparation.gmsh_extension_mesh import admit_gmsh_mesh
         return admit_gmsh_mesh(raw, binding, extension_id=extension_id)
     if raw.get("status") != "completed" or raw.get("solved") is not False or raw.get("units") != "mm":
         raise ValueError("External mesh must be completed, unsolved and in millimetres.")

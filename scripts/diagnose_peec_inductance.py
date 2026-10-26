@@ -14,10 +14,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import numpy as np
 from python.spike_core.contracts import AnalysisSpec
-from python.spike_core.hybrid_mesh import build_hybrid_mesh, TOPOLOGY_ONLY_BRANCH_KINDS
-from python.spike_core.peec_plugin import _make_native_solver, native
-from python.spike_core.peec_network import dense
-from python.spike_core.peec_volume_adapter import extract_volume_matrices
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh, TOPOLOGY_ONLY_BRANCH_KINDS
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import _make_native_solver, native
+from python.spike_core.solvers.power_integrity.peec.peec_network import dense
+from python.spike_core.solvers.power_integrity.peec.peec_volume_adapter import extract_volume_matrices
 from python.spike_core.service import _design_from_kicad
 
 

@@ -13,10 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.beta_runtime_readiness import (  # noqa: E402
-    BetaReadinessError,
-    build_readiness_report,
-)
+from python.spike_core.beta_runtime_readiness import BetaReadinessError, build_readiness_report
 from python.spikes.version import ENGINE_VERSION  # noqa: E402
 
 

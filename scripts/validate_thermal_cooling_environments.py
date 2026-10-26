@@ -20,17 +20,14 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.assembly_tetra_thermal import run_assembly_tetra_thermal
-from python.spike_core.assembly_tetra_thermal_validation import validate_request
-from python.spike_core.calculix_deck import compile_calculix_deck
-from python.spike_core.calculix_runtime import probe_calculix_runtime, run_calculix_deck
-from python.spike_core.openfoam_fan_fixture import build_fan_heated_fixture
-from python.spike_core.openfoam_flow_energy_validation import read_numeric_history, validate_flow_energy
-from python.spike_core.openfoam_multiregion_execution import (
-    load_verified_runnable_case,
-    run_multiregion_case,
-)
-from python.spike_core.openfoam_runtime import detect_openfoam_runtime
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal import run_assembly_tetra_thermal
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation import validate_request
+from python.spike_core.solvers.external_engines.calculix.calculix_deck import compile_calculix_deck
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime, run_calculix_deck
+from python.spike_core.solvers.external_engines.openfoam.openfoam_fan_fixture import build_fan_heated_fixture
+from python.spike_core.solvers.external_engines.openfoam.openfoam_flow_energy_validation import read_numeric_history, validate_flow_energy
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import load_verified_runnable_case, run_multiregion_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_runtime import detect_openfoam_runtime
 from tests.python.test_assembly_tetra_radiation import slab
 from tests.python.test_assembly_tetra_thermal import contact_request
 
@@ -277,12 +274,12 @@ def run_openfoam_cht(artifacts: str | Path) -> dict[str, Any]:
 def _source_identity() -> dict[str, str]:
     paths = [
         Path(__file__),
-        ROOT / "python/spike_core/assembly_tetra_thermal.py",
-        ROOT / "python/spike_core/calculix_deck.py",
-        ROOT / "python/spike_core/calculix_runtime.py",
-        ROOT / "python/spike_core/openfoam_fan_fixture.py",
-        ROOT / "python/spike_core/openfoam_flow_energy_validation.py",
-        ROOT / "python/spike_core/openfoam_multiregion_execution.py",
+        ROOT / "python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_thermal.py",
+        ROOT / "python/spike_core/solvers/external_engines/calculix/calculix_deck.py",
+        ROOT / "python/spike_core/solvers/external_engines/calculix/calculix_runtime.py",
+        ROOT / "python/spike_core/solvers/external_engines/openfoam/openfoam_fan_fixture.py",
+        ROOT / "python/spike_core/solvers/external_engines/openfoam/openfoam_flow_energy_validation.py",
+        ROOT / "python/spike_core/solvers/external_engines/openfoam/openfoam_multiregion_execution.py",
         ROOT / "tests/python/test_assembly_tetra_radiation.py",
         ROOT / "tests/python/test_assembly_tetra_thermal.py",
     ]

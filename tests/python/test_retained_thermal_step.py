@@ -7,9 +7,9 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_tetra_thermal_validation import AssemblyTetraThermalError
-from python.spike_core.retained_thermal_step import prepare_retained_thermal_step
-from python.spike_core import retained_thermal_step
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation import AssemblyTetraThermalError
+from python.spike_core.solvers.thermal_fluid.heat.retained_thermal_step import prepare_retained_thermal_step
+from python.spike_core.solvers.thermal_fluid.heat import retained_thermal_step
 from tests.python.test_assembly_tetra_thermal import boundary, contact_request, request
 
 

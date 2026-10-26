@@ -8,12 +8,8 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_tetra_transient import (
-    AssemblyTetraThermalError, run_assembly_tetra_transient,
-)
-from python.spike_core.assembly_field_transient import (
-    run_assembly_field_transient, validate_field_transient_settings, verify_assembly_field_transient_result,
-)
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient import AssemblyTetraThermalError, run_assembly_tetra_transient
+from python.spike_core.solvers.execution.coupling.assembly_field_transient import run_assembly_field_transient, validate_field_transient_settings, verify_assembly_field_transient_result
 from python.spike_core.multiboard_identity import canonical_json_digest
 from tests.python.test_assembly_tetra_thermal import cube, request, contact_request, boundary, exterior
 from tests.python.test_assembly_field_handoff import fixture
@@ -160,13 +156,13 @@ class AssemblyTetraTransientTests(unittest.TestCase):
         for change in changes:
             setup = settings()
             change(setup)
-            with self.subTest(change=change), patch('python.spike_core.assembly_tetra_transient._assemble') as assembly:
+            with self.subTest(change=change), patch('python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient._assemble') as assembly:
                 with self.assertRaises(AssemblyTetraThermalError):
                     run_assembly_tetra_transient(insulated(), setup)
                 assembly.assert_not_called()
         with self.assertRaisesRegex(AssemblyTetraThermalError, 'fixed boundary'):
             run_assembly_tetra_transient(one_dof(), settings(initial=301))
-        with patch('python.spike_core.assembly_tetra_transient.MAX_FRAME_VALUES', 10):
+        with patch('python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient.MAX_FRAME_VALUES', 10):
             with self.assertRaisesRegex(AssemblyTetraThermalError, 'memory budget'):
                 run_assembly_tetra_transient(insulated(), settings())
 
@@ -178,7 +174,7 @@ class AssemblyTetraTransientTests(unittest.TestCase):
             run_assembly_tetra_transient(insulated(), settings(), progress_callback=frames.append,
                                           cancel_check=lambda: len(frames) >= 2)
         self.assertEqual(len(frames), 2)
-        with patch('python.spike_core.assembly_tetra_transient.cg', return_value=(np.zeros(8), 1)):
+        with patch('python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient.cg', return_value=(np.zeros(8), 1)):
             with self.assertRaisesRegex(AssemblyTetraThermalError, 'CG did not converge'):
                 run_assembly_tetra_transient(insulated(), settings())
 

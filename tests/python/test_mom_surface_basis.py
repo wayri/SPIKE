@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.mom_surface_basis import build_surface_basis, divergence, evaluate, SurfaceBasisError
+from python.spike_core.solvers.electromagnetics.fields.mom_surface_basis import build_surface_basis, divergence, evaluate, SurfaceBasisError
 
 
 POINTS = [[0., 0., 0.], [1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]

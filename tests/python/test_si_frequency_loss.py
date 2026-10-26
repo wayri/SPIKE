@@ -6,10 +6,10 @@ import unittest
 import numpy as np
 from jsonschema import Draft202012Validator
 from tests.python import test_si_channel as fixture_module
-from python.spike_core.si_channel import extract_uniform_path_rlgc, uniform_rlgc_network, SiChannelError
-from python.spike_core.si_coupled_channel import extract_coupled_path_rlgc, multiconductor_rlgc_network
-from python.spike_core.si_frequency_loss import validate_loss_model, trace_impedance
-from python.spike_core.ac_power_integrity import analyze_ac_power_integrity
+from python.spike_core.solvers.signal_integrity.channels.si_channel import extract_uniform_path_rlgc, uniform_rlgc_network, SiChannelError
+from python.spike_core.solvers.signal_integrity.channels.si_coupled_channel import extract_coupled_path_rlgc, multiconductor_rlgc_network
+from python.spike_core.solvers.signal_integrity.channels.si_frequency_loss import validate_loss_model, trace_impedance
+from python.spike_core.solvers.power_integrity.peec.ac_power_integrity import analyze_ac_power_integrity
 
 class FrequencyLossTests(unittest.TestCase):
     def setUp(self):

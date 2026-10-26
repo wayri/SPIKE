@@ -8,16 +8,12 @@ from dataclasses import replace
 from typing import Any, Mapping
 
 try:
-    from python.spike_core.native_mna import (
-        REQUEST_CONTRACT as NATIVE_REQUEST_CONTRACT,
-        run_native_mna,
-        validate_native_mna_request,
-    )
+    from python.spike_core.solvers.circuits.models.native_mna import REQUEST_CONTRACT as NATIVE_REQUEST_CONTRACT, run_native_mna, validate_native_mna_request
 except ModuleNotFoundError as exc:
     if exc.name != "python":
         raise
     # Installed/PYTHONPATH layouts expose both packages at top level.
-    from spike_core.native_mna import (  # type: ignore[no-redef]
+    from spike_core.solvers.circuits.models.native_mna import (  # type: ignore[no-redef]
         REQUEST_CONTRACT as NATIVE_REQUEST_CONTRACT,
         run_native_mna,
         validate_native_mna_request,
@@ -404,7 +400,7 @@ def run_project(project: CircuitProject) -> CircuitResult:
                 "source_sha256": project.source_sha256,
                 "hierarchy": _hierarchy_metadata(project),
                 "transient_engine": {
-                    "implementation": "python.spike_core.native_mna",
+                    "implementation": "python.spike_core.solvers.circuits.models.native_mna",
                     "integration": "fixed_step_backward_euler",
                     "owned_cpp_transient": False,
                 },

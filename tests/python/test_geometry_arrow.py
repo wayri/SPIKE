@@ -4,11 +4,7 @@ import pyarrow as pa
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.geometry_arrow import (
-    GEOMETRY_ARROW_CONTRACT_V1, GEOMETRY_ARROW_CONTRACT_V2, GEOMETRY_ARROW_CONTRACT_V3,
-    GEOMETRY_ARROW_CONTRACT_V4, GeometryArrowError,
-    build_geometry_arrow, canonical_geometry_rows, geometry_arrow_contract, validate_geometry_arrow,
-)
+from python.spike_core.geometry_arrow import GEOMETRY_ARROW_CONTRACT_V1, GEOMETRY_ARROW_CONTRACT_V2, GEOMETRY_ARROW_CONTRACT_V3, GEOMETRY_ARROW_CONTRACT_V4, GeometryArrowError, build_geometry_arrow, canonical_geometry_rows, geometry_arrow_contract, validate_geometry_arrow
 
 
 def fixture(*, reverse: bool = False, path: bool = False) -> SpiDeRV2:

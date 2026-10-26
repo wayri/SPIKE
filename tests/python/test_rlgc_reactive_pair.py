@@ -8,7 +8,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from examples.rlgc_reactive_pair.run_pair import request
-from python.spike_core import rlgc_reactive_pair as reactive
+from python.spike_core.solvers.signal_integrity.lines import rlgc_reactive_pair as reactive
 
 
 def value(z):

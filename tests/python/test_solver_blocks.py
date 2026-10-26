@@ -9,9 +9,7 @@ from copy import deepcopy
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.solver_blocks import (
-    BLOCKS, handle_solver_blocks, solver_blocks_catalog, validate_graph,
-)
+from python.spike_core.solver_blocks import BLOCKS, handle_solver_blocks, solver_blocks_catalog, validate_graph
 
 
 class SolverBlockTests(unittest.TestCase):

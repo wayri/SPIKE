@@ -11,10 +11,10 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core.assembly_electrothermal import run_assembly_electrothermal
-from python.spike_core.assembly_electrothermal_setup import prepare_electrothermal
-from python.spike_core.calculix_runtime import probe_calculix_runtime, run_calculix_deck
-from python.spike_core.calculix_thermal import verify_calculix_thermal_result
+from python.spike_core.solvers.thermal_fluid.electrothermal.assembly_electrothermal import run_assembly_electrothermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.assembly_electrothermal_setup import prepare_electrothermal
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime, run_calculix_deck
+from python.spike_core.solvers.external_engines.calculix.calculix_thermal import verify_calculix_thermal_result
 from python.spike_core.multiboard_identity import canonical_json_digest
 from tests.python.test_assembly_electrothermal import request
 
@@ -34,7 +34,7 @@ class ThermalEngineAdmissionTests(unittest.TestCase):
                         {'thermal_engine':'calculix','thermal_engine_options':{'threads':True}}):
             raw = request()
             raw.update(changes)
-            with self.subTest(changes=changes), patch('python.spike_core.assembly_tetra_electrical.solve_assembly_tetra_electrical') as electrical:
+            with self.subTest(changes=changes), patch('python.spike_core.solvers.power_integrity.dc.assembly_tetra_electrical.solve_assembly_tetra_electrical') as electrical:
                 with self.assertRaises(ValueError):
                     run_assembly_electrothermal(raw)
                 electrical.assert_not_called()
@@ -43,7 +43,7 @@ class ThermalEngineAdmissionTests(unittest.TestCase):
         for key,value in [('thermal_resistance_k_per_w',.5),('contact_area_mm2',2e6),('endpoint_a','missing')]:
             raw = request()
             raw['geometry']['assembly']['thermal_contacts'][0][key] = value
-            with self.subTest(key=key),patch('python.spike_core.assembly_tetra_electrical.solve_assembly_tetra_electrical') as electrical:
+            with self.subTest(key=key),patch('python.spike_core.solvers.power_integrity.dc.assembly_tetra_electrical.solve_assembly_tetra_electrical') as electrical:
                 with self.assertRaises(ValueError):
                     run_assembly_electrothermal(raw)
                 electrical.assert_not_called()

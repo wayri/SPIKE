@@ -8,7 +8,7 @@ causality, broadband fitting or time-domain qualification.
 ## Workflow
 
 Call `resample_sparameter_network(request)` from
-`python.spike_core.sparameter_sampling`, or invoke the worker method of that
+`python.spike_core.solvers.signal_integrity.networks.sparameter_sampling`, or invoke the worker method of that
 name with `params: {request: ...}`. The API is available from the desktop
 script workspace; existing channel and network composition services keep their
 own grid admission rules. No implicit resampling is added to them.

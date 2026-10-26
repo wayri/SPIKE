@@ -13,10 +13,8 @@ import unittest
 import numpy as np
 from numpy.polynomial import Polynomial
 
-from python.spike_core.enclosure_rectilinear_momentum import (
-    CONTRACT, solve_enclosure_rectilinear_momentum,
-)
-from python.spike_core.enclosure_refinement import build_enclosure_grid
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_rectilinear_momentum import CONTRACT, solve_enclosure_rectilinear_momentum
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_refinement import build_enclosure_grid
 
 
 _T = Polynomial([0., 1.])

@@ -1,0 +1,161 @@
+{
+  "schema": "spike/original-planar-core-material-evidence/v1",
+  "scope": "Source-traceable property inventory and original nominal CAD; not a solver qualification or complete material card",
+  "candidate": {
+    "manufacturer": "TDK Electronics",
+    "mpn_per_half": "B66287G0000X197",
+    "material": "N97",
+    "quantity_halves": 2,
+    "pair_name": "EELP32",
+    "delivery": "Single pieces; two halves required per set"
+  },
+  "sources": [
+    {
+      "filename": "tdk-elp32-202210.pdf",
+      "url": "https://www.tdk-electronics.tdk.com/inf/80/db/fer/elp_32_6_20.pdf",
+      "sha256": "f885d865e01340fe2d41bdc6d3b247f71b95492dbb976f8d723f6b0b80048319",
+      "reviewed_version": "October 2022 (page2 footer10/22)",
+      "page": 2,
+      "redistribution": "Excluded: supplier copyrighted publication; reference URL/hash only"
+    },
+    {
+      "filename": "tdk-n97-202506.pdf",
+      "url": "https://www.tdk-electronics.tdk.com/inf/80/db/fer/n97.pdf",
+      "sha256": "84aabe6125840e6be005048b90e374263bb197a9d10ff989d184ffadf8d7ddac",
+      "reviewed_version": "June2025 (cover and page2 footer6/25)",
+      "page": 2,
+      "redistribution": "Excluded: supplier copyrighted publication; reference URL/hash only"
+    }
+  ],
+  "shape_magnetic_effective": {
+    "per": "matched core set",
+    "Ae_mm2": 130,
+    "Amin_mm2": 128,
+    "le_mm": 41.4,
+    "Ve_mm3": 5390,
+    "AL_nH_per_turn2": 5700,
+    "AL_tolerance_percent": 25,
+    "effective_relative_permeability": 1440,
+    "approximate_set_mass_g": 28,
+    "Bs_mT": 310,
+    "Bs_conditions": {
+      "temperature_c": 100,
+      "field_a_m": 250,
+      "frequency_hz": 10000
+    },
+    "set_loss_limit": {
+      "less_than_w": 2.6,
+      "conditions": {
+        "B_mT": 200,
+        "frequency_hz": 100000,
+        "temperature_c": 100
+      }
+    },
+    "source_page": 2
+  },
+  "nominal_shape_mm": {
+    "outer_width": 31.75,
+    "outer_width_tolerance": 0.65,
+    "depth": 20.35,
+    "depth_tolerance": 0.4,
+    "half_height": 6.35,
+    "half_height_tolerance": 0.15,
+    "inside_leg_span": 25.4,
+    "inside_leg_span_tolerance": 0.5,
+    "center_post_width": 6.35,
+    "center_post_width_tolerance": 0.15,
+    "half_window_height": 3.2,
+    "half_window_height_tolerance": 0.15,
+    "derived_window_width_each": 9.525,
+    "derived_outer_leg_width": 3.175,
+    "derived_base_thickness": 3.15,
+    "derived_pair_window_height": 6.4,
+    "center_post_plan_dimensions": [
+      6.35,
+      20.35
+    ],
+    "CAD_origin": "Center of paired core mating plane; x spans E width, y depth, z stack"
+  },
+  "material_properties": {
+    "base": "MnZn ferrite",
+    "mu_initial_relative": {
+      "value": 2300,
+      "tolerance_percent": 25,
+      "temperature_c": 25
+    },
+    "density_kg_m3": {
+      "value": 4850,
+      "kind": "typical"
+    },
+    "electrical_resistivity_ohm_m": {
+      "value": 8
+    },
+    "Bs_mT": {
+      "at_25c": 510,
+      "at_100c": 410,
+      "conditions": {
+        "field_a_m": 1200,
+        "frequency_hz": 10000
+      }
+    },
+    "coercive_field_a_m": {
+      "at_25c": 21,
+      "at_100c": 12,
+      "frequency_hz": 10000
+    },
+    "preferred_frequency_range_hz": [
+      25000,
+      500000
+    ],
+    "curie_temperature_c": {
+      "greater_than": 230
+    },
+    "specific_core_loss_samples": {
+      "kind": "typical discrete supplier conditions; not fitted or interpolated law",
+      "values": [
+        {
+          "frequency_hz": 25000,
+          "B_mT": 200,
+          "temperature_c": 100,
+          "Pv_w_m3": 45000
+        },
+        {
+          "frequency_hz": 100000,
+          "B_mT": 200,
+          "temperature_c": 100,
+          "Pv_w_m3": 300000
+        },
+        {
+          "frequency_hz": 300000,
+          "B_mT": 100,
+          "temperature_c": 100,
+          "Pv_w_m3": 340000
+        },
+        {
+          "frequency_hz": 500000,
+          "B_mT": 50,
+          "temperature_c": 100,
+          "Pv_w_m3": 205000
+        }
+      ]
+    }
+  },
+  "unknown_not_supplied_by_reviewed_pages": {
+    "thermal_conductivity_w_mk": null,
+    "specific_heat_j_kgk": null,
+    "young_modulus_pa": null,
+    "poisson_ratio": null,
+    "coefficient_thermal_expansion_per_k": null,
+    "full_BH_curve": null,
+    "frequency_temperature_amplitude_loss_law": null,
+    "dielectric_strength_or_isolation_rating": null
+  },
+  "restrictions": [
+    "mu_i and shape mu_e are different and not a nonlinear magnetic constitutive model",
+    "Material Bs and shape Bs use different excitation fields; preserve conditions",
+    "Do not use discrete losses as Steinmetz coefficients or infer arbitrary waveform/switching losses",
+    "No geometry-derived gap law, fringing, saturation, thermal, structural or coupled FEM qualified by this inventory",
+    "Rectilinear CAD omits supplier undimensioned fillets, bevels, clamp details; not a manufacturing replacement"
+  ],
+  "production_qualified": false
+}

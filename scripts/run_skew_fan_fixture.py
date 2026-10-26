@@ -10,10 +10,10 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core import openfoam_fan_fixture as fixture_module
-from python.spike_core.openfoam_mesh_geometry_audit import audit_mesh_geometry
-from python.spike_core.openfoam_multiregion_execution import run_multiregion_case
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.openfoam import openfoam_fan_fixture as fixture_module
+from python.spike_core.solvers.external_engines.openfoam.openfoam_mesh_geometry_audit import audit_mesh_geometry
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import run_multiregion_case
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 from scripts.fan_wsl_scratch import ScratchRunner
 
 

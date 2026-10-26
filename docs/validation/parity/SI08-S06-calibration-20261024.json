@@ -1,0 +1,72 @@
+{
+  "contract": "spike/one-port-calibration-evidence/v1",
+  "stage_id": "SI08-S06",
+  "status": "passed",
+  "stage_complete": true,
+  "workflow": "offline_reference",
+  "family_complete": false,
+  "production_qualified": false,
+  "measurement_qualified": false,
+  "linearization_qualified": false,
+  "sources_before": {
+    "python/spike_core/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "examples/one_port_calibration/run_calibration.py": "d7d72e362477c58b0ff967a9ce87113b1ce99dca887eb0a36188b698784f555a",
+    "tests/python/test_one_port_calibration.py": "83d5c183122acf390167cf35e4f88529cd92f010b85338cc89e4cf4afa2206de",
+    "tests/python/test_one_port_calibration_oracles.py": "6e95e8c6779b9443b417cec7c05085582874689e0a6c4cdfdba9848a27e5c109",
+    "scripts/verify_one_port_calibration.py": "169c87fbb94dbaf71f338769e7bff76f4833c925c7e70b2a7266a7d43ce6e3e8",
+    "tests/python/test_one_port_calibration_evidence.py": "0ea66f21cb7fa74ceb7986d5e18b88b63d973b429a9cc25fcddf81727e2ce09e",
+    "docs/ONE_PORT_CALIBRATION.md": "d982c7092f0bb6c417ca3acfe35b6597e31c854abcaa1c536164bf588c5a5066",
+    "docs/validation/ONE_PORT_CALIBRATION_DERIVATION_20261024.md": "5e1d13295315e91a2c00c6957d5977093c9604d0c28276762488021444137a99"
+  },
+  "sources_after": {
+    "python/spike_core/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "examples/one_port_calibration/run_calibration.py": "d7d72e362477c58b0ff967a9ce87113b1ce99dca887eb0a36188b698784f555a",
+    "tests/python/test_one_port_calibration.py": "83d5c183122acf390167cf35e4f88529cd92f010b85338cc89e4cf4afa2206de",
+    "tests/python/test_one_port_calibration_oracles.py": "6e95e8c6779b9443b417cec7c05085582874689e0a6c4cdfdba9848a27e5c109",
+    "scripts/verify_one_port_calibration.py": "169c87fbb94dbaf71f338769e7bff76f4833c925c7e70b2a7266a7d43ce6e3e8",
+    "tests/python/test_one_port_calibration_evidence.py": "0ea66f21cb7fa74ceb7986d5e18b88b63d973b429a9cc25fcddf81727e2ce09e",
+    "docs/ONE_PORT_CALIBRATION.md": "d982c7092f0bb6c417ca3acfe35b6597e31c854abcaa1c536164bf588c5a5066",
+    "docs/validation/ONE_PORT_CALIBRATION_DERIVATION_20261024.md": "5e1d13295315e91a2c00c6957d5977093c9604d0c28276762488021444137a99"
+  },
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.2.6"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_cancel_and_broken_callback_fail_closed",
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_covariance_rejects_indefinite_nonsymmetric_and_hidden_tiny_subblock",
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_example_retains_identity_and_recovers_physical_standards",
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_executable_capture_and_no_overwrite",
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_rank_deficient_and_zero_covariance_are_not_inflated",
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_resource_boundary_and_streamed_oversize_rejection",
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_structural_and_domain_failures",
+      "tests.python.test_one_port_calibration.CalibrationContractTests.test_valid_first_invalid_later_has_no_returned_partial_result",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_all_real_imaginary_sensitivities_independent_difference",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_coincident_standards_and_collapsed_measurements_reject",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_dense_joint_covariance_preserves_all_correlations",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_derived_network_mutation_cannot_change_retained_source",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_deterministic_nonlinear_covariance_convergence",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_dut_inverse_pole_is_rejected_at_last_frequency_without_mutation",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_reactive_standards_and_active_dut_cross_ratio",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_scalar_ideal_open_short_load_coefficients",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_small_indefinite_covariance_is_not_hidden_by_large_variance",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_standard_permutations_reorder_joint_covariance",
+      "tests.python.test_one_port_calibration_oracles.IndependentOnePortCalibrationTests.test_zero_and_rank_one_covariance_against_oracle"
+    ],
+    "run": 19,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": {
+    "path": "docs/validation/parity/SI08-S06-calibration-20261024.log",
+    "sha256": "86eae01b87216a261b03cbe1f3293f0b17714e7d3c5e1d77ac6e014cf9db1cea"
+  },
+  "capture": {
+    "path": "docs/validation/parity/SI08-S06-calibration-capture-20261024.json",
+    "sha256": "59329da7af911b2d766fd7b07f1911a07c88e3c324e5fe1eef63c4ece7fcde81"
+  }
+}

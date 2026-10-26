@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import numpy as np
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.transient_peec import _extract_stackup_capacitance, transient_settings
+from python.spike_core.solvers.power_integrity.peec.transient_peec import _extract_stackup_capacitance, transient_settings
 
 
 class TransientCapacitanceConsistencyTests(unittest.TestCase):
@@ -30,7 +30,7 @@ class TransientCapacitanceConsistencyTests(unittest.TestCase):
         info = {"model": "area-surrogate", "branch_reference_layers": ["B.Cu"],
                 "estimated_branch_count": 1, "total_capacitance_f": 8e-12}
         # Second endpoint pair records the explicit reference physical node.
-        with patch("python.spike_core.quasistatic_capacitance.estimate_branch_capacitance",
+        with patch("python.spike_core.solvers.power_integrity.pdn.quasistatic_capacitance.estimate_branch_capacitance",
                    return_value=(np.array([8e-12]), np.zeros(1), info)):
             matrix, provenance, values = _extract_stackup_capacitance(
                 design, spec, transient_settings(spec), branches, [(0, 2)], nodes, 3)
@@ -41,7 +41,7 @@ class TransientCapacitanceConsistencyTests(unittest.TestCase):
 
     def test_missing_reference_node_cannot_receive_implicit_shunt(self):
         design, spec, branches, nodes = self.fixture()
-        with patch("python.spike_core.quasistatic_capacitance.estimate_branch_capacitance",
+        with patch("python.spike_core.solvers.power_integrity.pdn.quasistatic_capacitance.estimate_branch_capacitance",
                    return_value=(np.array([8e-12]), np.zeros(1), {"branch_reference_layers": ["B.Cu"]})):
             matrix, info, values = _extract_stackup_capacitance(
                 design, spec, transient_settings(spec), branches, [(0, 1)], nodes[:2], 2)

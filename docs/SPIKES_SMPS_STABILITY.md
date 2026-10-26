@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Native ideal CCM SMPS stability analysis
 
-`src/spikes/smps_stability.cpp` executes the supplied-parameter analytical model
+`src/solvers/circuits/spikes/smps_stability.cpp` executes the supplied-parameter analytical model
 in C++. `python/spikes/smps_stability.py` remains an explicitly selected test
 reference. Neither is a periodic operating-point extractor, automatic circuit
 linearizer, or universal SMPS qualification suite. It covers ideal buck, boost,

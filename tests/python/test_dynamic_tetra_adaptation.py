@@ -5,8 +5,8 @@ import itertools
 import math
 import unittest
 
-from python.spike_core.dynamic_tetra_adaptation import adapt_tetra_mesh, _dorfler_marks
-from python.spike_core.tetra_mesh_refinement import TetraRefinementError, _det
+from python.spike_core.solvers.geometry_meshing.preparation.dynamic_tetra_adaptation import adapt_tetra_mesh, _dorfler_marks
+from python.spike_core.solvers.geometry_meshing.preparation.tetra_mesh_refinement import TetraRefinementError, _det
 
 
 def mesh_pair():
@@ -52,7 +52,7 @@ def interior_mesh():
 
 class DynamicTetraAdaptationTests(unittest.TestCase):
     def test_repeated_feedback_reduces_analytical_quadratic_interpolation_error(self):
-        from python.spike_core.internal_tetra_generation import generate_tetra_mesh
+        from python.spike_core.solvers.geometry_meshing.preparation.internal_tetra_generation import generate_tetra_mesh
         source = generate_tetra_mesh([list(p) for p in itertools.product((0., 1.), repeat=3)])
         mesh, boundary = source['mesh'], source['boundary_triangles']
         errors = []
@@ -102,7 +102,7 @@ class DynamicTetraAdaptationTests(unittest.TestCase):
 
     def test_roundoff_in_signed_material_integral_is_admitted(self):
         import random
-        from python.spike_core.internal_tetra_generation import generate_tetra_mesh
+        from python.spike_core.solvers.geometry_meshing.preparation.internal_tetra_generation import generate_tetra_mesh
         rng = random.Random(44)
         source = generate_tetra_mesh([[rng.random() for _ in range(3)] for _ in range(10)])
         mesh = source['mesh']

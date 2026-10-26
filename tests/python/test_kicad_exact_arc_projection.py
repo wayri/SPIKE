@@ -12,7 +12,7 @@ from python.spike_core.kicad_importer import import_kicad_design
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.spike_core.geometry_arrow import canonical_geometry_rows
 from python.spike_core.spikes_layout_geometry_handoff import _supported_sources
-from python.spike_core.thermal_copper_geometry import rasterize_copper
+from python.spike_core.solvers.thermal_fluid.heat.thermal_copper_geometry import rasterize_copper
 
 ROOT = Path(__file__).resolve().parents[2]
 

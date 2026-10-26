@@ -5,7 +5,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from scripts.run_multiboard_cross_heating import prepare
-from python.spike_core.openfoam_multiregion_execution import load_verified_runnable_case
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import load_verified_runnable_case
 
 
 class CrossHeatingPreparationTests(unittest.TestCase):

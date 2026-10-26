@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Experimental planar magnetic FEM
 
-`python/spike_core/magnetic_fem.py` provides a planar, triangular P1 magnetic
+`python/spike_core/solvers/electromagnetics/machines/magnetic_fem.py` provides a planar, triangular P1 magnetic
 vector-potential operator, a nonlinear magnetostatic solve, and a separate
 stationary-conductor backward-Euler eddy step. These are numerical verification
 increments. They do not qualify an arbitrary machine or a geometry compiler.

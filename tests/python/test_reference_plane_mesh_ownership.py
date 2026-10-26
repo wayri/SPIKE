@@ -8,14 +8,8 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 
 from tests.python import test_reference_plane_antipad_mesh_v2 as fixtures
-from python.spike_core.reference_plane_antipad_mesh_v2 import (
-    build_reference_plane_antipad_mesh_v2,
-)
-from python.spike_core.reference_plane_mesh_ownership import (
-    ReferencePlaneMeshOwnershipError,
-    build_reference_plane_mesh_ownership_overlay,
-    validate_reference_plane_mesh_ownership_overlay,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_mesh_v2 import build_reference_plane_antipad_mesh_v2
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_mesh_ownership import ReferencePlaneMeshOwnershipError, build_reference_plane_mesh_ownership_overlay, validate_reference_plane_mesh_ownership_overlay
 
 
 class ReferencePlaneMeshOwnershipTests(unittest.TestCase):

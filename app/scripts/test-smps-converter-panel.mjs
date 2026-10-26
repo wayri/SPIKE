@@ -49,7 +49,7 @@ assert.equal(request.inductor.inductance_h, 1e-5);
 
 const backendScript = [
   "import importlib.util, json, sys",
-  "spec = importlib.util.spec_from_file_location('spike_smps_converter', 'python/spike_core/smps_converter.py')",
+  "spec = importlib.util.spec_from_file_location('spike_smps_converter', 'python/spike_core/solvers/circuits/models/smps_converter.py')",
   "module = importlib.util.module_from_spec(spec)",
   "spec.loader.exec_module(module)",
   "print(json.dumps(module.evaluate_smps_converter(json.load(sys.stdin)), allow_nan=False))",

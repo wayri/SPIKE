@@ -1,0 +1,187 @@
+{
+  "contract": "spike/promo-release-curation/v1",
+  "date": "2026-10-26",
+  "license": "Apache-2.0; original SPIKE-owned inputs, generated results and UI captures",
+  "owner": "wayri and SPIKE contributors",
+  "solver_runs_performed": false,
+  "installed_desktop_capture": false,
+  "projects": [
+    {
+      "id": "ebrake-transient",
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/01-pcb-temperature/01-ebrake-transient/01-ebrake-transient.spike",
+      "source_sha256": "96e367e099b064fdfd078aefb9b33b146d15aabca0473c1bbce7de3df096abd5",
+      "source_bytes": 3438926,
+      "manifest_payload_sha256": "6c91a5f310031b418b065347c11d4167f051be9e55088844f0f7cf1044f8aedf",
+      "snapshot": "examples/promo_release/projects/ebrake-transient.spike.json",
+      "snapshot_sha256": "9fe3d3b5653fc2081c00568779c370b387762dfe49ab73baf5045050430bf44c",
+      "snapshot_bytes": 6287868,
+      "projection": "Complete existing frontend_project_payload after hydrate_result_state; no arrays removed",
+      "cad_member_limit": "External component model binaries are not included"
+    },
+    {
+      "id": "case-contact",
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/02-case-heatsink/case-contact.spike",
+      "source_sha256": "4e26975aae98c3a383c9fdfd145d1cb1337277d0f9c58579c32bb7c03e6a7b89",
+      "source_bytes": 191430,
+      "manifest_payload_sha256": "263d817f9a846777846f2cb266bae1f98462334fa393819a3944ba5bf8bde0a3",
+      "snapshot": "examples/promo_release/projects/case-contact.spike.json",
+      "snapshot_sha256": "6fe44a7096a8dd718b7134d81ca1b321c29d5e7424eb6c7bd9020256e9df522a",
+      "snapshot_bytes": 634864,
+      "projection": "Complete existing frontend_project_payload after hydrate_result_state; no arrays removed",
+      "cad_member_limit": "Case STEP companion requires relinking for CAD display; thermal mesh/results retained"
+    },
+    {
+      "id": "poor-contact",
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/02-case-heatsink/poor-contact.spike",
+      "source_sha256": "138c97008ba3411e253bfb872888e50fb453875a991c2deb499a312d7fbd5d59",
+      "source_bytes": 189433,
+      "manifest_payload_sha256": "9b9ae02e70320f6450ae05d3ff3cdbcdc8fb4b4790d10239bcb9087582420833",
+      "snapshot": "examples/promo_release/projects/poor-contact.spike.json",
+      "snapshot_sha256": "7577af471716798b6a95c3f398484dfcbde59066d18743a5d5752afe814beb97",
+      "snapshot_bytes": 635006,
+      "projection": "Complete existing frontend_project_payload after hydrate_result_state; no arrays removed",
+      "cad_member_limit": "Case STEP companion requires relinking for CAD display; thermal mesh/results retained"
+    },
+    {
+      "id": "planar-pm",
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/05-em-machines/planar_pm_fem.spike",
+      "source_sha256": "edf4c91a5c38eb3f53a8848e24996ebca58e908a37a26635e3329f7cbd9b9f33",
+      "source_bytes": 1018134,
+      "manifest_payload_sha256": "9c79da1d7b50a3ecf7714fb430054e450986660f6a318d4c83ab4729f8bee796",
+      "snapshot": "examples/promo_release/projects/planar-pm.spike.json",
+      "snapshot_sha256": "a030b9e83f249e40e9d0f554c7a6c0ce6654cff6b439d5bd13a5d7b96be08980",
+      "snapshot_bytes": 2760592,
+      "projection": "Complete existing frontend_project_payload after hydrate_result_state; no arrays removed",
+      "cad_member_limit": "External component model binaries are not included"
+    },
+    {
+      "id": "motor",
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/05-em-machines/motor.spike",
+      "source_sha256": "1ee640dc991533c25bcd1b7c413cd3b7583dfa50637dd41e4ed3084744442d52",
+      "source_bytes": 15345,
+      "manifest_payload_sha256": "48dd64639c170f6999711ad2f8261fae3f1a344e634ad5d34a7aaa851c7a8782",
+      "snapshot": "examples/promo_release/projects/motor.spike.json",
+      "snapshot_sha256": "78bcbcbc56b356f20251b78ac52bd241960fadc0c61801d6ef490d2cc4acf756",
+      "snapshot_bytes": 32210,
+      "projection": "Complete existing frontend_project_payload after hydrate_result_state; no arrays removed",
+      "cad_member_limit": "External component model binaries are not included"
+    },
+    {
+      "id": "electromagnet",
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/05-em-machines/electromagnet.spike",
+      "source_sha256": "f19e8d49064b63ec9f7a924443d31e9e194e6c72e001b23a23867fd3cb441725",
+      "source_bytes": 3961,
+      "manifest_payload_sha256": "3698414a3fca1eb83e17d5a58b9ed2b13def5e15104b95b581c73991046424e4",
+      "snapshot": "examples/promo_release/projects/electromagnet.spike.json",
+      "snapshot_sha256": "28b75a037c78ceac7f122cffd236619538418fabc8a6bcdaecccf4b9a817ec21",
+      "snapshot_bytes": 2431,
+      "projection": "Complete existing frontend_project_payload after hydrate_result_state; no arrays removed",
+      "cad_member_limit": "External component model binaries are not included"
+    },
+    {
+      "id": "electromagnet-air",
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/05-em-machines/electromagnet-air.spike",
+      "source_sha256": "cbf9339ab8ecea5502cddbc19670430b07432ec26557ad2b6e064aa0f6e4bbf5",
+      "source_bytes": 3981,
+      "manifest_payload_sha256": "ece403314db9d1d8040a4550012e6bb95192d5ada7c262eec8a2df709c4fef60",
+      "snapshot": "examples/promo_release/projects/electromagnet-air.spike.json",
+      "snapshot_sha256": "a0b19c68abce16a407d3d408111e373d9b721a47d06b258885787de9da1e74b6",
+      "snapshot_bytes": 2455,
+      "projection": "Complete existing frontend_project_payload after hydrate_result_state; no arrays removed",
+      "cad_member_limit": "External component model binaries are not included"
+    }
+  ],
+  "copies": [
+    {
+      "source": "LICENSE",
+      "target": "examples/promo_release/LICENSE",
+      "sha256": "1dbace2c4de7ffdf533d0a4cb55bd93177201ead936d0f349cd14a05a84d2266",
+      "bytes": 11560,
+      "modified": false
+    },
+    {
+      "source": "NOTICE",
+      "target": "examples/promo_release/NOTICE",
+      "sha256": "3792f16c6698d729b668f0335a82b650581f0fa0c3618e171091469f993bcbbd",
+      "bytes": 539,
+      "modified": false
+    },
+    {
+      "source": "docs/DEMO_BOARD_PROVENANCE.md",
+      "target": "examples/promo_release/DEMO_BOARD_PROVENANCE.md",
+      "sha256": "285b103a46c060a4a478afb9807790d85e0f7b89ff531d4bbe301c38a93f1428",
+      "bytes": 960,
+      "modified": false
+    },
+    {
+      "source": "examples/promo_showcase/START_HERE.md",
+      "target": "examples/promo_release/ORIGINAL_START_HERE.md",
+      "sha256": "a831affbac5615418c56689d7980af2b9ca9cc456d70bb6aa870b1b8193929b9",
+      "bytes": 9701,
+      "modified": false
+    },
+    {
+      "source": "examples/promo_showcase/electrical/source-provenance.json",
+      "target": "examples/promo_release/original-electrical-provenance.json",
+      "sha256": "e047ca33c8e0b0ab425d7ef6f70c76454273be44b5c72de89f4d7aa8aa8d760f",
+      "bytes": 12130,
+      "modified": false
+    },
+    {
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/EVIDENCE/integration-verification.json",
+      "target": "examples/promo_release/original-integration-verification.json",
+      "sha256": "34fa5e804a5acd88110db19af61c951deaffa163f7cc72bd505ec68181148352",
+      "bytes": 5149,
+      "modified": false
+    },
+    {
+      "source": "examples/promo_showcase/electrical/magnetics/planar_solenoid_fem.json",
+      "target": "examples/promo_release/solenoid-request.json",
+      "sha256": "056fad7c627599e55150571a53410de941fe07b7a8d8ec7f265ae9ad9ef7a490",
+      "bytes": 1256,
+      "modified": false
+    },
+    {
+      "source": "artifacts/real-board-multiphysics-20261025/preview/verification.json",
+      "target": "examples/promo_release/capture-verification.json",
+      "sha256": "5d3efb53d2fbd04533bb996ff067d7711b1d0d84043f1f96946bb5d31bbe6f4b",
+      "bytes": 2769,
+      "modified": false
+    },
+    {
+      "source": "artifacts/real-board-multiphysics-20261025/em/FIELD_LINE_METHOD_REVIEW.md",
+      "target": "examples/promo_release/FIELD_LINE_METHOD_REVIEW.md",
+      "sha256": "960ae5b774d0edf9450e15d770477e162717412f51d6133f6110dced526e0325",
+      "bytes": 14202,
+      "modified": false
+    },
+    {
+      "source": "artifacts/real-board-multiphysics-20261025/em/field-line-execution.json",
+      "target": "examples/promo_release/field-line-execution.json",
+      "sha256": "a218fd1c2ec5733602945f96471ec358e105033ed264d1524108fcca1a0ccba6",
+      "bytes": 3570,
+      "modified": false
+    },
+    {
+      "source": "artifacts/real-board-multiphysics-20261025/preview/electric-field-lines.png",
+      "target": "examples/promo_release/pictures/electric-field-lines.png",
+      "sha256": "98e968527a9d3e56dd62571c01c330c999e8d4001af4eb91df74a4923ff827cf",
+      "bytes": 59830,
+      "modified": false
+    },
+    {
+      "source": "artifacts/real-board-multiphysics-20261025/preview/magnetic-field-lines.png",
+      "target": "examples/promo_release/pictures/magnetic-field-lines.png",
+      "sha256": "710fe70076063229917b6025b09b39c8ec35cb73ce1c7971116bfc43f2ee225d",
+      "bytes": 61098,
+      "modified": false
+    },
+    {
+      "source": "output/promo-showcase-20261023/READY_TO_OPEN/02-case-heatsink/case-contact.spike#models/artifacts/original-case.step",
+      "target": "examples/promo_release/original-case.step",
+      "sha256": "34686d12112727f663ff7a9c8351e10b6618d7f1eb1960df0b3eba71391b4e10",
+      "bytes": 29373,
+      "modified": false
+    }
+  ]
+}

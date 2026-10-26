@@ -8,11 +8,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator, ValidationError
 
 from tests.python.test_reference_plane_antipad_native_handoff import full_plane_fixture
-from python.spike_core.reference_plane_antipad_mesh_quality import (
-    ReferencePlaneAntipadMeshQualityError,
-    build_reference_plane_antipad_mesh_quality,
-    validate_reference_plane_antipad_mesh_quality,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.reference_plane_antipad_mesh_quality import ReferencePlaneAntipadMeshQualityError, build_reference_plane_antipad_mesh_quality, validate_reference_plane_antipad_mesh_quality
 
 
 ROOT = Path(__file__).resolve().parents[2]

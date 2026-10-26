@@ -29,3 +29,9 @@ assert.equal(loadAppSettings().viewportBackground, "dark");
 assert.equal(loadAppSettings().viewportGrid, true);
 assert.equal(loadAppSettings().theme, "high-contrast", "Viewport mode does not replace application theme");
 console.log("Viewport background, orientation extent and preference persistence passed.");
+
+assert.equal(loadAppSettings().viewportOriginAxes, true);
+saveAppSettings({...loadAppSettings(), viewportOriginAxes:false});
+assert.equal(loadAppSettings().viewportOriginAxes, false, "Origin markers can stay hidden after restart");
+stored.set(APP_SETTINGS_STORAGE_KEY, JSON.stringify({viewportOriginAxes:"false"}));
+assert.equal(loadAppSettings().viewportOriginAxes, true, "Malformed axis preferences do not hide orientation unexpectedly");

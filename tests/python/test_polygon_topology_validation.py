@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.hybrid_mesh import _normalize_filled_zone_polygon, _polygon_is_simple
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _normalize_filled_zone_polygon, _polygon_is_simple
 
 
 class PolygonTopologyTests(unittest.TestCase):
@@ -33,7 +33,7 @@ class PolygonTopologyTests(unittest.TestCase):
     def test_ordinary_duplicate_cleanup_and_admission_are_preserved(self):
         polygon = [(0., 0.), (2., 0.), (2., 0.), (2., 2.), (0., 2.)]
         expected = [(0., 0.), (2., 0.), (2., 2.), (0., 2.)]
-        with patch('python.spike_core.filled_copper_path.MAX_SOURCE_VERTICES', 4):
+        with patch('python.spike_core.solvers.power_integrity.dc.filled_copper_path.MAX_SOURCE_VERTICES', 4):
             self.assertEqual(_normalize_filled_zone_polygon(polygon), expected)
 
 

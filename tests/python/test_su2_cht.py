@@ -8,8 +8,8 @@ import tempfile
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
-from python.spike_core.su2_cht import compile_su2_cht, parse_su2_cht, prepare_su2_cht, validate_su2_cht_request
-from python.spike_core.su2_airflow import _sha256
+from python.spike_core.solvers.external_engines.su2.su2_cht import compile_su2_cht, parse_su2_cht, prepare_su2_cht, validate_su2_cht_request
+from python.spike_core.solvers.external_engines.su2.su2_airflow import _sha256
 from scripts.benchmark_su2_cht import _resume
 
 

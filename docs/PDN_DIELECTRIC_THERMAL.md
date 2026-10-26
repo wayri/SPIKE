@@ -8,7 +8,7 @@ temperature-dependent conductivity, use the separate
 fixed electrical material properties and continues within PI/SI priority.
 
 Call `run_pdn_dielectric_thermal(request)` in
-`python/spike_core/pdn_dielectric_thermal.py`, or worker method
+`python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_thermal.py`, or worker method
 `run_pdn_dielectric_thermal` with exactly `{request: ...}`. Supply:
 
 - `contract`: `spike/pdn-dielectric-thermal-request/v1`.

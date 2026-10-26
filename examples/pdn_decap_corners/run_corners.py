@@ -6,7 +6,7 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.pdn_decap_corners import run_pdn_decap_corners
+from python.spike_core.solvers.power_integrity.pdn.pdn_decap_corners import run_pdn_decap_corners
 
 
 def make_request():

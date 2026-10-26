@@ -12,7 +12,7 @@ from pathlib import Path
 
 from examples.compiled_board_faults.build_and_run import load_fixture, native_value
 from python.spike_core.contracts import AnalysisSpec, DesignIR
-from python.spike_core.ngspice_plugin import NgspicePlugin
+from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin
 from python.spikes.board_library_client import BoardLibrary
 
 

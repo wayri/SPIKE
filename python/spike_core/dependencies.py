@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, Iterable
 
-from .acceleration import acceleration_catalog
+from .solvers.execution.resources.acceleration import acceleration_catalog
 from .external_engines import external_engine_catalog
 
 

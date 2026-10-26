@@ -4,13 +4,7 @@ from pathlib import Path
 
 
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.emi import (
-    EMI_PREFLIGHT_CONTRACT,
-    EMI_SETUP_CONTRACT,
-    EMI_WORKFLOW_CONTRACT,
-    screen_emi_setup,
-    validate_emi_setup,
-)
+from python.spike_core.solvers.electromagnetics.fields.emi import EMI_PREFLIGHT_CONTRACT, EMI_SETUP_CONTRACT, EMI_WORKFLOW_CONTRACT, screen_emi_setup, validate_emi_setup
 from python.spike_core.solver_plugins import default_solver_registry
 
 

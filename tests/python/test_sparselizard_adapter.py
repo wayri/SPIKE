@@ -13,14 +13,8 @@ from unittest.mock import patch
 from python.spike_core.cli import EXIT_OK, main
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
 from python.spike_core.service import handle
-from python.spike_core.sparselizard_adapter import (
-    SparseLizardAdapterError,
-    _run_adapter_process,
-    discover_sparselizard_adapter,
-    prepare_sparselizard_case,
-    run_sparselizard_case,
-)
-from python.spike_core.solver_geometry import DC_FEM_GEOMETRY_CONTRACT, build_dc_fem_geometry
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_adapter import SparseLizardAdapterError, _run_adapter_process, discover_sparselizard_adapter, prepare_sparselizard_case, run_sparselizard_case
+from python.spike_core.solvers.geometry_meshing.preparation.solver_geometry import DC_FEM_GEOMETRY_CONTRACT, build_dc_fem_geometry
 
 
 FIXTURE_PATH = (
@@ -234,7 +228,7 @@ class SparseLizardAdapterTests(unittest.TestCase):
                 output.write_text(json.dumps(materialize_result(fixture, case)), encoding="utf-8")
                 return {"return_code": 0, "stdout": "", "stderr": "", "memory_limit_enforced": False}
 
-            with patch("python.spike_core.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
+            with patch("python.spike_core.solvers.external_engines.sparselizard.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
                 run = run_sparselizard_case(root, executable=adapter)
 
         self.assertEqual(run["status"], "completed")
@@ -256,7 +250,7 @@ class SparseLizardAdapterTests(unittest.TestCase):
                     output.write_text(json.dumps(fixtures[fixture_id]["result"]), encoding="utf-8")
                     return {"return_code": 0, "stdout": "", "stderr": "", "memory_limit_enforced": False}
 
-                with patch("python.spike_core.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
+                with patch("python.spike_core.solvers.external_engines.sparselizard.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
                     with self.assertRaisesRegex(SparseLizardAdapterError, "spike/sparselizard-pcb-result/v1"):
                         run_sparselizard_case(root, executable=adapter)
 
@@ -274,7 +268,7 @@ class SparseLizardAdapterTests(unittest.TestCase):
                 output.write_text(json.dumps(materialize_result(fixture, case)), encoding="utf-8")
                 return {"return_code": 0, "stdout": "", "stderr": "", "memory_limit_enforced": False}
 
-            with patch("python.spike_core.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
+            with patch("python.spike_core.solvers.external_engines.sparselizard.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
                 with self.assertRaisesRegex(SparseLizardAdapterError, fixture["expected"]["error"]):
                     run_sparselizard_case(root, executable=adapter)
 
@@ -292,7 +286,7 @@ class SparseLizardAdapterTests(unittest.TestCase):
                 output.write_text(json.dumps(materialize_result(fixture, case)), encoding="utf-8")
                 return {"return_code": 0, "stdout": "", "stderr": "", "memory_limit_enforced": False}
 
-            with patch("python.spike_core.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
+            with patch("python.spike_core.solvers.external_engines.sparselizard.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
                 with self.assertRaisesRegex(SparseLizardAdapterError, fixture["expected"]["error"]):
                     run_sparselizard_case(root, executable=adapter)
 
@@ -331,7 +325,7 @@ class SparseLizardAdapterTests(unittest.TestCase):
                 Path(command[command.index("--output") + 1]).write_text(json.dumps(payload), encoding="utf-8")
                 return {"return_code": 0, "stdout": "", "stderr": "", "memory_limit_enforced": False}
 
-            with patch("python.spike_core.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
+            with patch("python.spike_core.solvers.external_engines.sparselizard.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
                 run = run_sparselizard_case(root, executable=adapter)
 
         self.assertEqual(run["result"]["contract"], "spike/v1")
@@ -366,7 +360,7 @@ class SparseLizardAdapterTests(unittest.TestCase):
                 output.write_text(json.dumps(malformed), encoding="utf-8")
                 return {"return_code": 0, "stdout": "", "stderr": "", "memory_limit_enforced": False}
 
-            with patch("python.spike_core.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
+            with patch("python.spike_core.solvers.external_engines.sparselizard.sparselizard_adapter._run_adapter_process", side_effect=fake_process):
                 with self.assertRaisesRegex(SparseLizardAdapterError, "failed external PI validation"):
                     run_sparselizard_case(root, executable=adapter)
 

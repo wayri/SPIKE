@@ -1,4 +1,4 @@
-#include "peec/reference_plane_antipad_mesh_input.hpp"
+#include "solvers/power_integrity/peec/reference_plane_antipad_mesh_input.hpp"
 
 #include <cassert>
 #include <iostream>

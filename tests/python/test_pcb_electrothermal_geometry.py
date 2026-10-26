@@ -6,9 +6,9 @@ from __future__ import annotations
 import copy
 import unittest
 
-from python.spike_core.assembly_electrothermal_setup import prepare_electrothermal
-from python.spike_core.assembly_field_handoff import prepare_assembly_field_handoff
-from python.spike_core.pcb_electrothermal_geometry import prepare_pcb_electrothermal_geometry
+from python.spike_core.solvers.thermal_fluid.electrothermal.assembly_electrothermal_setup import prepare_electrothermal
+from python.spike_core.solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
+from python.spike_core.solvers.thermal_fluid.electrothermal.pcb_electrothermal_geometry import prepare_pcb_electrothermal_geometry
 
 
 def mesh(units: str = "mm") -> dict:

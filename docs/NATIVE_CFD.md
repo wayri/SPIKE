@@ -6,7 +6,7 @@ entrypoint and [examples](../examples/internal_cfd/README.md) are separate from
 the original cavity endpoint described below. Neither provides general enclosure,
 turbulence, rotating machinery or FSI; see [the staged plan](INTERNAL_CFD_AND_FSI_PLAN.md).
 
-SPIKE owns a standalone C++ square-cavity momentum kernel in `src/airflow`.
+SPIKE owns a standalone C++ square-cavity momentum kernel in `src/solvers/thermal_fluid/airflow`.
 Python `native_airflow.py` owns admission, units, process timeout, provenance and
 results. This is a bounded numerical foundation for comparison with a separately
 installed SU2 runtime. It does not solve imported geometry, 3D flow, energy,

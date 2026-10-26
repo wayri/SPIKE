@@ -11,7 +11,7 @@ from python.spike_core.kicad_importer import import_kicad_design
 from python.spike_core.spider_v2 import SpiDeRV2, AssemblyIRV1
 from python.spike_core.assembly_frames import IDENTITY
 from python.spike_core.harness_authoring import discover_connectors, plan_harnesses
-from python.spike_core.harness_pi import run_harness_pi
+from python.spike_core.solvers.signal_integrity.lines.harness_pi import run_harness_pi
 
 
 def main():

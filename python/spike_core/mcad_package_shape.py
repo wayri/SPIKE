@@ -14,7 +14,7 @@ from .assembly_package_shapes import MAX_TOTAL_ENTITIES, TOPOLOGY_KINDS
 from .mcad_importer import McadImportError, validate_step_mcad_artifact
 from .mcad_tessellation import _freecad_path
 from .package_shape_geometry import PackageShapeGeometryError, canonicalize_selector_geometry
-from .sparselizard_process import SparseLizardAdapterError, run_adapter_process
+from .solvers.external_engines.sparselizard.sparselizard_process import SparseLizardAdapterError, run_adapter_process
 
 
 STEP_PACKAGE_SHAPE_CONTRACT = "spike/mcad-step-package-shape/v1"

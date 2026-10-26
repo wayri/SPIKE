@@ -8,7 +8,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.voice_coil_drive import CONTRACT, simulate_voice_coil_drive
+from python.spike_core.solvers.electromagnetics.machines.voice_coil_drive import CONTRACT, simulate_voice_coil_drive
 
 
 def request(**updates):

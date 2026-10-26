@@ -11,7 +11,7 @@ def handle_volume_electrothermal_request(method, params, *, request_id=None):
     if method not in methods:
         return None
     try:
-        from .assembly_field_handoff import bounded_json
+        from .solvers.execution.coupling.assembly_field_handoff import bounded_json
         bounded_json(params)
         required = ({'request', 'problem', 'contact_ids'} if method == 'autolink_assembly_thermal_contacts' else
                     {'request', 'problem'} if method == 'discover_assembly_thermal_links' else
@@ -22,11 +22,11 @@ def handle_volume_electrothermal_request(method, params, *, request_id=None):
         if not isinstance(params, dict) or set(params) != required:
             raise ValueError('VOLUME_COUPLING_FIELDS: exact method parameters required')
         if method in {'discover_assembly_thermal_links', 'autolink_assembly_thermal_contacts'}:
-            from . import assembly_thermal_autolink
+            from .solvers.geometry_meshing.preparation import assembly_thermal_autolink
             result = getattr(assembly_thermal_autolink, method)(**params)
         elif method == 'describe_volume_electrothermal_bindings':
-            from .multiboard_circuit import compile_multiboard_circuit
-            from .assembly_field_handoff import prepare_assembly_field_handoff
+            from .solvers.circuits.models.multiboard_circuit import compile_multiboard_circuit
+            from .solvers.execution.coupling.assembly_field_handoff import prepare_assembly_field_handoff
             from .multiboard_identity import assembly_physics_digest
             if assembly_physics_digest(params['geometry']['assembly']) != assembly_physics_digest(params['circuit']['assembly']):
                 raise ValueError('VOLUME_COUPLING_STALE: circuit and volume assembly differ')
@@ -39,10 +39,10 @@ def handle_volume_electrothermal_request(method, params, *, request_id=None):
                       'assembly_digest': assembly_physics_digest(params['geometry']['assembly']),
                       'status': 'identities_only', 'production_qualified': False}
         elif method == 'prepare_assembly_thermal_contact_model':
-            from .assembly_thermal_contact_model import prepare_assembly_thermal_contact_model
+            from .solvers.geometry_meshing.preparation.assembly_thermal_contact_model import prepare_assembly_thermal_contact_model
             result = prepare_assembly_thermal_contact_model(**params)
         else:
-            from . import multiboard_volume_electrothermal as coupling
+            from .solvers.thermal_fluid.electrothermal import multiboard_volume_electrothermal as coupling
             result = getattr(coupling, method)(**params)
         bounded_json(result)
         return {'ok': True, 'result': result}

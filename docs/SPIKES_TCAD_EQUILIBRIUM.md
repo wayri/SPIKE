@@ -3,7 +3,7 @@
 
 ## Current executable scope
 
-`src/spikes/tcad_equilibrium.cpp` is an original C++ 1D equilibrium
+`src/solvers/circuits/spikes/tcad_equilibrium.cpp` is an original C++ 1D equilibrium
 Poisson-Boltzmann solver with a static library and native console. It is separate
 from circuit MNA and PDK compact-model execution. It supports a uniform,
 homogeneous material, constant temperature, nondegenerate Boltzmann carriers,

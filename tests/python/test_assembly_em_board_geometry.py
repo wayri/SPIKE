@@ -4,7 +4,7 @@ import copy
 import unittest
 from shapely.geometry import Polygon
 
-from python.spike_core.assembly_em_board_geometry import prepare_routed_board_volume
+from python.spike_core.solvers.electromagnetics.fields.assembly_em_board_geometry import prepare_routed_board_volume
 
 
 def fixture():

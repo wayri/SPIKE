@@ -7,7 +7,7 @@ from unittest.mock import patch
 import numpy as np
 
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.thermal_copper_geometry import CopperGeometryError, rasterize_copper
+from python.spike_core.solvers.thermal_fluid.heat.thermal_copper_geometry import CopperGeometryError, rasterize_copper
 
 
 LAYERS = ["F.Cu", "In1.Cu", "B.Cu"]
@@ -26,7 +26,7 @@ class CopperGeometryTests(unittest.TestCase):
         zone = {"layer": "F.Cu", "points": points,
                 "filled_copper_state": "source_filled", "source_fill_provenance_complete": True,
                 "source_fill_representation": "flat_polygon_path"}
-        with patch("python.spike_core.thermal_copper_geometry._normalize_filled_zone_polygon",
+        with patch("python.spike_core.solvers.thermal_fluid.heat.thermal_copper_geometry._normalize_filled_zone_polygon",
                    side_effect=AssertionError("source path must not use simple-polygon repair")):
             fields, _ = raster(SpiDeR(zones=[zone]))
             zone["points"] = list(reversed(points))

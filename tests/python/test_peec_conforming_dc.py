@@ -6,11 +6,8 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.hybrid_mesh import HybridMesh, MeshBranch
-from python.spike_core.peec_conforming_dc import (
-    assemble_conforming_dc, solve_conforming_dc, triangle_resistance,
-    solve_hybridized_conforming_dc,
-)
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh, MeshBranch
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import assemble_conforming_dc, solve_conforming_dc, triangle_resistance, solve_hybridized_conforming_dc
 
 
 def rectangle_mesh(rectangles, contacts=(0, 1), conductance=1.0):

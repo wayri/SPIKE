@@ -6,9 +6,7 @@ import warnings
 
 import numpy as np
 
-from python.spike_core.si_clock_recovery import (
-    MAX_INPUT_SAMPLES, recover_nrz_clock, validate_cdr_model,
-)
+from python.spike_core.solvers.signal_integrity.receivers.si_clock_recovery import MAX_INPUT_SAMPLES, recover_nrz_clock, validate_cdr_model
 
 
 def waveform(offset_ppm=0, drift_ppm=0, samples_per_ui=32, phase=0.23,

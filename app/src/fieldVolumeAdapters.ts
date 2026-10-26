@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-import type { FieldVolumeData } from "./fieldVolumeModel";
+import { admitFieldVolume, type FieldVolumeData } from "./fieldVolumeModel";
 import type { CavityResult } from "./nativeCfdPresentation";
 
 type Row = Record<string, any>;
@@ -33,6 +33,11 @@ export function nativeCavityFieldVolume(result: CavityResult): FieldVolumeData |
 export function assemblyAirflowFieldVolume(result: Row): FieldVolumeData | null {
   if (result?.contract !== "spike/thermal-field-result/v1" || result?.status !== "completed" || result?.model_status !== "experimental"
       || result?.qualification?.production_qualified !== false) return null;
+  if (result.flow_field_volume !== undefined) {
+    // New workers retain native saved frames and streamlines. Malformed retained
+    // data must fail admission rather than silently becoming a terminal frame.
+    try { return admitFieldVolume(result.flow_field_volume); } catch { return null; }
+  }
   const temperature = result.fields?.temperature_k, velocity = result.fields?.velocity_m_s;
   if (temperature?.unit !== "K" || velocity?.unit !== "m/s" || !Array.isArray(temperature.samples) || !Array.isArray(velocity.samples)) return null;
   const temperatures = new Map<string, number>();

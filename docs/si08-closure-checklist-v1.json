@@ -1,0 +1,277 @@
+{
+  "contract": "spike/si08-finite-closure-checklist/v1",
+  "frozen_on": "2026-10-25",
+  "scope_version": 1,
+  "original_targets": [
+    "general_port_pairing",
+    "causality_resampling_dc",
+    "calibrated_fixture_removal",
+    "passive_causal_broadband_fitting"
+  ],
+  "policy": {
+    "implementation_complete": "All I01-I08 verified against current executed receipts.",
+    "full_family_complete": "Implementation complete and E01-E02 verified; never inferred from stage counts.",
+    "release_ready": "Full family complete and R01-R02 verified for the exact candidate.",
+    "external_gates_do_not_block_independent_implementation": true,
+    "scope_changes": "Change the version and record the reason; reopen affected acceptance. Do not split new stages to substitute for an unmet point."
+  },
+  "implementation": [
+    {
+      "id": "I01",
+      "title": "Named network interoperability and pairing",
+      "covers": [
+        "general_port_pairing"
+      ],
+      "depends_on": [],
+      "owner_role": "Network interoperability owner",
+      "status": "verified",
+      "steps": [
+        "Freeze receiver/source, polarity, pairing/unpaired-port, reference and source/export identity cases across all admitted contract bounds.",
+        "Execute one integrated import-transform-export replay with independent analytic answers and malformed/permutation/polarity cases."
+      ],
+      "acceptance": [
+        "Existing SI08-S01 and source-bound network tests; current end-to-end campaign receipt required."
+      ],
+      "evidence": "docs/validation/parity/SI08-I01-interoperability-r3-20261025.json",
+      "evidence_history": ["docs/validation/parity/SI08-I01-interoperability-20261025.json", "docs/validation/parity/SI08-I01-interoperability-r2-20261025.json"]
+    },
+    {
+      "id": "I02",
+      "title": "Causality, resampling and DC policy",
+      "covers": [
+        "causality_resampling_dc"
+      ],
+      "depends_on": [],
+      "owner_role": "SI network method owner",
+      "status": "verified",
+      "steps": [
+        "Retain explicit missing/supplied DC and interpolation policy; add analytical delayed/resonant causal and deliberately noncausal witness corpus.",
+        "Execute grid refinement and finite-band ambiguity cases; reports distinguish source causality unknown from a constructed causal realization."
+      ],
+      "acceptance": [
+        "Independent analytical causal/noncausal fixtures; policy and witness regression receipt."
+      ],
+      "evidence": "docs/validation/parity/SI08-I02-policy-20261025.json"
+    },
+    {
+      "id": "I03",
+      "title": "Operational known-standard calibration",
+      "covers": [
+        "calibrated_fixture_removal"
+      ],
+      "depends_on": [],
+      "owner_role": "Calibration owner",
+      "status": "planned",
+      "steps": [
+        "Integrate existing one-/multiport known-standard engines into strict public worker contracts with resource/cancellation admission.",
+        "Implement explicit general connected calibration-path graph within declared contract bounds, keeping unsupported crosstalk/acquisition states visible.",
+        "Exercise setup, saved input/coefficients/gauge/standards and capture replay, with independent ideal/nonideal references and invalid connectivity."
+      ],
+      "acceptance": [
+        "Current SI08-S06/S07 are partial offline evidence; fresh worker/graph/capture evidence required."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "I04",
+      "title": "Joint calibration and fixture uncertainty",
+      "covers": [
+        "calibrated_fixture_removal"
+      ],
+      "depends_on": [],
+      "owner_role": "Calibration uncertainty owner",
+      "status": "verified",
+      "steps": [
+        "Compose unchanged calibration and coupled fixture removal using one explicit joint covariance, including calibration/fixture cross-correlations and coordinate maps.",
+        "Verify analytic chain sensitivities against an independent full wave oracle, correlation/cancellation witnesses, port/storage permutations and local nonlinear refinement."
+      ],
+      "acceptance": [
+        "Source-bound coupled pipeline receipt with full-coordinate/covariance and failure checks."
+      ],
+      "evidence": "docs/validation/parity/SI08-I04-joint-uq-r2-20261025.json"
+    },
+    {
+      "id": "I05",
+      "title": "Automatic passive causal broadband fitting",
+      "covers": [
+        "passive_causal_broadband_fitting"
+      ],
+      "depends_on": [],
+      "owner_role": "Broadband model owner",
+      "status": "planned",
+      "steps": [
+        "Implement automatic stable real/complex-conjugate pole relocation with retained pre/post model and frequency scaling.",
+        "Assess broadband passivity between samples with a state-space bounded-real/Hamiltonian test; enforce only when a passive model is requested, retaining violation witnesses and failed models.",
+        "Freeze held-out delayed/resonant/multiport references, DC/high-frequency behavior, pole-order refinement, intersample violation and conditioning rejection."
+      ],
+      "acceptance": [
+        "Independent transfer-function and passive/active state-space references; all requested error/passivity gates must pass without repairs hidden from provenance."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "I06",
+      "title": "Loaded transient use of fitted models",
+      "covers": [
+        "passive_causal_broadband_fitting"
+      ],
+      "depends_on": [
+        "I05"
+      ],
+      "owner_role": "Transient network owner",
+      "status": "planned",
+      "steps": [
+        "Map real and conjugate-pair fitted states into the existing loaded circuit application boundary with explicit reference/port order.",
+        "Execute analytical and independently solved circuit cases, step refinement, long-horizon stability and passive energy accounting; expose unsupported singular/initial-condition cases."
+      ],
+      "acceptance": [
+        "Retained time/frequency/circuit comparison receipt with declared units and convergence tolerances."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "I07",
+      "title": "Complete desktop and saved workflow",
+      "covers": [
+        "general_port_pairing",
+        "causality_resampling_dc",
+        "calibrated_fixture_removal",
+        "passive_causal_broadband_fitting"
+      ],
+      "depends_on": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06"
+      ],
+      "owner_role": "Desktop integration owner",
+      "status": "planned",
+      "steps": [
+        "Expose supported operations and unsupported states through existing discovery/setup flow, schema/worker/desktop save/run/export and cancellation.",
+        "Execute actual native supported narrow/wide, import/edit/invalidation/error/recovery/export replays and reopen source-bound captures."
+      ],
+      "acceptance": [
+        "Actual worker/schema tests and trusted native observations with hashes; headless UI tests alone cannot close native acceptance."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "I08",
+      "title": "Integrated implementation acceptance manifest",
+      "covers": [
+        "general_port_pairing",
+        "causality_resampling_dc",
+        "calibrated_fixture_removal",
+        "passive_causal_broadband_fitting"
+      ],
+      "depends_on": [
+        "I01",
+        "I02",
+        "I03",
+        "I04",
+        "I05",
+        "I06",
+        "I07"
+      ],
+      "owner_role": "Integration owner",
+      "status": "planned",
+      "steps": [
+        "Pin one versioned manifest mapping every original SI08 target and I01-I07 acceptance to concrete source, fixture, observables, tolerances and executed current receipts.",
+        "Run all integrated cases, reject missing/stale/failed/overclaimed evidence, and publish implementation_complete separately from full_family_complete and release_ready."
+      ],
+      "acceptance": [
+        "Machine-checked manifest and replay of every implementation gate; no omitted scope gaps."
+      ],
+      "evidence": null
+    }
+  ],
+  "external_validation": [
+    {
+      "id": "E01",
+      "title": "Characterized standards and measurement corpus",
+      "status": "pending_external",
+      "owner_role": "Measurement owner",
+      "requires": [
+        "I03",
+        "I04"
+      ],
+      "steps": [
+        "Inventory local approved measured datasets; accept only original measurements with instrument/state/grid/reference/standards/certificate/source rights and repeatability/drift/noise evidence.",
+        "If absent, request dataset paths and calibration-certificate/budget provenance from owner; define the exact missing records without substituting synthetic data.",
+        "Pin the accepted corpus and uncertainty budgets with reviewed traceability and declared coverage conventions before measured comparisons."
+      ],
+      "evidence": null,
+      "blocker": "Owner confirmed on 25 October 2026: no measured corpus yet.",
+      "unblock_inputs": [
+        "Rights-approved VNA standards, fixture and DUT sweeps with explicit wave/reference/grid/instrument state",
+        "Calibration-standard definitions/certificates, repeatability/drift/noise records and joint covariance budget",
+        "Independent measured reference DUT and predeclared budget-derived comparison criteria"
+      ]
+    },
+    {
+      "id": "E02",
+      "title": "Independent measured correlation and applicability",
+      "status": "pending_external",
+      "owner_role": "Independent measurement reviewer",
+      "requires": [
+        "E01",
+        "I08"
+      ],
+      "steps": [
+        "Freeze observable-specific tolerances from the reviewed uncertainty budgets and an independent reference method before executing comparisons.",
+        "Compare calibrated fixture-corrected DUTs and fitted/transient predictions, document systematic residuals, standard-model applicability and nonlinear uncertainty adequacy.",
+        "Retain all failed cases and require review resolution within the frozen supported domain."
+      ],
+      "evidence": null
+    }
+  ],
+  "release": [
+    {
+      "id": "R01",
+      "title": "Knowledgeable human numerical review",
+      "status": "pending_release",
+      "owner_role": "Owner-designated qualified reviewer",
+      "requires": [
+        "I08",
+        "E02"
+      ],
+      "steps": [
+        "Provide governing references, independent derivations, source diffs and actual numerical/measurement evidence to the human reviewer.",
+        "Resolve recorded review findings and bind approval to the exact reviewed source; agent review is supplementary."
+      ],
+      "evidence": null
+    },
+    {
+      "id": "R02",
+      "title": "Exact installed candidate qualification",
+      "status": "pending_release",
+      "owner_role": "Release qualification owner",
+      "requires": [
+        "R01"
+      ],
+      "steps": [
+        "Build a new candidate that actually includes all accepted SI08 sources, schemas and native components; preserve previous immutable installers.",
+        "Execute clean installed worker/desktop/native acceptance, cancellation/resources, upgrade/reopen tests and source/binary coherence checks.",
+        "Record authorized wayri identity and publication scope; no automatic publication from development-stage completion."
+      ],
+      "evidence": null
+    }
+  ],
+  "execution_order": [
+    "I04",
+    "I01",
+    "I02",
+    "I03",
+    "I05",
+    "I06",
+    "I07",
+    "I08",
+    "E01",
+    "E02",
+    "R01",
+    "R02"
+  ],
+  "independent_si_pi_queue": "docs/SI_PI_EXECUTION_QUEUE_20261025.md"
+}

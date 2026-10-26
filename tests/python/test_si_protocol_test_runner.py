@@ -4,9 +4,7 @@ import unittest
 
 from tests.python.test_si_channel import SiUniformChannelTests
 from python.spike_core.service import handle
-from python.spike_core.si_protocol_test_runner import (
-    REQUEST_CONTRACT, SiProtocolTestRunnerError, run_si_protocol_test_suite,
-)
+from python.spike_core.solvers.signal_integrity.receivers.si_protocol_test_runner import REQUEST_CONTRACT, SiProtocolTestRunnerError, run_si_protocol_test_suite
 
 
 def fixture_suite() -> dict:

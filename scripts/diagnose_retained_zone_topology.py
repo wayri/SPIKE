@@ -9,8 +9,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.hybrid_mesh import _clean_polygon, _signed_polygon_area
-from python.spike_core.planar_polygon_topology import first_non_simple_edge_pair
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _clean_polygon, _signed_polygon_area
+from python.spike_core.solvers.geometry_meshing.preparation.planar_polygon_topology import first_non_simple_edge_pair
 
 
 def diagnose(path):

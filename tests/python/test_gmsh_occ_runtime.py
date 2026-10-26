@@ -10,7 +10,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core import gmsh_occ_runtime as runtime
+from python.spike_core.solvers.geometry_meshing.preparation import gmsh_occ_runtime as runtime
 from tests.python.test_gmsh_occ_mesher import request
 
 

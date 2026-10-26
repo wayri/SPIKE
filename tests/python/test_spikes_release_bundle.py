@@ -29,6 +29,7 @@ class SpikesReleaseBundleTests(unittest.TestCase):
             self.assertFalse(manifest["claims"]["production_signed"])
             self.assertGreater(len(manifest["files"]), 20)
             packaged_paths = {item["path"] for item in manifest["files"]}
+            self.assertIn("include/spikes/behavioral_expression.hpp", packaged_paths)
             self.assertIn("models/bsimbulk-107.2.1-windows-x64.osdi", packaged_paths)
             self.assertIn("models/bsimcmg-112.1.0-windows-x64.osdi", packaged_paths)
             self.assertIn("legal/bsimbulk-107.2.1/LICENSE.txt", packaged_paths)
@@ -37,7 +38,7 @@ class SpikesReleaseBundleTests(unittest.TestCase):
             # The public CLI imports these modules during startup and analysis.
             # Keeping them manifest-bound prevents a source checkout from
             # masking an incomplete archive during release verification.
-            self.assertIn("python/spike_core/native_mna.py", packaged_paths)
+            self.assertIn("python/spike_core/solvers/circuits/models/native_mna.py", packaged_paths)
             self.assertIn("python/core/board_parser.py", packaged_paths)
             self.assertIn("requirements-runtime-windows-x64.txt", packaged_paths)
             self.assertTrue(archive.is_file())

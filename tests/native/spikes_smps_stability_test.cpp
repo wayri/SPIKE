@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Original analytical oracles; no switched or hardware qualification implied.
-#include "spikes/smps_stability.hpp"
+#include "solvers/circuits/spikes/smps_stability.hpp"
 #include <algorithm>
 #include <cmath>
 #include <complex>

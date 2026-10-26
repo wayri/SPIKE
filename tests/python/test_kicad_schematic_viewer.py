@@ -7,12 +7,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from python.spike_core.kicad_schematic_importer import (
-    KicadSchematicViewError,
-    _parse_netlist,
-    _sanitize_svg,
-    import_kicad_schematic_view,
-)
+from python.spike_core.kicad_schematic_importer import KicadSchematicViewError, _parse_netlist, _sanitize_svg, import_kicad_schematic_view
 
 
 ROOT_SCH = '''(kicad_sch (version 20231120) (generator eeschema)

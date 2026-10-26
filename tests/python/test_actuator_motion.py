@@ -10,8 +10,8 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.actuator_force_map import CONTRACT as FORCE_CONTRACT
-from python.spike_core.actuator_motion import CONTRACT, simulate_actuator_motion
+from python.spike_core.solvers.electromagnetics.machines.actuator_force_map import CONTRACT as FORCE_CONTRACT
+from python.spike_core.solvers.electromagnetics.machines.actuator_motion import CONTRACT, simulate_actuator_motion
 
 
 def force_map(force=1.0):

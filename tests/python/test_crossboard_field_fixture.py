@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SigHarmonic
 import unittest
 from scripts.run_crossboard_openems import fixture
-from python.spike_core.openems_assembly_geometry import compile_assembly_geometry
+from python.spike_core.solvers.external_engines.openems.openems_assembly_geometry import compile_assembly_geometry
 
 
 class CrossboardFieldFixtureTests(unittest.TestCase):

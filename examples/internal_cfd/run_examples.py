@@ -13,9 +13,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.native_cht import run_native_cht, executable_path, REQUEST
-from python.spike_core.coupled_surface_exchange import (
-    coupled_surface_context_digest, transfer_coupled_surface_exchange)
+from python.spike_core.solvers.thermal_fluid.flow.native_cht import run_native_cht, executable_path, REQUEST
+from python.spike_core.solvers.execution.coupling.coupled_surface_exchange import coupled_surface_context_digest, transfer_coupled_surface_exchange
 
 
 def sha(path):
@@ -61,10 +60,10 @@ def main():
     if output.exists():
         parser.error("Choose a new output folder; existing evidence is never overwritten")
     output.mkdir(parents=True)
-    sources = [Path(__file__).resolve(), *sorted((ROOT/"src/airflow").glob("*.cpp")),
-        *sorted((ROOT/"src/airflow").glob("*.hpp")), ROOT/"src/airflow/CMakeLists.txt",
-        ROOT/"python/spike_core/native_cht.py", ROOT/"python/spike_core/native_cht_result.py",
-        ROOT/"python/spike_core/coupled_surface_exchange.py", ROOT/"python/spike_core/sparselizard_process.py",
+    sources = [Path(__file__).resolve(), *sorted((ROOT / 'src/solvers/thermal_fluid/airflow').glob("*.cpp")),
+        *sorted((ROOT / 'src/solvers/thermal_fluid/airflow').glob("*.hpp")), ROOT/"src/solvers/thermal_fluid/airflow/CMakeLists.txt",
+        ROOT/"python/spike_core/solvers/thermal_fluid/flow/native_cht.py", ROOT/"python/spike_core/solvers/thermal_fluid/flow/native_cht_result.py",
+        ROOT/"python/spike_core/solvers/execution/coupling/coupled_surface_exchange.py", ROOT/"python/spike_core/solvers/external_engines/sparselizard/sparselizard_process.py",
         *sorted(Path(__file__).parent.glob("*.json"))]
     before = {str(p.relative_to(ROOT)): sha(p) for p in sources}
     binary = executable_path()

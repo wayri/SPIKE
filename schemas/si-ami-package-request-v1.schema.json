@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/si-ami-package-request/v1",
+  "$comment": "SPDX-License-Identifier: Apache-2.0. Structural inventory request only. Finite JSON and the process transport budget remain mandatory. The decoder owns safe relative paths, distinct member identity, digest matching, canonical base64, decoded 4 MiB limit, bounded AMI syntax/semantics and response size. Passing this schema never authorizes library loading or execution.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "direction", "platform", "parameter_file", "executable_file"],
+  "properties": {
+    "contract": {"const": "spike/si-ami-package-request/v1"},
+    "direction": {"enum": ["tx", "rx"]},
+    "platform": {
+      "type": "string", "minLength": 1, "maxLength": 128,
+      "pattern": "^[A-Za-z0-9.-]+_[A-Za-z0-9.-]+_(32|64)$",
+      "not": {"pattern": "[^A-Za-z0-9._-]"}
+    },
+    "parameter_file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "text", "sha256"],
+      "properties": {
+        "path": {"allOf": [{"$ref": "#/$defs/member_name"}, {"pattern": "\\.ami$"}]},
+        "text": {
+          "type": "string", "minLength": 1, "maxLength": 1048576,
+          "not": {"pattern": "[^\t\r\n -~]"}
+        },
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    },
+    "executable_file": {
+      "type": "object", "additionalProperties": false,
+      "required": ["path", "base64", "sha256"],
+      "properties": {
+        "path": {"$ref": "#/$defs/member_name"},
+        "base64": {
+          "type": "string", "minLength": 4, "maxLength": 5592408,
+          "contentEncoding": "base64",
+          "pattern": "^[A-Za-z0-9+/]*={0,2}$",
+          "not": {"pattern": "[^A-Za-z0-9+/=]"}
+        },
+        "sha256": {"$ref": "#/$defs/sha256"}
+      }
+    }
+  },
+  "$defs": {
+    "member_name": {
+      "type": "string", "minLength": 1, "maxLength": 256,
+      "not": {"pattern": "[^ -~]"}
+    },
+    "sha256": {
+      "type": "string", "minLength": 64, "maxLength": 64,
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

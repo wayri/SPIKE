@@ -4,11 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from python.spike_core.pi_validation_evidence import (
-    PiValidationEvidenceError,
-    load_bound_pi_workflow_evidence,
-    validate_release_qualification_binding,
-)
+from python.spike_core.pi_validation_evidence import PiValidationEvidenceError, load_bound_pi_workflow_evidence, validate_release_qualification_binding
 
 
 def evidence() -> dict:

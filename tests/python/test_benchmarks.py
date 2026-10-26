@@ -1,6 +1,6 @@
 import unittest
 
-from python.spike_core.benchmarks import run_solver_benchmarks
+from python.spike_core.solvers.power_integrity.dc.benchmarks import run_solver_benchmarks
 
 
 class SolverBenchmarkTests(unittest.TestCase):

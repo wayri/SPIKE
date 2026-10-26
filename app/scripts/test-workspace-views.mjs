@@ -61,6 +61,8 @@ const base = {
   projectSession: "project-1", revision: "state-1", viewportRevision: "viewport-1",
   boards: { "design-A": board }, occurrences: [occurrence], assemblyModels: [{ id: "model-lid", partId: "lid" }],
   parts: [{ partId: "lid", title: "Lid" }], visibility: { "occ-A": true }, layerVisibility: { "occ-A": { "F.Cu": true } },
+  showNetNames: true, assemblyNetNameVisibility: { "occ-A": false, "occ-B": true },
+  zoneDisplay: "transparent", assemblyZoneDisplay: { "occ-A": "outline", "occ-B": "filled" },
   layerOpacity: { "occ-A": { "F.Cu": .8 } }, layerFocus: { "occ-A": "F.Cu" }, linkedNets: {},
   onAction: action => actions.push(action), onError: message => errors.push(message),
 };
@@ -76,6 +78,21 @@ ui.setActiveViewId(boardView.id); ui = runner.render(base);
 assert.equal(ui.activeRenderer.type, ScopedWorkspaceView);
 assert.equal(ui.activeRenderer.props.toolbarHost,sharedToolbarHost,"scoped controls use the shared row without changing view ownership");
 assert.equal(ui.activeRenderer.props.snapshot.targetBoards[0].id, "occ-A");
+assert.equal(ui.activeRenderer.props.snapshot.showNetNames, true);
+assert.deepEqual(ui.activeRenderer.props.snapshot.assemblyNetNameVisibility, { "occ-A": false });
+assert.equal(ui.activeRenderer.props.snapshot.zoneDisplay, "transparent");
+assert.deepEqual(ui.activeRenderer.props.snapshot.assemblyZoneDisplay, { "occ-A": "outline" }, "zone overrides stay occurrence scoped");
+const viewportBeforeToggle = ui.activeRenderer.props.viewport;
+const targetsBeforeToggle = ui.activeRenderer.props.snapshot.targetBoards;
+ui = runner.render({ ...base, assemblyNetNameVisibility: { "occ-A": true, "occ-B": true } });
+assert.deepEqual(ui.activeRenderer.props.snapshot.assemblyNetNameVisibility, { "occ-A": true }, "label changes invalidate scoped snapshot cache");
+assert.equal(ui.activeRenderer.props.viewport, viewportBeforeToggle, "label changes reuse the geometry payload");
+assert.equal(ui.activeRenderer.props.snapshot.targetBoards, targetsBeforeToggle, "label changes reuse scene occurrence inputs");
+ui = runner.render({ ...base, zoneDisplay: "filled", assemblyZoneDisplay: { "occ-A": "transparent", "occ-B": "outline" } });
+assert.equal(ui.activeRenderer.props.snapshot.zoneDisplay, "filled", "global zone changes invalidate the presentation snapshot");
+assert.deepEqual(ui.activeRenderer.props.snapshot.assemblyZoneDisplay, { "occ-A": "transparent" });
+assert.equal(ui.activeRenderer.props.viewport, viewportBeforeToggle, "zone changes reuse the geometry payload");
+assert.equal(ui.activeRenderer.props.snapshot.targetBoards, targetsBeforeToggle, "zone changes reuse scene occurrence inputs");
 ui.tabs.props.onMain(); ui = runner.render(base);
 assert.equal(ui.activeViewId, null); assert.equal(ui.activeRenderer, null, "Main unmounts the scoped WebGL renderer");
 ui.setActiveViewId(partView.id); ui = runner.render(base);
@@ -105,4 +122,55 @@ for (const candidate of [...maxUi.candidates]) { maxUi.addView(candidate); maxUi
 assert.equal(maxUi.views.length, model.MAX_WORKSPACE_VIEWS);
 assert.match(errors.at(-1), /At most 8/);
 
+// Exercise the actual scoped selector props and disconnected dispatch gate.
+const scopedSource = readFileSync(new URL("../src/ScopedWorkspaceView.tsx", import.meta.url), "utf8");
+const scopedJs = ts.transpileModule(scopedSource, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022, jsx: ts.JsxEmit.ReactJSX } }).outputText;
+const scopedModule = { exports: {} };
+const analysisResults = await importTestTypescript("analysisResults");
+const Selector = () => null;
+const BoardViewport = () => null;
+new Function("require", "module", "exports", scopedJs)(name => {
+  if (name === "react") return { useState: initial => [typeof initial === "function" ? initial() : initial, () => {}], useRef: initial => ({ current: initial }), useMemo: factory => factory(), useEffect() {} };
+  if (name === "react-dom") return { createPortal: node => node };
+  if (name === "react/jsx-runtime") return nativeRequire(name);
+  if (name === "./analysisResults") return analysisResults;
+  if (name === "./appSettings") return { loadAppSettings: () => ({}) };
+  if (name === "./icons") return { SlidersHorizontal: () => null, X: () => null };
+  if (name === "./ViewportLayerSelector") return { __esModule: true, default: Selector };
+  if (name === "./BoardViewport") return { __esModule: true, default: BoardViewport };
+  if (name.endsWith(".css")) return {};
+  return { __esModule: true, default: () => null };
+}, scopedModule, scopedModule.exports);
+function findSelector(node, component = Selector) {
+  if (!node || typeof node !== "object") return null;
+  if (node.type === component) return node;
+  const children = node.props?.children;
+  for (const child of Array.isArray(children) ? children.flat(Infinity) : [children]) {
+    const found = findSelector(child, component); if (found) return found;
+  }
+  return null;
+}
+const selectorActions = [];
+const selectorSnapshot = { ...base, descriptor: { id: "board-view", title: "Power board", scope: { kind: "board-occurrence", occurrenceId: "occ-A", designId: "design-A" }, viewMode: "3D", detached: false }, valid: true, targetBoards: [occurrence] };
+const renderedViewport = findSelector(scopedModule.exports.default({ snapshot: selectorSnapshot,
+  viewport: { boards: base.boards, revision: "viewport-1" }, connected: true, onAction() {} }), BoardViewport);
+assert.equal(renderedViewport.props.zoneDisplay, "transparent");
+assert.deepEqual(renderedViewport.props.assemblyZoneDisplay, base.assemblyZoneDisplay);
+assert.equal(renderedViewport.props.selectedBoardInstanceId, "occ-A", "the renderer resolves the fixed occurrence override ahead of global zone mode");
+const renderSelector = connected => findSelector(scopedModule.exports.default({ snapshot: selectorSnapshot, viewport: null, connected, onAction: action => selectorActions.push(action) }));
+const selector = renderSelector(true);
+assert.deepEqual(selector.props.board.opacity, { "F.Cu": .8 });
+selector.props.onOpacity("occ-A", "F.Cu", .25);
+selector.props.onAllOpacity("occ-A", .5);
+await new Promise(resolve => setImmediate(resolve));
+assert.deepEqual(selectorActions, [
+  { type: "layer-opacity", occurrenceId: "occ-A", layer: "F.Cu", value: .25 },
+  { type: "layer-opacity-all", occurrenceId: "occ-A", value: .5 },
+]);
+const disconnectedSelector = renderSelector(false);
+assert.equal(disconnectedSelector.props.disabled, true);
+disconnectedSelector.props.onOpacity("occ-A", "F.Cu", .7);
+disconnectedSelector.props.onAllOpacity("occ-A", .7);
+await new Promise(resolve => setImmediate(resolve));
+assert.equal(selectorActions.length, 2, "disconnected views cannot send opacity changes even through callbacks");
 console.log("workspace view hook harness: ok");

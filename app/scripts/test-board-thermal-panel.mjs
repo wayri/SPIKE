@@ -1,3 +1,4 @@
+import loadSolverSetupSteps from "./load-solver-setup-steps.mjs";
 // SPDX-License-Identifier: Apache-2.0
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -22,7 +23,17 @@ const PlotlyChart = ({ title, data, layout, revision }) => React.createElement("
   "data-plot-layout": JSON.stringify(layout),
   "data-plot-revision": revision,
 });
+let latestGuidedAdapter;
 const dependencies = {
+  "./boardThermalFieldVolume": await importTestTypescript("boardThermalFieldVolume"),
+  "./mainFieldViewport": { showFieldInMainViewport: () => {} },
+  "./useGuidedRunAdapter": { useGuidedRunAdapter: adapter => { latestGuidedAdapter = adapter; return async () => {
+    const signal = new AbortController().signal, checked = await adapter.check(adapter.context, signal);
+    const blocker = checked.requirements.find(row => row.severity === "blocker");
+    if (blocker) { adapter.fix(blocker); return; }
+    await adapter.run(adapter.context, signal);
+  }; } },
+  "./SolverSetupSteps": loadSolverSetupSteps(),
   react: React,
   "react/jsx-runtime": require("react/jsx-runtime"),
   "./thermalResultFields": { thermalFieldColor: value => value < 35 ? [0, 0, 1] : [1, 0, 0] },
@@ -121,6 +132,7 @@ let workerRequest;
 const interactive = { exports: {} };
 new Function("require", "module", "exports", compiled)(name => name === "react" ? {
   useEffect() {},
+  useRef: initial => ({current:initial}),
   useState(initial) {
     const index = cursor++;
     if (!(index in states)) states[index] = typeof initial === "function" ? initial() : initial;
@@ -142,7 +154,7 @@ function findNode(node, predicate) {
   return null;
 }
 const run = findNode(mount(), node => node.type === "button" && node.props.className === "run-btn");
-run.props.onClick();
+await run.props.onClick();
 await new Promise(resolve => setImmediate(resolve));
 assert.equal(workerRequest.method, "run_board_thermal");
 assert.equal(workerRequest.params.assembly_scope, null);
@@ -156,7 +168,7 @@ mode.props.onChange({ target: { value: "square" } });
 const width = findNode(mount(), node => node.type === "input" && node.props["aria-label"] === "U1 contact_size_mm");
 assert.equal(width.props.disabled, false);
 width.props.onChange({ target: { value: "2" } });
-findNode(mount(), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 await new Promise(resolve => setImmediate(resolve));
 assert.equal(workerRequest.params.request.components[0].contact_mode, "square");
 assert.equal(workerRequest.params.request.components[0].contact_size_mm, 2);
@@ -174,7 +186,7 @@ const model = findNode(mount(layeredBoard, design, layeredRequest), node => node
 assert.equal(model.props.value, "layered");
 assert.match(renderToStaticMarkup(mount(layeredBoard, design, layeredRequest)), /Via plating thickness/);
 assert.match(renderToStaticMarkup(mount(layeredBoard, design, layeredRequest)), /3 depth layers/);
-findNode(mount(layeredBoard, design, layeredRequest, "(kicad_pcb fixture)"), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(layeredBoard, design, layeredRequest, "(kicad_pcb fixture)"), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 await new Promise(resolve => setImmediate(resolve));
 assert.equal(workerRequest.params.request.board.model, "layered");
 assert.equal(workerRequest.params.source_kicad_pcb, "(kicad_pcb fixture)");
@@ -185,7 +197,7 @@ states.length = 0;
 const localRequest = { ...layeredRequest, board: { ...layeredRequest.board, grid_step_mm: undefined,
   x_edges_mm: [0, 1, 20], y_edges_mm: [0, 10], copper_raster_step_mm: 10,
   ambient_top_grid_c: [25, 30] }, components: [{ ...layeredRequest.components[0], contact_pad_numbers: ['1'] }] };
-findNode(mount(layeredBoard, design, localRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(layeredBoard, design, localRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 await new Promise(resolve => setImmediate(resolve));
 assert.deepEqual(workerRequest.params.request.board.x_edges_mm, [0, 1, 20]);
 assert.deepEqual(workerRequest.params.request.board.ambient_top_grid_c, [25, 30]);
@@ -194,7 +206,7 @@ assert.deepEqual(workerRequest.params.request.components[0].contact_pad_numbers,
 assert.match(findNode(mount(layeredBoard, design, localRequest), node => node.props?.role === 'alert').props.children,
   /invalid result/, 'the mock returns unselected pad2 and must be rejected');
 states.length = 0;
-findNode(mount(layeredBoard, design, layeredRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(layeredBoard, design, layeredRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 await new Promise(resolve => setImmediate(resolve));
 const layer = findNode(mount(layeredBoard, design, layeredRequest), node => node.type === "select" && node.props["aria-label"] === "Temperature layer");
 layer.props.onChange({ target: { value: "0" } });
@@ -214,7 +226,7 @@ const sinkMarkup = renderToStaticMarkup(React.createElement(BoardThermalPanel, {
 assert.match(sinkMarkup, /VIRTUAL BOARD HEATSINKS/);
 assert.match(sinkMarkup, /Virtual heatsink heat paths/);
 assert.match(sinkMarkup, /0\.5000/);
-findNode(mount(layeredBoard, design, sinkRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(layeredBoard, design, sinkRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 await new Promise(resolve => setImmediate(resolve));
 assert.deepEqual(workerRequest.params.request.virtual_heatsinks, sinkRequest.virtual_heatsinks);
 states.length = 0;
@@ -231,7 +243,7 @@ const transientMarkup = renderToStaticMarkup(React.createElement(BoardThermalPan
 assert.match(transientMarkup, /TRANSIENT BOARD ANIMATION/);
 assert.match(transientMarkup, /Maximum board temperature versus transient time/);
 assert.match(transientMarkup, /Transient board time frame/);
-findNode(mount(layeredBoard, design, transientRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(layeredBoard, design, transientRequest), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 await new Promise(resolve => setImmediate(resolve));
 assert.deepEqual(workerRequest.params.request.transient, transientRequest.transient);
 states.length = 0;
@@ -240,19 +252,19 @@ assert.equal(defaultLayered.props.value, "layered");
 states.length = 0;
 workerRequest = undefined;
 const oversized = { ...layeredRequest, board: { ...layeredRequest.board, grid_step_mm: 0.01 } };
-findNode(mount(layeredBoard, design, oversized), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(layeredBoard, design, oversized), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 assert.match(findNode(mount(layeredBoard, design, oversized), node => node.props?.role === "alert").props.children, /above the 8,192-cell limit/);
 assert.equal(workerRequest, undefined);
 states.length = 0;
 const mismatched = { ...layeredRequest, board: { ...layeredRequest.board, thickness_mm: 2 } };
-findNode(mount(layeredBoard, design, mismatched), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(layeredBoard, design, mismatched), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 assert.match(findNode(mount(layeredBoard, design, mismatched), node => node.props?.role === "alert").props.children, /agree with imported physical stackup thickness/);
 assert.equal(workerRequest, undefined);
 states.length = 0;
 workerRequest = undefined;
 const noPads = { ...board, pads: [] };
 const noPadDesign = { ...design, pads: [] };
-findNode(mount(noPads, noPadDesign), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
+await findNode(mount(noPads, noPadDesign), node => node.type === "button" && node.props.className === "run-btn").props.onClick();
 const alert = findNode(mount(noPads, noPadDesign), node => node.props?.role === "alert");
 assert.match(alert.props.children, /U1 has no eligible imported copper pads/);
 assert.equal(workerRequest, undefined, "invalid pad mode must not reach the worker");
@@ -267,7 +279,33 @@ const volumeNavigation = mount(board, design, request, null, () => { solidStudyO
 assert.match(renderToStaticMarkup(volumeNavigation), /this board-grid solve has no meshed package solids/);
 const openSolidStudy = findNode(volumeNavigation, isSolidStudyButton);
 assert.ok(openSolidStudy);
-openSolidStudy.props.onClick();
+await openSolidStudy.props.onClick();
 assert.equal(solidStudyOpens, 1, "volume study action must invoke the host navigation callback");
 assert.equal(workerRequest, undefined, "navigation must not implicitly solve or alter the board thermal case");
 console.log("Board thermal model coverage and explicit solid study navigation passed.");
+
+// Actual live adapter checks reuse the editor validation and never call a solver.
+render(request, null);
+const ready = latestGuidedAdapter;
+assert.equal((await ready.check()).requirements.length, 0);
+const revision = ready.context.revision;
+render(structuredClone(request), null);
+assert.equal(latestGuidedAdapter.context.revision, revision, "equal reconstructed inputs keep readiness stable");
+render({ ...request, components: [] }, null);
+let guided = await latestGuidedAdapter.check();
+assert.equal(guided.requirements[0].route, "loads");
+assert.match(guided.requirements[0].detail, /positive power/);
+render({ ...request, board: {...request.board, conductivity_w_mk: 0} }, null);
+guided = await latestGuidedAdapter.check();
+assert.equal(guided.requirements[0].route, "domain");
+assert.match(guided.requirements[0].detail, /conductivity/);
+render({ ...request, components: [{...request.components[0], r_case_board_k_w: 0}] }, null);
+guided = await latestGuidedAdapter.check();
+assert.equal(guided.requirements[0].route, "loads");
+render({ ...request, board: {...request.board, convection_top_w_m2k: 0, convection_bottom_w_m2k: 0} }, null);
+guided = await latestGuidedAdapter.check();
+assert.equal(guided.requirements[0].route, "solver");
+assert.match(guided.requirements[0].detail, /positive convection/);
+assert.equal(ready.tutorSteps.length, 4);
+assert.match(source, /onClick=\{requestBoardRun\}/);
+console.log("Board thermal guided run: shared validation, source revisions and heat-path repair routes passed");

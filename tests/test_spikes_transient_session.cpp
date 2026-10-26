@@ -1,4 +1,4 @@
-#include "spikes/transient_session.hpp"
+#include "solvers/circuits/spikes/transient_session.hpp"
 
 #include <cmath>
 #include <iostream>

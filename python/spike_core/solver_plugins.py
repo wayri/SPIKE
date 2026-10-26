@@ -16,9 +16,9 @@ from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, List, Protocol
 
 from .contracts import AnalysisResult, AnalysisSpec, SpiDeR, ValidationIssue
-from .dc_solver import solve_dc
-from .source_current_limits import CAPABILITY, capacity_failure, current_limit_issues, has_current_limits
-from .solver_geometry import build_solver_geometry
+from .solvers.power_integrity.dc.dc_solver import solve_dc
+from .solvers.power_integrity.dc.source_current_limits import CAPABILITY, capacity_failure, current_limit_issues, has_current_limits
+from .solvers.geometry_meshing.preparation.solver_geometry import build_solver_geometry
 
 
 PLUGIN_CONTRACT = "spike/solver-plugin/v1"
@@ -507,9 +507,9 @@ def _blocked_result(
 
 
 def default_solver_registry() -> SolverRegistry:
-    from .ngspice_plugin import NgspicePlugin
-    from .peec_plugin import native_available, solve_peec_2_5d
-    from .transient_peec import solve_peec_rl_transient
+    from .solvers.external_engines.circuits.ngspice_plugin import NgspicePlugin
+    from .solvers.power_integrity.peec.peec_plugin import native_available, solve_peec_2_5d
+    from .solvers.power_integrity.peec.transient_peec import solve_peec_rl_transient
 
     registry = SolverRegistry()
     registry.register(BuiltinSolverPlugin(

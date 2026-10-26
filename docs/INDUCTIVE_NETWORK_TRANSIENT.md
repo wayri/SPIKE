@@ -9,7 +9,7 @@ general circuit/DAE solver or a physical broadband qualification of sampled data
 ## Contract and use
 
 Call `run_inductive_network_transient(request)` in
-`python.spike_core.sparameter_inductive_terminated`, or use the worker method
+`python.spike_core.solvers.signal_integrity.networks.sparameter_inductive_terminated`, or use the worker method
 of the same name with exactly `params: {request: ...}`. The desktop script
 workspace can invoke the API. No dedicated inductive-boundary editor is added.
 The executable original example is:

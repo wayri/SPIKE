@@ -14,9 +14,9 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from python.spike_core.contracts import AnalysisSpec
-from python.spike_core.peec_conforming_mesh import build_conforming_mesh
-from python.spike_core.peec_conforming_dc import solve_hybridized_conforming_dc
-from python.spike_core.peec_plugin import _connected_component
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_mesh import build_conforming_mesh
+from python.spike_core.solvers.power_integrity.peec.peec_conforming_dc import solve_hybridized_conforming_dc
+from python.spike_core.solvers.power_integrity.peec.peec_plugin import _connected_component
 from python.spike_core.service import _design_from_kicad
 
 
@@ -168,9 +168,9 @@ def audit(board: Path, sizes: list[float], *, max_unknowns: int = 150000,
         "scope":"experimental sparse DC only; no L/C/AC/thermal or release qualification",
         "board_sha256":hashlib.sha256(board.read_bytes()).hexdigest(),
         "source_sha256":{str(path.relative_to(ROOT)):hashlib.sha256(path.read_bytes()).hexdigest()
-            for path in (Path(__file__), ROOT/"python/spike_core/peec_conforming_mesh.py",
-                         ROOT/"python/spike_core/peec_conforming_dc.py",
-                         ROOT/"python/spike_core/conforming_local_refinement.py")},
+            for path in (Path(__file__), ROOT/"python/spike_core/solvers/power_integrity/peec/peec_conforming_mesh.py",
+                         ROOT/"python/spike_core/solvers/power_integrity/peec/peec_conforming_dc.py",
+                         ROOT/"python/spike_core/solvers/geometry_meshing/preparation/conforming_local_refinement.py")},
         "max_unknowns":max_unknowns, "max_triangles":max_triangles,
         "interior_edge_factor":interior_edge_factor,
         "sizes_mm":sizes, "rows":rows,

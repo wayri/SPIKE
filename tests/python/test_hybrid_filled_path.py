@@ -1,15 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 """A retained source cutout must survive meshing and graph construction."""
+from dataclasses import asdict
 import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.filled_copper_path import FilledCopperPath
-from python.spike_core.hybrid_mesh import (
-    _normalize_filled_zone_polygon, _point_in_polygon, _polygon_area,
-    _polygon_is_contained_in, _segment_inside_polygon, _segments,
-    build_hybrid_mesh,
-)
+from python.spike_core.solvers.power_integrity.dc.filled_copper_path import FilledCopperPath
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import _normalize_filled_zone_polygon, _point_in_polygon, _polygon_area, _polygon_is_contained_in, _segment_inside_polygon, _segments, build_hybrid_mesh
 
 
 def source_path():
@@ -64,6 +61,24 @@ class HybridFilledPathTests(unittest.TestCase):
                 stack.extend(adjacent[index]-reached)
         self.assertTrue(set(owners) <= reached)
 
+    def test_indexed_cell_candidates_preserve_complete_mesh_identity(self):
+        design = SpiDeR(layers=[{'name': 'F.Cu'}], zones=[{
+            'id': 'source-with-hole', 'layer': 'F.Cu', 'net_name': 'VCC',
+            'points': source_path(),
+        }])
+        spec = AnalysisSpec(mode='dc', net_names=['VCC'], mesh={
+            'zone_cell_mm': 0.5, 'node_tolerance_mm': 1e-6,
+            'max_zone_cells': 1000,
+        })
+        with patch(
+            'python.spike_core.solvers.geometry_meshing.preparation.boundary_spatial_index.'
+            'BoundarySpatialIndex.query_indexed_edges',
+            lambda index, _bounds: tuple(enumerate(index.original_edges)),
+        ):
+            full_scan = build_hybrid_mesh(design, spec)
+        indexed = build_hybrid_mesh(design, spec)
+        self.assertEqual(asdict(indexed), asdict(full_scan))
+
     def test_narrow_hole_is_not_bridged_by_node_or_face_tolerance(self):
         source = [(0., 0.), (8., 0.), (8., 6.), (0., 6.), (0., 0.),
                   (4.00001, 4.), (4.00001, 2.), (4., 2.), (4., 4.), (4.00001, 4.)]
@@ -84,7 +99,7 @@ class HybridFilledPathTests(unittest.TestCase):
             'id': 'source-with-hole', 'layer': 'F.Cu', 'net_name': 'VCC',
             'points': source_path(),
         }])
-        with patch('python.spike_core.filled_copper_path.MAX_CELL_FRAGMENT_WORK', 0):
+        with patch('python.spike_core.solvers.power_integrity.dc.filled_copper_path.MAX_CELL_FRAGMENT_WORK', 0):
             mesh = build_hybrid_mesh(design, AnalysisSpec(mode='dc', net_names=['VCC'],
                 mesh={'zone_cell_mm': 1.}))
         self.assertEqual(mesh.branches, [])

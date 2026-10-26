@@ -1,8 +1,8 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
-# SPIKE electronics parity, general physics and wave optics plan
+# SPIKE electronics parity and general physics plan
 
 Electronics planning baseline: 12 October 2026. General physics, visualization,
-materials, acceleration and wave-optics scope expansion: 14 October 2026.
+materials and acceleration scope expansion: 14 October 2026.
 
 The [18 October platform strategy](MULTIPHYSICS_PLATFORM_STRATEGY.md) establishes
 general multiphysics simulation as the product direction, with simulation
@@ -21,12 +21,8 @@ SI/field/cooling coverage and establish the original parity program first.
 On 18 October 2026 the user explicitly activated a parallel coupled mechanics,
 magnetics, failure and semiconductor-device track. Its bounded scope and stages
 are defined in [the coupled suite plan](COUPLED_MECHANICS_MAGNETICS_DEVICES_PLAN.md).
-PI/SI remains the primary parity program. The 21 October owner request separately
-authorizes [optics/materials development](OPTICS_PHOTONICS_MATERIALS_PLAN.md)
-in parallel. Legacy OP01–OP05 backlog stages remain planned pending their own
-prerequisites/evidence; this scheduling exception does not open production or
-parity-completion gates. Unrelated expansion retains its existing policy.
-Adding solver names or controls alone
+PI/SI remains the primary parity program. Unrelated expansion retains its
+existing policy. Adding solver names or controls alone
 does not achieve parity.
 
 HyperLynx parity covers its SI, PI, schematic analysis, analog mixed-signal,
@@ -171,13 +167,12 @@ extend its current neutral contracts rather than duplicate each domain's setup.
 | WF05 | Batch, optimization and scalable execution | Bounded independent local/remote worker jobs exist; no general single-solve MPI or AMD/Intel GPU claim. [Worker manager](PARALLEL_WORKER_MANAGER.md). | Workload-specific scheduling, checkpoint/recovery, reuse caches; profile before adding distributed kernels/GPU; validate each backend. | P1 M2, P2 M5 |
 | WF06 | Measurement correlation and release qualification | Analytical/reference records and recorded telemetry comparison exist; general physical parity is unqualified. [Co-simulation](COSIMULATION_DIGITAL_TWIN.md), [contributing](../CONTRIBUTING.md). | Version-bound qualification packs, calibrated measurements, separate calibration/validation sets, supported-envelope reports and human numerical release review. | P0 M0, all milestones |
 
-## General physics, optics and scale expansion
+## General physics and scale expansion
 
 The 34 requirements below retain expansion scope; the explicitly requested coupled subset may proceed in parallel. Complete the
 original 34-family parity program before refining and implementing these additions. Reuse
 existing EM/TH/WF owners and contracts; overlapping foundations are shared work,
-not duplicate solver stacks. Full requirements, screenshot mappings, benchmark
-sequence and limits are in [the general physics and wave-optics plan](GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md).
+not duplicate solver stacks.
 
 | ID | Target capability | SPIKE baseline and evidence | Required improvement | Priority and milestone |
 | --- | --- | --- | --- | --- |
@@ -197,11 +192,6 @@ sequence and limits are in [the general physics and wave-optics plan](GENERAL_PH
 | GP16 | Satellite and launch-vehicle coupled dynamics | Requested target; current bounded mechanics does not establish this workflow. [Plan](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md). | Mission-bound environmental/coupled loads, spacecraft thermal-vacuum/attitude/jitter/deployment and launcher ascent/staging/GNC/flexible dynamics with independent and measured evidence. | Authorized parallel track; P1 M7 |
 | GP08 | Acoustic wave and vibroacoustic studies | General acoustic/building/vibroacoustic qualification is not established. [Evidence](SOLVER_STATUS.md). | Pressure waves, sources/impedance/absorbing boundaries, structural coupling, modal/transient/harmonic observables and domain/mesh/time references. | Post-parity; P2 M7 |
 | GP09 | Conservative general multiphysics coupling | Bounded reduced/retained coupling and co-simulation exist; general PDE coupling remains open. [Evidence](COSIMULATION_DIGITAL_TWIN.md). | Shared dependency graph, conservative nonmatching transfers, nonlinear/time-scale coupling, rollback, conservation and coupled convergence; reuse WF04/TH05. | Authorized parallel track; P0 M1, P2 M7 |
-| OP01 | Geometrical optics and lens/mirror assemblies | General mirror/lens ray tracing is not established; far-zone scattering is a different scope. [Evidence](SOLVER_STATUS.md). | Parametric/aspheric surfaces, normals/frames, stops/detectors, reflection/refraction, sequential/nonsequential rays, optical path and controlled multiple reflections. | Post-parity; P1 M9 |
-| OP02 | Coherent scalar wave propagation and diffraction | General coherent mirror/lens diffraction workflow is not established. [Evidence](SOLVER_STATUS.md). | Bounded Gaussian/Fresnel/angular-spectrum propagation, apertures and amplitude/phase surfaces; explicit scalar/paraxial limits, sampling/window refinement and power/phase checks. | Post-parity; P1 M9 |
-| OP03 | Vector wave optics, modes and resonators | Existing RF/PEC scattering adapters do not qualify dielectric vector optical assemblies. [Evidence](SOLVER_STATUS.md). | Polarized vector Maxwell/beam-envelope problems, high-NA/wavelength-scale structures, waveguides/resonators, PML/interfaces and modal/scattering power convergence. | Post-parity; P2 M9 |
-| OP04 | Optical materials and coatings | No qualified general spectral coating/index catalog established. [Evidence](SOLVER_STATUS.md). | Conditioned complex index/absorption/dispersion and anisotropy; passive multilayer amplitude/phase response, Fresnel/TIR and coating reference checks. | Post-parity; P0 M1, P1 M9 |
-| OP05 | Structural-thermal-optical performance | General STOP and optical assembly correlation are not established. [Evidence](SOLVER_STATUS.md). | Absorption-to-heat, dn/dT, stress/deformed surfaces and alignment/tolerance; PSF/MTF/wavefront/error and coupled conservation with independent correlation. | Post-parity; P2 M9 |
 | VF01 | General scientific field visualization | Existing contours, field samples and domain viewers cover bounded result types. [Evidence](VISUALIZATION_ARCHITECTURE.md). | Typed scalar/vector/tensor node/cell/face/sample fields; slices, isosurfaces, volumes, glyphs and streamlines with units, masks, interpolation and raw-result binding. | Authorized parallel track; P0 M1, M7 |
 | VF02 | Time, phase, motion and linked scientific probes | Some time/phase/field viewers exist; a general synchronized scientific scene is not established. [Evidence](VISUALIZATION_ARCHITECTURE.md). | Declared complex/real/modal semantics, transient/rotor/deformation/ray/particle animation, linked probes/integrals, reproducible exports and rendering budgets. | Authorized parallel track; P1 M7, M9 |
 | AX01 | Scalable physics execution and algebra | Hybrid DC acceleration includes single-process PETSc/MUMPS and optional CUDA; general single-solve MPI is absent. [Evidence](ACCELERATION_ARCHITECTURE.md). | Workload-specific matrix-free/sparse/FFT kernels, compatible Krylov/block/AMG methods, CPU/GPU/MPI qualification, precision/error controls and measured RAM/VRAM/time budgets. | Authorized parallel track; P1 M8 |
@@ -237,7 +227,7 @@ as a parallel coupled-physics track. The follow-up adds GP12-GP16 vibration,
 electronics reliability, mechanisms, drones and aerospace systems, plus GP05
 restricted to vehicle aerodynamics. See [the delivery matrix](VIBRATION_VEHICLES_AND_MECHANISMS_PLAN.md).
 This permission does not mark these
-families complete or open the full post-parity gate. Remaining OP, general GP05 outside vehicle aerodynamics, GP08,
+families complete or open the full post-parity gate. Remaining general GP05 outside vehicle aerodynamics, GP08,
 AX02, RF and PW expansion stays deferred. The backlog checker enforces the
 precise exception and retains the full original-family completion gate.
 

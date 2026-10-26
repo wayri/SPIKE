@@ -71,7 +71,59 @@ export function admitFieldVolume(value: unknown): FieldVolumeData {
   return { contract: "spike/field-volume-view/v1", id: data.id, label: data.label, lengthUnit: data.lengthUnit as "m" | "mm", geometryNote: data.geometryNote as string | undefined, ...(geometry ? { geometry } : {}),
     cells: { centers: cells.centers.map(v => [...v] as FieldPoint), ...(Array.isArray(cells.sizes) ? { sizes: cells.sizes.map(v => [...v] as FieldPoint) } : {}), ...(cells.flowDomain ? { flowDomain: "complete-cartesian-fluid" as const } : {}) }, quantities, frames };
 }
-export type FieldViewOptions = { frame: number; quantity: string; mode: "voxels" | "points" | "streamlines" | "streamtubes"; arrows: boolean; opacity: number; budget: number; sliceAxis: "all" | "x" | "y" | "z"; slicePercent: number; celsius: boolean; seedAxis?: "x" | "y" | "z"; seedDensity?: number; streamWidth?: number; showSolids?: boolean; solidOpacity?: number };
+export type FieldViewOptions = { frame: number; quantity: string; mode: "voxels" | "points" | "streamlines" | "streamtubes"; arrows: boolean; opacity: number; budget: number; sliceAxis: "all" | "x" | "y" | "z"; slicePercent: number; celsius: boolean; seedAxis?: "x" | "y" | "z"; seedDensity?: number; streamWidth?: number; showSolids?: boolean; solidOpacity?: number; colorRange?: [number, number]; sampleIndex?: number; contextOpacity?: number; pointSize?: number };
+
+/** Presets only select existing presentation paths; they never synthesize field quantities. */
+export function fieldInspectionPresets(data: FieldVolumeData, frame: number) {
+  const volumeMode = data.cells.sizes ? "voxels" as const : "points" as const;
+  const supplied = Boolean(data.frames[Math.max(0, Math.min(data.frames.length - 1, Math.trunc(frame)))]?.streamlines?.length);
+  return [
+    { id: "volume", label: data.cells.sizes ? "Full volume" : "All sample points", available: true, reason: "", patch: { mode: volumeMode, sliceAxis: "all" as const, slicePercent: 100 } },
+    { id: "cutaway", label: "Half-volume cutaway", available: true, reason: "", patch: { mode: volumeMode, sliceAxis: "x" as const, slicePercent: 50 } },
+    { id: "supplied", label: "Supplied field lines", available: supplied, reason: supplied ? "" : "No saved curves in this frame; field lines are not inferred from scalar samples.", patch: { mode: "streamlines" as const, sliceAxis: "all" as const, slicePercent: 100, arrows: false } },
+  ];
+}
+
+/** Exact stored cell samples, before clipping or display-budget reduction. */
+export function fieldSampleInspection(data: FieldVolumeData, options: FieldViewOptions) {
+  const quantity = data.quantities.find(q => q.id === options.quantity);
+  if (!quantity) throw new Error("Select an available field quantity.");
+  const frame = data.frames[Math.max(0, Math.min(data.frames.length - 1, Math.trunc(options.frame)))];
+  const convert = (value: number) => options.celsius && quantity.unit === "K" ? value - 273.15 : value;
+  const values = frame.scalars[quantity.id];
+  let low = 0, high = 0;
+  for (let i = 1; i < values.length; i++) { if (values[i] < values[low]) low = i; if (values[i] > values[high]) high = i; }
+  const sample = (index: number) => ({ index, value: convert(values[index]), point: data.cells.centers[index] });
+  const selected = Number.isFinite(options.sampleIndex) ? Math.max(0, Math.min(values.length - 1, Math.trunc(options.sampleIndex!))) : 0;
+  return { minimum: sample(low), maximum: sample(high), selected: sample(selected), count: values.length,
+    unit: options.celsius && quantity.unit === "K" ? "°C" : quantity.unit };
+}
+
+/** Manual endpoints are expressed in the selected display unit. Invalid ranges recover to the saved-data range. */
+export function fieldColorRange(range: FieldViewOptions["colorRange"], minimum: number, maximum: number): [number, number] {
+  return range?.length === 2 && range.every(Number.isFinite) && range[0] < range[1] ? [range[0], range[1]] : [minimum, maximum];
+}
+
+export function fieldSavedRange(data: FieldVolumeData, options: Pick<FieldViewOptions, "quantity" | "celsius">): [number, number] {
+  const quantity = data.quantities.find(q => q.id === options.quantity);
+  if (!quantity) throw new Error("Select an available field quantity.");
+  let minimum = Infinity, maximum = -Infinity;
+  const include = (value: number) => { const displayed = options.celsius && quantity.unit === "K" ? value - 273.15 : value; minimum = Math.min(minimum, displayed); maximum = Math.max(maximum, displayed); };
+  for (const frame of data.frames) {
+    frame.scalars[quantity.id].forEach(include);
+    for (const path of frame.streamlines ?? []) path.scalars[quantity.id].forEach(include);
+  }
+  return [minimum, maximum];
+}
+
+/** Renderer-generated curves share the saved vector-magnitude scale across frames. */
+export function fieldSavedSpeedRange(data: FieldVolumeData): [number, number] {
+  let minimum = Infinity, maximum = -Infinity;
+  for (const frame of data.frames) for (const vector of frame.vectors ?? []) {
+    const speed = Math.hypot(...vector); minimum = Math.min(minimum, speed); maximum = Math.max(maximum, speed);
+  }
+  return minimum === Infinity ? [0, 0] : [minimum, maximum];
+}
 export function fieldViewPlot(data: FieldVolumeData, options: FieldViewOptions) {
   const quantity = data.quantities.find(q => q.id === options.quantity);
   if (!quantity) throw new Error("Select an available field quantity.");
@@ -85,12 +137,11 @@ export function fieldViewPlot(data: FieldVolumeData, options: FieldViewOptions) 
     data.cells.centers.forEach((p, index) => { const half = (data.cells.sizes?.[index][axis] ?? 0) / 2; low = Math.min(low, p[axis] - half); high = Math.max(high, p[axis] + half); });
     return [low, high];
   });
-  let minimum = Infinity, maximum = -Infinity, maxSpeed = 0;
+  let [minimum, maximum] = fieldSavedRange(data, options), maxSpeed = 0;
   for (const saved of data.frames) {
-    for (const v of saved.scalars[quantity.id]) { minimum = Math.min(minimum, convert(v)); maximum = Math.max(maximum, convert(v)); }
-    if (saved.streamlines) for (const path of saved.streamlines) for (const v of path.scalars[quantity.id]) { minimum = Math.min(minimum, convert(v)); maximum = Math.max(maximum, convert(v)); }
     if (saved.vectors) for (const v of saved.vectors) maxSpeed = Math.max(maxSpeed, Math.hypot(...v));
   }
+  [minimum, maximum] = fieldColorRange(options.colorRange, minimum, maximum);
   if (options.mode === "streamlines" || options.mode === "streamtubes") {
     const streams = streamPresentation(data, { mode: options.mode, frame: Math.max(0, Math.min(data.frames.length - 1, Math.trunc(options.frame))), quantity: quantity.id, unit, celsius: options.celsius, minimum, maximum, opacity: options.opacity,
       budget: options.budget, seedAxis: options.seedAxis ?? "x", density: options.seedDensity ?? 4, width: options.streamWidth ?? 2 });
@@ -117,7 +168,7 @@ export function fieldViewPlot(data: FieldVolumeData, options: FieldViewOptions) 
       hovertemplate: `Cell face<br>%{intensity:.6g} ${unit}<extra></extra>` });
   } else {
     traces.push({ type: "scatter3d", mode: "markers", name: quantity.label, x: indices.map(i => data.cells.centers[i][0]), y: indices.map(i => data.cells.centers[i][1]), z: indices.map(i => data.cells.centers[i][2]),
-      marker: { size: 4, color: values, opacity: options.opacity, ...scale }, customdata: values,
+      marker: { size: Math.max(2, Math.min(18, Number.isFinite(options.pointSize) ? options.pointSize! : 4)), color: values, opacity: options.opacity, ...scale }, customdata: values,
       hovertemplate: `x=%{x} ${data.lengthUnit}<br>y=%{y}<br>z=%{z}<br>%{customdata:.6g} ${unit}<extra></extra>` });
   }
   let arrowCount = 0;
@@ -139,6 +190,12 @@ export function fieldViewPlot(data: FieldVolumeData, options: FieldViewOptions) 
       arrowCount++;
     });
     traces.push({ type: "scatter3d", name: "Velocity direction (m/s)", mode: "lines", x, y, z, line: { color: "#57d8c7", width: 3 }, hoverinfo: "skip", showlegend: false });
+  }
+  if (Number.isInteger(options.sampleIndex) && options.sampleIndex! >= 0 && options.sampleIndex! < data.cells.centers.length) {
+    const sample = fieldSampleInspection(data, options).selected;
+    traces.push({ type: "scatter3d", mode: "markers", name: "Inspected stored sample", x: [sample.point[0]], y: [sample.point[1]], z: [sample.point[2]],
+      marker: { size: 10, color: "#ffffff", opacity: 1 }, customdata: [sample.value],
+      hovertemplate: `Inspected sample ${sample.index + 1}<br>x=%{x} ${data.lengthUnit}<br>y=%{y} ${data.lengthUnit}<br>z=%{z} ${data.lengthUnit}<br>%{customdata:.6g} ${unit}<extra></extra>` });
   }
   traces.push(...solidOverlay.traces);
   return { traces, shown: indices.length, total: data.cells.centers.length, eligible: candidates.length, arrowCount, minimum, maximum, unit, streamCount: 0, streamNote: "", solidShown: solidOverlay.shown, solidTotal: solidOverlay.total };

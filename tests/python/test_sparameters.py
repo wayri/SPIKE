@@ -4,18 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
-from python.spike_core.sparameters import (
-    NetworkData,
-    TouchstoneError,
-    analyze_network,
-    read_touchstone,
-    renormalize_s,
-    single_ended_to_mixed_mode,
-    s_to_y,
-    s_to_z,
-    write_touchstone,
-    z_to_s,
-)
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData, TouchstoneError, analyze_network, read_touchstone, renormalize_s, single_ended_to_mixed_mode, s_to_y, s_to_z, write_touchstone, z_to_s
 
 
 class SParameterTests(unittest.TestCase):

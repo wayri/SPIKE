@@ -10,9 +10,9 @@ import unittest
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
-from python.spike_core.gmsh_occ_mesher import _focus_fields, build_occ_mesh, validate_request
-from python.spike_core.pcb_focus_sizing import assess_focus_mesh, plan_focus_regions
-from python.spike_core.pcb_volume_mesh import prepare_pcb_volume_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_mesher import _focus_fields, build_occ_mesh, validate_request
+from python.spike_core.solvers.geometry_meshing.preparation.pcb_focus_sizing import assess_focus_mesh, plan_focus_regions
+from python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_mesh import prepare_pcb_volume_mesh
 from python.spike_core.service_meshing import handle_meshing_request
 from tests.python.test_pcb_focus_sizing import two_cell_mesh, region
 
@@ -91,14 +91,14 @@ class PcbVolumeMeshTests(unittest.TestCase):
         self.assertNotIn('solids', plan)
 
     def test_worker_admission_and_structured_failure(self):
-        with patch('python.spike_core.gmsh_occ_runtime.verify_installation', side_effect=ValueError('unavailable')):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime.verify_installation', side_effect=ValueError('unavailable')):
             probe = handle_meshing_request('pcb_volume_mesh_capabilities', {})
         self.assertTrue(probe['ok'])
         self.assertFalse(probe['result']['runtime']['available'])
         self.assertTrue(probe['result']['prepare_available'])
         self.assertFalse(probe['result']['production_qualified'])
-        with patch('python.spike_core.gmsh_occ_runtime.verify_installation', return_value={}), \
-                patch('python.spike_core.pcb_volume_mesh.importlib.util.find_spec', return_value=None):
+        with patch('python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime.verify_installation', return_value={}), \
+                patch('python.spike_core.solvers.geometry_meshing.preparation.pcb_volume_mesh.importlib.util.find_spec', return_value=None):
             absent = handle_meshing_request('pcb_volume_mesh_capabilities', {})
         self.assertFalse(absent['result']['prepare_available'])
         self.assertFalse(absent['result']['runtime']['available'])

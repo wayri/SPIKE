@@ -1,10 +1,7 @@
 import unittest
 
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.native_circuit_compiler import (
-    compile_spice_workspace_to_native_mna,
-    run_spice_workspace_native_mna,
-)
+from python.spike_core.solvers.circuits.models.native_circuit_compiler import compile_spice_workspace_to_native_mna, run_spice_workspace_native_mna
 from python.spike_core.service import handle
 from python.spike_core.spice_workspace import SPICE_WORKSPACE_CONTRACT
 

@@ -9,7 +9,7 @@ analysis or coupled-physics feature has already been ported.
 ## Changes verified on 2026-10-13
 
 - Ideal CCM buck, boost, buck-boost and flyback stability calculations now run
-  in `src/spikes/smps_stability.cpp`: operating point, rational plant and loop
+  in `src/solvers/circuits/spikes/smps_stability.cpp`: operating point, rational plant and loop
   response, poles, all crossings and stability classification. The additive C
   ABI transfers typed bulk arrays rather than per-point JSON. Studio and CLI
   select native execution by default; reference execution is explicit.

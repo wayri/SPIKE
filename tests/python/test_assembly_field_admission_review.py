@@ -4,9 +4,7 @@
 import copy
 import unittest
 
-from python.spike_core.assembly_field_thermal import (
-    run_assembly_field_thermal, verify_assembly_field_result,
-)
+from python.spike_core.solvers.execution.coupling.assembly_field_thermal import run_assembly_field_thermal, verify_assembly_field_result
 from python.spike_core.multiboard_identity import canonical_json_digest
 from python.spike_core.spider_v2 import AssemblyIRV1, BoardInstance, AssemblyContact
 from python.spike_core.spider_v2_schema import CoordinateFrame

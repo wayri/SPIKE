@@ -8,7 +8,7 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.si_candidate_study import run_si_candidate_study
+from python.spike_core.solvers.signal_integrity.networks.si_candidate_study import run_si_candidate_study
 
 
 def request():

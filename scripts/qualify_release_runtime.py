@@ -11,10 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from python.spike_core.runtime_qualification import (  # noqa: E402
-    collect_runtime_snapshot,
-    qualify_runtime_snapshots,
-)
+from python.spike_core.runtime_qualification import collect_runtime_snapshot, qualify_runtime_snapshots
 
 
 def main() -> int:

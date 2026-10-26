@@ -19,7 +19,7 @@ def digest(path):
 
 def run(source,output):
     inputs=[source/"channel.json",source/"loaded-example.json"]
-    paths=sorted((ROOT/"python/spike_core").glob("*.py"))+sorted((ROOT/"schemas").glob("*.json"))
+    paths=sorted((ROOT/"python/spike_core").rglob("*.py"))+sorted((ROOT/"schemas").glob("*.json"))
     paths += [Path(__file__).resolve(),ROOT/"tests/python/test_si_network_graph_workflow.py"]
     before={str(p.relative_to(ROOT)):digest(p) for p in paths}
     input_hashes={p.name:digest(p) for p in inputs}

@@ -115,6 +115,13 @@ function copyJson(value: unknown, seen = new WeakSet<object>(), depth = 0): Stud
 export function copyStudyJson(value: unknown): StudyJson | undefined { return copyJson(value); }
 export function studyJsonBytes(value: StudyJson): number { return new TextEncoder().encode(JSON.stringify(value)).length; }
 
+/** Object property order is not a physical setup change; array order remains meaningful. */
+function canonicalSetup(value: StudyJson): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalSetup).join(",")}]`;
+  if (value && typeof value === "object") return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonicalSetup(value[key])}`).join(",")}}`;
+  return JSON.stringify(value);
+}
+
 const copyObject = (value: unknown): StudyJsonObject => {
   const copied = copyJson(value);
   return object(copied) ? copied as StudyJsonObject : {};
@@ -267,6 +274,9 @@ export function normalizeStudies(raw: unknown): SimulationStudy[] {
     const normalized: SimulationStudy = { version: STUDY_SCHEMA_VERSION, id, name: nonempty(row.name, "Untitled study"),
       notes: notes(row.notes), tags: stringList(row.tags, 32, 80), archived: row.archived === true,
       datasets, cases: normalizedCases };
+    if (normalizedCases.some(item => item.type === "em-resistor-cht") && studyJsonBytes(normalized as unknown as StudyJson) > 3 * 1024 * 1024) {
+      throw new Error("AC/CHT study exceeds the 3 MiB round-trip limit.");
+    }
     if (new TextEncoder().encode(JSON.stringify(normalized)).length > MAX_STUDY_DOCUMENT_BYTES) {
       throw new Error("Simulation study exceeds the 256 MiB document limit.");
     }
@@ -321,8 +331,10 @@ export function duplicateStudyCase(study: SimulationStudy, caseId: string): Simu
 export function updateStudyCase(study: SimulationStudy, caseId: string, patch: Partial<Omit<SimulationStudyCase, "id">>): SimulationStudy {
   const cases = study.cases.map(item => {
     if (item.id !== caseId) return item;
-    const setupChanged = patch.type !== undefined || patch.mode !== undefined ||
-      patch.scenario !== undefined || patch.settings !== undefined;
+    const setupChanged = (patch.type !== undefined && patch.type !== item.type)
+      || (patch.mode !== undefined && patch.mode !== item.mode)
+      || (patch.scenario !== undefined && canonicalSetup(copyObject(patch.scenario)) !== canonicalSetup(item.scenario))
+      || (patch.settings !== undefined && canonicalSetup(copyObject(patch.settings)) !== canonicalSetup(item.settings));
     const hasSnapshotPatch = Object.prototype.hasOwnProperty.call(patch, "resultSnapshot");
     const hasRefPatch = Object.prototype.hasOwnProperty.call(patch, "resultRef");
     const captureFacts = hasSnapshotPatch && patch.resultSnapshot !== undefined ? resultFacts(patch.resultSnapshot) : {};

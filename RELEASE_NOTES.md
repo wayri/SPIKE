@@ -1,5 +1,20 @@
 # SPIKE Release Notes
 
+## Next: SPIKE 0.4.2 development candidate
+
+The next release target is **0.4.2**, retaining the **alpha / experimental**
+channel. This candidate includes the accumulated desktop and solver integration,
+the latest guarded SI/IBIS and spatial workflows, the offline work-example
+library, and promo/example source workflows within their documented limits.
+See the [candidate scope](docs/releases/v0.4.2.md) and
+[release plan and outstanding gates](docs/RELEASE_0_4_2_PLAN.md).
+
+This source version is not publication approval or installed-build evidence.
+The separate 25 October 0.4.2 beta and earlier 0.4.1 platform receipts retain
+their original source and artifact identity. Required numerical human review,
+full validation, native UI and package lifecycle acceptance remain open.
+
+
 ## SPIKE desktop 0.3.0 — community engineering preview
 
 **Channel:** community engineering preview for testing. The current-source
@@ -493,8 +508,8 @@ This release establishes the foundational architecture and operational protocols
 ### C++ Kernel (Stubs)
 
 #### PEEC Solver
-- **src/peec/peec_solver.hpp** - Interface with complete API documentation
-- **src/peec/peec_solver.cpp** - Stub implementation
+- **src/solvers/power_integrity/peec/peec_solver.hpp** - Interface with complete API documentation
+- **src/solvers/power_integrity/peec/peec_solver.cpp** - Stub implementation
 - Features:
   - `Filament` and `Patch` geometry structures
   - Partial inductance calculation (volume integration)
@@ -503,8 +518,8 @@ This release establishes the foundational architecture and operational protocols
   - Frequency sweep support
 
 #### Thermal Solver
-- **src/thermal/thermal_solver.hpp** - FEM solver interface
-- **src/thermal/thermal_solver.cpp** - Stub implementation
+- **src/solvers/thermal_fluid/thermal/thermal_solver.hpp** - FEM solver interface
+- **src/solvers/thermal_fluid/thermal/thermal_solver.cpp** - Stub implementation
 - Features:
   - Steady-state heat equation solver
   - Transient thermal analysis
@@ -629,10 +644,10 @@ You should see the SPIKE Ribbon UI with placeholder panels.
 The C++ files show lint errors because Eigen3 is not yet installed. These will be resolved when dependencies are installed in v0.1.7.0.
 
 **Affected Files:**
-- `src/peec/peec_solver.hpp`
-- `src/peec/peec_solver.cpp`
-- `src/thermal/thermal_solver.hpp`
-- `src/thermal/thermal_solver.cpp`
+- `src/solvers/power_integrity/peec/peec_solver.hpp`
+- `src/solvers/power_integrity/peec/peec_solver.cpp`
+- `src/solvers/thermal_fluid/thermal/thermal_solver.hpp`
+- `src/solvers/thermal_fluid/thermal/thermal_solver.cpp`
 
 **Resolution:** Install Eigen3 via package manager (vcpkg, apt, brew)
 

@@ -34,7 +34,7 @@ python -m python.spike_core.cli --output build/si-guide-result.json si-workflow 
 The equivalent direct Python entry point is useful when only the SI package dependencies are installed:
 
 ```powershell
-python -c "import json; from pathlib import Path; from python.spike_core.si_workflow import run_si_workflow; request=json.loads(Path('examples/si/analytical-coupled-rlgc.json').read_text()); result=run_si_workflow(request); Path('build/si-guide-result.json').write_text(json.dumps(result, indent=2, allow_nan=False)); print(result['status'], result['time_domain']['status'])"
+python -c "import json; from pathlib import Path; from python.spike_core.solvers.signal_integrity.receivers.si_workflow import run_si_workflow; request=json.loads(Path('examples/si/analytical-coupled-rlgc.json').read_text()); result=run_si_workflow(request); Path('build/si-guide-result.json').write_text(json.dumps(result, indent=2, allow_nan=False)); print(result['status'], result['time_domain']['status'])"
 ```
 
 The first command also exports the **edited, unloaded channel** as Touchstone. Endpoint source/receiver impedances, passive loading, and the receiver eye are reported in JSON, not embedded in that `.s4p` file. If CLI startup reports a missing Python package, install this repository's [development prerequisites](../DEVELOPMENT.md) in the interpreter used for the command; do not interpret an import failure as a solver result.

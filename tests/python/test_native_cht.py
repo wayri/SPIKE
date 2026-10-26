@@ -13,8 +13,8 @@ import threading
 import unittest
 from unittest.mock import patch
 
-from python.spike_core import native_cht as cht
-from python.spike_core.native_cht_result import admit_native_cht_result
+from python.spike_core.solvers.thermal_fluid.flow import native_cht as cht
+from python.spike_core.solvers.thermal_fluid.flow.native_cht_result import admit_native_cht_result
 from python.spike_core.service_cfd import handle_cfd_request
 
 

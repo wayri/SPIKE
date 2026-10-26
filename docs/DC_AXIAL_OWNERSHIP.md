@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Explicit annular DC land and barrel ownership
 
-`python/spike_core/dc_axial_ownership.py` is an experimental, independent helper
+`python/spike_core/solvers/power_integrity/dc/dc_axial_ownership.py` is an experimental, independent helper
 for one explicitly supplied coaxial annular stack. It partitions the declared
 land and barrel geometry and evaluates imposed uniform axial gap currents.
 It does not infer electrodes, import a board, solve land transition fields,

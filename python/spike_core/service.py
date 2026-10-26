@@ -4,7 +4,6 @@ while a future cloud worker can expose the same request/response shapes over HTT
 """
 
 from __future__ import annotations
-import json
 import os
 import subprocess
 import sys
@@ -12,14 +11,18 @@ from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Dict
 
+if __name__ == "__main__":
+    from .numerical_runtime import bootstrap_worker_numerics
+    bootstrap_worker_numerics()
+
 from .kicad_schematic_importer import handle_kicad_schematic_request, KicadSchematicViewError
 from .connectivity_view_importer import handle_connectivity_view_request, ConnectivityViewError
-from .acceleration import acceleration_catalog
+from .solvers.execution.resources.acceleration import acceleration_catalog
 from .capabilities import capabilities
 from .capability_ledger import native_capability_ledger
-from .benchmarks import run_solver_benchmarks
+from .solvers.power_integrity.dc.benchmarks import run_solver_benchmarks
 from .dependencies import dependency_status, verify_lockfile
-from .emi import screen_emi_setup, validate_emi_setup
+from .solvers.electromagnetics.fields.emi import screen_emi_setup, validate_emi_setup
 from .environment_profiles import (
     ENVIRONMENT_PROFILE_CONTRACT,
     ENVIRONMENT_PROFILE_VALIDATION_CONTRACT,
@@ -32,22 +35,17 @@ from .environment_profiles import (
 )
 from .contracts import AnalysisSpec, SpiDeR, ValidationIssue
 from .spider_v2 import SpiDeRV2
-from .converter_study import converter_capabilities, run_converter_study, validate_converter_study
-from .errors import error_envelope
+from .solvers.circuits.models.converter_study import converter_capabilities, run_converter_study, validate_converter_study
 from .convergence import run_mesh_convergence
-from .geometry import extract_net_geometry
+from .solvers.geometry_meshing.preparation.geometry import extract_net_geometry
 from .extensions import ExtensionPackageManager, ExtensionRegistry, default_extension_roots
 from .service_script_workspace import handle_script_workspace_request
 from .emerge_runtime_updates import handle_emerge_update_request, invoke_extension_with_update_guard
-from .si_protocol_suites import (
-    SiProtocolSuiteError,
-    plan_si_protocol_analysis,
-    validate_si_protocol_suite,
-)
-from .si_channel import SiChannelError, analyze_uniform_design_channel
-from .si_workflow import run_si_workflow, workflow_catalog
-from .si_ibis import parse_ibis
-from .si_protocol_test_runner import SiProtocolTestRunnerError, run_si_protocol_test_suite
+from .solvers.signal_integrity.receivers.si_protocol_suites import SiProtocolSuiteError, plan_si_protocol_analysis, validate_si_protocol_suite
+from .solvers.signal_integrity.channels.si_channel import SiChannelError, analyze_uniform_design_channel
+from .solvers.signal_integrity.receivers.si_workflow import run_si_workflow, workflow_catalog
+from .solvers.signal_integrity.receivers.si_ibis import parse_ibis
+from .solvers.signal_integrity.receivers.si_protocol_test_runner import SiProtocolTestRunnerError, run_si_protocol_test_suite
 from .external_engines import external_engine_catalog
 from .solver_blocks import handle_solver_blocks
 from .solver_plugins import default_solver_registry
@@ -66,29 +64,19 @@ from .service_spider import dispatch_spider_request
 from .service_studio_board_coupling import handle_studio_board_cosimulation_request
 from .studio_bridge import handle_studio_bridge_request
 from .spikes_runtime import handle_worker_method as handle_spikes_worker_method
-from .native_mna import run_native_mna, validate_native_mna_request
-from .native_circuit_compiler import (
-    compile_spice_workspace_to_native_mna,
-    run_spice_workspace_native_mna,
-)
+from .solvers.circuits.models.native_mna import run_native_mna, validate_native_mna_request
+from .solvers.circuits.models.native_circuit_compiler import compile_spice_workspace_to_native_mna, run_spice_workspace_native_mna
 from .owned_spice_workspace import (
     run_owned_spice_workspace,
     validate_owned_spice_workspace_request,
 )
-from .field_circuit_cosim import (
-    run_iterative_field_circuit_cosimulation,
-    validate_field_circuit_request,
-)
-from .peec_field_provider import NativePeecFieldReductionProvider
-from .topology_circuit import bridge_topology_to_analysis_spec, validate_topology_circuit
-from .peec_spice_export import (
-    import_peec_rlcg,
-    list_peec_spice_networks,
-    run_staged_hybrid_cosimulation,
-)
-from .sparselizard_adapter import prepare_sparselizard_case, run_sparselizard_case
-from .sparselizard_runtime import detect_sparselizard_runtime
-from .sparselizard_validation import evaluate_sparselizard_validation
+from .solvers.execution.coupling.field_circuit_cosim import run_iterative_field_circuit_cosimulation, validate_field_circuit_request
+from .solvers.power_integrity.peec.peec_field_provider import NativePeecFieldReductionProvider
+from .solvers.circuits.models.topology_circuit import bridge_topology_to_analysis_spec, validate_topology_circuit
+from .solvers.power_integrity.peec.peec_spice_export import import_peec_rlcg, list_peec_spice_networks, run_staged_hybrid_cosimulation
+from .solvers.external_engines.sparselizard.sparselizard_adapter import prepare_sparselizard_case, run_sparselizard_case
+from .solvers.external_engines.sparselizard.sparselizard_runtime import detect_sparselizard_runtime
+from .solvers.external_engines.sparselizard.sparselizard_validation import evaluate_sparselizard_validation
 from .spikes_layout_adapter import (
     SpikesLayoutAdapterError,
     map_layout_results,
@@ -103,9 +91,9 @@ from .layout_metric_registry import (
     validate_requirements_for_launch,
 )
 from .preflight import build_mesh_preview, preflight_analysis
-from .pdn import optimize_pdn, review_pdn
-from .pi_path import validate_pi_path
-from .pi_path_circuit import compile_pi_path_to_native_mna, run_pi_path_native_mna
+from .solvers.power_integrity.pdn.pdn import optimize_pdn, review_pdn
+from .solvers.power_integrity.dc.pi_path import validate_pi_path
+from .solvers.power_integrity.dc.pi_path_circuit import compile_pi_path_to_native_mna, run_pi_path_native_mna
 from .power_tree import extract_power_path
 from .service_helpers import (
     build_solver_catalog, error_response, export_step, operation_id,
@@ -124,7 +112,6 @@ from .service_engineering_review import validate_design
 from .kicad_importer import import_kicad_design as _design_from_kicad
 from .external_pi_result_validation import validate_external_pi_multiport
 from . import __version__
-
 
 _solver_registry = default_solver_registry()
 _extension_registry = ExtensionRegistry()
@@ -149,14 +136,13 @@ _operation_id = operation_id
 _error_response = error_response
 _export_step = export_step
 
-
 def handle(request: Dict[str, Any]) -> Dict[str, Any]:
     return dispatch_spider_request(request, _dispatch)
 
-
 def _dispatch(request: Dict[str, Any]) -> Dict[str, Any]:
-    method = request.get("method")
-    params = request.get("params", {})
+    method, params = request.get("method"), request.get("params", {})
+    if not isinstance(params, dict):
+        return {"ok": False, "error": "Request params must be an object", "type": "TypeError"}
     spider_result = handle_spider_request(method, params)
     if spider_result is not None:
         return {"ok": True, "result": spider_result}

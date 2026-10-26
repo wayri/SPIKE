@@ -2,9 +2,9 @@
 # Copyright (c) 2026 SigHarmonic
 import unittest
 import numpy as np
-from python.spike_core.si_impedance import analyze_impedance, network_impedance_report
+from python.spike_core.solvers.signal_integrity.channels.si_impedance import analyze_impedance, network_impedance_report
 from unittest.mock import patch
-from python.spike_core.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
 
 
 def network(s, reference=50, f=None):

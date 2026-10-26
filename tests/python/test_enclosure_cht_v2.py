@@ -12,8 +12,8 @@ from unittest.mock import patch
 from jsonschema import Draft202012Validator
 import numpy as np
 
-from python.spike_core.enclosure_cht import solve_enclosure_cht
-from python.spike_core.enclosure_cht_v2 import REQUEST, solve_enclosure_cht_v2
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_cht import solve_enclosure_cht
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_cht_v2 import REQUEST, solve_enclosure_cht_v2
 from python.spike_core.service_cfd import handle_cfd_request
 
 
@@ -188,7 +188,7 @@ class EnclosureChtV2Tests(unittest.TestCase):
         forged = {"status": "completed", "fields": {
             "face_velocity_m_s": [value.tolist() for value in faces],
             "pressure_pa": np.zeros((3, 3, 3)).tolist()}, "diagnostics": {}}
-        with patch("python.spike_core.enclosure_rectilinear_momentum."
+        with patch("python.spike_core.solvers.thermal_fluid.flow.enclosure_rectilinear_momentum."
                    "solve_enclosure_rectilinear_momentum", return_value=forged):
             result = solve_enclosure_cht_v2(request)
         self.assertEqual(result["status"], "blocked", result)
@@ -205,9 +205,9 @@ class EnclosureChtV2Tests(unittest.TestCase):
         forged = {"status": "completed", "fields": {
             "face_velocity_m_s": [value.tolist() for value in faces],
             "pressure_pa": np.zeros((2, 2, 2)).tolist()}, "diagnostics": {}}
-        with patch("python.spike_core.enclosure_rectilinear_momentum."
+        with patch("python.spike_core.solvers.thermal_fluid.flow.enclosure_rectilinear_momentum."
                    "solve_enclosure_rectilinear_momentum", return_value=forged), patch(
-                       "python.spike_core.enclosure_cht_v2.solve_enclosure_energy") as thermal:
+                       "python.spike_core.solvers.thermal_fluid.flow.enclosure_cht_v2.solve_enclosure_energy") as thermal:
             result = solve_enclosure_cht_v2(request)
         self.assertEqual(result["status"], "blocked", result)
         self.assertNotIn("fields", result)
@@ -239,7 +239,7 @@ class EnclosureChtV2Tests(unittest.TestCase):
         self.assertEqual(cancelled["status"], "cancelled")
         self.assertNotIn("fields", cancelled)
 
-        from python.spike_core import enclosure_cht_v2
+        from python.spike_core.solvers.thermal_fluid.flow import enclosure_cht_v2
         original = enclosure_cht_v2._snapshot
 
         def reject_result(value, **kwargs):

@@ -15,6 +15,7 @@ function loadComponent(name, mocks = {}) {
   const module = { exports: {} };
   new Function("require", "module", "exports", compiled)(specifier => {
     if (specifier === "./icons") return icons;
+    if (specifier === "./PanelHeaderMenu") return { usePanelHeaderMenu: () => ({ headerProps: {}, menu: null }) };
     if (specifier.endsWith(".css")) return {};
     if (specifier in mocks) return mocks[specifier];
     return require(specifier);

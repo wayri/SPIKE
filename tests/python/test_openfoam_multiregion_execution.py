@@ -9,11 +9,7 @@ from unittest.mock import patch
 
 from jsonschema import Draft202012Validator
 
-from python.spike_core.openfoam_multiregion_execution import (
-    MultiRegionExecutionError, RUNNABLE_CASE_CONTRACT, _digest,
-    _bounded_command, _command, _write_native_field_export, import_multiregion_fields,
-    load_verified_runnable_case, run_multiregion_case,
-)
+from python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution import MultiRegionExecutionError, RUNNABLE_CASE_CONTRACT, _check_mesh_admission, _digest, _bounded_command, _command, _write_native_field_export, import_multiregion_fields, load_verified_runnable_case, run_multiregion_case
 
 
 def _case(root: Path) -> dict:
@@ -80,7 +76,7 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
             self.assertEqual(result["fields"]["pressure_pa"]["samples"][0]["value"], 101330)
             self.assertEqual(result["fields"]["heat_flux_w_m2"]["samples"][0]["value"], [-0.7, 0.35, -0.175])
             (latest / 'air' / 'p').unlink()
-            from python.spike_core.openfoam import OpenFoamAdapterError
+            from python.spike_core.solvers.external_engines.openfoam.openfoam import OpenFoamAdapterError
             with self.assertRaises(OpenFoamAdapterError):
                 _write_native_field_export(root, manifest)
 
@@ -89,7 +85,7 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
             "transport": "wsl_process", "version": "2606", "launcher": "C:/Windows/System32/wsl.exe", "distribution": "Ubuntu",
             "command_prefix": ["C:/Windows/System32/wsl.exe", "-d", "Ubuntu", "--", "/usr/bin/openfoam2606"],
         }
-        with patch("python.spike_core.openfoam_multiregion_execution._wsl_case_path", return_value="/mnt/c/case") as mapped:
+        with patch("python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution._wsl_case_path", return_value="/mnt/c/case") as mapped:
             argv = _command(runtime, "checkMesh", Path(r"C:\\case"), "-allRegions", "-allTopology")
         self.assertEqual(argv, [*runtime["command_prefix"], "checkMesh", "-case", "/mnt/c/case", "-allRegions", "-allTopology"])
         mapped.assert_called_once()
@@ -100,7 +96,7 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
             "transport": "wsl_process", "version": "2606", "distribution": "Ubuntu",
             "command_prefix": ["C:/Windows/System32/wsl.exe", "-d", "Ubuntu", "--", "/usr/bin/openfoam2606"],
         }
-        with patch("python.spike_core.openfoam_multiregion_execution._wsl_case_path", return_value="/mnt/c/case"):
+        with patch("python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution._wsl_case_path", return_value="/mnt/c/case"):
             argv = _bounded_command(
                 runtime, "chtMultiRegionFoam", Path(r"C:\case"),
                 timeout_s=60, memory_limit_mb=1024, output_limit_bytes=1048576,
@@ -122,10 +118,10 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp); _case(root); calls = []
             def runner(argv, **kwargs):
-                calls.append((argv, kwargs)); return {"return_code": 0, "stdout": "ok", "stderr": ""}
+                calls.append((argv, kwargs)); return {"return_code": 0, "stdout": "Mesh OK.\nMesh OK.\n", "stderr": ""}
             runtime = {"transport": "native_process", "version": "2606"}
-            with patch("python.spike_core.openfoam_multiregion_execution.shutil.which", side_effect=lambda name: f"/opt/openfoam/{name}"), patch(
-                "python.spike_core.openfoam_multiregion_execution._write_native_field_export", side_effect=lambda case_root, manifest: _export(case_root, manifest),
+            with patch("python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution.shutil.which", side_effect=lambda name: f"/opt/openfoam/{name}"), patch(
+                "python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution._write_native_field_export", side_effect=lambda case_root, manifest: _export(case_root, manifest),
             ):
                 result = run_multiregion_case(root, runtime=runtime, runner=runner)
             self.assertEqual(result["status"], "completed", result)
@@ -136,6 +132,24 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
             self.assertEqual(commands[5:], ["postProcess"] * 6)
             self.assertTrue(all(isinstance(item, str) for call, _ in calls for item in call))
 
+    def test_check_mesh_requires_explicit_success_for_every_region(self):
+        passed = _check_mesh_admission(
+            {"return_code": 0, "stdout": "Mesh OK.\nMesh OK.\n", "stderr": ""},
+            ["board", "air"],
+        )
+        self.assertTrue(passed["passed"])
+        missing = _check_mesh_admission(
+            {"return_code": 0, "stdout": "Mesh OK.\n", "stderr": ""},
+            ["board", "air"],
+        )
+        self.assertFalse(missing["passed"])
+        failed = _check_mesh_admission(
+            {"return_code": 0, "stdout": "Mesh OK.\nMesh OK.\nFailed 1 mesh checks.\n", "stderr": ""},
+            ["board", "air"],
+        )
+        self.assertFalse(failed["passed"])
+        self.assertEqual(failed["failed_mesh_check_counts"], [1])
+
     def test_view_factor_case_probes_and_executes_required_preprocessors_before_solver(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp); manifest = _case(root); calls = []
@@ -144,11 +158,11 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
             (root / "spike_multiregion_runnable_case.json").write_text(json.dumps(manifest), encoding="utf-8")
 
             def runner(argv, **kwargs):
-                calls.append((argv, kwargs)); return {"return_code": 0, "stdout": "ok", "stderr": ""}
+                calls.append((argv, kwargs)); return {"return_code": 0, "stdout": "Mesh OK.\nMesh OK.\n", "stderr": ""}
 
             runtime = {"transport": "native_process", "version": "2606"}
-            with patch("python.spike_core.openfoam_multiregion_execution.shutil.which", side_effect=lambda name: f"/opt/openfoam/{name}"), patch(
-                "python.spike_core.openfoam_multiregion_execution._write_native_field_export", side_effect=lambda case_root, verified: _export(case_root, verified),
+            with patch("python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution.shutil.which", side_effect=lambda name: f"/opt/openfoam/{name}"), patch(
+                "python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution._write_native_field_export", side_effect=lambda case_root, verified: _export(case_root, verified),
             ):
                 result = run_multiregion_case(root, runtime=runtime, runner=runner)
 
@@ -175,10 +189,10 @@ class OpenFoamMultiRegionExecutionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp); _case(root)
             def runner(argv, **kwargs):
-                return {"return_code": 0, "stdout": "ok", "stderr": ""}
+                return {"return_code": 0, "stdout": "Mesh OK.\nMesh OK.\n", "stderr": ""}
             runtime = {"transport": "native_process", "version": "2606"}
-            with patch("python.spike_core.openfoam_multiregion_execution.shutil.which", return_value="/opt/openfoam/command"), patch(
-                "python.spike_core.openfoam_multiregion_execution._write_native_field_export", side_effect=MultiRegionExecutionError("missing grad(T)"),
+            with patch("python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution.shutil.which", return_value="/opt/openfoam/command"), patch(
+                "python.spike_core.solvers.external_engines.openfoam.openfoam_multiregion_execution._write_native_field_export", side_effect=MultiRegionExecutionError("missing grad(T)"),
             ):
                 result = run_multiregion_case(root, runtime=runtime, runner=runner)
             self.assertEqual(result["status"], "failed")

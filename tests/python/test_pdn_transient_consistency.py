@@ -11,7 +11,7 @@ import unittest
 import numpy as np
 from scipy.linalg import expm
 
-from python.spike_core.pdn_network import PdnNetworkError, evaluate_pdn_network
+from python.spike_core.solvers.power_integrity.pdn.pdn_network import PdnNetworkError, evaluate_pdn_network
 
 
 def element(identifier, kind, **values):

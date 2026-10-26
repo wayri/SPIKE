@@ -13,7 +13,7 @@ import numpy as np
 from scipy.integrate import quad
 from scipy.linalg import expm
 
-from python.spike_core import sparameter_capacitive_terminated as capacitive
+from python.spike_core.solvers.signal_integrity.networks import sparameter_capacitive_terminated as capacitive
 from tests.python.test_sparameter_transient import one_fit
 
 

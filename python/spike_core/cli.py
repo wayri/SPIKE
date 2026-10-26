@@ -19,23 +19,18 @@ from .batch_report import (
     BatchReportError,
     normalize_pi_batch_report,
 )
-from .benchmarks import run_solver_benchmarks
+from .solvers.power_integrity.dc.benchmarks import run_solver_benchmarks
 from .contracts import CONTRACT_VERSION, AnalysisSpec, SpiDeR
 from .spider_v2 import SpiDeRV2
-from .field_circuit_cosim import REQUEST_CONTRACT as FIELD_CIRCUIT_REQUEST_CONTRACT
-from .openems_benchmarks import evaluate_mesh_convergence, run_patch_antenna_benchmark
+from .solvers.execution.coupling.field_circuit_cosim import REQUEST_CONTRACT as FIELD_CIRCUIT_REQUEST_CONTRACT
+from .solvers.external_engines.openems.openems_benchmarks import evaluate_mesh_convergence, run_patch_antenna_benchmark
 from .pi_release_qualification import load_json_report, qualify_pi_release
 from .project_package import PROJECT_FORMAT_V3, ProjectPackageError, read_project
 from .service import handle
 from .spice_workspace import SPICE_WORKSPACE_CONTRACT
-from .sparameters import (
-    analyze_network,
-    read_touchstone,
-    renormalize_s,
-    write_touchstone,
-)
-from .si_channel import REQUEST_CONTRACT as SI_CHANNEL_REQUEST_CONTRACT, analyze_uniform_design_channel
-from .si_workflow import run_si_workflow
+from .solvers.signal_integrity.networks.sparameters import analyze_network, read_touchstone, renormalize_s, write_touchstone
+from .solvers.signal_integrity.channels.si_channel import REQUEST_CONTRACT as SI_CHANNEL_REQUEST_CONTRACT, analyze_uniform_design_channel
+from .solvers.signal_integrity.receivers.si_workflow import run_si_workflow
 
 
 from . import __version__ as CLI_VERSION
@@ -1094,6 +1089,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--quiet", action="store_true", help="Do not write the result to stdout")
     parser.add_argument("--fail-on-warning", action="store_true", help=f"Return exit code {EXIT_WARNING} when warnings exist")
     sub = parser.add_subparsers(dest="command", required=True)
+    from .cli_em_cosimulation import register_em_cosimulation_commands
+    register_em_cosimulation_commands(sub)
     from .cluster_cli import register_commands
     register_commands(sub)
 
@@ -1491,6 +1488,10 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
+    if args.command == "em-cosim":
+        from .cli_em_cosimulation import dispatch_em_cosimulation
+        result = dispatch_em_cosimulation(args, read_json=_read_json, response=_response)
+        return result, _result_exit(result, args.fail_on_warning)
     from .cluster_cli import COMMANDS, dispatch_cluster
     if args.command in COMMANDS:
         result = dispatch_cluster(args)
@@ -2047,7 +2048,7 @@ def dispatch(args: argparse.Namespace) -> tuple[Any, int]:
     elif args.command == "assembly-em":
         if args.request.stat().st_size > 8 * 1024 * 1024:
             raise CliError("Assembly EM request exceeds 8 MiB.")
-        from .assembly_em import prepare_assembly_em, run_assembly_em
+        from .solvers.electromagnetics.fields.assembly_em import prepare_assembly_em, run_assembly_em
         request = _read_json(args.request)
         result = prepare_assembly_em(request) if args.prepare_only else run_assembly_em(request, args.run_dir)
     elif args.command == "magnetic-machine":

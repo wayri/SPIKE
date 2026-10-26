@@ -7,7 +7,7 @@ from unittest.mock import patch
 
 import numpy as np
 
-from python.spike_core import pdn_dielectric_ac as dielectric
+from python.spike_core.solvers.power_integrity.pdn import pdn_dielectric_ac as dielectric
 from tests.python.test_pdn_electrostatic import plate as electrostatic_plate
 
 
@@ -40,7 +40,71 @@ def gamma(material, frequency):
     return material["conductivity_s_m"] + omega * material["permittivity_f_m"] * (material["loss_tangent"] + 1j)
 
 
+def unequal_grounded_gaps(n=4):
+    """Two face-connected gaps separated by a supplied grounded sheet."""
+    request = layered(n)
+    request["frequencies_hz"] = [10.]
+    request["materials"][1] = {**request["materials"][0], "id": "second"}
+    for key in ("permittivity_f_m", "conductivity_s_m"):
+        request["materials"][1][key] *= 1e-12
+    request["electrodes"].insert(1, {
+        "id": "middle-ground", "node": "ground",
+        "vertices": [i for i, p in enumerate(request["mesh"]["vertices"]) if p[0] == .5]})
+    request["reference_electrode"] = "middle-ground"
+    return request
+
+
 class PdnDielectricAcTests(unittest.TestCase):
+    def test_unequal_grounded_gaps_preserve_each_admittance_and_field(self):
+        for refinement in (2, 4):
+            request = unequal_grounded_gaps(refinement)
+            response = dielectric.extract_pdn_dielectric_ac(request)["ac"][0]
+            expected = np.diag([2 * gamma(m, 10.) for m in request["materials"]])
+            actual = complex_values(response["admittance_s"])
+            for column in range(2):
+                np.testing.assert_allclose(actual[:, column] / expected[column, column],
+                                           np.eye(2)[:, column], rtol=2e-12, atol=2e-12)
+            expected_potential = [[max(1 - 2*x, 0.), max(2*x - 1, 0.)]
+                                  for x, _, _ in request["mesh"]["vertices"]]
+            np.testing.assert_allclose(complex_values(response["basis_node_potential_v"]),
+                                       expected_potential, rtol=0, atol=2e-12)
+
+    def test_strong_basis_cannot_hide_corrupt_weak_basis_solution(self):
+        solve = dielectric._solve_linear
+
+        def corrupt_weak_basis(*args):
+            solution, backward_error, condition = solve(*args)
+            solution[:, 1] *= .9
+            return solution, backward_error, condition
+
+        with patch.object(dielectric, "_solve_linear", side_effect=corrupt_weak_basis):
+            with self.assertRaisesRegex(dielectric.PdnDielectricAcError, "residual"):
+                dielectric.extract_pdn_dielectric_ac(unequal_grounded_gaps())
+
+    def test_strong_basis_cannot_hide_corrupt_weak_basis_power(self):
+        reaction = dielectric._electrode_reactions
+
+        def corrupt_weak_basis(*args):
+            currents, nodal = reaction(*args)
+            currents[:, 1] *= 1.1
+            return currents, nodal
+
+        with patch.object(dielectric, "_electrode_reactions", side_effect=corrupt_weak_basis):
+            with self.assertRaisesRegex(dielectric.PdnDielectricAcError, "power"):
+                dielectric.extract_pdn_dielectric_ac(unequal_grounded_gaps())
+
+    def test_strong_basis_cannot_hide_weak_reference_current_imbalance(self):
+        reaction = dielectric._electrode_reactions
+
+        def corrupt_weak_reference(*args):
+            currents, nodal = reaction(*args)
+            currents[1, 1] *= 1.1
+            return currents, nodal
+
+        with patch.object(dielectric, "_electrode_reactions", side_effect=corrupt_weak_reference):
+            with self.assertRaisesRegex(dielectric.PdnDielectricAcError, "conservation"):
+                dielectric.extract_pdn_dielectric_ac(unequal_grounded_gaps())
+
     def test_homogeneous_plate_refinements_and_full_fields(self):
         for epsilon in (4e-8, np.diag([3e-8, 5e-8, 7e-8]).tolist()):
             directional = epsilon if isinstance(epsilon, float) else epsilon[0][0]

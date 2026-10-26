@@ -1,0 +1,72 @@
+{
+  "contract": "spike/calibrated-fixture-uq-evidence/v1",
+  "stage_id": "SI08-I04",
+  "status": "passed",
+  "stage_complete": true,
+  "workflow": "offline_reference",
+  "family_complete": false,
+  "production_qualified": false,
+  "measurement_qualified": false,
+  "linearization_qualified": false,
+  "sources_before": {
+    "python/spike_core/solvers/signal_integrity/networks/calibrated_fixture_uq.py": "73515e68f68cb4ad60f584b088fe0240bc545bba6b74bc5d79998bcf909172ca",
+    "python/spike_core/solvers/signal_integrity/networks/multiport_calibration.py": "26c92fba072b409fec145481a69ae7775272076637c6a2a0af56095c863fa67e",
+    "python/spike_core/solvers/signal_integrity/networks/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_multiport_deembedding.py": "b9bf300382a71aecbca3054971535c0ac5dff57edabb3849c9eb2aceda6141b7",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "examples/calibrated_fixture_uq/run_study.py": "145c66742d1bc85a416a4fa5954fd470e0a8120a3922f29f7451a9bd1a6ee866",
+    "tests/python/test_calibrated_fixture_uq.py": "207b56d9e44a2bf0b77a80f540abbdd04f7b64d11b0ea85385e82028de733b2b",
+    "tests/python/test_calibrated_fixture_uq_oracles.py": "9a76558176a7ec7d6515ef7e575ec3fa0650101fe9d114ebfb93fe795a17a59d",
+    "scripts/verify_calibrated_fixture_uq.py": "c03f677c5349aab2c27ad16234c04ff28f47f1cd2dbe89eae4f52736d625561f",
+    "docs/CALIBRATED_FIXTURE_UQ.md": "1a8aa6f1b6e767af98d307ab64b119c57d4d1889ed0c07117e16102236278117",
+    "docs/validation/CALIBRATED_FIXTURE_UQ_DERIVATION_20261025.md": "3189d05ff13c8ecd29be84b0d42edffde8cb2a6dd09de3bda2d5d21c305b14f7"
+  },
+  "sources_after": {
+    "python/spike_core/solvers/signal_integrity/networks/calibrated_fixture_uq.py": "73515e68f68cb4ad60f584b088fe0240bc545bba6b74bc5d79998bcf909172ca",
+    "python/spike_core/solvers/signal_integrity/networks/multiport_calibration.py": "26c92fba072b409fec145481a69ae7775272076637c6a2a0af56095c863fa67e",
+    "python/spike_core/solvers/signal_integrity/networks/one_port_calibration.py": "e9f2ec28eebe53e61a77c2945248837a5808374ef83a57f8bb5ab183978b2e74",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_multiport_deembedding.py": "b9bf300382a71aecbca3054971535c0ac5dff57edabb3849c9eb2aceda6141b7",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py": "31666bd44fee635b5d8f124551d63d9afe8c45d872af275db667bb1586307207",
+    "examples/calibrated_fixture_uq/run_study.py": "145c66742d1bc85a416a4fa5954fd470e0a8120a3922f29f7451a9bd1a6ee866",
+    "tests/python/test_calibrated_fixture_uq.py": "207b56d9e44a2bf0b77a80f540abbdd04f7b64d11b0ea85385e82028de733b2b",
+    "tests/python/test_calibrated_fixture_uq_oracles.py": "9a76558176a7ec7d6515ef7e575ec3fa0650101fe9d114ebfb93fe795a17a59d",
+    "scripts/verify_calibrated_fixture_uq.py": "c03f677c5349aab2c27ad16234c04ff28f47f1cd2dbe89eae4f52736d625561f",
+    "docs/CALIBRATED_FIXTURE_UQ.md": "1a8aa6f1b6e767af98d307ab64b119c57d4d1889ed0c07117e16102236278117",
+    "docs/validation/CALIBRATED_FIXTURE_UQ_DERIVATION_20261025.md": "3189d05ff13c8ecd29be84b0d42edffde8cb2a6dd09de3bda2d5d21c305b14f7"
+  },
+  "runtime": {
+    "python": "3.11.9",
+    "numpy": "2.2.6"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_calibrated_fixture_uq.JointFixtureContractTests.test_actual_cli_capture_and_exclusive_output",
+      "tests.python.test_calibrated_fixture_uq.JointFixtureContractTests.test_cancel_callback_and_budget",
+      "tests.python.test_calibrated_fixture_uq.JointFixtureContractTests.test_source_and_output_ownership",
+      "tests.python.test_calibrated_fixture_uq.JointFixtureContractTests.test_strict_fields_joint_basis_and_leading_block",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_all_direction_recovery_and_feedback_poles_reject",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_all_joint_coordinates_dense_psd_and_frequency_correlations",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_calibration_external_port_permutation_preserves_physical_dut",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_correlated_common_error_cancels_without_double_counting",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_fixture_storage_and_dut_order_covariance_permutations",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_late_cancellation_preserves_input",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_mismatched_calibration_covariance_and_late_sample_failure",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_symmetric_nonlinear_covariance_refinement",
+      "tests.python.test_calibrated_fixture_uq_oracles.CalibratedFixtureIndependentTests.test_two_three_four_port_truth_and_immutable_sources"
+    ],
+    "run": 13,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": {
+    "path": "docs/validation/parity/SI08-I04-joint-uq-r2-20261025.log",
+    "sha256": "23b5a084e1f587114963e27e0930296c788246f83caf319c3b7053abf737bdba"
+  },
+  "capture": {
+    "path": "docs/validation/parity/SI08-I04-joint-uq-r2-capture-20261025.json",
+    "sha256": "715f3fc05326f1b262797caa644aac762b782b260012c3fc29d885d6e87468d0"
+  }
+}

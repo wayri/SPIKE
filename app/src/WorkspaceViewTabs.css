@@ -43,9 +43,9 @@
 .workspace-command-row .toolbar-menu-trigger { min-width:26px;width:26px;min-height:26px;height:26px;padding:3px; }
 .workspace-command-row .toolbar-menu-trigger > span,.workspace-command-row .toolbar-menu-trigger > svg:last-child { display:none; }
 .app-shell.interface-clean .canvas-area { grid-template-rows:minmax(0,1fr) auto!important; }
-.app-shell.interface-clean .workspace-document-open .workspace-view-tabs,
-.app-shell.interface-clean .workspace-document-open .workspace-viewport-tools { display:none; }
-.app-shell.interface-clean .workspace-document-open .workspace-editor-tabs { flex:1; }
+.app-shell.interface-clean .focus-panel-expanded .workspace-view-tabs,
+.app-shell.interface-clean .focus-panel-expanded .workspace-viewport-tools { display:none; }
+.app-shell.interface-clean .focus-panel-expanded .workspace-editor-tabs { flex:1; }
 .app-shell.interface-clean .workspace-header-utilities .toolbar-menu-trigger { width:28px;min-width:28px;height:28px;padding:4px; }
 .app-shell.interface-clean .workspace-header-utilities .toolbar-menu-trigger > span,
 .app-shell.interface-clean .workspace-header-utilities .toolbar-menu-trigger > svg:last-child { display:none; }

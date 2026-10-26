@@ -4,8 +4,8 @@
 
 ### **1. PEEC Electromagnetic Solver** ✍️ **100% CUSTOM**
 **Files:**
-- `src/peec/peec_solver.hpp` (199 lines)
-- `src/peec/peec_solver.cpp` (76 lines)
+- `src/solvers/power_integrity/peec/peec_solver.hpp` (199 lines)
+- `src/solvers/power_integrity/peec/peec_solver.cpp` (76 lines)
 
 **What we implemented:**
 - ✅ Neumann formula for mutual inductance

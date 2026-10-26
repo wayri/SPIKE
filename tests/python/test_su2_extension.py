@@ -44,7 +44,7 @@ class Su2ExtensionTests(unittest.TestCase):
         self.assertFalse(result['data']['production_qualified'])
 
     def test_failed_thermal_validation_remains_failed(self):
-        with patch('python.spike_core.su2_cht.run_su2_cht', return_value={
+        with patch('python.spike_core.solvers.external_engines.su2.su2_cht.run_su2_cht', return_value={
             'status': 'failed_validation', 'validation': {'passed': False},
             'convergence': {'converged': True}}):
             result = execute(request('su2-cht', {'cells': 16}))
@@ -52,7 +52,7 @@ class Su2ExtensionTests(unittest.TestCase):
         self.assertFalse(result['data']['result']['validation']['passed'])
 
     def test_cht_preview_shows_both_solids_without_execution(self):
-        with patch('python.spike_core.su2_cht.run_su2_cht', side_effect=AssertionError('unexpected launch')):
+        with patch('python.spike_core.solvers.external_engines.su2.su2_cht.run_su2_cht', side_effect=AssertionError('unexpected launch')):
             result = execute(request('su2-cht-preview', {'cells': 16}))
         self.assertIn('cold_solid_bounds_m', result['data']['geometry'])
         self.assertIn('runtime', result['data'])

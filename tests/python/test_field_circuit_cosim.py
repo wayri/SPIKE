@@ -3,12 +3,7 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import SpiDeR
-from python.spike_core.field_circuit_cosim import (
-    FIELD_RESULT_CONTRACT,
-    REQUEST_CONTRACT,
-    run_iterative_field_circuit_cosimulation,
-    validate_field_circuit_request,
-)
+from python.spike_core.solvers.execution.coupling.field_circuit_cosim import FIELD_RESULT_CONTRACT, REQUEST_CONTRACT, run_iterative_field_circuit_cosimulation, validate_field_circuit_request
 from tests.python.test_native_circuit_compiler import design, workspace
 
 
@@ -140,7 +135,7 @@ class FieldCircuitCosimulationTests(unittest.TestCase):
             return response(item, 0.2)
 
         with patch(
-            "python.spike_core.field_circuit_cosim.run_owned_spice_workspace",
+            "python.spike_core.solvers.execution.coupling.field_circuit_cosim.run_owned_spice_workspace",
             side_effect=RuntimeError("owned circuit integrity failure"),
         ):
             result = run_iterative_field_circuit_cosimulation(

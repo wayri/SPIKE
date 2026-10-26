@@ -1,0 +1,11 @@
+.ibis-behavioral { max-width: 72rem; padding: 1rem; margin-block: 1rem; border: 1px solid var(--border, #53636d); border-radius: 6px; min-width: 0; }
+.ibis-behavioral p { max-width: 84ch; line-height: 1.5; }
+.ibis-models { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap: 1rem; }
+.ibis-behavioral fieldset { min-width: 0; padding: .85rem; border: 1px solid var(--border, #53636d); }
+.ibis-behavioral label { display: grid; gap: .35rem; margin-block: .6rem; text-transform: none; }
+.ibis-behavioral label:has(input[type=checkbox]) { display: flex; align-items: center; gap: .6rem; }
+.ibis-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-block: .75rem; }
+.ibis-behavioral textarea { width: 100%; box-sizing: border-box; font-family: ui-monospace, monospace; }
+.ibis-behavioral code { display: block; overflow-wrap: anywhere; margin-block: .5rem; }
+.ibis-behavioral pre { max-height: 22rem; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ibis-stage { margin-top: .75rem; }

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import type { AssemblySceneModel } from "./mcadAssembly";
 import type { ParsedBoard } from "./boardParser";
 import type { VirtualBoardVisual } from "./harnessVisualization";
+import type { ZoneDisplayMode } from "./zoneDisplay";
 import ScopedWorkspaceView from "./ScopedWorkspaceView";
 import WorkspaceViewHost from "./WorkspaceViewHost";
 import WorkspaceViewTabs from "./WorkspaceViewTabs";
@@ -24,6 +25,10 @@ export type UseWorkspaceViewsOptions = {
   assemblyModels: readonly AssemblySceneModel[];
   parts: readonly WorkspaceViewPartCandidate[];
   visibility: Record<string, boolean>;
+  showNetNames?: boolean;
+  assemblyNetNameVisibility?: Record<string, boolean>;
+  zoneDisplay?: ZoneDisplayMode;
+  assemblyZoneDisplay?: Record<string, ZoneDisplayMode>;
   layerVisibility: Record<string, Record<string, boolean>>;
   layerOpacity: Record<string, Record<string, number>>;
   layerFocus: Record<string, string>;
@@ -53,7 +58,7 @@ const hash = (value: string) => { let result = 2166136261; for (let i = 0; i < v
 const scopedId = (prefix: "board" | "part", identity: string) => `${prefix}-${safe(identity)}-${hash(identity)}`;
 const pick = <T,>(source: Record<string, T>, id?: string): Record<string, T> => id && source[id] !== undefined ? { [id]: source[id] } : {};
 const linkedFor = (source: Record<string, string[]>, occurrenceId?: string) => occurrenceId ? Object.fromEntries(Object.entries(source).filter(([key, values]) => key === occurrenceId || key.startsWith(`${occurrenceId}::`) || values.some(value => value === occurrenceId || value.startsWith(`${occurrenceId}::`)))) : {};
-type DerivedWorkspaceView = Pick<WorkspaceViewSnapshot, "targetBoards" | "sourceDesignId" | "visibility" | "layerVisibility" | "layerOpacity" | "layerFocus" | "linkedNets"> & { valid: boolean; invalidReason?: string; viewport: WorkspaceViewViewportData };
+type DerivedWorkspaceView = Pick<WorkspaceViewSnapshot, "targetBoards" | "sourceDesignId" | "visibility" | "showNetNames" | "assemblyNetNameVisibility" | "zoneDisplay" | "assemblyZoneDisplay" | "layerVisibility" | "layerOpacity" | "layerFocus" | "linkedNets"> & { valid: boolean; invalidReason?: string; viewport: WorkspaceViewViewportData };
 
 /** Pure scope projection used by the hook and focused contract tests. */
 export function deriveWorkspaceViewScope(options: Omit<UseWorkspaceViewsOptions, "onAction" | "onError">, view: WorkspaceViewDescriptor): DerivedWorkspaceView {
@@ -71,6 +76,10 @@ export function deriveWorkspaceViewScope(options: Omit<UseWorkspaceViewsOptions,
   return {
     valid, invalidReason: valid ? undefined : scope.kind === "board-occurrence" ? "This board occurrence no longer exists in the active project." : "This assembly part no longer exists in the active project.",
     targetBoards: targetOccurrence ? [targetOccurrence] : [], sourceDesignId: occurrence?.designId,
+    showNetNames: options.showNetNames ?? false,
+    assemblyNetNameVisibility: pick(options.assemblyNetNameVisibility ?? {}, occurrence?.id),
+    zoneDisplay: options.zoneDisplay ?? "filled",
+    assemblyZoneDisplay: pick(options.assemblyZoneDisplay ?? {}, occurrence?.id),
     visibility: occurrence ? { [occurrence.id]: options.visibility[occurrence.id] !== false } : {},
     layerVisibility: pick(options.layerVisibility, occurrence?.id), layerOpacity: pick(options.layerOpacity, occurrence?.id), layerFocus: pick(options.layerFocus, occurrence?.id),
     linkedNets: linkedFor(options.linkedNets, occurrence?.id),
@@ -132,13 +141,16 @@ export function useWorkspaceViews(options: UseWorkspaceViewsOptions): WorkspaceV
       derivedCache.current.set(view.id, derived);
     }
     const admittedRevision = `${current.revision.slice(0, 460)}:${current.analysisDomain ?? "view"}`;
-    const resultInputs = [view, current.projectSession, admittedRevision, current.analysisDomain, derived.value] as const;
+    const resultInputs = [view, current.projectSession, admittedRevision, current.analysisDomain, derived.value, current.showNetNames, occurrence ? current.assemblyNetNameVisibility?.[occurrence.id] : undefined,
+      current.zoneDisplay, occurrence ? current.assemblyZoneDisplay?.[occurrence.id] : undefined] as const;
     const cached = resultCache.current.get(view.id);
     if (cached && cached.inputs.length === resultInputs.length && cached.inputs.every((item, index) => item === resultInputs[index])) return cached.value;
     const snapshot: WorkspaceViewSnapshot = {
       viewId: view.id, projectSession: current.projectSession, revision: admittedRevision, viewportRevision: derived.value.valid ? scopedViewportRevision : null,
       descriptor: view, valid: derived.value.valid, invalidReason: derived.value.invalidReason,
       targetBoards: derived.value.targetBoards, sourceDesignId: derived.value.sourceDesignId,
+      showNetNames: current.showNetNames ?? false, assemblyNetNameVisibility: pick(current.assemblyNetNameVisibility ?? {}, occurrence?.id),
+      zoneDisplay: current.zoneDisplay ?? "filled", assemblyZoneDisplay: pick(current.assemblyZoneDisplay ?? {}, occurrence?.id),
       visibility: derived.value.visibility, layerVisibility: derived.value.layerVisibility, layerOpacity: derived.value.layerOpacity,
       layerFocus: derived.value.layerFocus, linkedNets: derived.value.linkedNets, analysisDomain: current.analysisDomain,
     };

@@ -71,9 +71,9 @@ def measure(function, runs=5):
 def run(case, output, runs=5):
     import numpy as np
     import scipy
-    from python.spike_core.cfd_tetra_mesh import admit_cfd_tetra_mesh
-    from python.spike_core.cfd_tetra_stokes import solve_cfd_tetra_stokes
-    from python.spike_core.cfd_tetra_energy import solve_cfd_tetra_energy
+    from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_mesh import admit_cfd_tetra_mesh
+    from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_stokes import solve_cfd_tetra_stokes
+    from python.spike_core.solvers.thermal_fluid.flow.cfd_tetra_energy import solve_cfd_tetra_energy
 
     inputs = {name: case/(name+"-request.json") for name in ("flow", "energy")}
     requests = {}

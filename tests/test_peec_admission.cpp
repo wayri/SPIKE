@@ -2,7 +2,7 @@
 // Copyright (c) 2026 SigHarmonic
 // Independently authored API-admission regressions. These checks do not
 // establish physical validity of the legacy filament/patch approximation.
-#include "peec/peec_solver.hpp"
+#include "solvers/power_integrity/peec/peec_solver.hpp"
 
 #include <cmath>
 #include <functional>

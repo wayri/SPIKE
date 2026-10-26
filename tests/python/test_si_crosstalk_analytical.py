@@ -3,9 +3,9 @@
 import unittest
 import numpy as np
 from scripts.benchmark_si_crosstalk import run_benchmarks,line_fixture,independent_modal_s
-from python.spike_core.si_coupled_channel import crosstalk_report,multiconductor_rlgc_network
-from python.spike_core.si_crosstalk import analyze_crosstalk
-from python.spike_core.sparameters import NetworkData
+from python.spike_core.solvers.signal_integrity.channels.si_coupled_channel import crosstalk_report, multiconductor_rlgc_network
+from python.spike_core.solvers.signal_integrity.receivers.si_crosstalk import analyze_crosstalk
+from python.spike_core.solvers.signal_integrity.networks.sparameters import NetworkData
 
 
 class CrosstalkAnalyticalTests(unittest.TestCase):

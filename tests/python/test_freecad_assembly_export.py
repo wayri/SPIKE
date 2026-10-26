@@ -8,7 +8,7 @@ from python.spike_core.assembly_exchange import import_exchange
 from python.spike_core.assembly_frames import resolve_world
 from python.spike_core.spider_v2 import AssemblyIRV1
 from python.spike_core.mcad_tessellation import _freecad_path, McadTessellationError
-from python.spike_core.sparselizard_process import run_adapter_process
+from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 
 
 class FreeCADAssemblyExportTests(unittest.TestCase):

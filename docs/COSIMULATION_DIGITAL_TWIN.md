@@ -58,7 +58,7 @@ reported data; `completed` means comparison executed, not that a model passed.
 
 ## Co-simulation API and equations
 
-`python/spike_core/cosimulation.py` owns `run_cosimulation(request, *, adapters,
+`python/spike_core/solvers/execution/coupling/cosimulation.py` owns `run_cosimulation(request, *, adapters,
 cancelled, timeout_s)`. Request schema: `schemas/cosimulation-request-v1.schema.json`.
 Participant IDs, model revisions, scalar port directions, unit labels, initial
 outputs and adapter configuration are explicit. Each input has exactly one

@@ -13,7 +13,7 @@
     "revision": { "type": "string", "minLength": 1, "maxLength": 80 },
     "description": { "type": "string", "minLength": 1, "maxLength": 2000 },
     "signaling": { "enum": ["single_ended", "differential", "parallel_bus", "mixed"] },
-    "encoding": { "enum": ["NRZ", "PAM4", "mixed", "user_defined"] },
+    "encoding": { "enum": ["NRZ", "PAM3", "PAM4", "mixed", "user_defined"] },
     "topology": { "$ref": "#/$defs/stringList" },
     "requiredInputs": { "$ref": "#/$defs/stringList" },
     "analyses": {

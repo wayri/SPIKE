@@ -1,3 +1,4 @@
+import loadSolverSetupSteps from "./load-solver-setup-steps.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import ts from "typescript";
@@ -14,6 +15,7 @@ assert.match(workflowUi, /Bound IBIS values override matching editable parameter
 // Render the actual endpoint page, not just markup string checks. Worker calls
 // are not needed to edit the source/receiver setup.
 const require = createRequire(import.meta.url);
+const stepsUi = loadSolverSetupSteps({ ...React, useId: () => "si-step-description" });
 const assignments = { exports: {} };
 new Function("module", "exports", ts.transpileModule(readFileSync(new URL("../src/siWorkflowAssignments.ts", import.meta.url), "utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 },
@@ -24,8 +26,20 @@ const uiCode = ts.transpileModule(workflowUi, { compilerOptions: {
   module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX, esModuleInterop: true,
 } }).outputText;
 const updates = [];
+// The app opens a review panel. This harness executes the same readiness gate
+// before the existing raw run, so worker payload and blocking tests stay meaningful.
+const guidedHook = { useGuidedRunAdapter: adapter => async () => {
+  const signal = new AbortController().signal;
+  const checked = await adapter.check(adapter.context, signal);
+  const blocker = checked.requirements.find(row => row.severity === "blocker");
+  if (blocker) { adapter.fix(blocker); return; }
+  await adapter.run(adapter.context, signal);
+} };
+
 new Function("require", "module", "exports", uiCode)(name => {
-  if (name === "react") return { ...React, useEffect: () => {}, useState: initial => [typeof initial === "function" ? initial() : initial === "channel" ? "endpoints" : initial, update => updates.push(update)] };
+  if (name === "./useGuidedRunAdapter") return guidedHook;
+  if (name === "react") return { ...React, useMemo: factory => factory(), useRef: initial => ({current:initial}), useEffect: () => {}, useState: initial => [typeof initial === "function" ? initial() : initial === "channel" ? "endpoints" : initial, update => updates.push(update)] };
+  if (name === "./SolverSetupSteps") return stepsUi;
   if (name.endsWith(".css")) return {};
   if (name === "./workerBridge") return { isDesktopShell: () => true };
   if (name === "./siWorkflowCatalog.json") return catalog;
@@ -42,7 +56,7 @@ assert.equal((html.match(/class="spike-table si-endpoint-table"/g) ?? []).length
 assert.match(html, /Primary source/);
 assert.match(html, /Receiver 1/);
 assert.ok(!html.includes('class="si-endpoint"'), 'legacy cards must not remain');
-const nodes = node => !node || typeof node !== "object" ? [] : Array.isArray(node) ? node.flatMap(nodes) : [node, ...nodes(node.props?.children)];
+const nodes = node => !node || typeof node !== "object" ? [] : Array.isArray(node) ? node.flatMap(nodes) : node.type === stepsUi.default ? nodes(stepsUi.default(node.props)) : [node, ...nodes(node.props?.children)];
 nodes(tree).find(node => node.props?.["aria-label"] === "source 1 port (1-based)").props.onChange({ target: { value: "3" } });
 assert.equal(updates[0](catalog.defaults).sources[0].port, 2, 'displayed ports preserve zero-based worker mapping');
 
@@ -54,11 +68,13 @@ function mountWorkflow({ desktop = true, setup = catalog.defaults, worker, desig
   const module = { exports: {} };
   const request = structuredClone(setup);
   new Function("require", "module", "exports", uiCode)(name => {
-    if (name === "react") return { ...React, useEffect: () => {}, useState: initial => {
+    if (name === "./useGuidedRunAdapter") return guidedHook;
+  if (name === "react") return { ...React, useMemo: factory => factory(), useRef: initial => ({current:initial}), useEffect: () => {}, useState: initial => {
       const index = cursor++;
       if (!(index in state)) state[index] = typeof initial === "function" ? initial() : initial;
       return [state[index], value => { state[index] = typeof value === "function" ? value(state[index]) : value; }];
     } };
+    if (name === "./SolverSetupSteps") return stepsUi;
     if (name.endsWith(".css")) return {};
     if (name === "./workerBridge") return { isDesktopShell: () => desktop, runLocalWorker: worker };
     if (name === "./siWorkflowCatalog.json") return { ...catalog, defaults: request };
@@ -125,12 +141,13 @@ let invalidCalls = 0;
 const customFlow = mountWorkflow({ setup: custom, design: board, worker: () => { invalidCalls++; throw Error("Invalid assignments must not reach the worker"); } });
 customFlow.click("Extract active board path");
 for (const key of ["sources", "receivers", "passives", "edits"]) assert.deepEqual(customFlow.setup()[key], custom[key], `${key} must not be silently changed or dropped`);
-assert.equal(customFlow.button("Run loaded SI study").props.disabled, true);
+assert.equal(customFlow.button("Run loaded SI study").props.disabled, false, "Run remains available to open guided repair");
 assert.match(textOf(customFlow.render()), /Receiver 1: choose a whole-number port from 1 to 2/);
 assert.match(textOf(customFlow.render()), /Passive 1 \(Passives\)/);
 assert.match(textOf(customFlow.render()), /update the reorder operation/);
 customFlow.click("Run loaded SI study");
-assert.equal(invalidCalls, 0, "the handler also guards direct invocation while disabled");
+await Promise.resolve(); await Promise.resolve();
+assert.equal(invalidCalls, 0, "guided repair must not execute invalid assignments");
 const corrected = { ...customFlow.setup(), sources: [{ ...custom.sources[0], port: 0 }], receivers: [{ ...custom.receivers[0], port: 1 }], passives: [{ ...custom.passives[0], port: 1 }], edits: [{ kind: "reorder", ports: [0, 1] }] };
 assert.deepEqual(assignments.exports.siWorkflowPortIssues(corrected), [], "correcting every assignment restores admission");
 assert.match(assignments.exports.siWorkflowPortIssues({ ...corrected, receivers: [{ ...corrected.receivers[0], port: 0 }] }).join(" "), /already has an endpoint/);
@@ -153,6 +170,7 @@ assert.match(textOf(browser.render()), /Open the SPIKE desktop app/);
 let finish;
 const pending = mountWorkflow({ worker: () => new Promise(resolve => { finish = resolve; }) });
 pending.click("Run loaded SI study");
+await Promise.resolve();
 assert.ok(pending.button("Stop SI study"));
 assert.equal(nodes(pending.render()).find(node => node.type === "input" && node.props.accept === ".json").props.disabled, true);
 finish({ ok: true, result: { contract: "spike/si-workflow-result/v1", request: catalog.defaults, status: "partial" } });
@@ -174,6 +192,8 @@ function mountProtocol(props = {}) {
   let cursor = 0;
   const module = { exports: {} };
   new Function("require", "module", "exports", workbenchCode)(name => {
+    if (name === "./SolverSetupSteps") return stepsUi;
+    if (name === "./useGuidedRunAdapter") return guidedHook;
     if (name === "react") return { ...React,
       useState: initial => { const index = cursor++; if (!(index in state)) state[index] = typeof initial === "function" ? initial() : initial; return [state[index], value => { state[index] = typeof value === "function" ? value(state[index]) : value; }]; },
       useEffect: effect => effects.push(effect), useMemo: read => read(), useRef: value => ({ current: value }),
@@ -201,6 +221,7 @@ const protocol = mountProtocol({ suite: { id: "fixture", name: "Fixture suite", 
 } });
 assert.equal(nodes(protocol.render()).find(node => node.type === "button" && textOf(node.props.children) === "Geometry / protocol / network inspection").props.className, "primary-btn", "selected protocol suites must open their own configuration");
 nodes(protocol.render()).find(node => node.type === "button" && textOf(node.props.children).includes("Run experimental SI channel")).props.onClick();
+await Promise.resolve();
 assert.ok(nodes(protocol.render()).some(node => node.type === "button" && textOf(node.props.children).includes("Stop SI channel")), "running protocol work can be cancelled");
 await new Promise(resolve => setImmediate(resolve));
 assert.match(textOf(protocol.render()), /fixture worker failure/);
@@ -210,7 +231,7 @@ const crosstalk = mountProtocol({ initialView: "geometry", initialFocus: "crosst
   contract: "spike/design-ir/v2", design_id: "coupled", nets: [{ id: "sig", name: "TX" }, { id: "victim", name: "RX" }, { id: "gnd", name: "GND" }], layers: [{ id: "bottom", name: "B.Cu", layer_type: "copper" }],
 } });
 const runCrosstalk = () => nodes(crosstalk.render()).find(node => node.type === "button" && textOf(node.props.children).includes("Run NEXT / FEXT"));
-runCrosstalk().props.onClick();
+await runCrosstalk().props.onClick();
 assert.match(textOf(crosstalk.render()), /Choose a separate victim net/);
 const victimSelect = nodes(crosstalk.render()).find(node => node.type === "select" && textOf(node.props.children).includes("No separate victim"));
 victimSelect.props.onChange({ target: { value: "victim" } });

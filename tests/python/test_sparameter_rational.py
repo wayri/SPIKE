@@ -8,7 +8,7 @@ from unittest.mock import patch
 import numpy as np
 from scipy.integrate import quad
 
-from python.spike_core import sparameter_rational as rational
+from python.spike_core.solvers.signal_integrity.networks import sparameter_rational as rational
 
 
 DIRECT = np.array([[.05, .02], [-.04, .1]])

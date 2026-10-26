@@ -60,7 +60,7 @@ assert result["status"] == "completed"
 print(error, result["diagnostics"])
 
 from tests.python.test_enclosure_sa_transport import manufactured_request
-from python.spike_core.enclosure_sa_transport import solve_enclosure_sa_transport
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_sa_transport import solve_enclosure_sa_transport
 request, exact = manufactured_request(8, q_amplitude=1.92)
 result = solve_enclosure_sa_transport(request)
 assert result["status"] == "completed"

@@ -18,7 +18,7 @@ from .multiboard_execution import (
 )
 from .service_helpers import error_response, operation_id
 from .harness_authoring import plan_harnesses
-from .harness_pi import run_harness_pi
+from .solvers.signal_integrity.lines.harness_pi import run_harness_pi
 from .multiboard_study import prepare_multiboard_study, validate_study_result
 
 
@@ -30,7 +30,7 @@ ASSEMBLY_SCOPED_METHODS = {
     "run_converter_study", "validate_topology_circuit", "bridge_topology_to_analysis_spec", "validate_pi_path",
     "compile_pi_path_native_mna", "run_pi_path_native_mna", "run_hybrid_cosimulation", "prepare_sparselizard_case",
     "extract_net_geometry", "extract_power_path", "validate_thermal", "estimate_thermal", "prepare_thermal_case",
-    "run_thermal_case", "run_component_thermal", "run_board_thermal",
+    "run_thermal_case", "run_component_thermal", "validate_component_thermal", "run_board_thermal",
     "prepare_openems_case", "run_openems_case",
 }
 
@@ -84,13 +84,13 @@ def handle_assembly_request(
             from .assembly_linked_nets import linked_assembly_nets
             result = linked_assembly_nets(params.get("request") or {})
         elif method == "run_multiboard_circuit":
-            from .multiboard_circuit import run_multiboard_circuit
+            from .solvers.circuits.models.multiboard_circuit import run_multiboard_circuit
             result = run_multiboard_circuit(params.get("request") or {})
         elif method == "run_multiboard_thermal":
-            from .multiboard_thermal import run_multiboard_thermal
+            from .solvers.thermal_fluid.heat.multiboard_thermal import run_multiboard_thermal
             result = run_multiboard_thermal(params.get("request") or {})
         elif method == "run_multiboard_em":
-            from .multiboard_em import run_multiboard_em
+            from .solvers.electromagnetics.fields.multiboard_em import run_multiboard_em
             result = run_multiboard_em(params.get("request") or {})
         elif method == "prepare_multiboard_study":
             result = prepare_multiboard_study(params.get("request") or {})
@@ -98,7 +98,7 @@ def handle_assembly_request(
             digest = validate_study_result(params["assembly"], params["domain"], params["request"], params["result"])
             result = {"assembly_digest": digest, "matches": True}
         elif method == "generate_tetrahedral_mesh":
-            from .gmsh_occ_runtime import run_occ_case
+            from .solvers.geometry_meshing.preparation.gmsh_occ_runtime import run_occ_case
             if set(params) - {"request", "timeout_s", "memory_limit_mb"}:
                 raise ValueError("Unexpected tetrahedral meshing parameters.")
             with tempfile.TemporaryDirectory(prefix="spike-tetra-") as directory:
@@ -120,16 +120,16 @@ def handle_assembly_request(
         elif method in {"run_harness_si", "prepare_harness_em"}:
             if set(params) != {"request"}:
                 raise ValueError("Harness SI/EM operations require exactly one request field.")
-            from .harness_signal import run_harness_si, prepare_harness_em
+            from .solvers.signal_integrity.lines.harness_signal import run_harness_si, prepare_harness_em
             result = (run_harness_si if method == "run_harness_si" else prepare_harness_em)(params["request"])
         elif method in {"run_harness_mtl", "extract_harness_round_wire_rlgc"}:
             if set(params) != {"request"}:
                 raise ValueError("Harness network operations require exactly one request field.")
             if method == "run_harness_mtl":
-                from .harness_mtl import run_harness_mtl
+                from .solvers.signal_integrity.lines.harness_mtl import run_harness_mtl
                 result = run_harness_mtl(params["request"])
             else:
-                from .harness_rlgc_geometry import extract_parallel_round_rlgc
+                from .solvers.signal_integrity.lines.harness_rlgc_geometry import extract_parallel_round_rlgc
                 result = extract_parallel_round_rlgc(params["request"])
         elif method == "plan_assembly_harnesses":
             result = plan_harnesses(params.get("request") or {})

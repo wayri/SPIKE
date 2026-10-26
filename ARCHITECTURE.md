@@ -1,5 +1,11 @@
 # SPIKE Architecture
 
+The experimental retained geometry propulsion loop has a shared CLI/worker
+application boundary and a separate saved capture contract. Numerical owners,
+inline-source identity, heavy-worker supervision and GUI replay are separated in
+[ADR0136](docs/adr/0136-explicit-geometry-propulsion-ports.md); source-specific
+field/CFD convergence is not inferred from transport or display admission.
+
 Studio reusable component packages remain inert on import. Visual symbol/pin
 editing, source capture and explicitly approved SPICE/C++/Verilog build paths
 are separate services; see [ADR 0125](docs/adr/0125-reusable-component-maker.md)
@@ -467,7 +473,7 @@ modules predate the current boundaries and need staged extraction:
   still coupled.
 - `python/spike_core/cli.py` and `transient_peec.py`: command/formulation
   responsibilities should be decomposed as their contracts stabilize.
-- `python/spike_core/hybrid_mesh.py`: topology construction and discretization
+- `python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py`: topology construction and discretization
   should separate after hybrid-geometry regression coverage is broader.
 
 New functionality must not expand these modules without a documented reason.
@@ -549,3 +555,17 @@ admission with a conditioned resistive feedback connection and bounded
 augmented-exponential propagation. Worker contracts retain the source/fit and
 declared boundaries. See
 [ADR 0093](docs/adr/0093-resistive-rational-network-feedback.md).
+
+Saved-file CAD links and reviewed package refresh use the existing worker/import
+boundary. See [ADR 0138](docs/adr/0138-reviewed-linked-cad-sources.md) and
+[linked CAD sources](docs/LINKED_CAD_SOURCES.md) for ownership, trust and limits.
+
+Guided Run and Tutor use live revision-bound editor adapters and pure readiness
+checks under [ADR 0139](docs/adr/0139-guided-simulation-admission.md). The controller
+never supplies missing physical values or replaces final solver admission.
+
+Local portable project recovery uses a host-owned application-data root and the existing Python project writer. Renderer timers and Settings never choose backup paths or mark current edits saved. See [ADR 0140](docs/adr/0140-local-project-recovery.md) and [backup behavior](docs/PROJECT_BACKUPS.md).
+
+Explicit solder presentation extends retained UI bond records without changing solver contacts. Identity admission and instanced profiles remain in the frontend under [ADR 0141](docs/adr/0141-explicit-solder-presentation.md).
+
+Solver discovery resolves exact panel/template destinations and retains source-only boundaries under [ADR 0142](docs/adr/0142-exact-solver-capability-destinations.md). The [generated integration map](docs/SOLVER_INTEGRATION.md) is checked against the presentation catalog and Python dependency snapshot.

@@ -20,5 +20,15 @@ const points = assemblyAirflowFieldVolume(airflow);
 assert.deepEqual(points.cells,{centers:[[1,2,3]]});
 assert.deepEqual(points.frames[0].scalars,{temperature_k:[300],speed_m_s:[5]});
 assert.deepEqual(points.frames[0].vectors,[[3,4,0]]);
+const savedFlow = { ...points, frames: [points.frames[0], { ...points.frames[0], timeS: 2,
+  scalars: { temperature_k: [304], speed_m_s: [2] }, vectors: [[2,0,0]],
+  streamlines: [{ points: [[1,2,3],[2,2,3]], scalars: { temperature_k: [304,303], speed_m_s: [2,1] } }] }] };
+const retained = assemblyAirflowFieldVolume({ ...airflow, flow_field_volume: savedFlow });
+assert.equal(retained.frames.length, 2);
+assert.equal(retained.frames[1].timeS, 2);
+assert.deepEqual(retained.frames[1].scalars.temperature_k, [304]);
+assert.deepEqual(retained.frames[1].streamlines[0].points, [[1,2,3],[2,2,3]]);
+assert.equal(assemblyAirflowFieldVolume({ ...airflow, status: "failed", flow_field_volume: savedFlow }), null);
+assert.equal(assemblyAirflowFieldVolume({ ...airflow, flow_field_volume: { ...savedFlow, frames: [] } }), null);
 assert.equal(assemblyAirflowFieldVolume({...airflow,fields:{...airflow.fields,velocity_m_s:{unit:"m/s",samples:[{point_mm:[9,9,9],value:[1,0,0],region:"air"}]}}}),null);
 console.log("field volume CFD adapters preserve returned coordinates, vectors, values, and geometry limits");

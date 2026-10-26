@@ -17,16 +17,16 @@ if str(ROOT) not in sys.path:
 from python.spike_core import __version__
 from python.spike_core.assembly_frames import IDENTITY
 from python.spike_core.harness_authoring import discover_connectors, validate_harness_connections
-from python.spike_core.multiboard_circuit import run_multiboard_circuit
-from python.spike_core.multiboard_thermal import run_multiboard_thermal
+from python.spike_core.solvers.circuits.models.multiboard_circuit import run_multiboard_circuit
+from python.spike_core.solvers.thermal_fluid.heat.multiboard_thermal import run_multiboard_thermal
 from python.spike_core.project_package import _source_member_name, read_project, write_spike_package
 from python.spike_core.service_project import import_design
 from python.spike_core.service_project_handlers import handle_project_request
 from python.spike_core.spider_v2 import AssemblyIRV1
 from python.spike_core.spider_v2_schema import content_digest
-from python.spike_core.geometry import extract_net_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.geometry import extract_net_geometry
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.hybrid_mesh import build_hybrid_mesh, nearest_mesh_node
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh, nearest_mesh_node
 
 SOURCE = ROOT / "app/public/demo/ebrake1.kicad_pcb"
 DEFAULT_OUTPUT = ROOT / "build/multiboard-acceptance-20261001"

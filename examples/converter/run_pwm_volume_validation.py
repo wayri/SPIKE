@@ -18,10 +18,10 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 
-from python.spike_core.pwm_electrothermal import DEFAULTS
-from python.spike_core.pwm_volume_electrothermal import REQUEST, run_pwm_volume_electrothermal
-from python.spike_core.calculix_transient import run_calculix_transient
-from python.spike_core.assembly_tetra_transient import run_assembly_tetra_transient
+from python.spike_core.solvers.thermal_fluid.electrothermal.pwm_electrothermal import DEFAULTS
+from python.spike_core.solvers.thermal_fluid.electrothermal.pwm_volume_electrothermal import REQUEST, run_pwm_volume_electrothermal
+from python.spike_core.solvers.external_engines.calculix.calculix_transient import run_calculix_transient
+from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_transient import run_assembly_tetra_transient
 from tests.python.test_assembly_tetra_thermal import cube, request
 from tests.python.test_calculix_transient import sine_case
 
@@ -179,10 +179,10 @@ def retained_board_package_replay(directory):
     This reuses SPIKE's original OCC-meshed two-board/STEP package fixture.
     No remeshing or source-package modification is required.
     """
-    from python.spike_core.assembly_field_transient import _bind_canonical, remap_field_transient_settings
-    from python.spike_core.calculix_transient import run_calculix_field_transient, verify_calculix_field_transient_result
-    from python.spike_core.assembly_tetra_thermal_validation import validate_request
-    from python.spike_core.retained_thermal_step import prepare_retained_thermal_step
+    from python.spike_core.solvers.execution.coupling.assembly_field_transient import _bind_canonical, remap_field_transient_settings
+    from python.spike_core.solvers.external_engines.calculix.calculix_transient import run_calculix_field_transient, verify_calculix_field_transient_result
+    from python.spike_core.solvers.thermal_fluid.heat.assembly_tetra_thermal_validation import validate_request
+    from python.spike_core.solvers.thermal_fluid.heat.retained_thermal_step import prepare_retained_thermal_step
     names = ('geometry', 'problem', 'settings', 'spike')
     inputs = {name: json.loads((directory/(name+'.json')).read_text()) for name in names}
     geometry, problem, settings = (inputs[name] for name in names[:3])
@@ -317,9 +317,9 @@ def main():
               'calculix_executable_sha256': correlation['external_history']['execution']['runtime']['executable_sha256'],
               'artifacts': dict(artifacts),
               'source_sha256': {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in (
-                  'python/spike_core/pwm_volume_electrothermal.py',
-                  'python/spike_core/retained_thermal_step.py',
-                  'python/spike_core/calculix_transient.py',
+                  'python/spike_core/solvers/thermal_fluid/electrothermal/pwm_volume_electrothermal.py',
+                  'python/spike_core/solvers/thermal_fluid/heat/retained_thermal_step.py',
+                  'python/spike_core/solvers/external_engines/calculix/calculix_transient.py',
                   'examples/converter/run_pwm_volume_validation.py')},
               'limits': ['synthetic uniform solid, not a representative PCB or measured hardware',
                          'nonuniform cross-solver capacity matrices intentionally differ',

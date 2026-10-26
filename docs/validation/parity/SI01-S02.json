@@ -1,0 +1,56 @@
+{
+  "contract": "spike/si-candidate-constraint-evidence/v1",
+  "stage_id": "SI01-S02",
+  "status": "passed",
+  "stage_complete": true,
+  "workflow": "offline_reviewed_export",
+  "sources_before": {
+    "python/spike_core/solvers/signal_integrity/networks/si_candidate_constraints.py": "44df73713ab20c24685873222bd3e107b24e0e6182c14cda86c8900b70257b3d",
+    "python/spike_core/solvers/signal_integrity/networks/si_candidate_study.py": "7b8c05f976ad7544c754c9f7f6312a1f9efcfcdbbed3d358d321ce0e7912fbee",
+    "tests/python/test_si_candidate_constraints.py": "1db339a236499be19eefacbc5c265a0d1a0846623e9c1382bb51f41ac3b61018",
+    "tests/python/test_si_candidate_constraint_evidence.py": "dc75acee601808e39b61476cd642a7778bfdb280ea67ae6fead6bc227577d08c",
+    "scripts/verify_si_candidate_constraints.py": "9cd2221c19f373118e168a3935f4c9a2ebd7e2985d090538499964a01ca16fe6",
+    "docs/SI_CANDIDATE_CONSTRAINT_EXPORT.md": "3ad0848d13cc7543974970c967bb062bdfe6fbac61770fbb2d227d0d74435946",
+    "docs/SI_CANDIDATE_STUDY.md": "1a0e88fc78a8a3f768432b006c0f7c7c517a56e71a5f7b55e1664c1fc65c1988",
+    "examples/si_candidate_constraints/run_export.py": "06dba571964acdb2b093a85e1d45114a2e70eb90e371cff0d26e3de970972dc8",
+    "schemas/si-candidate-study-request-v1.schema.json": "cffedc2de8e8a337d5e27e02957c0202bf229d36d6fd29657e8ed4f6a445f73c",
+    "schemas/si-candidate-study-result-v1.schema.json": "56e7798b4f4806d09aab0122b43686910a9c93a56466898d528b8b0590b1f535"
+  },
+  "sources_after": {
+    "python/spike_core/solvers/signal_integrity/networks/si_candidate_constraints.py": "44df73713ab20c24685873222bd3e107b24e0e6182c14cda86c8900b70257b3d",
+    "python/spike_core/solvers/signal_integrity/networks/si_candidate_study.py": "7b8c05f976ad7544c754c9f7f6312a1f9efcfcdbbed3d358d321ce0e7912fbee",
+    "tests/python/test_si_candidate_constraints.py": "1db339a236499be19eefacbc5c265a0d1a0846623e9c1382bb51f41ac3b61018",
+    "tests/python/test_si_candidate_constraint_evidence.py": "dc75acee601808e39b61476cd642a7778bfdb280ea67ae6fead6bc227577d08c",
+    "scripts/verify_si_candidate_constraints.py": "9cd2221c19f373118e168a3935f4c9a2ebd7e2985d090538499964a01ca16fe6",
+    "docs/SI_CANDIDATE_CONSTRAINT_EXPORT.md": "3ad0848d13cc7543974970c967bb062bdfe6fbac61770fbb2d227d0d74435946",
+    "docs/SI_CANDIDATE_STUDY.md": "1a0e88fc78a8a3f768432b006c0f7c7c517a56e71a5f7b55e1664c1fc65c1988",
+    "examples/si_candidate_constraints/run_export.py": "06dba571964acdb2b093a85e1d45114a2e70eb90e371cff0d26e3de970972dc8",
+    "schemas/si-candidate-study-request-v1.schema.json": "cffedc2de8e8a337d5e27e02957c0202bf229d36d6fd29657e8ed4f6a445f73c",
+    "schemas/si-candidate-study-result-v1.schema.json": "56e7798b4f4806d09aab0122b43686910a9c93a56466898d528b8b0590b1f535"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_si_candidate_constraints.CandidateConstraintExportTests.test_accepted_export_preserves_original_limit_and_scope",
+      "tests.python.test_si_candidate_constraints.CandidateConstraintExportTests.test_digest_review_and_constraint_selection_fail_closed",
+      "tests.python.test_si_candidate_constraints.CandidateConstraintExportTests.test_failed_candidate_cannot_be_accepted",
+      "tests.python.test_si_candidate_constraints.CandidateConstraintExportTests.test_forged_status_coverage_and_witness_fail_closed",
+      "tests.python.test_si_candidate_constraints.CandidateConstraintExportTests.test_hold_and_reject_retain_failed_evidence_without_application",
+      "tests.python.test_si_candidate_constraints.CandidateConstraintExportTests.test_nonfinite_trace_and_incomplete_case_fail_accepted_export"
+    ],
+    "run": 6,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": {
+    "path": "docs/validation/parity/SI01-S02-reviewed-constraint-20261025.log",
+    "sha256": "59aaba8217849f3e9f6b8a5f59a74e0e4551403efe2be39cc79f0271f74a6f79"
+  },
+  "native_layout_applied": false,
+  "continuous_band_qualified": false,
+  "physical_qualified": false,
+  "production_qualified": false,
+  "family_complete": false
+}

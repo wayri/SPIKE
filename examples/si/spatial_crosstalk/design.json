@@ -1,0 +1,123 @@
+{
+  "design_id": "original-si-spatial-pair",
+  "name": "Supplied RLGC crosstalk pair",
+  "source": {
+    "source_format": "spike-original-fixture",
+    "source_digest": "78ab525656c77c5e351c7cbc988f046d52f8ffdc9cf2c133a126c835d29d75ce",
+    "native_id": "",
+    "artifact_path": ""
+  },
+  "frame": {
+    "frame_id": "board",
+    "parent_frame_id": "",
+    "units": "mm",
+    "handedness": "right",
+    "transform": [
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "contract": "spike/design-ir/v2",
+  "materials": [],
+  "layers": [
+    {
+      "id": "top",
+      "source_id": "",
+      "name": "F.Cu",
+      "extensions": {},
+      "layer_type": "copper",
+      "order": 0,
+      "z_mm": 0.0,
+      "thickness_mm": 0.035,
+      "material_id": "",
+      "region_ids": []
+    }
+  ],
+  "nets": [
+    {
+      "id": "aggressor-net",
+      "source_id": "",
+      "name": "AGGRESSOR",
+      "extensions": {},
+      "net_class": "signal",
+      "aliases": []
+    },
+    {
+      "id": "victim-net",
+      "source_id": "",
+      "name": "VICTIM",
+      "extensions": {},
+      "net_class": "signal",
+      "aliases": []
+    }
+  ],
+  "tracks": [
+    {
+      "id": "aggressor-stroke",
+      "source_id": "",
+      "name": "",
+      "extensions": {},
+      "net_id": "aggressor-net",
+      "layer_id": "top",
+      "start_mm": [
+        0.0,
+        0.0
+      ],
+      "end_mm": [
+        80.0,
+        0.0
+      ],
+      "width_mm": 0.2
+    },
+    {
+      "id": "victim-stroke",
+      "source_id": "",
+      "name": "",
+      "extensions": {},
+      "net_id": "victim-net",
+      "layer_id": "top",
+      "start_mm": [
+        0.0,
+        1.0
+      ],
+      "end_mm": [
+        80.0,
+        1.0
+      ],
+      "width_mm": 0.2
+    }
+  ],
+  "arcs": [],
+  "zones": [],
+  "pads": [],
+  "vias": [],
+  "drills": [],
+  "castellations": [],
+  "pins": [],
+  "components": [],
+  "component_bonds": [],
+  "connectors": [],
+  "regions": [],
+  "bends": [],
+  "models": [],
+  "constraints": [],
+  "variants": [],
+  "simulation_models": [],
+  "issues": [],
+  "vendor_extensions": {},
+  "metadata": {}
+}

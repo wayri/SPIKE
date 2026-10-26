@@ -8,7 +8,7 @@ automatic optimization and measured qualification remain open.
 ## Run a study
 
 Call `run_pdn_decap_corners(request)` from
-`python.spike_core.pdn_decap_corners`, or invoke the worker method of the same
+`python.spike_core.solvers.power_integrity.pdn.pdn_decap_corners`, or invoke the worker method of the same
 name with `params: {request: ...}`. The desktop script workspace can use this
 Python API. No dedicated desktop editor is introduced by this stage.
 

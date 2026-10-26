@@ -6,7 +6,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "python"))
-from spike_core.si_eye_mask import evaluate_eye_mask, validate_eye_mask
+from python.spike_core.solvers.signal_integrity.receivers.si_eye_mask import evaluate_eye_mask, validate_eye_mask
 
 
 def fixture():

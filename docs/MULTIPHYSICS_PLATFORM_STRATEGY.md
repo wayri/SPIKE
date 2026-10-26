@@ -71,10 +71,8 @@ any parity claim. Different suites emphasize different levels of fidelity.
 
 Priority here is a recommendation: **foundation** serves every current domain;
 **adjacent** extends authorized applications after prerequisites; **horizon** is
-separate future scope. The 21 October owner request authorizes the
-[optics/materials development track](OPTICS_PHOTONICS_MATERIALS_PLAN.md), without
-promoting runtime/release claims. Other deferred families retain their explicit
-execution policy. Research experiments never
+separate future scope. Deferred families retain their explicit execution policy.
+Research experiments never
 become a production capability merely by appearing in this table.
 
 | Coverage | What SPIKE should include | Mathematical and validation boundary | Existing owner/scope |
@@ -92,8 +90,6 @@ become a production capability merely by appearing in this table.
 | Adjacent: hydraulics, pneumatics and tribology | Pumps/valves/lines/accumulators, hydraulic actuators, seals, lubricating films, elastohydrodynamic bearings/gears and wear. | Mass/momentum/energy network DAEs plus local flow/contact models; cavitation, leakage, friction/heating and wear laws need calibrated bounds. | GP14/05/06; additional application stages proposed. |
 | Adjacent: nonlinear/multiscale materials | Composites, visco/hyperelasticity, plasticity/creep, cohesive interfaces, fracture/damage, homogenized lattices and metamaterials. | Frame objectivity, dissipation, tangent checks, length-scale/mesh dependence, irreversibility and measurements; microstructure-to-continuum transfer needs uncertainty. | GP07/11/13, LB01; distinguish constitutive physics from material appearance. |
 | Adjacent/later: particles and large-deformation methods | DEM grain/contact dynamics, SPH fluids and MPM solid/particle-grid formulations for selected impact, granular and free-surface problems. | Conservation, particle/kernel consistency, contact calibration, boundary support, stress integration, instability and resolution/convergence checks. BEM surface discretization and particle methods have different equations and applicability. | New bounded method stages proposed under GP02/05/07/14; not a generic meshless-solver claim. |
-| Authorized development: optics and photonics | Ray and wave optics, polarization/coatings, coherent propagation, optical resonators, optomechanics and structural-thermal-optical performance. | Maxwell/scalar-wave approximations, diffraction, aperture/sampling and energy/phase references. Semiconductor optics is a distinct coupled device model. | [21 October scope](OPTICS_PHOTONICS_MATERIALS_PLAN.md); OP01–05 qualification and runtime gates remain. |
-| Authorized bounded development: electron/ion optics and vacuum; other radiation remains horizon | [21 October scope](CHARGED_PARTICLE_VACUUM_PLAN.md): beam optics, TEM/SEM/sensors, rarefied/pressure environments and kinetic diagnostics. Spacecraft charging/radiation remain separate. | Regime checks, particle noise, charge/energy balance, cross-section/environment provenance, imaging and measured evidence. Reactive plasma chemistry remains separate paused scope. | Reuse EM/GP10/16 and native kernels; scalar references do not establish full workflows. |
 | Horizon: manufacturing physics | Nonreactive laser/weld heat transfer, melting/solidification, residual stress, forming, machining/contact and distortion. | Process/material applicability, phase-change/strain history, mesh/time and measured distortion; reaction-dependent curing is excluded for now. | Shared GP06/07/11; process stages proposed. |
 | Horizon: biomechanical, civil and geophysical physics | Bioheat/ultrasound/implants, porous flow/poroelasticity, soil/rock and seismic waves, renewable/ocean/atmospheric applications. | Separate constitutive laws, boundary scales, physical validation and use-specific acceptance; generic PDE availability does not qualify an application. | Future scope after the common core and relevant references. |
 
@@ -183,7 +179,7 @@ Prioritize verified sparse/preconditioned solves, conservative coupling and
 error estimates before chasing large domain counts. Add DOE/UQ and sensitivities
 to bounded validated solvers first; add inverse design after forward and gradient
 verification. Extend FSI, smart-material devices, fluid power, advanced flow and
-acoustics incrementally under their existing or newly agreed gates. Keep optics,
+acoustics incrementally under their existing or newly agreed gates. Keep
 unrelated broad expansion and chemistry sequencing explicit.
 
 For any added target, first identify the governing problem, existing family,

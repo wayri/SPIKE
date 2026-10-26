@@ -24,9 +24,9 @@ if str(ROOT) not in sys.path:
 from python.spike_core import __version__
 from python.spike_core.assembly_frames import IDENTITY
 from python.spike_core.harness_authoring import discover_connectors, validate_harness_connections
-from python.spike_core.multiboard_circuit import run_multiboard_circuit
-from python.spike_core.multiboard_em import run_multiboard_em
-from python.spike_core.multiboard_thermal import run_multiboard_thermal
+from python.spike_core.solvers.circuits.models.multiboard_circuit import run_multiboard_circuit
+from python.spike_core.solvers.electromagnetics.fields.multiboard_em import run_multiboard_em
+from python.spike_core.solvers.thermal_fluid.heat.multiboard_thermal import run_multiboard_thermal
 from python.spike_core.project_package import _source_member_name, read_project, write_spike_package
 from python.spike_core.project_state_artifacts import hydrate_result_state
 from python.spike_core.multiboard_study import validate_study_result

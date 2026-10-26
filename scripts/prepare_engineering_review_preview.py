@@ -6,7 +6,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from tests.python.test_engineering_review import request
-from python.spike_core.engineering_review import review_engineering,quick_engineering_tool
+from python.spike_core.engineering_review import review_engineering, quick_engineering_tool
 
 review=request();review['overrides']=[]
 quick={'contract':'spike/quick-engineering-tool-request/v1','tool':'resistor_divider',

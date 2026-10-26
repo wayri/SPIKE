@@ -73,7 +73,7 @@ def probe_pool(config):
 
 def run_cluster_batch(config, request):
     """Distribute independent jobs; never automatically retry an uncertain solve."""
-    from .parallel_pool import validate_batch
+    from .solvers.execution.resources.parallel_pool import validate_batch
     request = validate_batch(request, cpu_budget=256)
     status = probe_pool(config)
     usable = [row for row in status["nodes"] if row["state"] == "ready"]

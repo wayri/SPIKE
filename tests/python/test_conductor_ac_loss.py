@@ -3,7 +3,7 @@
 import math
 import unittest
 
-from python.spike_core.conductor_ac_loss import slab_internal_impedance_per_m
+from python.spike_core.solvers.power_integrity.peec.conductor_ac_loss import slab_internal_impedance_per_m
 
 MU = 4e-7 * math.pi
 PARAMETERS = {"conductivity_s_per_m": 5.8e7, "width_m": 0.001,

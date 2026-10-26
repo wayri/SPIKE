@@ -34,7 +34,7 @@ def dispatch_cluster(args):
     if args.command == "cluster-discover":
         from .cluster_discovery import discover
         return discover(broadcast=args.broadcast)
-    from .parallel_pool import pool_catalog, run_parallel_batch
+    from .solvers.execution.resources.parallel_pool import pool_catalog, run_parallel_batch
     if args.command == "parallel-pool":
         return pool_catalog()
     if args.command == "parallel-run":

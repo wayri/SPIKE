@@ -5,6 +5,8 @@ import {readFile} from 'node:fs/promises';
 import ts from 'typescript';
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import {importTestTypescript} from './import-test-typescript.mjs';
+const {zoneSceneKind}=await importTestTypescript('zoneDisplay');
 const source=await readFile(new URL('../src/BoardViewport.tsx',import.meta.url),'utf8');
 const ast=ts.createSourceFile('BoardViewport.tsx',source,ts.ScriptTarget.Latest,true,ts.ScriptKind.TSX);
 let traversal,importedTraversal;const functions={};
@@ -22,8 +24,8 @@ let importedVisibilityFunction;importedLayerAst.forEachChild(node=>{if(ts.isFunc
 assert.ok(importedVisibilityFunction);const importedBoardLayerVisible=new Function(compile(`${importedVisibilityFunction.replace(/^export\s+/,'')}\nreturn importedBoardLayerVisible;`))();
 const policy=await import(`data:text/javascript;base64,${Buffer.from(compile(await readFile(new URL('../src/viewportScenePolicy.ts',import.meta.url),'utf8'))).toString('base64')}`);
 const netFocusPolicy=await import(`data:text/javascript;base64,${Buffer.from(compile(await readFile(new URL('../src/netFocusMaterial.ts',import.meta.url),'utf8'))).toString('base64')}`);
-const keys=['group','placeholderRoot','visibleLayers','copperLayers','viewMode','missingModelSet','importedBoardLayers','showThtModels','showSmdModels','showModels','resultModelsVisible','proceduralModelsAllowed','authoritativeView','presentation','showVias','isolatedNet','analysisNetSet','analysisOnlyScene','resultVisualization','offsetForLayer','layerOpacity','selectedId','hoverPreview','hoverMaterials','selectionMaterials','netFocusActive'];
-const execute=new Function('THREE','env','layerObjectVisible','viaSpanVisible','applyNetFocusColor',compile(`const {${keys.join(',')}}=env; group.traverse(${traversal});`));
+const keys=['group','placeholderRoot','visibleLayers','copperLayers','viewMode','missingModelSet','importedBoardLayers','showThtModels','showSmdModels','showModels','resultModelsVisible','proceduralModelsAllowed','authoritativeView','presentation','showVias','isolatedNet','analysisNetSet','analysisOnlyScene','resultVisualization','offsetForLayer','layerOpacity','selectedId','hoverPreview','hoverMaterials','selectionMaterials','netFocusActive','effectiveZoneDisplay'];
+const execute=new Function('THREE','env','layerObjectVisible','viaSpanVisible','applyNetFocusColor','zoneSceneKind',compile(`const {${keys.join(',')}}=env; group.traverse(${traversal});`));
 const batch=new Function('THREE','mergeGeometries','viewportSceneIdentity','viewportRenderOrder',compile(`${functions.identifySceneObject}\n${functions.batchProceduralGeometry}\nreturn batchProceduralGeometry;`))(THREE,mergeGeometries,policy.viewportSceneIdentity,policy.viewportRenderOrder);
 const effective=o=>{for(let p=o;p;p=p.parent)if(!p.visible)return false;return true;};
 const importedRoot=new THREE.Group();
@@ -39,15 +41,15 @@ for(const count of [2,6,12,16,32])for(const batched of [false,true]){
  const all=[...layers,'F.Mask','B.Mask','Board body'];const group=new THREE.Group();
  const add=data=>{const m=new THREE.Mesh(new THREE.BoxGeometry(1,1,.01),new THREE.MeshStandardMaterial());m.userData=data;group.add(m);return m;};
  const substrate=add({substrate:true}), frontMask=add({layer:'F.Mask',surface:true}), backMask=add({layer:'B.Mask',surface:true}), component=add({model:true,mount:'smd',layer:'F.Cu'});
- const traces=new Map();for(const layer of layers)traces.set(layer,add({type:'trace',layer}));
+ const traces=new Map();for(const layer of layers)traces.set(layer,add({type:'trace',layer,spikeSceneIdentity:policy.viewportSceneIdentity('copper-track',layer,`track-${layer}`)}));
  const viaGroup=new THREE.Group();viaGroup.userData={type:'via',via:true,layer:'through'};group.add(viaGroup);
  const shared=new THREE.MeshStandardMaterial();
  for(const layer of layers){const face=add({type:'via',layer:'through',viaFaceLayer:layer});if(batched)face.material=shared;viaGroup.add(face);}
  for(let i=0;i<layers.length-1;i++){const barrel=add({type:'via',layer:'through',viaBarrel:true,viaStartLayer:layers[i],viaEndLayer:layers[i+1]});viaGroup.add(barrel);}
  for(const [start,end] of [[0,layers.length-1],[1,Math.max(1,layers.length-2)]]){if(end>=layers.length)continue;const barrel=add({type:'via',layer:'through',viaBarrel:true,viaStartLayer:layers[start],viaEndLayer:layers[end]});viaGroup.add(barrel);}
  if(batched)batch(group,layers);
- const env={netFocusActive:false,group,placeholderRoot:null,copperLayers:layers,viewMode:'3D',missingModelSet:new Set(),importedBoardLayers:new Set(),showThtModels:true,showSmdModels:true,showModels:true,resultModelsVisible:true,proceduralModelsAllowed:true,authoritativeView:false,presentation:{proceduralComponents:true},showVias:true,isolatedNet:null,analysisNetSet:new Set(),analysisOnlyScene:false,resultVisualization:null,offsetForLayer:()=>0,layerOpacity:{},selectedId:null,hoverPreview:null,hoverMaterials:new Set(),selectionMaterials:new Set()};
- const run=()=>execute(THREE,env,policy.layerObjectVisible,policy.viaSpanVisible,netFocusPolicy.applyNetFocusColor);
+ const env={effectiveZoneDisplay:"filled",netFocusActive:false,group,placeholderRoot:null,copperLayers:layers,viewMode:'3D',missingModelSet:new Set(),importedBoardLayers:new Set(),showThtModels:true,showSmdModels:true,showModels:true,resultModelsVisible:true,proceduralModelsAllowed:true,authoritativeView:false,presentation:{proceduralComponents:true},showVias:true,isolatedNet:null,analysisNetSet:new Set(),analysisOnlyScene:false,resultVisualization:null,offsetForLayer:()=>0,layerOpacity:{},selectedId:null,hoverPreview:null,hoverMaterials:new Set(),selectionMaterials:new Set()};
+ const run=()=>execute(THREE,env,policy.layerObjectVisible,policy.viaSpanVisible,netFocusPolicy.applyNetFocusColor,zoneSceneKind);
  const check=()=>group.traverse(object=>{
   const d=object.userData;if(d.model||d.substrate)return;
   if(d.viaBarrel){const span=layers.slice(layers.indexOf(d.viaStartLayer),layers.indexOf(d.viaEndLayer)+1);assert.equal(effective(object),span.some(l=>env.visibleLayers[l]!==false),`${count}/${batched} barrel span`);}
@@ -81,6 +83,15 @@ for(const count of [2,6,12,16,32])for(const batched of [false,true]){
  assert.equal(effective(substrate),false,'Imported board body suppresses only its procedural duplicate');
  if(!batched){assert.equal(effective(traces.get('F.Cu')),false,'Imported front copper suppresses its procedural duplicate');
  assert.equal(effective(traces.get('B.Cu')),true,'Uncovered back copper retains procedural geometry');}
+ for(const mode of ['transparent','outline']){
+  env.effectiveZoneDisplay=mode;run();
+  group.traverse(object=>{if(object instanceof THREE.Mesh&&zoneSceneKind(object)==='copper-track'&&object.userData.layer==='F.Cu')assert.equal(effective(object),true,'Alternate zone modes reveal retained front copper beneath the mixed imported layer');});
+  assert.equal(effective(substrate),false,'Alternate zone modes preserve the authoritative substrate');
+  env.visibleLayers={'F.Cu':false};run();
+  group.traverse(object=>{if(object instanceof THREE.Mesh&&zoneSceneKind(object)==='copper-track'&&object.userData.layer==='F.Cu')assert.equal(effective(object),false,'Retained fallback still respects explicitly hidden copper');});
+  env.visibleLayers={};
+ }
+ env.effectiveZoneDisplay='filled';run();
  const base={is3D:true,boardReady:true,componentsReady:true,split:true,layerAddressable:true,layerFiltered:false,exploded:false,isolated:false,analysisOnly:false,resultsOnly:false,showModels:true,categoryFiltered:false,resultModelsVisible:true,missingModels:false};
  for(const layerFiltered of [false,true])for(const exploded of [false,true]){const r=policy.boardSceneVisibility({...base,layerFiltered,exploded});assert.equal(r.importedBoard,false);assert.equal(r.proceduralRoot,true);assert.equal(r.importedComponents,true);}
  assert.equal(policy.boardSceneVisibility({...base,componentsReady:false,split:false}).proceduralComponents,true);

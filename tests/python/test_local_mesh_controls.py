@@ -5,9 +5,9 @@ import copy
 import math
 import unittest
 
-from python.spike_core.local_mesh_controls import LocalTrackControls
+from python.spike_core.solvers.geometry_meshing.preparation.local_mesh_controls import LocalTrackControls
 from python.spike_core.contracts import SpiDeR, AnalysisSpec
-from python.spike_core.hybrid_mesh import build_hybrid_mesh
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh
 
 
 TRACKS = [{"id": "t1", "net_name": "PWR"}, {"id": "t2", "net_name": "GND"}]

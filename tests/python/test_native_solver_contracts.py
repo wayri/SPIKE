@@ -1,14 +1,6 @@
 import unittest
 
-from python.spike_core.native_solver_contracts import (
-    NATIVE_SOLVE_REQUEST_CONTRACT,
-    NATIVE_SOLVE_RESULT_CONTRACT,
-    NativeSolveRequest,
-    NativeSolveResult,
-    ResourceEstimate,
-    SolveStatus,
-    ValidationState,
-)
+from python.spike_core.native_solver_contracts import NATIVE_SOLVE_REQUEST_CONTRACT, NATIVE_SOLVE_RESULT_CONTRACT, NativeSolveRequest, NativeSolveResult, ResourceEstimate, SolveStatus, ValidationState
 
 
 class NativeSolverContractsTests(unittest.TestCase):

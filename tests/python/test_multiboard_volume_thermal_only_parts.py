@@ -8,10 +8,9 @@ import unittest
 
 from examples.assembly_field.run_multiboard_volume import request
 from python.spike_core.assembly_frames import IDENTITY
-from python.spike_core.assembly_thermal_components import promote_thermal_components
-from python.spike_core.multiboard_circuit import compile_multiboard_circuit, run_multiboard_circuit
-from python.spike_core.multiboard_volume_electrothermal import (
-    run_multiboard_volume_electrothermal, verify_multiboard_volume_electrothermal_result)
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_components import promote_thermal_components
+from python.spike_core.solvers.circuits.models.multiboard_circuit import compile_multiboard_circuit, run_multiboard_circuit
+from python.spike_core.solvers.thermal_fluid.electrothermal.multiboard_volume_electrothermal import run_multiboard_volume_electrothermal, verify_multiboard_volume_electrothermal_result
 
 
 def fixture():

@@ -13,7 +13,7 @@ netlist preview before any solver is invoked.
   bindings, parasitic endpoints, and operating-point/AC/transient setup.
 - `python/spike_core/spice_workspace.py` is the validation and deterministic
   composition boundary.
-- `python/spike_core/ngspice_plugin.py` owns process-isolated ngspice execution.
+- `python/spike_core/solvers/external_engines/circuits/ngspice_plugin.py` owns process-isolated ngspice execution.
 - `schemas/spice-workspace-v1.schema.json` is the portable wire contract.
 
 ## Required Workflow
@@ -57,3 +57,14 @@ different nets, and every intervening package has reviewed input/output pad
 mapping. Linear DC resistance interfaces execute in the conductor solver.
 Reactive, nonlinear, behavioral, AC, and transient interfaces open this
 workspace for explicit model assignment and staged PEEC/ngspice execution.
+
+
+## Import a model library
+
+Select **Import model**, inspect a bounded self-contained library, choose its
+entry point, and review pins/defaults/dependencies before adding it. Map physical
+pads explicitly in Parts & pins and compose before running. Import never starts
+a solver. Source/license notes and hashes persist with the project model.
+See [user model libraries and backend extension routes](USER_MODELS_AND_BACKENDS.md)
+for the supported subset, example, error recovery and remaining SI/extraction
+work.

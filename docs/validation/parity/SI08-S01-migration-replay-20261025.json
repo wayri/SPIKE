@@ -1,0 +1,31 @@
+{
+  "contract": "spike/pisi-numerical-stage/v1",
+  "stage_id": "SI08-S01",
+  "status": "passed",
+  "production_qualified": false,
+  "sources": {
+    "scripts/parity_pisi_gate.py": "d5ca375c71a9987dab8bcf13419973a487dbcc2ba9257a5009777ceb80f15e05",
+    "python/spike_core/solvers/signal_integrity/networks/sparameter_modes.py": "ec62ba1c80be27064c165d74347f2f8d592294d86b9518cf510fafabe1e0a656",
+    "python/spike_core/solvers/signal_integrity/networks/sparameters.py": "f4b53ce4dd104416e70b6344aa6b817025de46a2c3aae24d69442847c14826e9",
+    "tests/python/test_sparameter_modes.py": "6156a54e737d0c50648f5ea95ff7ce72447be249f592100978bed53dcf0a67c9"
+  },
+  "tests": {
+    "names": [
+      "tests.python.test_sparameter_modes.MixedModeTests.test_active_network_is_not_repaired",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_invalid_data_rejected",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_invalid_partition_rejected",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_nonadjacent_polarity_and_order_analytic",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_original_preserved_and_z_input",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_power_reciprocity_and_legacy",
+      "tests.python.test_sparameter_modes.MixedModeTests.test_voltage_current_impedance_oracle"
+    ],
+    "run": 7,
+    "failures": [],
+    "errors": [],
+    "skipped": [],
+    "expected_failures": [],
+    "unexpected_successes": []
+  },
+  "log": "docs/validation/parity/SI08-S01-migration-replay-20261025.log",
+  "log_sha256": "c3d7134dec695fb08d33506ea0dd7b9b84b4bba99d3cb7ea2774412866e95b4f"
+}

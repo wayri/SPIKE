@@ -149,7 +149,7 @@ class PalaceProcessTests(unittest.TestCase):
             driver=control/'driver.py'
             driver.write_text('import sys\nsys.path.insert(0,'+repr(str(project))+')\n'
                 'from extensions.palace_suite import guardian\n'
-                'from python.spike_core.sparselizard_process import run_adapter_process\n'
+                'from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process\n'
                 'from pathlib import Path\n'
                 'def owned_fixture(params,binding,event):\n'
                 ' try:\n'

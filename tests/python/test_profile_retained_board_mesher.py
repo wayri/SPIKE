@@ -10,7 +10,7 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import SpiDeR, ValidationIssue
-from python.spike_core.hybrid_mesh import HybridMesh
+from python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh import HybridMesh
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -108,7 +108,7 @@ class RetainedBoardProfilerTests(unittest.TestCase):
                     return_value=design,
                 ),
                 patch(
-                    "python.spike_core.hybrid_mesh.build_hybrid_mesh",
+                    "python.spike_core.solvers.geometry_meshing.preparation.hybrid_mesh.build_hybrid_mesh",
                     return_value=mesh,
                 ),
             ):
@@ -116,14 +116,14 @@ class RetainedBoardProfilerTests(unittest.TestCase):
 
             self.assertEqual(result["mesh"]["issues"], [warning.__dict__])
             expected_sources = {
-                "python/spike_core/hybrid_mesh.py",
-                "python/spike_core/filled_copper_path.py",
-                "python/spike_core/boundary_spatial_index.py",
-                "python/spike_core/hybrid_owned_copper.py",
-                "python/spike_core/planar_polygon_topology.py",
-                "python/spike_core/source_filled_boundary.py",
+                "python/spike_core/solvers/geometry_meshing/preparation/hybrid_mesh.py",
+                "python/spike_core/solvers/power_integrity/dc/filled_copper_path.py",
+                "python/spike_core/solvers/geometry_meshing/preparation/boundary_spatial_index.py",
+                "python/spike_core/solvers/power_integrity/dc/hybrid_owned_copper.py",
+                "python/spike_core/solvers/geometry_meshing/preparation/planar_polygon_topology.py",
+                "python/spike_core/solvers/power_integrity/dc/source_filled_boundary.py",
                 "python/spike_core/kicad_importer.py",
-                "python/spike_core/zone_pad_connection_evidence.py",
+                "python/spike_core/solvers/power_integrity/dc/zone_pad_connection_evidence.py",
                 "python/core/board_parser.py",
             }
             self.assertEqual(

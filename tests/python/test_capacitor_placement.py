@@ -9,9 +9,7 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.capacitor_placement import (
-    REQUEST_CONTRACT, CapacitorPlacementError, evaluate_capacitor_placement,
-)
+from python.spike_core.solvers.power_integrity.pdn.capacitor_placement import REQUEST_CONTRACT, CapacitorPlacementError, evaluate_capacitor_placement
 
 
 def request():

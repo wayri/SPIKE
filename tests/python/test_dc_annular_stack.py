@@ -6,8 +6,8 @@ import unittest
 
 import numpy as np
 
-from python.spike_core.dc_annular_stack import solve_annular_stack
-from python.spike_core.dc_annular_evidence import validate_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_stack import solve_annular_stack
+from python.spike_core.solvers.power_integrity.dc.dc_annular_evidence import validate_annular_stack
 
 
 def explicit_annular_stack(*, spreading=False, current=1.):

@@ -2,7 +2,7 @@
 """Stopping-evidence cases for the retained openEMS adapter."""
 import unittest
 
-from python.spike_core.openems_stopping import parse_openems_stopping
+from python.spike_core.solvers.external_engines.openems.openems_stopping import parse_openems_stopping
 
 
 RUNTIME = {"engine": "openEMS", "python_package_version": "0.0.36"}

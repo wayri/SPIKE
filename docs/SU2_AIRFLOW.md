@@ -33,7 +33,7 @@ for audit; they are not automatically removed.
 
 ## Contract and physical case
 
-`python/spike_core/su2_airflow.py` exposes `su2_airflow_capabilities()` and
+`python/spike_core/solvers/external_engines/su2/su2_airflow.py` exposes `su2_airflow_capabilities()` and
 `run_su2_airflow(request)`. Allowed request fields are `case` (only
 `lid_driven_cavity`), `cells` (even 8..128, default 32), `reynolds` (1..400,
 default 100), `iterations` (10..100000, default 10000), and `timeout_s`

@@ -34,11 +34,11 @@
         "sha256": "8bad990369d674c0fbdffd5033300319b740fb7a4824938caa384594141769a2"
       },
       {
-        "path": "python/spike_core/assembly_field_thermal.py",
+        "path": "python/spike_core/solvers/execution/coupling/assembly_field_thermal.py",
         "sha256": "cd2e5236dcd29697276d818ad2ee3be750841f20f72cf54de283545a6d4dd66e"
       },
       {
-        "path": "python/spike_core/assembly_tetra_thermal.py",
+        "path": "python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_thermal.py",
         "sha256": "080af44da4775116163483f80de1ede3054ed99ea9ff6a4f0ff5f647bc1a4fc2"
       }
     ]

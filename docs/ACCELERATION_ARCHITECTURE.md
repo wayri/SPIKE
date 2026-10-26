@@ -10,9 +10,9 @@ an accuracy upgrade. A result remains `validated`, `approximate`,
 produced it.
 
 The implemented acceleration boundary is
-`python/spike_core/acceleration.py`. The current production consumer is the
+`python/spike_core/solvers/execution/resources/acceleration.py`. The current production consumer is the
 hybrid copper-geometry DC solver in
-`python/spike_core/hybrid_dc_solver.py`.
+`python/spike_core/solvers/power_integrity/dc/hybrid_dc_solver.py`.
 
 ## Current execution path
 

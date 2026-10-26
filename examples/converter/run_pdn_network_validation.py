@@ -12,9 +12,9 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
-from python.spike_core.pdn_network import evaluate_pdn_network
+from python.spike_core.solvers.power_integrity.pdn.pdn_network import evaluate_pdn_network
 from python.spike_core.service_pdn_network import handle_pdn_network_request
-from python.spike_core.pdn_series_capacitors import review_series_capacitor_leg
+from python.spike_core.solvers.power_integrity.pdn.pdn_series_capacitors import review_series_capacitor_leg
 from tests.python.test_pdn_network import basic, element
 from tests.python.test_pdn_electrostatic import plate, EPSILON_0
 
@@ -83,8 +83,8 @@ def main():
     assert not review['automatic_voltage_uprating_permitted']
     retain('series-rating-request.json', leg)
     retain('series-rating-result.json', review)
-    sources = ['python/spike_core/pdn_network.py', 'python/spike_core/pdn_electrostatic.py',
-               'python/spike_core/pdn_shunt_capacitance.py', 'python/spike_core/pdn_series_capacitors.py',
+    sources = ['python/spike_core/solvers/power_integrity/pdn/pdn_network.py', 'python/spike_core/solvers/power_integrity/pdn/pdn_electrostatic.py',
+               'python/spike_core/solvers/power_integrity/pdn/pdn_shunt_capacitance.py', 'python/spike_core/solvers/power_integrity/pdn/pdn_series_capacitors.py',
                'python/spike_core/service_pdn_network.py', 'examples/converter/run_pdn_network_validation.py']
     report = {'status': 'bounded_reference_cases_passed', 'production_qualified': False,
               'python': platform.python_version(), 'platform': platform.platform(), 'cases': summaries,

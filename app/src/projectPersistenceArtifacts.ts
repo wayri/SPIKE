@@ -97,14 +97,20 @@ function assertSelfContainedArtifact(artifact: VisualArtifact) {
     }
     return;
   }
-  const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
-  const view = new DataView(bytes.buffer);
-  if (bytes.length < 20 || view.getUint32(0, true) !== 0x46546c67 || view.getUint32(4, true) !== 2 || view.getUint32(8, true) !== bytes.length) {
+  // Preflight reads only the header and JSON. The materializer still decodes
+  // and hashes every payload byte before exposing any model object URL.
+  if (binary.length < 20) throw new Error('Saved model is not a valid GLB.');
+  const header = new Uint8Array(20);
+  for (let index = 0; index < header.length; index++) header[index] = binary.charCodeAt(index);
+  const view = new DataView(header.buffer);
+  if (view.getUint32(0, true) !== 0x46546c67 || view.getUint32(4, true) !== 2 || view.getUint32(8, true) !== binary.length) {
     throw new Error('Saved model is not a valid GLB.');
   }
   const jsonBytes = view.getUint32(12, true);
-  if (view.getUint32(16, true) !== 0x4e4f534a || 20 + jsonBytes > bytes.length) throw new Error('Saved GLB has no valid JSON chunk.');
-  const gltf = JSON.parse(new TextDecoder().decode(bytes.subarray(20, 20 + jsonBytes)));
+  if (view.getUint32(16, true) !== 0x4e4f534a || 20 + jsonBytes > binary.length) throw new Error('Saved GLB has no valid JSON chunk.');
+  const json = new Uint8Array(jsonBytes);
+  for (let index = 0; index < json.length; index++) json[index] = binary.charCodeAt(20 + index);
+  const gltf = JSON.parse(new TextDecoder().decode(json));
   if ([...(gltf.buffers ?? []), ...(gltf.images ?? [])].some(item => item.uri && !String(item.uri).startsWith('data:'))) {
     throw new Error('Saved GLB references an external resource.');
   }

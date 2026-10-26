@@ -4,7 +4,7 @@ import subprocess
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.openfoam_runtime import detect_openfoam_runtime
+from python.spike_core.solvers.external_engines.openfoam.openfoam_runtime import detect_openfoam_runtime
 
 
 class OpenFoamRuntimeTests(unittest.TestCase):
@@ -16,12 +16,12 @@ class OpenFoamRuntimeTests(unittest.TestCase):
 
     def test_wsl_probe_uses_a_fixed_no_shell_command(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="2606\n", stderr="")
-        with patch("python.spike_core.openfoam_runtime._native_runtime", return_value=None), patch(
-            "python.spike_core.openfoam_runtime.sys.platform", "win32"
+        with patch("python.spike_core.solvers.external_engines.openfoam.openfoam_runtime._native_runtime", return_value=None), patch(
+            "python.spike_core.solvers.external_engines.openfoam.openfoam_runtime.sys.platform", "win32"
         ), patch(
-            "python.spike_core.openfoam_runtime.shutil.which", return_value=r"C:\\Windows\\System32\\wsl.exe"
+            "python.spike_core.solvers.external_engines.openfoam.openfoam_runtime.shutil.which", return_value=r"C:\\Windows\\System32\\wsl.exe"
         ), patch(
-            "python.spike_core.openfoam_runtime.subprocess.run", return_value=completed
+            "python.spike_core.solvers.external_engines.openfoam.openfoam_runtime.subprocess.run", return_value=completed
         ) as spawned:
             runtime = detect_openfoam_runtime()
 
@@ -34,11 +34,11 @@ class OpenFoamRuntimeTests(unittest.TestCase):
 
     def test_invalid_wsl_version_is_not_reported_as_available(self):
         completed = subprocess.CompletedProcess(args=[], returncode=0, stdout="unexpected\n", stderr="")
-        with patch("python.spike_core.openfoam_runtime._native_runtime", return_value=None), patch(
-            "python.spike_core.openfoam_runtime.sys.platform", "win32"
+        with patch("python.spike_core.solvers.external_engines.openfoam.openfoam_runtime._native_runtime", return_value=None), patch(
+            "python.spike_core.solvers.external_engines.openfoam.openfoam_runtime.sys.platform", "win32"
         ), patch(
-            "python.spike_core.openfoam_runtime.shutil.which", return_value=r"C:\\Windows\\System32\\wsl.exe"
-        ), patch("python.spike_core.openfoam_runtime.subprocess.run", return_value=completed):
+            "python.spike_core.solvers.external_engines.openfoam.openfoam_runtime.shutil.which", return_value=r"C:\\Windows\\System32\\wsl.exe"
+        ), patch("python.spike_core.solvers.external_engines.openfoam.openfoam_runtime.subprocess.run", return_value=completed):
             runtime = detect_openfoam_runtime()
 
         self.assertFalse(runtime["available"])

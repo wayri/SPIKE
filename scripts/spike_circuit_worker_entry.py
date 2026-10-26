@@ -28,7 +28,7 @@ if getattr(sys, "frozen", False):
             circuit_package.__path__ = [str(frozen_root / Path(archive_path))]
             sys.modules[package_name] = circuit_package
 
-from python.spike_core.owned_spice_process import main
+from python.spike_core.solvers.external_engines.circuits.owned_spice_process import main
 
 
 if __name__ == "__main__":

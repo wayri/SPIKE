@@ -9,7 +9,7 @@ qualification remain open.
 ## Request and workflow
 
 Use `run_pdn_decap_selection(request)` from
-`python.spike_core.pdn_decap_selection`, or the worker method of the same name
+`python.spike_core.solvers.power_integrity.pdn.pdn_decap_selection`, or the worker method of the same name
 with `params: {request: ...}`. The desktop script workspace can invoke the API.
 The `spike/pdn-decap-selection-request/v1` contract supplies:
 

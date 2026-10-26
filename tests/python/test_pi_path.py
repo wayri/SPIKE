@@ -1,8 +1,8 @@
 import unittest
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.meshing import build_mesh
-from python.spike_core.pi_path import PI_PATH_CONTRACT, validate_pi_path
+from python.spike_core.solvers.geometry_meshing.preparation.meshing import build_mesh
+from python.spike_core.solvers.power_integrity.dc.pi_path import PI_PATH_CONTRACT, validate_pi_path
 from python.spike_core.service import handle
 from python.spike_core.solver_plugins import default_solver_registry
 

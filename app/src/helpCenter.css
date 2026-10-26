@@ -86,3 +86,22 @@
 }
 
 .help-browser .help-image-button:focus-visible, .help-browser a[data-help-topic]:focus-visible { outline: 2px solid var(--spike-accent); outline-offset: 4px; }
+
+/* Fit the reading experience to the docked panel, independently of window width. */
+.help-browser { container-type: inline-size; }
+.help-browse-toggle { display: none; }
+@container (max-width: 850px) {
+  .help-browser .help-layout { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+  .help-browser .help-sidebar { grid-template-columns: minmax(0, 1fr) minmax(110px, 35%); grid-template-rows: auto auto; border-right: 0; border-bottom: 1px solid var(--spike-border-subtle); }
+  .help-browser .help-search { margin: 8px; }
+  .help-browser .help-sidebar > select { margin: 8px 8px 8px 0; }
+  .help-result-count { grid-column: 1 / -1; padding: 0 10px 8px; display: flex; gap: 12px; align-items: center; }
+  .help-browse-toggle { display: inline-flex; padding: 3px 8px; border: 1px solid var(--spike-border-default); border-radius: 4px; background: var(--spike-surface-raised); }
+  .help-browser .help-sidebar nav { display: none; grid-column: 1 / -1; max-height: 190px; overflow-y: auto; }
+  .help-browser.help-browse-open .help-sidebar nav { display: block; }
+  .help-toolbar { padding: 8px; flex-wrap: wrap; }
+  .help-toolbar > span { display: none; }
+  .help-browser article { padding: 20px; }
+  .help-browser article h1 { font-size: 24px; }
+  .help-header-actions > button:first-child { display: none; }
+}

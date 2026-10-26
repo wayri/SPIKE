@@ -5,9 +5,9 @@ import json
 import tempfile
 from pathlib import Path
 
-from .assembly_field_handoff import _assembly
+from .solvers.execution.coupling.assembly_field_handoff import _assembly
 from .assembly_frames import resolve_world
-from .assembly_thermal_meshing import prepare_assembly_thermal_mesh, _artifact
+from .solvers.geometry_meshing.preparation.assembly_thermal_meshing import prepare_assembly_thermal_mesh, _artifact
 from .multiboard_identity import canonical_json_digest
 from .project_package import ProjectPackageError, write_spike_package
 from .service_project_assembly_field import _open_current_project
@@ -82,7 +82,7 @@ def run_in_project(params, *, application_version):
                 step = root / (str(index) + '.step')
                 step.write_bytes(_artifact(reader, shape['path'], shape['sha256']))
                 shape['path'] = str(step)
-        from .assembly_airflow import run_assembly_airflow
+        from .solvers.thermal_fluid.flow.assembly_airflow import run_assembly_airflow
         result = run_assembly_airflow(runtime_request, root / 'run')
     if result.get('status') not in ('completed', 'success', 'passed'):
         return {'status': 'failed', 'result': result, 'saved': False}

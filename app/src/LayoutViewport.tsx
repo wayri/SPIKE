@@ -1,3 +1,4 @@
+import { zoneSvgStyle, type ZoneDisplayMode } from "./zoneDisplay";
 import { viewportBackgroundColor } from "./viewportEnvironment";
 import type { ViewportNetTuneHandler } from "./viewportNetTune";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
@@ -12,7 +13,7 @@ import { numericExtent, numericMaximum } from "./numericRange";
 import { resolveBoardCopperLayers } from "./copperLayerSelection";
 import { solverResultOverlayActive } from "./viewportScenePolicy";
 import { meshCellFaceVertices } from "./meshTopology";
-import { spatiallyThinSamples, viewportResultField } from "./viewportResultFields";
+import { resultFieldLayerSelectionKey, spatiallyThinSamples, viewportResultField } from "./viewportResultFields";
 import { pointOnResultConductor, resultDatumFitsConductor, resultFaceTriangleIndices } from "./resultGeometryMask";
 import { buildScalarSvgBatches } from "./resultSvgBatches";
 import { smoothDisplaySamples } from "./resultSurfaceInterpolation";
@@ -164,6 +165,7 @@ type Props = {
   board: ParsedBoard;
   visibleLayers: Record<string, boolean>;
   layerOpacity: Record<string, number>;
+  zoneDisplay?: ZoneDisplayMode;
   showVias?: boolean;
   showNetNames?: boolean;
   selectedId: string | null;
@@ -256,7 +258,7 @@ function trackCoveredByZones(track: ParsedBoard["tracks"][number], zones: Parsed
   return coverage >= 5;
 }
 
-function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, showNetNames = false, selectedId, selectedPosition, selectedNet = null, highlightedNets = [], hoverPreview = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, onHoverProbe, onValueScale, onNetTune, terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true }, translucentScene = false, viewportBackground = "dark", showWorldGrid = true, showAxes = true, cameraCommand, viewportRestore = null, onViewChange, selectionBlink = true, selectionFilter, onSelect, onContextMenu }: Props) {
+function LayoutViewport({ board, visibleLayers, layerOpacity, zoneDisplay = "filled", showVias = true, showNetNames = false, selectedId, selectedPosition, selectedNet = null, highlightedNets = [], hoverPreview = null, isolatedNet = null, analysisResult = null, resultVisualization, analysisNets = [], probes = [], showProbes = true, hoverProbeEnabled = false, onHoverProbe, onValueScale, onNetTune, terminalMarkers = [], thermalScenario = null, thermalVisibility = { volume: true, heatSources: true, airflow: true, hardware: true }, translucentScene = false, viewportBackground = "dark", showWorldGrid = true, showAxes = true, cameraCommand, viewportRestore = null, onViewChange, selectionBlink = true, selectionFilter, onSelect, onContextMenu }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
   const dragRef = useRef({ x: 0, y: 0, moved: false });
   const draggingRef = useRef(false);
@@ -293,7 +295,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
   const [failedLayerUrls, setFailedLayerUrls] = useState<Set<string>>(() => new Set());
   const plottedLayerAvailable = (layer: string) => {
     const url = board.layoutLayerUrls?.[layer];
-    return Boolean(url && !failedLayerUrls.has(url) && (showVias || !availableCopperLayers.includes(layer)));
+    return Boolean((zoneDisplay === "filled" || !availableCopperLayers.includes(layer)) && url && !failedLayerUrls.has(url) && (showVias || !availableCopperLayers.includes(layer)));
   };
   const copperLayerColors = useMemo(
     () => Object.fromEntries(availableCopperLayers.map((layer, index) => [layer, layerCssColor(layer, index)])),
@@ -405,7 +407,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
       }
       setNavigationStatus("Pointer unavailable; zoomed around the view center.");
     }
-    if (cameraCommand.startsWith("fit")) {
+    if (cameraCommand.startsWith("reset-view-") || cameraCommand.startsWith("fit")) {
       setView(initialView);
       return;
     }
@@ -795,36 +797,41 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     const zones = netZones.filter(item => activeCopperLayer === "All" || item.layer === activeCopperLayer);
     const tracks = netTracks.filter(item =>
       (activeCopperLayer === "All" || item.layer === activeCopperLayer)
-      && (item.id === selectedId || !trackCoveredByZones(item, zones)),
+      && (item.id === selectedId || zoneDisplay !== "filled" || !trackCoveredByZones(item, zones)),
     );
     const pads = netPads.filter(item => layersContainCopper(item.layers, activeCopperLayer));
     const vias = netVias.filter(item => layersContainCopper(viaCopperLayers(item.layers), activeCopperLayer));
-    const zonePathValue = zones.map(zone => zone.points.map((point, index) => {
+    const zonePathValue = zones.map(zone => [zone.points, ...(zone.holes ?? [])].map(loop => loop.map((point, index) => {
       const [x, y] = toLayout(point);
       return `${index ? "L" : "M"}${x},${y}`;
-    }).join(" ") + " Z").join(" ");
+    }).join(" ") + " Z").join(" ")).join(" ");
     return { zones, tracks, pads, vias, zonePathValue };
-  }, [netSets, activeCopperLayer, selectedId, projectionKey]);
+  }, [netSets, activeCopperLayer, selectedId, projectionKey, zoneDisplay]);
   const displayedNetZones = displayedNets.zones;
   const displayedNetTracks = displayedNets.tracks;
   const displayedNetPads = displayedNets.pads;
   const displayedNetVias = showVias ? displayedNets.vias : [];
   const selectedZoneActive = displayedNetZones.some(zone => zone.id === selectedId);
   const selectedZone = netZones.some(zone => zone.id === selectedId);
-  const zonePath = (zones: ParsedBoard["zones"]) => zones.map(zone => zone.points.map((point, index) => {
+  const zonePath = (zones: ParsedBoard["zones"]) => zones.map(zone => [zone.points, ...(zone.holes ?? [])].map(loop => loop.map((point, index) => {
     const [x, y] = toLayout(point);
     return `${index ? "L" : "M"}${x},${y}`;
-  }).join(" ") + " Z").join(" ");
+  }).join(" ") + " Z").join(" ")).join(" ");
   const renderNativeLayer = (layer: string, key: string, opacity = 1) => {
     const geometry = nativeLayerGeometry[layer];
     if (!geometry) return null;
     const color = copperLayerColors[layer] ?? layerCssColor(layer);
-    return <g key={key} opacity={opacity} pointerEvents="none" aria-label={`${layer} native vector geometry`}>
-      {geometry.zones && <path d={geometry.zones} fill={color} fillOpacity="0.54" fillRule="evenodd" />}
+    const zoneOpacity = (layerOpacity[layer] ?? 1) * (netFocusActive ? .28 : 1)
+      * (resultVisualization?.sceneMode === "analysis_only" ? .04
+        : resultVisualization && ((resultVisualization.mode !== "geometry" && resultVisualization.mode !== "impedance") || translucentScene || resultVisualization.sceneMode === "translucent") ? resultVisualization.boardOpacity : 1);
+    return <g key={key} pointerEvents="none" aria-label={`${layer} native vector geometry`}>
+      {geometry.zones && <path d={geometry.zones} {...zoneSvgStyle(zoneDisplay, color, zoneOpacity)} />}
+      <g opacity={opacity}>
       {geometry.tracks.map((track, index) => <path key={`${key}-track-${index}`} d={track.path} fill="none" stroke={color} strokeWidth={track.width} strokeLinecap="round" strokeLinejoin="round" />)}
       {geometry.pads && <path d={geometry.pads} fill={color} fillRule="evenodd" />}
       {showVias && geometry.vias && <path d={geometry.vias} fill={color} fillRule="evenodd" />}
-      {geometry.drawings.map((drawing, index) => <path key={`${key}-drawing-${index}`} d={drawing.path} fill={drawing.filled ? color : "none"} stroke={drawing.filled ? "none" : color} strokeWidth={drawing.width} strokeLinecap="round" strokeLinejoin="round" />)}
+      </g>
+      {geometry.drawings.map((drawing, index) => <path key={`${key}-drawing-${index}`} d={drawing.path} {...(drawing.filled && layer.endsWith(".Cu") ? zoneSvgStyle(zoneDisplay, color, zoneOpacity) : { opacity, fill: drawing.filled ? color : "none", stroke: drawing.filled ? "none" : color, strokeWidth: drawing.width })} strokeLinecap="round" strokeLinejoin="round" />)}
     </g>;
   };
   const resultModeKey = resultVisualization?.mode ?? "geometry";
@@ -836,6 +843,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     setActiveCopperLayer("All");
   }, [availableCopperLayers.join(":"), visibleLayersKey]);
   const resultAnalysisOnly = Boolean(resultVisualization?.analysisOnly);
+  const selectedResultLayersKey = resultFieldLayerSelectionKey(resultVisualization?.visibleResultLayers);
   const rawResultSamples = scalarSamplesForMode(analysisResult, resultModeKey);
   useEffect(() => {
     if (!resultVisualization?.visible || resultModeKey === "geometry" || resultModeKey === "mesh") return;
@@ -847,7 +855,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
       visibleLayers,
     );
     if (selectedLayer !== activeCopperLayer) setActiveCopperLayer(selectedLayer);
-  }, [analysisResult, resultModeKey, resultVisualization?.visible, resultVisualization?.visibleResultLayers.join("\u0001"), activeCopperLayer, board.layers.join("\u0001"), visibleLayersKey]);
+  }, [analysisResult, resultModeKey, resultVisualization?.visible, selectedResultLayersKey, activeCopperLayer, board.layers.join("\u0001"), visibleLayersKey]);
   const fieldPipeline = useMemo(() => {
     const rawSamples = rawResultSamples;
     const filtered = rawSamples.filter(sample => {
@@ -887,7 +895,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
       maximum: Number.isFinite(savedMaximum) ? savedMaximum : extent.maximum,
       cellSize,
     };
-  }, [analysisResult, board, resultAnalysisOnly, analysisNetsKey, activeCopperLayer, isolatedNet, visibleLayersKey, resultVisualization, resultModeKey]);
+  }, [analysisResult, board, resultAnalysisOnly, analysisNetsKey, activeCopperLayer, isolatedNet, visibleLayersKey, selectedResultLayersKey, resultModeKey]);
   const resultSamples = fieldPipeline.samples;
   const resultMinimum = fieldPipeline.minimum;
   const resultMaximum = fieldPipeline.maximum;
@@ -919,7 +927,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     const vectors = spatiallyThinSamples(filtered, 240);
     const vectorMaximum = Math.max(numericMaximum(vectors.map(sample => sample.magnitude), 0), Number.EPSILON);
     return { vectors, vectorMaximum };
-  }, [analysisResult, board, resultAnalysisOnly, analysisNetsKey, activeCopperLayer, isolatedNet, visibleLayersKey, resultVisualization, resultModeKey]);
+  }, [analysisResult, board, resultAnalysisOnly, analysisNetsKey, activeCopperLayer, isolatedNet, visibleLayersKey, selectedResultLayersKey, resultModeKey]);
   const resultVectors = vectorPipeline.vectors;
   const resultVectorMaximum = vectorPipeline.vectorMaximum;
   useEffect(() => {
@@ -1011,7 +1019,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
           * (resultVisualization?.sceneMode === "analysis_only" ? 0.04
             : resultVisualization && ((resultVisualization.mode !== "geometry" && resultVisualization.mode !== "impedance") || translucentScene || resultVisualization.sceneMode === "translucent") ? resultVisualization.boardOpacity : 1),
       ))
-    : null), [resultsOnlyScene, isolatedNet, activeCopperLayer, drawableLayers, board, visibleLayers, layerOpacity, netFocusActive, translucentScene, resultVisualization, nativeLayerGeometry, copperLayerColors, projectionKey, failedLayerUrls, showVias, compositeCopper]);
+    : null), [resultsOnlyScene, isolatedNet, activeCopperLayer, drawableLayers, board, visibleLayers, layerOpacity, netFocusActive, translucentScene, resultVisualization, nativeLayerGeometry, copperLayerColors, projectionKey, failedLayerUrls, showVias, compositeCopper, zoneDisplay]);
 
   const netHighlightOverlay = useMemo(() => {
     if (resultsOnlyScene || activeCopperLayer === "Overview" || !hasHighlightedNets || resultFieldActive) return null;
@@ -1019,10 +1027,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
       {displayedNetZones.length > 0 && <path
         key={`highlight-zones-${highlightedNetKey}-${activeCopperLayer}`}
         d={displayedNets.zonePathValue}
-        fill={selectedZoneActive ? "#ffc04f" : netColor}
-        fillOpacity={isolatedNet ? 0.28 : selectedZoneActive ? 0.42 : 0.055}
-        fillRule="nonzero"
-        stroke="none"
+        {...zoneSvgStyle(zoneDisplay, selectedZoneActive ? "#ffc04f" : netColor, isolatedNet ? 0.28 : selectedZoneActive ? 0.42 : 0.055)}
       />}
       {displayedNetTracks.map(track => {
         const start = toLayout(track.start);
@@ -1049,7 +1054,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         </g>;
       })}
     </g>;
-  }, [resultsOnlyScene, activeCopperLayer, highlightedNetKey, resultFieldActive, selectionPulseClass, displayedNets, displayedNetZones, displayedNetTracks, displayedNetPads, displayedNetVias, selectedZoneActive, netColor, isolatedNet, selectedId, netFocusActive, projectionKey]);
+  }, [resultsOnlyScene, activeCopperLayer, highlightedNetKey, resultFieldActive, selectionPulseClass, displayedNets, displayedNetZones, displayedNetTracks, displayedNetPads, displayedNetVias, selectedZoneActive, netColor, isolatedNet, selectedId, netFocusActive, projectionKey, zoneDisplay]);
 
   const meshCellsOverlay = useMemo(() => {
     if (activeCopperLayer === "Overview" || resultModeKey !== "mesh") return null;
@@ -1254,7 +1259,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
         <path key={layer} d={nativeLayerGeometry[layer]?.vias ?? ""} fill="#c79c50" fillRule="evenodd" />)}</g>}
       {netHighlightOverlay}
       {hoverPreview && <g className="viewport-hover-preview" aria-label={`Preview ${hoverPreview.label}`}>
-        {previewZones.filter(zone => activeCopperLayer === "All" || activeCopperLayer === "Overview" || zone.layer === activeCopperLayer).map(zone => <path key={`preview-zone-${zone.id}`} d={zonePath([zone])} fill="#ff38c7" fillOpacity="0.28" stroke="#ff8ee3" strokeWidth="0.28" fillRule="nonzero" />)}
+        {previewZones.filter(zone => activeCopperLayer === "All" || activeCopperLayer === "Overview" || zone.layer === activeCopperLayer).map(zone => <path key={`preview-zone-${zone.id}`} d={zonePath([zone])} {...zoneSvgStyle(zoneDisplay, "#ff38c7", .28)} />)}
         {previewTracks.filter(track => activeCopperLayer === "All" || activeCopperLayer === "Overview" || track.layer === activeCopperLayer).map(track => { const start = toLayout(track.start); const end = toLayout(track.end); return <line key={`preview-track-${track.id}`} x1={start[0]} y1={start[1]} x2={end[0]} y2={end[1]} stroke="#ff38c7" strokeWidth={Math.max(track.width + 0.38, 0.62)} strokeLinecap="round" />; })}
         {previewPads.filter(pad => layersContainCopper(pad.layers, activeCopperLayer)).map((pad, index) => { const point = toLayout(pad.at); return <rect key={`preview-pad-${pad.id}-${index}`} x={point[0] - pad.width / 2} y={point[1] - pad.height / 2} width={pad.width} height={pad.height} rx={Math.min(pad.width, pad.height) * 0.16} fill="#ff38c7" stroke="#ffe2f8" strokeWidth="0.3" transform={`rotate(${pad.rotation} ${point[0]} ${point[1]})`} />; })}
         {showVias && previewVias.map(via => { const point = toLayout(via.at); return <g key={`preview-via-${via.id}`}><circle cx={point[0]} cy={point[1]} r={via.size / 2 + 0.22} fill="#ff38c7" /><circle cx={point[0]} cy={point[1]} r={via.drill / 2} fill="#0b141a" /></g>; })}
@@ -1416,7 +1421,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
     {activeCopperLayer === "Overview" && <div className="layout-overview">
       {availableCopperLayers.map(layer => {
         const layerZones = netZones.filter(item => item.layer === layer);
-        const layerTracks = netTracks.filter(item => item.layer === layer && (item.id === selectedId || !trackCoveredByZones(item, layerZones)));
+        const layerTracks = netTracks.filter(item => item.layer === layer && (item.id === selectedId || zoneDisplay !== "filled" || !trackCoveredByZones(item, layerZones)));
         const layerPads = netPads.filter(item => layersContainCopper(item.layers, layer));
         const layerVias = netVias.filter(item => layersContainCopper(item.layers, layer));
         const featureCount = layerZones.length + layerTracks.length + layerPads.length + layerVias.length;
@@ -1464,7 +1469,7 @@ function LayoutViewport({ board, visibleLayers, layerOpacity, showVias = true, s
                 }}
               /> : renderNativeLayer(layer, `overview-native-${layer}`, hasHighlightedNets && !resultFieldActive ? selectedZone && layerZones.length ? 0.22 : 0.34 : 0.9))}
               {!resultsOnlyScene && hasHighlightedNets && !resultFieldActive && <g className={selectionPulseClass} pointerEvents="none">
-              {layerZones.length > 0 && <path d={zonePath(layerZones)} fill={selectedZone ? "#ffc04f" : netColor} fillOpacity={selectedZone ? 0.5 : 0.16} fillRule="nonzero" stroke="none" />}
+              {layerZones.length > 0 && <path d={zonePath(layerZones)} {...zoneSvgStyle(zoneDisplay, selectedZone ? "#ffc04f" : netColor, selectedZone ? .5 : .16)} />}
               {layerTracks.map(track => {
                 const start = toLayout(track.start);
                 const end = toLayout(track.end);

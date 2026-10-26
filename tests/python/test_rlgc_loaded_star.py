@@ -8,7 +8,7 @@ import numpy as np
 from scipy.linalg import expm
 from numpy.polynomial.legendre import leggauss
 from examples.rlgc_loaded_star.run_loaded import request
-from python.spike_core import rlgc_loaded_star as loaded
+from python.spike_core.solvers.signal_integrity.lines import rlgc_loaded_star as loaded
 from tests.python.test_rlgc_coupled_star import physical_oracle as wave_oracle, value
 
 
@@ -85,7 +85,7 @@ class LoadedStarTests(unittest.TestCase):
         json.dumps(out, allow_nan=False); self.assertFalse(out["production_qualified"])
 
     def test_two_leg_equivalence_to_loaded_cascade(self):
-        from python.spike_core.rlgc_loaded_cascade import run_rlgc_loaded_cascade, REQUEST
+        from python.spike_core.solvers.signal_integrity.lines.rlgc_loaded_cascade import run_rlgc_loaded_cascade, REQUEST
         raw=request();raw["legs"]=raw["legs"][:2];raw["terminations"]=raw["terminations"][:4]
         for source in raw["sources"]:source["voltage_v"]=source["voltage_v"][:4]
         expected=run_rlgc_loaded_cascade({"contract":REQUEST,"sections":raw["legs"],"terminations":raw["terminations"],"sources":raw["sources"]})

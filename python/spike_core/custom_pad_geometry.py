@@ -61,6 +61,12 @@ def _polygon_is_simple(points: Sequence[tuple[float, float]]) -> bool:
 def validate_custom_pad_geometries(pads: Sequence[Any]) -> None:
     """Validate the admitted undrilled custom-pad boundary and evidence."""
 
+    # Footprint instances often carry identical local polygons. Reuse only the
+    # pure simplicity predicate within this validation call; every pad's other
+    # fields and every coordinate are still admitted independently. Both bounds
+    # keep unique geometry from becoming an unbounded retained cache.
+    polygon_validity: dict[tuple[tuple[float, float], ...], bool] = {}
+    cached_vertices = 0
     for pad in pads:
         geometry = pad.custom_geometry
         if not geometry:
@@ -152,5 +158,12 @@ def validate_custom_pad_geometries(pads: Sequence[Any]) -> None:
             if not all(math.isfinite(value) and abs(value) <= 1_000_000 for value in point_value):
                 raise ValueError("Custom pad polygon coordinates are invalid.")
             points.append(point_value)
-        if not _polygon_is_simple(points):
+        key = tuple(points)
+        simple = polygon_validity.get(key)
+        if simple is None:
+            simple = _polygon_is_simple(points)
+            if len(polygon_validity) < 128 and cached_vertices + len(key) <= 32_768:
+                polygon_validity[key] = simple
+                cached_vertices += len(key)
+        if not simple:
             raise ValueError("Custom pad polygon must be finite, simple, and nondegenerate.")

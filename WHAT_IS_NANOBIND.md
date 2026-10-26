@@ -145,7 +145,7 @@ except RuntimeError as e:
 
 ### **C++ Code (Already Written):**
 ```cpp
-// src/peec/peec_solver.cpp
+// src/solvers/power_integrity/peec/peec_solver.cpp
 Eigen::SparseMatrix<double> PEECSolver::compute_partial_inductance() {
     // Complex electromagnetic calculations
     // Uses Eigen3, OpenMP, advanced C++

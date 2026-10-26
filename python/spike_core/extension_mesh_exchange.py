@@ -9,9 +9,9 @@ from dataclasses import asdict
 from typing import Any
 
 from .contracts import AnalysisSpec, SpiDeR
-from .hybrid_mesh import build_hybrid_mesh
-from .meshing import MeshingEngine, MeshingOptions
-from .solver_geometry import build_solver_geometry
+from .solvers.geometry_meshing.preparation.hybrid_mesh import build_hybrid_mesh
+from .solvers.geometry_meshing.preparation.meshing import MeshingEngine, MeshingOptions
+from .solvers.geometry_meshing.preparation.solver_geometry import build_solver_geometry
 
 
 MAX_EXCHANGE_BRANCHES = 8192

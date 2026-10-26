@@ -12,8 +12,8 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.assembly_frames import IDENTITY
-from python.spike_core.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
-from python.spike_core import gmsh_occ_runtime as runtime
+from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import prepare_assembly_thermal_mesh, run_assembly_thermal_mesh
+from python.spike_core.solvers.geometry_meshing.preparation import gmsh_occ_runtime as runtime
 
 
 def fixture():

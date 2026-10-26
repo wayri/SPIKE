@@ -19,7 +19,7 @@ function restoreScalars<T extends object>(defaults: T, value: unknown): T {
   const source = record(value), output = { ...defaults };
   for (const key of Object.keys(defaults) as (keyof T)[]) {
     const candidate = source[String(key)], fallback = defaults[key];
-    if ((typeof fallback === "string" && text(candidate, String(key) === "python_executable" ? 4096 : 1024))
+    if ((typeof fallback === "string" && text(candidate, String(key) === "python_executable" ? 4096 : String(key) === "shorting_via_ids" ? 2048 : 1024))
         || (typeof fallback === "boolean" && typeof candidate === "boolean")) output[key] = candidate as T[keyof T];
   }
   return output;
@@ -72,7 +72,7 @@ export function normalizeEMergeSetup(value: unknown): EMergeSetup {
   for (const key of Object.keys(enums) as (keyof typeof enums)[]) {
     if (!(enums[key] as readonly unknown[]).includes(source[key])) Object.assign(output,{[key]:defaults[key]});
   }
-  const textKeys = new Set(["signal_net","return_net","signal_pad_id","return_pad_id","receive_signal_pad_id","receive_return_pad_id","python_executable"]);
+  const textKeys = new Set(["signal_net","return_net","signal_pad_id","return_pad_id","receive_signal_pad_id","receive_return_pad_id","python_executable","shorting_via_ids"]);
   const enumKeys = new Set(Object.keys(enums));
   for (const key of Object.keys(defaults) as (keyof EMergeSetup)[]) {
     if (typeof defaults[key] === "string" && !textKeys.has(key) && !enumKeys.has(key) && !numeric(source[key])) Object.assign(output,{[key]:defaults[key]});

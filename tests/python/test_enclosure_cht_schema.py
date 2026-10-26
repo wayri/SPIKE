@@ -8,7 +8,7 @@ import unittest
 from jsonschema import Draft202012Validator
 import numpy as np
 
-from python.spike_core.enclosure_cht import solve_enclosure_cht
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_cht import solve_enclosure_cht
 from tests.python.test_enclosure_cht import fixture, layered_fixture, material
 
 ROOT = Path(__file__).resolve().parents[2]

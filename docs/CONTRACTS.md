@@ -1,5 +1,67 @@
 # Versioned Data Contracts
 
+Offline `spike/calibrated-fixture-uq-request/v1` and `spike/calibrated-fixture-uq-result/v1` retain one complete calibration-plus-physical-fixture covariance; nested calibration covariance must match its leading block exactly. Scope, identities, explicit coordinate maps, budgets and source snapshots remain distinct from physical qualification. See [contract and method](CALIBRATED_FIXTURE_UQ.md). The [finite checklist](si08-closure-checklist-v1.json) separates implementation/external/release state and is machine-checked; it grants no worker registration or installed qualification.
+
+Offline `spike/multiport-calibration-request/v1` and `spike/multiport-calibration-result/v1` preserve named receiver/source identity, three known reflection standards per port, a known coupling standard, coherent-wave matrix-ratio assertion, explicit gain gauge and full joint real covariance. `spike/multiport-calibration-evidence/v1` permits bounded SI08-S07 completion while physical/linearization/production/family flags remain false. Strict Python admission is separate from worker/schema registration; see [method and fields](MULTIPORT_CALIBRATION.md).
+
+
+Offline `spike/one-port-calibration-request/v1` and `spike/one-port-calibration-result/v1` preserve three supplied known standards, explicit joint real covariance basis, source snapshot and separate corrected DUT. `spike/one-port-calibration-evidence/v1` permits only bounded SI08-S06 completion with measurement/linearization/production/family flags false. These are strict Python-admitted offline records, without worker/schema catalogue registration; see [contract and scope](ONE_PORT_CALIBRATION.md).
+
+The separate offline `spike/multiport-deembedding-request/v1` and
+`spike/multiport-deembedding-result/v1` contracts retain supplied measured and
+coupled-fixture networks, exact real-reference grids, complete named port maps
+and a separately derived DUT. See [strict local fields and numerical scope](MULTIPORT_DEEMBEDDING.md).
+They are registered in the worker/schema catalog with strict nested records
+and unique canonical IDs; dynamic numerical/map invariants remain worker checks. The
+source-bound evidence contract is `spike/multiport-deembedding-evidence/v1`;
+its scope explicitly keeps full-family and production qualification false.
+
+The `spike/multiport-native-observation/v1` manifest records explicitly trusted
+native agent/human observations, hash-bound artifacts and stable runtime source
+snapshots. `spike/multiport-native-stage-evidence/v1` binds that manifest,
+executed headless evidence and current validator identities. It permits only
+SI08-S05 software-stage completion; family and production remain false. See
+[native acceptance scope](validation/SI08_MULTIPORT_INTEGRATION_20261024.md).
+
+Separate offline `spike/tetra-dc-rt0-scalable-request/v1`,
+`spike/dc-board-volume-scalable-model/v1` and
+`spike/source-board-volume-scalable-study/v1` explicitly select the bounded 50k
+development profile. Original request/model admission remains unchanged.
+`spike/selected-board-volume-refinement/v1` binds the same physical source model,
+three factor-two mesh levels, supervision and retained field replay; inspection
+cannot become acceptance, and failed stability retains stage/production false.
+See [numerics, resources and frozen criteria](DC_TETRA_SCALABLE.md). No public
+worker route, registered production schema or installed qualification is added.
+
+Offline experimental `spike/tetra-dc-rt0-request/v1` uses the retained solid mesh,
+exact per-cell scalar conductivity and whole exterior-face current patches.
+`spike/dc-board-volume-model/v1` declares copper slabs, barrel gaps and full finite
+electrodes; `spike/source-board-volume-study/v1` additionally pins native board
+identity and explicit pad/layer/side electrodes. Result wrappers retain actual
+fields, source/fill/coverage evidence, per-volume watts and separate experimental
+scope flags. Strict Python admission/replay owns these internal contracts;
+no registered production worker route or public schema is introduced. See
+[interfaces and physical limits](DC_TETRA_RT0.md) and [executed evidence](validation/PI01_BOARD_VOLUME_20261023.md).
+
+`spike/si-material-scenario-request/v1` admits explicit conductivity and
+provenance for exact material IDs on a bound design/source revision. Its
+registered schema is structural; finite values, ownership, stale revisions,
+resource bounds and immutability remain decoder checks. Inline worker
+preparation and retained in-process designs have different explicit size
+limits. `spike/si-uniform-channel-request/v1` adds optional exact
+`reference_zone_id` without relaxing reference coverage or geometry gates.
+
+`spike/em-spice-coupling-request/v1` and
+`spike/em-body-heating-request/v1` now have strict self-contained schemas in the
+catalog. Exact wrappers, finite JSON, 8 MiB admission, digest association,
+passivity, conditioning and physical conservation remain runtime gates;
+schema conformance alone does not establish a valid simulation.
+
+The EMerge co-simulation boundary exposes exactly `{request: ...}` worker
+parameters and registered preparation, sampled AC and resistor-thermal request
+schemas. Source errors block admission; source warnings/status are preserved.
+See [contracts, ports, RMS units and limits](EMERGE_COSIMULATION.md).
+
 Experimental offline annular DC uses `spike/dc-annular-land-request/v1` and
 `spike/dc-annular-stack-request/v1`; corresponding results preserve unit/final
 fields and explicit port incidence. `spike/source-annular-pad/v1` authenticates

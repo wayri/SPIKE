@@ -10,8 +10,8 @@ from typing import Any, Dict
 
 from .assembly_analysis_scope import attach_scope_provenance, write_case_scope
 from .contracts import AnalysisResult, AnalysisSpec, SpiDeR, ValidationIssue
-from .component_thermal import run_component_thermal
-from .board_thermal import run_board_thermal
+from .solvers.thermal_fluid.heat.component_thermal import run_component_thermal, validate_component_thermal
+from .solvers.thermal_fluid.heat.board_thermal import run_board_thermal
 from .external_engines import prepare_openems_case, run_openems_case
 from .models import (
     build_model_manifest,
@@ -19,14 +19,14 @@ from .models import (
     kicad_scene_capabilities,
     search_model_library,
 )
-from .openfoam import openfoam_capabilities, prepare_case, run_case
-from .openfoam_multiregion import prepare_multiregion_case, prepare_runnable_multiregion_case
-from .openfoam_multiregion_execution import MultiRegionExecutionError, probe_v2606_commands, run_multiregion_case
-from .openfoam_multiregion_validation import import_v2606_validation_evidence
-from .openfoam_polymesh import OpenFoamPolyMeshError, write_polymesh
+from .solvers.external_engines.openfoam.openfoam import openfoam_capabilities, prepare_case, run_case
+from .solvers.external_engines.openfoam.openfoam_multiregion import prepare_multiregion_case, prepare_runnable_multiregion_case
+from .solvers.external_engines.openfoam.openfoam_multiregion_execution import MultiRegionExecutionError, probe_v2606_commands, run_multiregion_case
+from .solvers.external_engines.openfoam.openfoam_multiregion_validation import import_v2606_validation_evidence
+from .solvers.external_engines.openfoam.openfoam_polymesh import OpenFoamPolyMeshError, write_polymesh
 from .service_helpers import prepare_visual_bundle, error_response
-from .thermal import ThermalScenario, estimate_compact_thermal, validate_scenario
-from .thermal_field_job import execute_thermal_field_job, plan_thermal_field_job
+from .solvers.thermal_fluid.heat.thermal import ThermalScenario, estimate_compact_thermal, validate_scenario
+from .solvers.thermal_fluid.heat.thermal_field_job import execute_thermal_field_job, plan_thermal_field_job
 
 
 def handle_simulation_request(
@@ -38,10 +38,26 @@ def handle_simulation_request(
     thermal_adapter_registry: Dict[str, Any] | None = None,
 ) -> Dict[str, Any] | None:
     """Handle model and simulation requests, or return ``None``."""
+    from .service_model_library import handle_model_library_request
+    model_library_response = handle_model_library_request(method, params)
+    if model_library_response is not None:
+        return model_library_response
+    from .service_propulsion_pod import handle_propulsion_pod_request
+    propulsion_response = handle_propulsion_pod_request(method, params)
+    if propulsion_response is not None:
+        return propulsion_response
+    from .service_si_models import handle_si_model_request
+    si_model_response = handle_si_model_request(method, params)
+    if si_model_response is not None:
+        return si_model_response
     from .service_sparameter_processing import handle_sparameter_processing_request
     network_response = handle_sparameter_processing_request(method, params)
     if network_response is not None:
         return network_response
+    from .service_em_cosimulation import handle_em_cosimulation_request
+    em_cosimulation_response = handle_em_cosimulation_request(method, params)
+    if em_cosimulation_response is not None:
+        return em_cosimulation_response
     from .service_pdn_network import handle_pdn_network_request
     pdn_response = handle_pdn_network_request(method, params)
     if pdn_response is not None:
@@ -54,7 +70,7 @@ def handle_simulation_request(
         try:
             if not isinstance(params, dict) or set(params) != {"request"}:
                 raise ValueError("Exactly one magnetic machine request is required")
-            from .magnetic_machine_study import run_magnetic_machine
+            from .solvers.electromagnetics.machines.magnetic_machine_study import run_magnetic_machine
             return {"ok": True, "result": run_magnetic_machine(params["request"])}
         except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
             return error_response("SPIKE-BE-IPC-E-0001", "Magnetic FEM study failed.",
@@ -63,7 +79,7 @@ def handle_simulation_request(
         try:
             if not isinstance(params, dict) or set(params) != {"request"}:
                 raise ValueError("Exactly one machine request is required")
-            from .em_machines import run_machine
+            from .solvers.electromagnetics.machines.em_machines import run_machine
             return {"ok": True, "result": run_machine(params["request"])}
         except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
             return error_response("SPIKE-BE-IPC-E-0001", "Machine model input is invalid.",
@@ -78,13 +94,13 @@ def handle_simulation_request(
                                     context={"method": method}, error_type="ValueError"), "code": "PI_ENGINEERING_FIELDS"}
         try:
             if method == "run_smps_converter":
-                from .smps_converter import evaluate_smps_converter
+                from .solvers.circuits.models.smps_converter import evaluate_smps_converter
                 result = evaluate_smps_converter(params["request"])
             elif method == "evaluate_capacitor_placement":
-                from .capacitor_placement import evaluate_capacitor_placement
+                from .solvers.power_integrity.pdn.capacitor_placement import evaluate_capacitor_placement
                 result = evaluate_capacitor_placement(params["request"])
             else:
-                from .pi_return_path import plan_pi_return_path
+                from .solvers.power_integrity.dc.pi_return_path import plan_pi_return_path
                 result = plan_pi_return_path(params["design"], params["request"])
             return {"ok": True, "result": result}
         except (ValueError, TypeError, KeyError, ArithmeticError) as exc:
@@ -93,7 +109,7 @@ def handle_simulation_request(
                                     context={"method": method, "kernel_code": kernel_code}, error_type=type(exc).__name__),
                     "code": kernel_code}
     if method == "analyze_ac_power_integrity":
-        from .ac_power_integrity import analyze_ac_power_integrity
+        from .solvers.power_integrity.peec.ac_power_integrity import analyze_ac_power_integrity
         return {"ok": True, "result": analyze_ac_power_integrity(params["request"])}
     if method == "model_manifest":
         design = SpiDeR(**params["design"])
@@ -133,12 +149,14 @@ def handle_simulation_request(
     if method == "run_internal_airflow":
         if not isinstance(params, dict) or set(params) != {"request"}:
             raise ValueError("INTERNAL_AIRFLOW_FIELDS: only request accepted")
-        from .internal_airflow import run_internal_airflow
+        from .solvers.thermal_fluid.flow.internal_airflow import run_internal_airflow
         return {"ok": True, "result": run_internal_airflow(params["request"])}
     if method == "validate_thermal":
         return {"ok": True, "result": validate_scenario(ThermalScenario(**params["scenario"]))}
     if method == "estimate_thermal":
         return {"ok": True, "result": estimate_compact_thermal(ThermalScenario(**params["scenario"]))}
+    if method == "validate_component_thermal":
+        return {"ok": True, "result": validate_component_thermal(params)}
     if method == "run_component_thermal":
         return {"ok": True, "result": attach_scope_provenance(run_component_thermal(params), assembly_scope)}
     if method == "run_board_thermal":

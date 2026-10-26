@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.crossboard_field_screen import compare_mesh_cases
+from python.spike_core.solvers.electromagnetics.fields.crossboard_field_screen import compare_mesh_cases
 
 
 def main():

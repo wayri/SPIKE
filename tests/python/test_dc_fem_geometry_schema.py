@@ -10,7 +10,7 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 
 from python.spike_core.contracts import AnalysisSpec, SpiDeR
-from python.spike_core.solver_geometry import build_dc_fem_geometry
+from python.spike_core.solvers.geometry_meshing.preparation.solver_geometry import build_dc_fem_geometry
 
 
 ROOT = Path(__file__).resolve().parents[2]

@@ -14,9 +14,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from python.spike_core.fan_system_operating_point import (
-    REQUEST_CONTRACT, curve_digest, solve_fan_system_operating_point,
-)
+from python.spike_core.solvers.thermal_fluid.flow.fan_system_operating_point import REQUEST_CONTRACT, curve_digest, solve_fan_system_operating_point
 
 
 def _source(description, data):

@@ -13,7 +13,7 @@ import time
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from scripts.admit_cambridge_measured_si import FILES,admit_blob
-from python.spike_core.sparameters import analyze_network
+from python.spike_core.solvers.signal_integrity.networks.sparameters import analyze_network
 
 
 def main():

@@ -37,7 +37,7 @@ def digest(path):
 
 def source_identity():
     # All shared enclosure modules, plus the exact benchmark/oracle sources.
-    paths = list((ROOT / "python/spike_core").glob("enclosure*.py"))
+    paths = list((ROOT / "python/spike_core").rglob("enclosure*.py"))
     paths += [ROOT / f"tests/python/{name}.py" for name in MODULES]
     paths += [ROOT / name for name in (
         "tests/python/test_enclosure_laminar.py",

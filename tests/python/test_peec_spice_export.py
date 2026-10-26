@@ -2,12 +2,8 @@ import unittest
 from unittest.mock import patch
 
 from python.spike_core.contracts import AnalysisResult, SpiDeR
-from python.spike_core.peec_spice_export import (
-    import_peec_rlcg,
-    list_peec_spice_networks,
-    run_staged_hybrid_cosimulation,
-)
-from python.spike_core.ngspice_plugin import _find_ngspice
+from python.spike_core.solvers.power_integrity.peec.peec_spice_export import import_peec_rlcg, list_peec_spice_networks, run_staged_hybrid_cosimulation
+from python.spike_core.solvers.external_engines.circuits.ngspice_plugin import _find_ngspice
 from python.spike_core.spice_workspace import SPICE_WORKSPACE_CONTRACT
 
 
@@ -137,7 +133,7 @@ class PeecSpiceExportTests(unittest.TestCase):
         self.assertFalse(imported["validity"]["preserves_frequency_sweep"])
         self.assertEqual(workspace()["parasitics"], [])
 
-    @patch("python.spike_core.peec_spice_export.NgspicePlugin")
+    @patch("python.spike_core.solvers.power_integrity.peec.peec_spice_export.NgspicePlugin")
     def test_hybrid_runner_composes_geometry_parasitics_for_ngspice(self, plugin_type):
         plugin_type.return_value.run.return_value = AnalysisResult(
             analysis_id="hybrid",

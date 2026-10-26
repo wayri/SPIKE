@@ -5,6 +5,7 @@ import { runSerializedAutomaticWorker } from "./automaticWorkerQueue";
 import type { FieldObject } from "./assemblyFieldStudyPresentation";
 import { showFieldInMainViewport } from "./mainFieldViewport";
 import { assemblyAirflowFieldVolume } from "./fieldVolumeAdapters";
+import SolverSetupSteps, { SolverSetupPanel, type SolverSetupStep } from "./SolverSetupSteps";
 import "./buttonStandard.css";
 import "./AssemblyAirflowPanel.css";
 
@@ -51,6 +52,7 @@ export function AirflowFieldView({ result }: { result: FieldObject }) {
   const [position, setPosition] = useState(50);
   const [yaw, setYaw] = useState(35);
   const volume = useMemo(() => assemblyAirflowFieldVolume(result), [result]);
+  useEffect(() => { if (volume) showFieldInMainViewport(volume); }, [volume]);
   const source = result.fields?.[field];
   const all = (source?.samples || []).filter((s: FieldObject) => Array.isArray(s.point_mm) && s.point_mm.length === 3
     && s.point_mm.every(Number.isFinite) && (Array.isArray(s.value) ? s.value.length === 3 && s.value.every(Number.isFinite) : Number.isFinite(s.value)));
@@ -71,6 +73,7 @@ export function AirflowFieldView({ result }: { result: FieldObject }) {
   const projected = rows.map(project);
   const extent = projected.reduce((r: number[], p: number[]) => [Math.min(r[0], p[0]), Math.max(r[1], p[0]), Math.min(r[2], p[1]), Math.max(r[3], p[1])], [Infinity, -Infinity, Infinity, -Infinity]);
   return <section className="assembly-airflow-fields" aria-label="Computed airflow fields">
+    {result.flow_field_volume_error && <p role="status">Streamline playback unavailable: {String(result.flow_field_volume_error)}. Returned cell fields remain available.</p>}
     {volume && <button type="button" onClick={() => showFieldInMainViewport(volume)}>Show fields in main viewport</button>}
     <div className="assembly-airflow-toolbar"><label>Field <select value={field} onChange={e => setField(e.target.value)}><option value="temperature_k">Temperature (K)</option><option value="velocity_m_s">Speed (m/s)</option></select></label>
       <label>View <select value={plane} onChange={e => setPlane(e.target.value)}>{["xy", "xz", "yz", "3d"].map(p => <option key={p}>{p}</option>)}</select></label>
@@ -97,6 +100,7 @@ export default function AssemblyAirflowPanel({ projectPath, manifestDigest, mesh
   const [acknowledged, setAcknowledged] = useState(false);
   const [advanced, setAdvanced] = useState("");
   const [dirty, setDirty] = useState(false);
+  const [setupStep, setSetupStep] = useState("source");
   const generation = useRef(0), operation = useRef<string | null>(null);
   const identity = `${projectPath}\0${manifestDigest}`;
   const currentIdentity = useRef(identity); currentIdentity.current = identity;
@@ -127,26 +131,44 @@ export default function AssemblyAirflowPanel({ projectPath, manifestDigest, mesh
   };
   const number = (label: string, v: unknown, update: (n: number | null) => void) => <label>{label}<input type="number" step="any" value={typeof v === "number" ? v : ""} disabled={locked} onChange={e => update(e.target.value === "" ? null : Number(e.target.value))}/></label>;
   const invalid = airflowDraftError(draft);
+  const setupSteps: readonly SolverSetupStep[] = [
+    { id: "source", label: "Source", description: "Load retained assembly geometry, mesh ownership and any saved airflow study." },
+    { id: "geometry-air", label: "Geometry & air", description: "Select the flow mode, ambient state and surrounding world-coordinate air domain." },
+    { id: "materials-power", label: "Materials & power", description: "Enter explicit fluid and solid properties, solid roles and finite heat loads." },
+    { id: "boundaries", label: "Boundaries", description: "Define forced-flow planes when used and acknowledge the solid-contact boundary assumption." },
+    { id: "mesh-runtime", label: "Mesh & runtime", description: "Review the loaded mesh request, time integration and advanced request JSON." },
+    { id: "review", label: "Review & run", description: "Acknowledge the experimental limits, run the existing project workflow and inspect returned fields." },
+  ];
   return <details className="assembly-airflow-panel"><summary>Assembly air and temperature · OpenFOAM (experimental)</summary>
     <p>Build air around retained assembly solids and solve coupled fluid/solid temperatures. The installed Gmsh and OpenFOAM runtimes are required. Radiation and fan curves are not included.</p>
-    <div className="assembly-airflow-toolbar"><button type="button" disabled={locked || !meshSetup} onClick={() => void action("read_assembly_airflow_setup_in_project", meshSetup!, read => { const next = makeAirflowDraft(read); setDraft(next); setAcknowledged(false); setOwners(read.owners); setAdvanced(format(next)); setResult(null); setDirty(true); setStatus("Assembly sources loaded. Enter material properties and world air bounds."); })}>Load current assembly sources</button>
+    <SolverSetupSteps label="Assembly airflow setup steps" steps={setupSteps.map(step => step.id === "source" ? step : { ...step, disabled: !draft, description: draft ? step.description : "Load current assembly sources or a saved study in Source first." })} current={setupStep} onChange={setSetupStep} />
+    <SolverSetupPanel active={setupStep === "source"} label="Assembly source">
+      <div className="assembly-airflow-toolbar"><button type="button" disabled={locked || !meshSetup} onClick={() => void action("read_assembly_airflow_setup_in_project", meshSetup!, read => { const next = makeAirflowDraft(read); setDraft(next); setAcknowledged(false); setOwners(read.owners); setAdvanced(format(next)); setResult(null); setDirty(true); setStatus("Assembly sources loaded. Enter material properties and world air bounds."); })}>Load current assembly sources</button>
       <button type="button" disabled={locked} onClick={() => void action("read_assembly_airflow_study_in_project", {}, read => { if (read.state === "current") { setDraft(read.record.request); setAcknowledged(false); setAdvanced(format(read.record.request)); setResult(read.record.result); setOwners(read.record.result.source_owners || {}); setDirty(false); setStatus("Saved airflow study loaded."); } else setStatus(read.reason || "No saved airflow result."); })}>Load saved airflow results</button>
-      {busy && <button type="button" onClick={() => { const id = operation.current; generation.current++; operation.current = null; setBusy(false); setStatus("Cancelled."); if (id) void cancelLocalWorker(id); }}>Cancel airflow</button>}</div>
-    {!meshSetup && <p>Choose material assignments in the assembly meshing setup above to load current sources.</p>}
-    {draft && <><fieldset disabled={locked}><legend>Operating mode and air domain</legend><div className="assembly-airflow-grid">
+      </div>
+      {!meshSetup && <p>Choose material assignments in the assembly meshing setup above to load current sources.</p>}
+    </SolverSetupPanel>
+    {busy && <div className="assembly-airflow-toolbar"><button type="button" onClick={() => { const id = operation.current; generation.current++; operation.current = null; setBusy(false); setStatus("Cancelled."); if (id) void cancelLocalWorker(id); }}>Cancel airflow</button></div>}
+    {draft && <><SolverSetupPanel active={setupStep === "geometry-air"} label="Geometry and air domain"><fieldset disabled={locked}><legend>Operating mode and air domain</legend><div className="assembly-airflow-grid">
       <label>Mode<select value={draft.mode} onChange={e => change(r => { r.mode = e.target.value; delete r.inlet; delete r.outlet; delete r.flow_rate_m3_s; const air = r.materials.find((m: FieldObject) => m.id === "air"); delete air.density_model; if (r.mode === "forced") Object.assign(r, { flow_rate_m3_s: null, inlet: { axis: 0, coordinate_mm: null }, outlet: { axis: 0, coordinate_mm: null } }); if (r.mode === "natural") air.density_model = { type: "Boussinesq", rho0_kg_m3: air.density_kg_m3, T0_k: r.ambient_temperature_k, beta_per_k: 1 / r.ambient_temperature_k, temperature_min_k: r.ambient_temperature_k - 20, temperature_max_k: r.ambient_temperature_k + 20 }; })}><option value="static">Static air conduction</option><option value="natural">Natural convection · gravity −Z</option><option value="forced">Prescribed inlet flow</option></select></label>
       {number("Ambient (K)", draft.ambient_temperature_k, n => change(r => { r.ambient_temperature_k = n; }))}
       {[0, 1, 2].flatMap(axis => [0, 1].map(side => { const d = draft.geometry.air_domain; const v = axis === 2 ? d[side ? "z_max_mm" : "z_min_mm"] : d.outer_mm[side ? 2 : 0][axis]; return <span key={`${axis}${side}`}>{number(`${"XYZ"[axis]} ${side ? "maximum" : "minimum"} (mm)`, v, n => change(r => { const a = r.geometry.air_domain; if (axis === 2) a[side ? "z_max_mm" : "z_min_mm"] = n; else for (const index of axis === 0 ? side ? [1, 2] : [0, 3] : side ? [2, 3] : [0, 1]) a.outer_mm[index][axis] = n; }))}</span>; }))}
-    </div><p>Bounds must contain every solid. Exterior air walls use the ambient temperature. This is a user-defined surrounding domain; inlet/outlet planes select its exterior air faces.</p></fieldset>
-    <fieldset disabled={locked}><legend>Material properties and heat</legend>{draft.materials.map((m: FieldObject, i: number) => <div className="assembly-airflow-material" key={m.id}><strong>{m.id}</strong><div className="assembly-airflow-grid">{[["Density (kg/m³)", "density_kg_m3"], ["Heat capacity (J/kg K)", "specific_heat_j_kgk"], ["Conductivity (W/m K)", "conductivity_w_mk"], ...(m.phase === "fluid" ? [["Dynamic viscosity (Pa s)", "dynamic_viscosity_pa_s"]] : [])].map(([label, key]) => <span key={key}>{number(label, m[key], n => change(r => { r.materials[i][key] = n; }))}</span>)}</div>
+    </div><p>Bounds must contain every solid. Exterior air walls use the ambient temperature. This is a user-defined surrounding domain; inlet/outlet planes select its exterior air faces.</p></fieldset></SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "materials-power"} label="Materials and power"><fieldset disabled={locked}><legend>Material properties and heat</legend>{draft.materials.map((m: FieldObject, i: number) => <div className="assembly-airflow-material" key={m.id}><strong>{m.id}</strong><div className="assembly-airflow-grid">{[["Density (kg/m³)", "density_kg_m3"], ["Heat capacity (J/kg K)", "specific_heat_j_kgk"], ["Conductivity (W/m K)", "conductivity_w_mk"], ...(m.phase === "fluid" ? [["Dynamic viscosity (Pa s)", "dynamic_viscosity_pa_s"]] : [])].map(([label, key]) => <span key={key}>{number(label, m[key], n => change(r => { r.materials[i][key] = n; }))}</span>)}</div>
       {m.density_model && <div className="assembly-airflow-grid">{Object.keys(m.density_model).filter(k => k !== "type").map(key => <span key={key}>{number(key, m.density_model[key], n => change(r => { r.materials[i].density_model[key] = n; }))}</span>)}</div>}</div>)}
-      {Object.entries(draft.region_properties).map(([id, p]: [string, any]) => <div className="assembly-airflow-grid" key={id}><span title={id}>{owners[id]?.occurrence_id || id}</span>{number("Heat load (W)", p.power_w, n => change(r => { r.region_properties[id].power_w = n; }))}<label>Solid role<select value={p.role} onChange={e => change(r => { r.region_properties[id].role = e.target.value; })}>{["board", "package", "heatsink", "enclosure", "potting", "coating"].map(role => <option key={role}>{role}</option>)}</select></label></div>)}</fieldset>
+      {Object.entries(draft.region_properties).map(([id, p]: [string, any]) => <div className="assembly-airflow-grid" key={id}><span title={id}>{owners[id]?.occurrence_id || id}</span>{number("Heat load (W)", p.power_w, n => change(r => { r.region_properties[id].power_w = n; }))}<label>Solid role<select value={p.role} onChange={e => change(r => { r.region_properties[id].role = e.target.value; })}>{["board", "package", "heatsink", "enclosure", "potting", "coating"].map(role => <option key={role}>{role}</option>)}</select></label></div>)}</fieldset></SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "boundaries"} label="Boundary conditions">
     {draft.mode === "forced" && <fieldset disabled={locked}><legend>Prescribed flow</legend><div className="assembly-airflow-grid">{number("Volumetric flow (m³/s)", draft.flow_rate_m3_s, n => change(r => { r.flow_rate_m3_s = n; }))}{["inlet", "outlet"].map(key => <div key={key}><label>{key} normal axis<select value={draft[key].axis} onChange={e => change(r => { r[key].axis = Number(e.target.value); })}>{["X", "Y", "Z"].map((axis, i) => <option value={i} key={axis}>{axis}</option>)}</select></label>{number(`${key} plane (mm)`, draft[key].coordinate_mm, n => change(r => { r[key].coordinate_mm = n; }))}</div>)}</div></fieldset>}
-    <fieldset disabled={locked}><legend>Time integration</legend><div className="assembly-airflow-grid">{[["End time (s)", "end_time_s"], ["Time step (s)", "delta_t_s"], ["Write interval (steps)", "write_interval_steps"]].map(([label, key]) => <span key={key}>{number(label, draft.numerics[key], n => change(r => { r.numerics[key] = n; }))}</span>)}</div></fieldset>
     <label><input type="checkbox" disabled={locked} checked={draft.perfect_solid_contact_acknowledged === true} onChange={e => change(r => { r.perfect_solid_contact_acknowledged = e.target.checked; })}/> Use perfect thermal contact at touching solid interfaces. Finite contact resistance is not supported by this airflow adapter; do not use this assumption for a study requiring it.</label>
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "mesh-runtime"} label="Mesh and runtime">
+    <fieldset disabled={locked}><legend>Time integration for loaded assembly mesh</legend><div className="assembly-airflow-grid">{[["End time (s)", "end_time_s"], ["Time step (s)", "delta_t_s"], ["Write interval (steps)", "write_interval_steps"]].map(([label, key]) => <span key={key}>{number(label, draft.numerics[key], n => change(r => { r.numerics[key] = n; }))}</span>)}</div></fieldset>
     <details><summary>Advanced request JSON</summary><textarea aria-label="Airflow request JSON" value={advanced} disabled={locked} onChange={e => { setAdvanced(e.target.value); setDirty(true); setAcknowledged(false); setResult(null); }}/><button type="button" disabled={locked} onClick={() => { try { const parsed = JSON.parse(advanced); const reason = airflowDraftError(parsed); if (reason) throw new Error(reason); setDraft(parsed); setResult(null); setError(""); } catch (e) { setError(String(e)); } }}>Apply JSON</button></details>
+    </SolverSetupPanel>
+    <SolverSetupPanel active={setupStep === "review"} label="Review and run">
     <label><input type="checkbox" checked={acknowledged} disabled={locked} onChange={e => setAcknowledged(e.target.checked)}/> I reviewed the bounds, heat loads, material properties, boundary conditions and time settings. This experimental result needs convergence and physical validation.</label>
-    {invalid && <p role="status">{invalid}</p>}<button type="button" className="spike-control--primary" disabled={locked || !meshSetup || !acknowledged || !!invalid || advanced !== format(draft)} onClick={() => void action("run_assembly_airflow_in_project", { ...meshSetup, request: draft }, read => { if (read.saved && read.result?.status === "completed") { setResult(read.result); setDirty(false); setStatus("Completed airflow result saved in this project."); void onUpdated(); } else { setResult(null); setError(read.result?.message || "Airflow did not complete; no result saved."); setStatus(read.result?.status || read.status); } })}>Run and save airflow</button></>}
-    {status && <p role="status">{status}</p>}{error && <p role="alert">{error}</p>}{result?.status === "completed" && <AirflowFieldView result={result}/>}</details>;
+    {invalid && <p role="status">{invalid}</p>}<button type="button" className="spike-control--primary" disabled={locked || !meshSetup || !acknowledged || !!invalid || advanced !== format(draft)} onClick={() => void action("run_assembly_airflow_in_project", { ...meshSetup, request: draft }, read => { if (read.saved && read.result?.status === "completed") { setResult(read.result); setDirty(false); setStatus("Completed airflow result saved in this project."); void onUpdated(); } else { setResult(null); setError(read.result?.message || "Airflow did not complete; no result saved."); setStatus(read.result?.status || read.status); } })}>Run and save airflow</button>
+    {result?.status === "completed" && <AirflowFieldView result={result}/>}</SolverSetupPanel></>}
+    {status && <p role="status">{status}</p>}{error && <p role="alert">{error}</p>}</details>;
 }
 

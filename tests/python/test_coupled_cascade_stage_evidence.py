@@ -15,8 +15,8 @@ class CoupledCascadeEvidenceTests(unittest.TestCase):
         validate_done_import_stage({"id": "SI02-S10", "evidence": evidence}, ROOT)
         for mutate in (lambda r: r.__setitem__("production_qualified", True),
                        lambda r: r.__setitem__("status", "failed"),
-                       lambda r: r["sources_after"].__setitem__("python/spike_core/rlgc_coupled_cascade.py", "0"*64),
-                       lambda r: r["sources_before"].pop("python/spike_core/rlgc_coupled_pair.py"),
+                       lambda r: r["sources_after"].__setitem__("python/spike_core/solvers/signal_integrity/lines/rlgc_coupled_cascade.py", "0"*64),
+                       lambda r: r["sources_before"].pop("python/spike_core/solvers/signal_integrity/lines/rlgc_coupled_pair.py"),
                        lambda r: r["tests"].__setitem__("skipped", [r["tests"]["names"][0]]),
                        lambda r: r["tests"].__setitem__("run", 0),
                        lambda r: r.__setitem__("log_sha256", "0"*64)):

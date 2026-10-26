@@ -4,11 +4,7 @@ import unittest
 
 from python.spike_core.contracts import SpiDeR
 from python.spike_core.spider_v2 import SpiDeRV2
-from python.spike_core.spikes_layout_adapter import (
-    SpikesLayoutAdapterError,
-    design_ir_artifact_identity,
-    preflight_layout_candidate,
-)
+from python.spike_core.spikes_layout_adapter import SpikesLayoutAdapterError, design_ir_artifact_identity, preflight_layout_candidate
 
 
 class SpikesLayoutCandidatePreflightTests(unittest.TestCase):

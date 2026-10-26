@@ -8,7 +8,7 @@ import sys
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from examples.assembly_field.run_examples import setup
-from python.spike_core.assembly_electrothermal import run_assembly_electrothermal
+from python.spike_core.solvers.thermal_fluid.electrothermal.assembly_electrothermal import run_assembly_electrothermal
 from python.spike_core.multiboard_identity import canonical_json_digest
 
 

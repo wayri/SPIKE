@@ -298,7 +298,13 @@ class DebugSession:
             try:
                 compiled = compile(self.request["code"], self.filename, "exec")
                 sys.settrace(self.trace)
-                exec(compiled, namespace)
+                try:
+                    exec(compiled, namespace)
+                finally:
+                    # Debugger/library exception reporting must not traverse
+                    # user-frame path checks or process pending pause commands.
+                    # Publish terminal state without tracing its bookkeeping.
+                    sys.settrace(None)
             except SystemExit:
                 if self._stopping:
                     status, reason = "stopped", "stopped by user"

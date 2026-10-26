@@ -7,16 +7,9 @@ from pathlib import Path
 
 from python.spike_core.spider_v2 import SpiDeRV2
 from python.spike_core.kicad_importer import import_kicad_design
-from python.spike_core.thermal_relief_boundary_contact import (
-    build_thermal_relief_boundary_contact_evidence,
-)
-from python.spike_core.thermal_relief_observed_topology import (
-    build_thermal_relief_observed_topology,
-    validate_thermal_relief_observed_topology,
-)
-from python.spike_core.zone_pad_connection_evidence import (
-    build_zone_pad_connection_evidence,
-)
+from python.spike_core.solvers.thermal_fluid.heat.thermal_relief_boundary_contact import build_thermal_relief_boundary_contact_evidence
+from python.spike_core.solvers.thermal_fluid.heat.thermal_relief_observed_topology import build_thermal_relief_observed_topology, validate_thermal_relief_observed_topology
+from python.spike_core.solvers.power_integrity.dc.zone_pad_connection_evidence import build_zone_pad_connection_evidence
 
 
 class ThermalReliefObservedTopologyTests(unittest.TestCase):

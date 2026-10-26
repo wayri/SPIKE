@@ -15,18 +15,18 @@ if str(ROOT) not in sys.path:
 
 STAGES = {
     'SI08-S01': ('tests.python.test_sparameter_modes',
-                 ('python/spike_core/sparameter_modes.py', 'python/spike_core/sparameters.py',
+                 ('python/spike_core/solvers/signal_integrity/networks/sparameter_modes.py', 'python/spike_core/solvers/signal_integrity/networks/sparameters.py',
                   'tests/python/test_sparameter_modes.py')),
     'PI04-S01': ('tests.python.test_pdn_transient_consistency',
-                 ('python/spike_core/pdn_network.py', 'tests/python/test_pdn_transient_consistency.py')),
+                 ('python/spike_core/solvers/power_integrity/pdn/pdn_network.py', 'tests/python/test_pdn_transient_consistency.py')),
     'PI04-S02': (('tests.python.test_pdn_multiload', 'tests.python.test_pdn_multiload_contract'),
-                 ('python/spike_core/pdn_network.py', 'tests/python/test_pdn_multiload.py',
+                 ('python/spike_core/solvers/power_integrity/pdn/pdn_network.py', 'tests/python/test_pdn_multiload.py',
                   'tests/python/test_pdn_multiload_contract.py', 'python/spike_core/service_pdn_network.py',
                   'schemas/pdn-network-request-v1.schema.json')),
     'PI02-S01': (('tests.python.test_pdn_dielectric_ac', 'tests.python.test_pdn_dielectric_ac_contract'),
-                 ('python/spike_core/pdn_dielectric_ac.py', 'python/spike_core/pdn_electrostatic.py',
-                  'python/spike_core/pdn_network.py', 'python/spike_core/assembly_tetra_thermal_validation.py',
-                  'python/spike_core/tetra_aabb_candidates.py', 'python/spike_core/service_pdn_network.py',
+                 ('python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_ac.py', 'python/spike_core/solvers/power_integrity/pdn/pdn_electrostatic.py',
+                  'python/spike_core/solvers/power_integrity/pdn/pdn_network.py', 'python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_thermal_validation.py',
+                  'python/spike_core/solvers/geometry_meshing/preparation/tetra_aabb_candidates.py', 'python/spike_core/service_pdn_network.py',
                   'tests/python/test_pdn_dielectric_ac.py', 'tests/python/test_pdn_dielectric_ac_contract.py',
                   'tests/python/test_pdn_electrostatic.py', 'tests/python/test_assembly_tetra_thermal.py',
                   'schemas/pdn-dielectric-ac-request-v1.schema.json',
@@ -34,28 +34,28 @@ STAGES = {
 }
 STAGES['PI02-S02'] = (
     ('tests.python.test_pdn_admittance_reduction', 'tests.python.test_pdn_reduction_contract'),
-    (*STAGES['PI02-S01'][1], 'python/spike_core/pdn_admittance_reduction.py',
+    (*STAGES['PI02-S01'][1], 'python/spike_core/solvers/power_integrity/pdn/pdn_admittance_reduction.py',
      'tests/python/test_pdn_admittance_reduction.py', 'tests/python/test_pdn_reduction_contract.py',
      'schemas/pdn-admittance-reduction-request-v1.schema.json',
      'schemas/pdn-admittance-reduction-result-v1.schema.json'))
 STAGES['PI02-S03'] = (
     ('tests.python.test_pdn_dielectric_thermal', 'tests.python.test_pdn_dielectric_thermal_contract'),
-    (*STAGES['PI02-S01'][1], 'python/spike_core/pdn_dielectric_thermal.py',
-     'python/spike_core/assembly_tetra_thermal.py', 'python/spike_core/assembly_tetra_radiation.py',
+    (*STAGES['PI02-S01'][1], 'python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_thermal.py',
+     'python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_thermal.py', 'python/spike_core/solvers/thermal_fluid/heat/assembly_tetra_radiation.py',
      'tests/python/test_pdn_dielectric_thermal.py', 'tests/python/test_pdn_dielectric_thermal_contract.py',
      'examples/pdn_dielectric_thermal/run_slab.py',
      'schemas/pdn-dielectric-thermal-request-v1.schema.json',
      'schemas/pdn-dielectric-thermal-result-v1.schema.json'))
 STAGES['PI02-S04'] = (
     ('tests.python.test_pdn_dielectric_feedback', 'tests.python.test_pdn_dielectric_feedback_contract'),
-    (*STAGES['PI02-S03'][1], 'python/spike_core/pdn_dielectric_feedback.py',
+    (*STAGES['PI02-S03'][1], 'python/spike_core/solvers/power_integrity/pdn/pdn_dielectric_feedback.py',
      'tests/python/test_pdn_dielectric_feedback.py', 'tests/python/test_pdn_dielectric_feedback_contract.py',
      'examples/pdn_dielectric_thermal/run_feedback.py',
      'schemas/pdn-dielectric-feedback-request-v1.schema.json',
      'schemas/pdn-dielectric-feedback-result-v1.schema.json'))
 STAGES['PI03-S01'] = (
     ('tests.python.test_pdn_decap_corners', 'tests.python.test_pdn_decap_corners_contract'),
-    ('python/spike_core/pdn_decap_corners.py', 'python/spike_core/pdn_network.py',
+    ('python/spike_core/solvers/power_integrity/pdn/pdn_decap_corners.py', 'python/spike_core/solvers/power_integrity/pdn/pdn_network.py',
      'python/spike_core/service_pdn_network.py', 'tests/python/test_pdn_decap_corners.py',
      'tests/python/test_pdn_decap_corners_contract.py',
      'examples/pdn_decap_corners/run_corners.py',
@@ -64,13 +64,13 @@ STAGES['PI03-S01'] = (
      'schemas/pdn-decap-corners-result-v1.schema.json'))
 STAGES['PI03-S02'] = (
     ('tests.python.test_pdn_decap_selection', 'tests.python.test_pdn_decap_selection_contract'),
-    (*STAGES['PI03-S01'][1], 'python/spike_core/pdn_decap_selection.py',
+    (*STAGES['PI03-S01'][1], 'python/spike_core/solvers/power_integrity/pdn/pdn_decap_selection.py',
      'tests/python/test_pdn_decap_selection.py', 'tests/python/test_pdn_decap_selection_contract.py',
      'schemas/pdn-decap-selection-request-v1.schema.json',
      'schemas/pdn-decap-selection-result-v1.schema.json'))
 STAGES['SI08-S02'] = (
     ('tests.python.test_sparameter_deembedding', 'tests.python.test_sparameter_deembedding_contract'),
-    ('python/spike_core/sparameter_deembedding.py',
+    ('python/spike_core/solvers/signal_integrity/networks/sparameter_deembedding.py',
      'python/spike_core/service_sparameter_processing.py',
      'python/spike_core/service_simulation_handlers.py',
      'tests/python/test_sparameter_deembedding.py',
@@ -79,7 +79,7 @@ STAGES['SI08-S02'] = (
      'schemas/two-port-deembedding-result-v1.schema.json'))
 STAGES['SI08-S03'] = (
     ('tests.python.test_sparameter_sampling', 'tests.python.test_sparameter_sampling_contract'),
-    ('python/spike_core/sparameter_sampling.py',
+    ('python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py',
      'python/spike_core/service_sparameter_processing.py',
      'python/spike_core/service_simulation_handlers.py',
      'tests/python/test_sparameter_sampling.py', 'tests/python/test_sparameter_sampling_contract.py',
@@ -87,7 +87,7 @@ STAGES['SI08-S03'] = (
      'schemas/sparameter-resampling-result-v1.schema.json'))
 STAGES['SI08-S04'] = (
     ('tests.python.test_sparameter_rational', 'tests.python.test_sparameter_rational_contract'),
-    ('python/spike_core/sparameter_rational.py', 'python/spike_core/sparameter_sampling.py',
+    ('python/spike_core/solvers/signal_integrity/networks/sparameter_rational.py', 'python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py',
      'python/spike_core/service_sparameter_processing.py',
      'python/spike_core/service_simulation_handlers.py',
      'tests/python/test_sparameter_rational.py', 'tests/python/test_sparameter_rational_contract.py',
@@ -97,8 +97,8 @@ STAGES['SI08-S04'] = (
 
 STAGES['SI07-S01'] = (
     ('tests.python.test_sparameter_transient', 'tests.python.test_sparameter_transient_contract'),
-    ('python/spike_core/sparameter_transient.py', 'python/spike_core/sparameter_rational.py',
-     'python/spike_core/sparameter_sampling.py',
+    ('python/spike_core/solvers/signal_integrity/networks/sparameter_transient.py', 'python/spike_core/solvers/signal_integrity/networks/sparameter_rational.py',
+     'python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py',
      'python/spike_core/service_sparameter_processing.py',
      'python/spike_core/service_simulation_handlers.py',
      'tests/python/test_sparameter_transient.py', 'tests/python/test_sparameter_transient_contract.py',
@@ -110,8 +110,8 @@ STAGES['SI07-S01'] = (
 
 STAGES['SI07-S02'] = (
     ('tests.python.test_sparameter_terminated', 'tests.python.test_sparameter_terminated_contract'),
-    ('python/spike_core/sparameter_terminated.py', 'python/spike_core/sparameter_transient.py',
-     'python/spike_core/sparameter_rational.py', 'python/spike_core/sparameter_sampling.py',
+    ('python/spike_core/solvers/signal_integrity/networks/sparameter_terminated.py', 'python/spike_core/solvers/signal_integrity/networks/sparameter_transient.py',
+     'python/spike_core/solvers/signal_integrity/networks/sparameter_rational.py', 'python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py',
      'python/spike_core/service_sparameter_processing.py',
      'python/spike_core/service_simulation_handlers.py',
      'tests/python/test_sparameter_terminated.py', 'tests/python/test_sparameter_terminated_contract.py',
@@ -123,7 +123,7 @@ STAGES['SI07-S02'] = (
 
 STAGES['SI07-S03'] = (
     ('tests.python.test_sparameter_inductive_terminated', 'tests.python.test_sparameter_inductive_contract'),
-    (*STAGES['SI07-S02'][1], 'python/spike_core/sparameter_inductive_terminated.py',
+    (*STAGES['SI07-S02'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_inductive_terminated.py',
      'tests/python/test_sparameter_inductive_terminated.py',
      'tests/python/test_sparameter_inductive_contract.py', 'tests/python/test_sparameter_transient.py',
      'examples/inductive_network_transient/run_rlc.py',
@@ -134,7 +134,7 @@ STAGES['SI07-S03'] = (
 
 STAGES['SI07-S04'] = (
     ('tests.python.test_sparameter_capacitive_terminated', 'tests.python.test_sparameter_capacitive_contract'),
-    (*STAGES['SI07-S02'][1], 'python/spike_core/sparameter_capacitive_terminated.py',
+    (*STAGES['SI07-S02'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_capacitive_terminated.py',
      'tests/python/test_sparameter_capacitive_terminated.py',
      'tests/python/test_sparameter_capacitive_contract.py', 'tests/python/test_sparameter_transient.py',
      'examples/capacitive_network_transient/run_rc.py',
@@ -145,10 +145,10 @@ STAGES['SI07-S04'] = (
 
 STAGES['SI07-S05'] = (
     ('tests.python.test_sparameter_rlc_terminated', 'tests.python.test_sparameter_rlc_contract'),
-    (*STAGES['SI07-S02'][1], 'python/spike_core/sparameter_rlc_terminated.py',
+    (*STAGES['SI07-S02'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_rlc_terminated.py',
      'tests/python/test_sparameter_rlc_terminated.py', 'tests/python/test_sparameter_rlc_contract.py',
-     'python/spike_core/sparameter_inductive_terminated.py',
-     'python/spike_core/sparameter_capacitive_terminated.py',
+     'python/spike_core/solvers/signal_integrity/networks/sparameter_inductive_terminated.py',
+     'python/spike_core/solvers/signal_integrity/networks/sparameter_capacitive_terminated.py',
      'tests/python/test_sparameter_transient.py',
      'examples/rlc_network_transient/run_loaded_rlc.py',
      'schemas/rlc-network-transient-request-v1.schema.json',
@@ -158,7 +158,7 @@ STAGES['SI07-S05'] = (
 
 STAGES['SI07-S06'] = (
     ('tests.python.test_sparameter_rlc_initial', 'tests.python.test_sparameter_rlc_initial_contract'),
-    (*STAGES['SI07-S05'][1], 'python/spike_core/sparameter_rlc_initial.py',
+    (*STAGES['SI07-S05'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_rlc_initial.py',
      'tests/python/test_sparameter_rlc_initial.py', 'tests/python/test_sparameter_rlc_initial_contract.py',
      'examples/rlc_network_initial/run_free_decay.py',
      'schemas/rlc-initial-state-v1.schema.json',
@@ -169,7 +169,7 @@ STAGES['SI07-S06'] = (
 
 STAGES['SI07-S07'] = (
     ('tests.python.test_sparameter_rlc_energy', 'tests.python.test_sparameter_rlc_energy_contract'),
-    (*STAGES['SI07-S06'][1], 'python/spike_core/sparameter_rlc_energy.py',
+    (*STAGES['SI07-S06'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_rlc_energy.py',
      'tests/python/test_sparameter_rlc_energy.py', 'tests/python/test_sparameter_rlc_energy_contract.py',
      'examples/rlc_energy_ledger/run_energy.py',
      'schemas/rlc-energy-ledger-request-v1.schema.json',
@@ -179,7 +179,7 @@ STAGES['SI07-S07'] = (
 
 STAGES['SI07-S08'] = (
     ('tests.python.test_sparameter_multi_aggressor', 'tests.python.test_sparameter_multi_aggressor_contract'),
-    (*STAGES['SI07-S06'][1], 'python/spike_core/sparameter_multi_aggressor.py',
+    (*STAGES['SI07-S06'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_multi_aggressor.py',
      'tests/python/test_sparameter_multi_aggressor.py', 'tests/python/test_sparameter_multi_aggressor_contract.py',
      'examples/multi_aggressor_crosstalk/run_crosstalk.py',
      'schemas/multi-aggressor-crosstalk-request-v1.schema.json',
@@ -189,7 +189,7 @@ STAGES['SI07-S08'] = (
 
 STAGES['SI07-S09'] = (
     ('tests.python.test_sparameter_crosstalk_timing', 'tests.python.test_sparameter_crosstalk_timing_contract'),
-    (*STAGES['SI07-S08'][1], 'python/spike_core/sparameter_crosstalk_timing.py',
+    (*STAGES['SI07-S08'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_crosstalk_timing.py',
      'tests/python/test_sparameter_crosstalk_timing.py', 'tests/python/test_sparameter_crosstalk_timing_contract.py',
      'examples/crosstalk_timing_corners/run_timing.py',
      'schemas/crosstalk-timing-corners-request-v1.schema.json',
@@ -199,7 +199,7 @@ STAGES['SI07-S09'] = (
 
 STAGES['SI07-S10'] = (
     ('tests.python.test_sparameter_reflectometry', 'tests.python.test_sparameter_reflectometry_contract'),
-    (*STAGES['SI07-S06'][1], 'python/spike_core/sparameter_reflectometry.py',
+    (*STAGES['SI07-S06'][1], 'python/spike_core/solvers/signal_integrity/networks/sparameter_reflectometry.py',
      'tests/python/test_sparameter_reflectometry.py', 'tests/python/test_sparameter_reflectometry_contract.py',
      'examples/network_reflectometry/run_reflectometry.py',
      'schemas/network-reflectometry-request-v1.schema.json',
@@ -209,7 +209,7 @@ STAGES['SI07-S10'] = (
 
 STAGES['SI02-S01'] = (
     ('tests.python.test_lossless_line_transient', 'tests.python.test_lossless_line_transient_contract'),
-    ('python/spike_core/lossless_line_transient.py', 'python/spike_core/sparameter_sampling.py',
+    ('python/spike_core/solvers/signal_integrity/lines/lossless_line_transient.py', 'python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py',
      'python/spike_core/service_sparameter_processing.py',
      'python/spike_core/service_simulation_handlers.py',
      'tests/python/test_lossless_line_transient.py', 'tests/python/test_lossless_line_transient_contract.py',
@@ -220,7 +220,7 @@ STAGES['SI02-S01'] = (
 
 STAGES['SI02-S02'] = (
     ('tests.python.test_distortionless_line_transient', 'tests.python.test_distortionless_line_transient_contract'),
-    (*STAGES['SI02-S01'][1], 'python/spike_core/distortionless_line_transient.py',
+    (*STAGES['SI02-S01'][1], 'python/spike_core/solvers/signal_integrity/lines/distortionless_line_transient.py',
      'tests/python/test_distortionless_line_transient.py', 'tests/python/test_distortionless_line_transient_contract.py',
      'examples/distortionless_line_transient/run_line.py',
      'schemas/distortionless-line-transient-request-v1.schema.json',
@@ -229,7 +229,7 @@ STAGES['SI02-S02'] = (
 
 STAGES['SI02-S03'] = (
     ('tests.python.test_rlgc_line_network', 'tests.python.test_rlgc_line_network_contract'),
-    ('python/spike_core/rlgc_line_network.py', 'python/spike_core/sparameter_sampling.py',
+    ('python/spike_core/solvers/signal_integrity/lines/rlgc_line_network.py', 'python/spike_core/solvers/signal_integrity/networks/sparameter_sampling.py',
      'python/spike_core/service_sparameter_processing.py',
      'python/spike_core/service_simulation_handlers.py',
      'tests/python/test_rlgc_line_network.py', 'tests/python/test_rlgc_line_network_contract.py',
@@ -240,7 +240,7 @@ STAGES['SI02-S03'] = (
 
 STAGES['SI02-S04'] = (
     ('tests.python.test_rlgc_line_fields', 'tests.python.test_rlgc_line_fields_contract'),
-    (*STAGES['SI02-S03'][1], 'python/spike_core/rlgc_line_fields.py',
+    (*STAGES['SI02-S03'][1], 'python/spike_core/solvers/signal_integrity/lines/rlgc_line_fields.py',
      'tests/python/test_rlgc_line_fields.py', 'tests/python/test_rlgc_line_fields_contract.py',
      'examples/rlgc_line_fields/run_line.py',
      'schemas/rlgc-line-fields-request-v1.schema.json',
@@ -249,7 +249,7 @@ STAGES['SI02-S04'] = (
 
 STAGES['SI02-S05'] = (
     ('tests.python.test_rlgc_line_cascade', 'tests.python.test_rlgc_line_cascade_contract'),
-    (*STAGES['SI02-S04'][1], 'python/spike_core/rlgc_line_cascade.py', 'python/spike_core/cli.py',
+    (*STAGES['SI02-S04'][1], 'python/spike_core/solvers/signal_integrity/lines/rlgc_line_cascade.py', 'python/spike_core/cli.py',
      'tests/python/test_rlgc_line_cascade.py', 'tests/python/test_rlgc_line_cascade_contract.py',
      'examples/rlgc_line_cascade/run_line.py', 'examples/rlgc_line_cascade/three-sections.request.json',
      'schemas/rlgc-line-cascade-request-v1.schema.json',
@@ -258,7 +258,7 @@ STAGES['SI02-S05'] = (
 
 STAGES['SI02-S06'] = (
     ('tests.python.test_rlgc_line_junction', 'tests.python.test_rlgc_line_junction_contract'),
-    (*STAGES['SI02-S04'][1], 'python/spike_core/rlgc_line_junction.py', 'python/spike_core/cli.py',
+    (*STAGES['SI02-S04'][1], 'python/spike_core/solvers/signal_integrity/lines/rlgc_line_junction.py', 'python/spike_core/cli.py',
      'tests/python/test_rlgc_line_junction.py', 'tests/python/test_rlgc_line_junction_contract.py',
      'examples/rlgc_line_junction/run_line.py', 'examples/rlgc_line_junction/three-legs.request.json',
      'schemas/rlgc-line-junction-request-v1.schema.json',

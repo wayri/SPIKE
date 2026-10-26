@@ -13,8 +13,8 @@ from examples.converter.run_pwm_volume_validation import (
     uniform_case, switched_reference, assert_uniform_conservation,
     correlate_uniform_calculix, nonuniform_capacity_distinction, retained_board_package_replay,
 )
-from python.spike_core.calculix_runtime import probe_calculix_runtime
-from python.spike_core.pwm_volume_electrothermal import run_pwm_volume_electrothermal
+from python.spike_core.solvers.external_engines.calculix.calculix_runtime import probe_calculix_runtime
+from python.spike_core.solvers.thermal_fluid.electrothermal.pwm_volume_electrothermal import run_pwm_volume_electrothermal
 
 
 def endpoint(result):

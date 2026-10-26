@@ -6,14 +6,10 @@ import unittest
 import numpy as np
 from scipy.sparse import diags
 
-from python.spike_core.enclosure_rectilinear_momentum import (
-    _assemble, _iteration, solve_enclosure_rectilinear_momentum,
-)
-from python.spike_core.enclosure_refinement import build_enclosure_grid
-from python.spike_core.enclosure_rotating_frame import (
-    CONTRACT, _coriolis, solve_enclosure_rotating_frame,
-)
-from python.spike_core.enclosure_stokes import EnclosureFlowError
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_rectilinear_momentum import _assemble, _iteration, solve_enclosure_rectilinear_momentum
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_refinement import build_enclosure_grid
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_rotating_frame import CONTRACT, _coriolis, solve_enclosure_rotating_frame
+from python.spike_core.solvers.thermal_fluid.flow.enclosure_stokes import EnclosureFlowError
 from tests.python.test_enclosure_laminar import exact_fields
 from tests.python.test_enclosure_rectilinear_momentum import fixture as base_fixture
 

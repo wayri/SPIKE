@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Copyright (c) 2026 SigHarmonic
-#include "peec/sparse_magnetic_energy.hpp"
+#include "solvers/power_integrity/peec/sparse_magnetic_energy.hpp"
 #include <algorithm>
 #include <cmath>
 #include <iostream>

@@ -22,14 +22,13 @@ const requiredAppFragments = [
   "Prepare a runnable OpenFOAM case before execution",
   "No result is marked validated here.",
   "Approximate independent RC sources only",
+  'const requestCfdGuidedRun=useGuidedRunAdapter',
+  'guidedBlocker("cfd-boundaries"',
+  '!preparedCase?.can_run||!preparedCase.case_dir||preparedGuideRevision!==JSON.stringify(scenario)',
 ];
 
 for (const fragment of requiredAppFragments) {
   if (!app.includes(fragment)) throw new Error(`Thermal workflow is missing: ${fragment}`);
-}
-
-if (!app.includes('disabled={busy !== null || !preparedCase?.can_run || activeBoundaries.length > 0}')) {
-  throw new Error("OpenFOAM execution must remain gated by a prepared runnable case and unsupported surface boundaries");
 }
 
 for (const fragment of ["solver?:", "mesh?:", "run?:", "flow_rate_m3_s", "diameter_mm"]) {
@@ -49,9 +48,14 @@ const boundaryModule = { exports: {} };
 new Function("require", "module", "exports", ts.transpileModule(readFileSync(resolve(appRoot, "src", "thermalBoundaries.ts"), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText)(require, boundaryModule, boundaryModule.exports);
 const { normalizeThermalBoundaries, nativeThermalInputs } = boundaryModule.exports;
 const emptyComponent = () => null;
-function mountWizard(initialScenario, workerAvailable = true, onOpenSolidStudy) {
+const settle = async () => {
+  await new Promise(resolve => setImmediate(resolve));
+  await new Promise(resolve => setImmediate(resolve));
+};
+function mountWizard(initialScenario, workerAvailable = true, onOpenSolidStudy, options = {}) {
   const states = [];
-  let cursor = 0, saved, request;
+  const adapters = new Map(), requests = [], guidedChecks = [], statuses = [];
+  let cursor = 0, saved, request, lastGuided;
   const dependencies = {
     require, exports: {},
     useState(initial) {
@@ -59,7 +63,29 @@ function mountWizard(initialScenario, workerAvailable = true, onOpenSolidStudy) 
       if (!(index in states)) states[index] = typeof initial === "function" ? initial() : initial;
       return [states[index], value => { states[index] = typeof value === "function" ? value(states[index]) : value; }];
     },
-    useMemo: callback => callback(), useEffect() {}, asThermalScenario: value => value,
+    useMemo: callback => callback(), useEffect() {}, useRef: initial => ({ current: initial }), asThermalScenario: value => value,
+    useGuidedRunAdapter(adapter) {
+      adapters.set(adapter.id, adapter);
+      return async () => {
+        const operation = new AbortController();
+        const checked = await adapter.check(adapter.context, operation.signal);
+        lastGuided = { id: adapter.id, checked };
+        if (!checked.requirements.some(item => item.severity === "blocker")) await adapter.run(adapter.context, operation.signal);
+      };
+    },
+    guidedBlocker: (id, detail, route = "review") => ({ id, title: "Complete simulation setup", detail, severity: "blocker", route }),
+    guidedRequirements: (issues, route, prefix = "setup") => Array.isArray(issues) ? issues.flatMap((issue, index) => {
+      if (!issue || !["error", "critical", "warning"].includes(issue.severity)) return [];
+      const detail = String(issue.message ?? "Required setup input is missing.");
+      return [{ id: `${prefix}:${issue.code ?? index}:${index}`, title: detail, detail, severity: issue.severity === "warning" ? "warning" : "blocker", route: route(detail) }];
+    }) : [],
+    async guidedWorkerCheck(method, params, signal) {
+      guidedChecks.push({ method, params });
+      if (signal.aborted) throw new Error("Setup check cancelled");
+      if (method === "validate_component_thermal") return { can_solve: true, issues: [] };
+      if (method === "validate_thermal") return { valid: true, solver_ready: true, issues: [], capability: {} };
+      throw new Error(`Unexpected guided worker check: ${method}`);
+    },
     normalizeThermalElements: value => value ?? [], normalizeThermalLinks: value => value ?? [], normalizeThermalBoundaries, nativeThermalInputs,
     normalizeThermalFans: value => value ?? [], normalizeThermalHeatsinks: value => value ?? [],
     thermalAssemblyIssues: () => [], screenThermalElements: () => [], thermalSchematic: () => ({}),
@@ -67,16 +93,22 @@ function mountWizard(initialScenario, workerAvailable = true, onOpenSolidStudy) 
     ThermalInputImport: emptyComponent, ThermalAssemblyEditor: emptyComponent, ThermalBoundaryEditor: emptyComponent, ThermalHardwareEditor: emptyComponent, ThermalEnvironmentPanel: emptyComponent, BoardThermalPanel: emptyComponent,
     InternalAirflowPanel: emptyComponent, PwmElectrothermalPanel: emptyComponent, ThermalTransientOverlay: emptyComponent, DataTable: ({ children }) => children,
     X: emptyComponent, Play: emptyComponent, AlertTriangle: emptyComponent, Boxes: emptyComponent, BarChart3: emptyComponent,
+    thermalFieldResultPreview: () => null, cancelLocalWorker: async () => false,
     async runLocalWorker(value) {
+      requests.push(value);
       request = value;
+      if (value.method === "validate_thermal") return { ok: true, result: { valid: true, solver_ready: true, issues: [], capability: {} } };
+      if (value.method === "prepare_thermal_case") return { ok: true, result: { status: "prepared", can_run: true, case_dir: "C:\\bounded-thermal-case", issues: [] } };
+      if (value.method === "run_thermal_case") return { ok: true, result: { status: "completed", result_contract: "spike/openfoam-result/v1" } };
       return { ok: true, result: { contract: "spike/component-thermal-result/v1", status: "completed", model_status: "approximate", nodes: [], transient: [], summary: {}, issues: [] } };
     },
   };
   const Wizard = new Function(...Object.keys(dependencies), `${compiled}\nreturn ThermalWizard;`)(...Object.values(dependencies));
   return {
-    render() { cursor = 0; return Wizard({ initialScenario, assemblyBoards: [], onOpenSolidStudy, componentBonds: [], board: null, design: null, workerAvailable,
-      onRequireAdmission: async () => null, onClose() {}, onStatus() {}, onPreview() {}, onScenario(value) { saved = value; } }); },
-    get saved() { return saved; }, get request() { return request; },
+    render() { cursor = 0; return Wizard({ initialScenario, assemblyBoards: [], onOpenSolidStudy, componentBonds: [], board: null, design: options.design ?? null, workerAvailable,
+      onRequireAdmission: async () => null, onClose() {}, onStatus(value) { statuses.push(value); }, onPreview() {}, onScenario(value) { saved = value; } }); },
+    get saved() { return saved; }, get request() { return request; }, get requests() { return requests; }, get guidedChecks() { return guidedChecks; },
+    get lastGuided() { return lastGuided; }, get statuses() { return statuses; }, get adapters() { return adapters; },
   };
 }
 function findNode(node, predicate) {
@@ -96,7 +128,7 @@ for (const thermal_elements of [[], [{ reference: "U1", kind: "pcb_component", e
   const run = findNode(tree, node => node.type === "button" && node.props.className === "run-btn");
   assert.equal(run.props.disabled, false, "native runs need no board or OpenFOAM runtime");
   run.props.onClick();
-  await new Promise(resolve => setImmediate(resolve));
+  await settle();
   assert.equal(mounted.request.method, "run_component_thermal");
   if (!thermal_elements.length) assert.equal(mounted.request.params.components[0].thermal_capacitance_j_per_c, 37);
   assert.equal(mounted.saved.board_fallback_power_w, 8);
@@ -106,8 +138,13 @@ for (const thermal_elements of [[], [{ reference: "U1", kind: "pcb_component", e
   findNode(reopenedTree, node => node.props?.["aria-label"] === "Component transient time step").props.onChange({ target: { value: "0.5" } });
   assert.match(renderToStaticMarkup(reopened.render()), /Inputs changed/);
 }
-const unavailable = mountWizard(null, false).render();
-assert.equal(findNode(unavailable, node => node.type === "button" && node.props.className === "run-btn").props.disabled, true);
+const unavailable = mountWizard(null, false);
+const unavailableRun = findNode(unavailable.render(), node => node.type === "button" && node.props.className === "run-btn");
+assert.equal(unavailableRun.props.disabled, false, "guided run remains available so its setup blocker can explain the unavailable worker");
+unavailableRun.props.onClick();
+await settle();
+assert.deepEqual(unavailable.lastGuided.checked.requirements.map(item => item.id), ["thermal-worker"]);
+assert.equal(unavailable.request, undefined, "worker-unavailable guidance must not start a thermal solve");
 const coupled = mountWizard({ mode: "steady_state", thermal_elements: [
   { reference: "U1", kind: "pcb_component", enabled: true, power_w: 2, position: [0, 0, 0], dimensions_mm: { x: 2, y: 2, z: 1 } },
   { reference: "HS1", kind: "heatsink", enabled: true, power_w: 0, position: [0, 0, 0], dimensions_mm: { x: 10, y: 10, z: 2 } },
@@ -119,7 +156,7 @@ const coupledTree = coupled.render();
 assert.equal(findNode(coupledTree, node => node.props?.boundaries?.[0]?.id === "contact")?.props.elements.some(element => element.reference === "HS1"), true);
 assert.equal(findNode(coupledTree, node => node.type === "button" && node.props.children === "Preflight")?.props.disabled, true, "optional CFD must not silently ignore object boundaries");
 findNode(coupledTree, node => node.type === "button" && node.props.className === "run-btn").props.onClick();
-await new Promise(resolve => setImmediate(resolve));
+await settle();
 assert.deepEqual(coupled.request.params.components.map(item => item.component_ref), ["U1", "HS1"]);
 assert.deepEqual(coupled.request.params.surfaces.map(item => item.id), ["contact", "air"]);
 assert.equal(coupled.saved.thermal_boundaries.length, 2);
@@ -128,6 +165,33 @@ assert.doesNotMatch(renderToStaticMarkup(coupledReopened.render()), /Inputs chan
 const boundaryEditor = findNode(coupledReopened.render(), node => node.props?.boundaries?.[0]?.id === "contact");
 boundaryEditor.props.onBoundaries(boundaryEditor.props.boundaries.map(item => item.id === "air" ? { ...item, heat_transfer_coefficient_w_m2_k: 25 } : item));
 assert.match(renderToStaticMarkup(coupledReopened.render()), /Inputs changed/);
+
+const cfdButton = tree => findNode(tree, node => node.type === "button" && [node.props.children].flat(Infinity).some(child => typeof child === "string" && child.includes("Run OpenFOAM")));
+const coupledCfd = mountWizard(coupled.saved, true, undefined, { design: { design_id: "thermal-test" } });
+cfdButton(coupledCfd.render()).props.onClick();
+await settle();
+assert.deepEqual(coupledCfd.lastGuided.checked.requirements.map(item => item.id), ["cfd-boundaries"], "explicit surface physics must block the OpenFOAM adapter");
+assert.equal(coupledCfd.requests.some(item => item.method === "run_thermal_case"), false, "unsupported boundaries must not be silently dropped into a CFD run");
+
+const missingPrepared = mountWizard({ mode: "transient" }, true, undefined, { design: { design_id: "thermal-test" } });
+cfdButton(missingPrepared.render()).props.onClick();
+await settle();
+assert.deepEqual(missingPrepared.lastGuided.checked.requirements.map(item => item.id), ["cfd-prepare"], "a runnable case is required for the current inputs");
+assert.deepEqual(missingPrepared.guidedChecks.map(item => item.method), ["validate_thermal"]);
+assert.equal(missingPrepared.requests.some(item => item.method === "run_thermal_case"), false, "missing preparation must fail closed before execution");
+
+const stalePrepared = mountWizard({ mode: "transient" }, true, undefined, { design: { design_id: "thermal-test" } });
+const prepareButton = findNode(stalePrepared.render(), node => node.type === "button" && node.props.children === "Prepare case");
+prepareButton.props.onClick();
+await settle();
+const preparedTree = stalePrepared.render();
+assert.equal(stalePrepared.requests.some(item => item.method === "prepare_thermal_case"), true, "test setup must prepare a runnable case first");
+findNode(preparedTree, node => node.props?.["aria-label"] === "Component transient time step").props.onChange({ target: { value: "0.5" } });
+cfdButton(stalePrepared.render()).props.onClick();
+await settle();
+assert.equal(stalePrepared.lastGuided.checked.requirements.some(item => item.id === "cfd-prepare"), true, "a prepared case from earlier inputs must be rejected as stale");
+assert.equal(stalePrepared.requests.some(item => item.method === "run_thermal_case"), false, "stale preparation must fail closed before execution");
+console.log("Thermal guided-run blockers reject unavailable workers, unsupported CFD boundaries, and missing or stale prepared cases.");
 const editorModule = { exports: {} };
 const editorCode = ts.transpileModule(readFileSync(resolve(appRoot, "src", "ThermalBoundaryEditor.tsx"), "utf8"), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020, jsx: ts.JsxEmit.ReactJSX } }).outputText;
 new Function("require", "module", "exports", editorCode)(name => name === "react" ? { useState: initial => [initial, () => {}] } : name === "./thermalBoundaries" ? boundaryModule.exports : ["./icons", "lucide-react"].includes(name) ? { Plus: emptyComponent, Trash2: emptyComponent } : require(name), editorModule, editorModule.exports);

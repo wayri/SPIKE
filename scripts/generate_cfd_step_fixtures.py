@@ -25,7 +25,7 @@ def fixture_worker():
     """Fixed trusted shapes only; never executes user geometry/script text."""
     import ctypes.util
     import os
-    from python.spike_core.gmsh_occ_runtime import API, DLL, verify_installation
+    from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import API, DLL, verify_installation
 
     verify_installation()
     with os.add_dll_directory(str(DLL.parent)):
@@ -61,9 +61,9 @@ def fixture_worker():
 
 
 def generate(output):
-    from python.spike_core.gmsh_occ_runtime import verify_installation, _worker_interpreter
-    from python.spike_core.gmsh_environment import isolated_preflight_source
-    from python.spike_core.sparselizard_process import run_adapter_process
+    from python.spike_core.solvers.geometry_meshing.preparation.gmsh_occ_runtime import verify_installation, _worker_interpreter
+    from python.spike_core.solvers.geometry_meshing.preparation.gmsh_environment import isolated_preflight_source
+    from python.spike_core.solvers.external_engines.sparselizard.sparselizard_process import run_adapter_process
 
     provenance = verify_installation()  # Never bypass a changed entry hash.
     output = output.resolve()

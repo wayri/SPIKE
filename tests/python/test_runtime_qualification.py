@@ -6,13 +6,7 @@ import subprocess
 import unittest
 from unittest.mock import patch
 
-from python.spike_core.runtime_qualification import (
-    QUALIFICATION_CONTRACT,
-    canonical_digest,
-    collect_runtime_snapshot,
-    normalize_runtime_results,
-    qualify_runtime_snapshots,
-)
+from python.spike_core.runtime_qualification import QUALIFICATION_CONTRACT, canonical_digest, collect_runtime_snapshot, normalize_runtime_results, qualify_runtime_snapshots
 
 
 def fixture_results() -> dict:

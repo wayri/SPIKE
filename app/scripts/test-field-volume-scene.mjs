@@ -19,6 +19,17 @@ assert.deepEqual(mesh.geometry.boundingBox.min.toArray(), [-2, -4, 0], "metres b
 assert.deepEqual(mesh.geometry.boundingBox.max.toArray(), [2, 4, 12]);
 const arrows = scene.children.filter(object => object instanceof THREE.Line);
 assert.ok(arrows.length >= 1, "velocity arrows share the scene");
+const rangedScene = buildFieldVolumeScene(base, { ...options, arrows: false, colorRange: [4, 8], sampleIndex: 0 });
+assert.deepEqual(rangedScene.userData.scalarRange, [4, 8], "Three legend follows manual range");
+const rangedColors = rangedScene.children.find(object => object instanceof THREE.Mesh).geometry.attributes.color;
+assert.ok(Math.abs(rangedColors.getX(0) - .12) < 1e-6 && Math.abs(rangedColors.getZ(0) - .92) < 1e-6, "Manual endpoint actually changes GPU vertex colors");
+const sampleMarker = rangedScene.children.find(object => object instanceof THREE.Points);
+assert.ok(sampleMarker, "Exact sample inspection creates an actual renderer marker");
+assert.deepEqual(Array.from(sampleMarker.geometry.attributes.position.array), [1, -2, 3]);
+disposeScene(rangedScene);
+const sizedPoints = buildFieldVolumeScene(base, { ...options, mode: "points", arrows: false, pointSize: 12 });
+assert.equal(sizedPoints.children.find(object => object instanceof THREE.Points).material.size, 12, "Sample size reaches the actual Three material");
+disposeScene(sizedPoints);
 
 const curves = { ...base, lengthUnit: "mm", cells: { centers: [[0, 0, 0]] }, frames: [{ timeS: 0, scalars: { q: [0] }, streamlines: [
   { points: [[1, 2, 3], [2, 3, 4]], scalars: { q: [0, 1] } }, { points: [[10, 20, 30], [11, 21, 31]], scalars: { q: [1, 2] } }] }] };
@@ -26,6 +37,11 @@ const lineScene = buildFieldVolumeScene(curves, { ...options, mode: "streamlines
 assert.equal(lineScene.children.length, 2, "separate source curves remain distinct Three lines");
 assert.deepEqual(Array.from(lineScene.children[0].geometry.attributes.position.array.slice(0, 3)), [1, -2, 3]);
 const suppliedTubeScene = buildFieldVolumeScene(curves, { ...options, mode: "streamtubes", arrows: false });
+const rangedLines = buildFieldVolumeScene(curves, { ...options, mode: "streamlines", arrows: false, colorRange: [0, 4] });
+assert.deepEqual(rangedLines.userData.scalarRange, [0, 4]);
+const lineColors = rangedLines.children[0].geometry.attributes.color;
+assert.ok(lineColors.getZ(1) > .5, "Supplied line colors use the requested common scale");
+disposeScene(rangedLines);
 const suppliedTubeColors = suppliedTubeScene.children.find(object => object instanceof THREE.Mesh).geometry.attributes.color;
 const tubeColors = Array.from({ length: suppliedTubeColors.count }, (_, index) =>
   [suppliedTubeColors.getX(index), suppliedTubeColors.getY(index), suppliedTubeColors.getZ(index)]);
@@ -47,6 +63,14 @@ assert.equal(tube.geometry.attributes.color.count, tube.geometry.attributes.posi
 assert.equal(tubeScene.userData.scalarLabel, "Speed"); assert.equal(tubeScene.userData.scalarUnit, "m/s");
 assert.deepEqual(tubeScene.userData.scalarRange, [1, 3], "generated speed scale is fixed over saved vector history");
 assert.match(tubeScene.userData.streamNote, /center seed plane/);
+const varyingDirection = { ...generatedSource, frames: [1, 2].map((factor, frame) => ({ timeS: frame,
+  scalars: { q: gridCenters.map(() => 0) }, vectors: gridCenters.map(point => [factor, point[1] === 0 ? -factor : factor, 0]) })) };
+const varyingScenes = [0, 1].map(frame => buildFieldVolumeScene(varyingDirection, { ...options, frame, mode: "streamtubes", arrows: false, seedDensity: 4, budget: 1000 }));
+for (const rendered of varyingScenes) {
+  assert.ok(rendered.children.length > 0, "The nonuniform field must actually trace curves");
+  assert.deepEqual(rendered.userData.scalarRange, [Math.SQRT2, 2 * Math.SQRT2], "Interpolated path speeds must not rescale the saved-vector legend");
+  disposeScene(rendered);
+}
 const unsupported = buildFieldVolumeScene({ ...base, cells: { centers: [[0, 0, 0]] }, frames: [{ timeS: 0, scalars: { q: [1] } }] },
   { ...options, mode: "streamtubes", arrows: false });
 assert.equal(unsupported.children.length, 0); assert.equal(unsupported.userData.error, "");

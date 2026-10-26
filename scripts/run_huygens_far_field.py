@@ -10,7 +10,7 @@ import numpy as np
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
-from python.spike_core.huygens_far_field import huygens_far_field,FarFieldError
+from python.spike_core.solvers.electromagnetics.fields.huygens_far_field import huygens_far_field, FarFieldError
 
 LIMIT=8*1024*1024
 

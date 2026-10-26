@@ -19,7 +19,7 @@ def _area(points):
 def evaluate_geometry_gate(payload):
     from python.spike_core.spider_v2 import SpiDeRV2
     from python.spike_core.geometry_arrow import canonical_geometry_rows
-    from python.spike_core.assembly_thermal_meshing import _board_model
+    from python.spike_core.solvers.geometry_meshing.preparation.assembly_thermal_meshing import _board_model
     from python.spike_core.spikes_layout_geometry_handoff import _supported_sources
 
     design = SpiDeRV2.from_dict(payload['design'])

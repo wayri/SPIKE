@@ -2,7 +2,7 @@
 import copy
 import unittest
 from python.spike_core.service import handle
-from python.spike_core.pdn_series_capacitors import review_series_capacitor_leg
+from python.spike_core.solvers.power_integrity.pdn.pdn_series_capacitors import review_series_capacitor_leg
 from tests.python.test_pdn_network import basic, element
 from tests.python.test_pdn_shunt_capacitance import supplied
 

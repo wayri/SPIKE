@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "spike/si-pam3-request/v1",
+  "title": "Explicit sampled-channel generic PAM3 request; no protocol compliance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract", "symbols", "levels_v", "channel_impulse", "symbol_rate_hz", "samples_per_ui"],
+  "properties": {
+    "contract": {"const": "spike/si-pam3-request/v1"},
+    "symbols": {"type": "array", "minItems": 1, "maxItems": 16384, "items": {"type": "integer", "enum": [0, 1, 2]}},
+    "levels_v": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number", "minimum": -1000, "maximum": 1000}},
+    "channel_impulse": {"type": "array", "minItems": 1, "maxItems": 65536, "items": {"type": "number"}},
+    "symbol_rate_hz": {"type": "number", "minimum": 1, "maximum": 1000000000000},
+    "samples_per_ui": {"type": "integer", "minimum": 8, "maximum": 256},
+    "sampling_phase_ui": {"type": "number", "minimum": 0, "exclusiveMaximum": 1},
+    "channel_cursor_samples": {"type": "integer", "minimum": 0, "maximum": 65535},
+    "decision_thresholds_v": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number", "minimum": -1000000000, "maximum": 1000000000}},
+    "voltage_noise_rms_v": {"type": "number", "minimum": 0, "maximum": 1000},
+    "noise_seed": {"type": "integer", "minimum": 0, "maximum": 18446744073709551615}
+  }
+}

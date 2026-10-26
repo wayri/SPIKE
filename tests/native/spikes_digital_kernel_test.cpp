@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 // Independent truth tables, tick-order oracles and bounded-failure checks.
-#include "spikes/digital_kernel.hpp"
+#include "solvers/circuits/spikes/digital_kernel.hpp"
 #include <array>
 #include <iostream>
 

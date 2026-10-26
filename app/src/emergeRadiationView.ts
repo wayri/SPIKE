@@ -41,3 +41,14 @@ export function savedEmergeRadiationPreview(raw: unknown, sourceDesignId: string
   const envelope = { title: surrogate ? "Saved two-conductor EMerge surrogate" : "Saved EMerge radiation result", data: { analysis_result: raw } };
   return emergeRadiationPatterns(envelope).length ? { envelope, surrogate } : null;
 }
+
+/** Restore a presentation envelope from raw or current normalized saved arrays. */
+export function savedEMergeResultEnvelope(raw: unknown): { title: string; data: { analysis_result: Record<string, unknown> } } | null {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+  const value = raw as Record<string, unknown>;
+  const provenance = value.provenance as Record<string, unknown> | undefined;
+  if (value.status !== "completed" || typeof provenance?.solver !== "string" || !provenance.solver.startsWith("EMerge/")) return null;
+  const fields = value.em_fields ?? value.fields, networks = value.em_networks ?? value.networks;
+  if (!fields || typeof fields !== "object" || !networks || typeof networks !== "object") return null;
+  return { title: "Saved EMerge result (unvalidated)", data: { analysis_result: { ...value, fields, networks } } };
+}

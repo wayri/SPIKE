@@ -23,7 +23,7 @@ disconnection as proof that manufactured copper is disconnected.
 
 ## Worker API
 
-`python.spike_core.pi_return_path.plan_pi_return_path(design, request)` takes a
+`python.spike_core.solvers.power_integrity.dc.pi_return_path.plan_pi_return_path(design, request)` takes a
 SpiDeR v1 dictionary in millimetres and this exact request shape:
 
 ```json

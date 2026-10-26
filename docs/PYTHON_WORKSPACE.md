@@ -112,6 +112,11 @@ polling enforces that deadline with bounded process-tree cleanup while startup
 imports run, before the child's watchdog initializes. This startup fallback
 requires polling; it is not an OS-enforced guarantee for an unobserved startup.
 
+When a script raises an exception, user-code tracing stops before the debugger
+formats the traceback and publishes the failed state. Exception reporting
+does not process stepping or pause commands. Nonfinite published results
+remain rejected and are not offered to the viewport.
+
 Line breakpoints apply to the script that started the session. Step into can
 enter local Python modules under that script's working directory; stack frame
 links can open their source. Remote attach, separate thread debugging, and
@@ -119,7 +124,10 @@ expression evaluation are not available. You can edit another tab during a
 run; the executing script stays locked until it stops.
 
 A saved script runs with its parent folder as the working directory. An unsaved
-tab runs from the selected workspace folder. Resolve important input and output
+tab runs from its explicitly retained work folder when staged by the Assistant
+task harness, otherwise the selected workspace folder. Harness staging opens a
+new unsaved tab and never runs its source; review and Run remain user actions.
+Resolve important input and output
 paths explicitly. The child has the user's ordinary local file and
 installed-package access. The process boundary supports cancellation and fault
 containment; it is not a security sandbox.

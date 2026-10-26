@@ -11,7 +11,7 @@ import sys
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 from tests.python.test_assembly_em import fixture
-from python.spike_core.assembly_em import run_assembly_em
+from python.spike_core.solvers.electromagnetics.fields.assembly_em import run_assembly_em
 
 
 def write_report(directory, results, summary):

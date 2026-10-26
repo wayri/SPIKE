@@ -2,6 +2,7 @@
 """Ensure development tracking cannot silently omit capabilities or claim completion."""
 import copy
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -28,7 +29,8 @@ class ParityBacklogTests(unittest.TestCase):
 
         def execute(script, arguments, accepted, timeout):
             result = subprocess.run([sys.executable, str(ROOT / 'scripts' / script), *arguments],
-                                    cwd=ROOT, capture_output=True, text=True, timeout=timeout)
+                                    cwd=ROOT, capture_output=True, text=True, timeout=timeout,
+                                    env={**os.environ, 'TEMP': str(directory), 'TMP': str(directory)})
             if result.returncode not in accepted:
                 raise AssertionError(result.stdout + result.stderr)
 
@@ -70,14 +72,14 @@ class ParityBacklogTests(unittest.TestCase):
 
     def test_current_coverage_and_pinned_fixture(self):
         result = validate_backlog(self.payload, self.roadmap)
-        self.assertEqual(result['items'], 68)
+        self.assertEqual(result['items'], 63)
         self.assertNotIn('WF01', result['benchmark_definitions_pending'])
         self.assertTrue({'RF01', 'RF02', 'PW01', 'PW02', 'PW03', 'PW04', 'PW05'}.issubset(
                             result['benchmark_definitions_pending']))
-        self.assertTrue({'GP01', 'GP04', 'OP01', 'OP02', 'OP03', 'OP04', 'OP05',
-                         'VF01', 'VF02', 'AX01', 'AX02', 'LB01', 'LB02'}.issubset(
+        self.assertTrue({'GP01', 'GP04', 'VF01', 'VF02', 'AX01', 'AX02',
+                         'LB01', 'LB02'}.issubset(
                              result['benchmark_definitions_pending']))
-        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1', 'WF01-S04C2', 'WF01-S04C3', 'WF01-S04C4', 'WF01-S04C5', 'WF01-S04C6', 'SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'GP07-S01', 'SI07-S03', 'SI07-S04', 'SI07-S05', 'SI07-S06', 'SI07-S07', 'SI07-S08', 'SI07-S09', 'SI07-S10', 'SI02-S01', 'SI02-S02', 'SI02-S03', 'SI02-S04', 'SI02-S05', 'SI02-S06', 'PI01-S01', 'SI01-S01', 'SI02-S07', 'SI02-S08', 'SI02-S09', 'SI02-S10', 'SI02-S11', 'SI02-S12', 'SI02-S13', 'PI01-S02A'])
+        self.assertEqual(result['done_stages'], ['WF01-S01', 'WF01-S02', 'WF01-S03', 'WF01-S04A', 'WF01-S04B', 'WF01-S04C1', 'WF01-S04C2', 'WF01-S04C3', 'WF01-S04C4', 'WF01-S04C5', 'WF01-S04C6', 'SI08-S01', 'PI04-S01', 'PI04-S02', 'PI02-S01', 'PI02-S02', 'PI02-S03', 'PI02-S04', 'PI03-S01', 'PI03-S02', 'SI08-S02', 'SI08-S03', 'SI08-S04', 'SI07-S01', 'SI07-S02', 'GP07-S01', 'SI07-S03', 'SI07-S04', 'SI07-S05', 'SI07-S06', 'SI07-S07', 'SI07-S08', 'SI07-S09', 'SI07-S10', 'SI02-S01', 'SI02-S02', 'SI02-S03', 'SI02-S04', 'SI02-S05', 'SI02-S06', 'PI01-S01', 'SI01-S01', 'SI02-S07', 'SI02-S08', 'SI02-S09', 'SI02-S10', 'SI02-S11', 'SI02-S12', 'SI02-S13', 'PI01-S02A', 'SI08-S05', 'SI08-S06', 'SI08-S07', 'SI01-S02'])
 
     def test_duplicate_missing_and_unknown_capabilities_fail(self):
         for mutation in ('duplicate', 'missing', 'unknown'):
@@ -95,18 +97,36 @@ class ParityBacklogTests(unittest.TestCase):
         for mutation in ('item', 'radio', 'hvdc', 'stage', 'phase', 'scope'):
             payload = copy.deepcopy(self.payload)
             if mutation == 'item':
-                next(x for x in payload['items'] if x['id'] == 'OP02')['status'] = 'in_progress'
+                next(x for x in payload['items'] if x['id'] == 'RF01')['status'] = 'in_progress'
             elif mutation == 'radio':
                 next(x for x in payload['items'] if x['id'] == 'RF01')['status'] = 'in_progress'
             elif mutation == 'hvdc':
                 next(x for x in payload['items'] if x['id'] == 'PW01')['status'] = 'in_progress'
             elif mutation == 'stage':
-                payload['stages'].append({'id': 'OP02-S99', 'capability_id': 'OP02', 'status': 'in_progress'})
+                payload['stages'].append({'id': 'RF01-S99', 'capability_id': 'RF01', 'status': 'in_progress'})
             elif mutation == 'phase':
                 payload['execution_policy']['active_phase'] = 'post_parity'
             else:
                 payload['execution_policy']['parity_capabilities'].append('GP01')
             with self.assertRaisesRegex(ValueError, 'post.parity'):
+                validate_backlog(payload, self.roadmap)
+
+    def test_private_research_cannot_be_smuggled_into_public_backlog(self):
+        for mutation in ('item', 'stage', 'evidence', 'policy'):
+            payload = copy.deepcopy(self.payload)
+            if mutation == 'item':
+                payload['items'][0]['id'] = 'OP99'
+            elif mutation == 'stage':
+                payload['stages'].append({
+                    'id': 'OP02-S01', 'capability_id': 'OP02', 'status': 'planned',
+                })
+            elif mutation == 'evidence':
+                payload['items'][0]['baseline_evidence'].append(
+                    'GENERAL_PHYSICS_AND_WAVE_OPTICS_PLAN.md'
+                )
+            else:
+                payload['execution_policy']['post_parity_capabilities'].append('OP02')
+            with self.assertRaisesRegex(ValueError, 'private research', msg=mutation):
                 validate_backlog(payload, self.roadmap)
 
     def test_explicit_parallel_scope_preserves_other_deferrals(self):
@@ -157,7 +177,8 @@ class ParityBacklogTests(unittest.TestCase):
             with self.assertRaises(ValueError): validate_backlog(other, self.roadmap)
 
     def test_structural_done_rejects_failed_skipped_stale_or_overclaimed_receipt(self):
-        stage = {'id': 'GP07-S01', 'evidence': 'docs/validation/parity/GP07-S01.json'}
+        current = next(s for s in self.payload['stages'] if s['id'] == 'GP07-S01')
+        stage = {'id': current['id'], 'evidence': current['evidence']}
         original = json.loads((ROOT/stage['evidence']).read_text(encoding='utf-8'))
         validate_done_import_stage(stage, ROOT)
         with tempfile.TemporaryDirectory(dir=ROOT/'build/parity-test-temp') as directory:
@@ -167,7 +188,7 @@ class ParityBacklogTests(unittest.TestCase):
                 receipt = copy.deepcopy(original)
                 if mutation == 'failed': receipt['status'] = 'failed'
                 if mutation == 'skipped': receipt['tests']['skipped'] = [receipt['tests']['names'][0]]
-                if mutation == 'stale': receipt['sources']['python/spike_core/assembly_tetra_structural.py'] = '0'*64
+                if mutation == 'stale': receipt['sources']['python/spike_core/solvers/mechanics/elasticity/assembly_tetra_structural.py'] = '0'*64
                 if mutation == 'overclaimed': receipt['production_qualified'] = True
                 if mutation == 'count': receipt['tests']['run'] -= 1
                 if mutation == 'log': receipt['log_sha256'] = '0'*64

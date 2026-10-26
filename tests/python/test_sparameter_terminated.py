@@ -8,8 +8,8 @@ from unittest.mock import patch
 import numpy as np
 from scipy.linalg import expm
 
-from python.spike_core import sparameter_terminated as terminated
-from python.spike_core import sparameter_transient as prescribed
+from python.spike_core.solvers.signal_integrity.networks import sparameter_terminated as terminated
+from python.spike_core.solvers.signal_integrity.networks import sparameter_transient as prescribed
 from tests.python.test_sparameter_transient import one_fit, wave
 
 

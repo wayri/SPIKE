@@ -17,6 +17,7 @@ mod gpu_metrics;
 mod mcp_bridge;
 mod package_trust;
 mod project_trust_binding;
+mod project_backups;
 mod resident_worker_lifecycle;
 mod close_recovery;
 mod desktop_lifecycle;
@@ -231,8 +232,20 @@ fn worker_method(request: &serde_json::Value) -> &str {
 fn is_heavy_worker_method(method: &str) -> bool {
     matches!(
         method,
-        "benchmarks"
+        "deembed_multiport"
+            | "simulate_si_pam3"
+            | "extract_pdn_dielectric_ac"
+            | "reduce_pdn_admittance"
+            | "run_assembly_tetra_structural"
+            | "run_assembly_thermomechanical"
+            | "run_pdn_dielectric_thermomechanical"
+            | "run_propulsion_pod"
+            | "run_propulsion_pod_three_phase"
+            | "benchmarks"
+            | "run_propulsion_pod_geometry"
             | "read_project_package"
+            | "prepare_linked_source_update"
+            | "apply_linked_source_update"
             | "bind_multiboard_coupled_reduced_network"
             | "execute_thermal_field_job"
             | "import_into_assembly_project"
@@ -262,6 +275,12 @@ fn is_heavy_worker_method(method: &str) -> bool {
             | "run_converter_study"
             | "run_field_circuit_cosimulation"
             | "run_cosimulation"
+            | "solve_em_network_ac"
+            | "run_em_network_resistor_thermal"
+            | "run_em_network_resistor_cht"
+            | "run_em_spice_coupling"
+            | "run_em_body_heating"
+            | "run_cfd_tetra_cht"
             | "run_studio_board_cosimulation"
             | "run_em_machine"
             | "review_engineering"
@@ -329,6 +348,7 @@ fn is_heavy_worker_method(method: &str) -> bool {
             | "run_owned_spice_workspace"
             | "run_sparselizard_case"
             | "run_component_thermal"
+            | "validate_component_thermal"
             | "run_board_thermal"
             | "run_thermal_case"
     )
@@ -872,8 +892,32 @@ fn project_worker_paths(request: &serde_json::Value) -> Result<Vec<PathBuf>, Str
         .get("params")
         .and_then(serde_json::Value::as_object)
         .ok_or("Project worker operations require approved path parameters")?;
+    let method = worker_method(request);
+    // Persisted links are resolved by the project worker, never by an arbitrary
+    // renderer path. Only creating/replacing a link admits a chooser-granted path.
+    if project_trust_binding::is_linked_source_method(method) {
+        if params.contains_key("source_path") || params.contains_key("source_paths")
+            || (method != "link_project_source" && params.contains_key("path"))
+        {
+            return Err("Linked source access requires a project target, not a path override".into());
+        }
+        if method == "link_project_source" {
+            if let Some(unlink) = params.get("unlink") {
+                if !unlink.is_boolean() {
+                    return Err("Linked source unlink must be a boolean".into());
+                }
+                if unlink == &serde_json::Value::Bool(true) && params.contains_key("path") {
+                    return Err("Unlink must not supply a source path".into());
+                }
+            }
+        }
+    }
     let required_fields: &[&str] =
-        if matches!(worker_method(request), "attach_mcad_part_to_project") {
+        if method == "link_project_source" && params.get("unlink").and_then(serde_json::Value::as_bool) != Some(true) {
+            &["project_path", "path"]
+        } else if project_trust_binding::is_linked_source_method(method) {
+            &["project_path"]
+        } else if matches!(worker_method(request), "attach_mcad_part_to_project") {
             &["project_path", "source_path"]
         } else if worker_method(request) == "import_into_assembly_project" {
             &["project_path"]
@@ -1302,13 +1346,13 @@ fn select_assembly_sources(
 }
 
 #[tauri::command]
-fn select_import_file(
+async fn select_import_file(
     kind: String,
     directory: bool,
     state: tauri::State<'_, ApprovedFileState>,
 ) -> Result<Option<SelectedFile>, String> {
     let dialog = match kind.as_str() {
-        "board" => rfd::FileDialog::new().add_filter(
+        "board" => rfd::AsyncFileDialog::new().add_filter(
             "PCB source (KiCad, normalized JSON, IPC/XML, or ODB++)",
             &[
                 "kicad_pcb",
@@ -1325,25 +1369,25 @@ fn select_import_file(
             ],
         ),
         "harness" => {
-            rfd::FileDialog::new().add_filter("Harness connection list", &["json", "csv", "tsv"])
+            rfd::AsyncFileDialog::new().add_filter("Harness connection list", &["json", "csv", "tsv"])
         }
-        "extension" => rfd::FileDialog::new()
+        "extension" => rfd::AsyncFileDialog::new()
             .add_filter("SPIKE extension package", &["zip", "spike-extension"]),
-        "structure" => rfd::FileDialog::new().add_filter("STEP structure", &["step", "stp"]),
-        "script" => rfd::FileDialog::new()
+        "structure" => rfd::AsyncFileDialog::new().add_filter("STEP structure", &["step", "stp"]),
+        "script" => rfd::AsyncFileDialog::new()
             .set_title("Open Python workspace folder")
             .add_filter("Python script", &["py"]),
         _ => return Err("Unknown import source kind".to_string()),
     };
     let selected = if directory {
-        dialog.pick_folder()
+        dialog.pick_folder().await
     } else {
-        dialog.pick_file()
+        dialog.pick_file().await
     };
     let Some(path) = selected else {
         return Ok(None);
     };
-    let approved = register_approved_path(&state, &path)?;
+    let approved = register_approved_path(&state, path.path())?;
     Ok(Some(SelectedFile {
         file_name: approved
             .file_name()
@@ -1593,12 +1637,28 @@ fn worker_thread_budget() -> usize {
         .clamp(1, available)
 }
 
-fn worker_thread_count() -> String {
-    worker_thread_budget().to_string()
+fn validated_worker_blas_threads(raw: &str, cpu_budget: usize) -> Result<String, String> {
+    if raw.len() > 3 || !raw.bytes().all(|value| value.is_ascii_digit()) {
+        return Err("SPIKE_BLAS_THREADS must be a canonical integer in 1..256 within the CPU budget".to_string());
+    }
+    match raw.parse::<usize>() {
+        Ok(value) if (1..=256).contains(&value) && value <= cpu_budget && value.to_string() == raw => {
+            Ok(value.to_string())
+        }
+        _ => Err("SPIKE_BLAS_THREADS must be a canonical integer in 1..256 within the CPU budget".to_string()),
+    }
 }
 
 fn spawn_worker_process(workspace: &Path) -> Result<Child, String> {
-    let worker_threads = worker_thread_count();
+    let cpu_budget = worker_thread_budget();
+    let worker_threads = cpu_budget.to_string();
+    // Establish the inner numerical budget before frozen runtime hooks can
+    // initialize BLAS. Reject invalid overrides before creating any child;
+    // Python independently validates its entry path as well.
+    let blas_threads = validated_worker_blas_threads(
+        &std::env::var("SPIKE_BLAS_THREADS").unwrap_or_else(|_| "1".to_string()),
+        cpu_budget,
+    )?;
     let mut launch_errors = Vec::new();
     for candidate in worker_launch_candidates(workspace) {
         if candidate.program.components().count() > 1 && !candidate.program.is_file() {
@@ -1614,14 +1674,18 @@ fn spawn_worker_process(workspace: &Path) -> Result<Child, String> {
             .env("PYTHONDONTWRITEBYTECODE", "1")
             .env("PYTHONUTF8", "1")
             .env("SPIKE_CPU_THREADS", &worker_threads)
+            .env("SPIKE_BLAS_THREADS", &blas_threads)
+            .env_remove("MKL_DOMAIN_NUM_THREADS")
             .env("NUMBA_NUM_THREADS", &worker_threads)
-            .env("VECLIB_MAXIMUM_THREADS", &worker_threads)
+            .env("VECLIB_MAXIMUM_THREADS", &blas_threads)
             .env("OMP_MAX_ACTIVE_LEVELS", "1")
-            .env("OMP_NUM_THREADS", &worker_threads)
-            .env("OPENBLAS_NUM_THREADS", &worker_threads)
-            .env("MKL_NUM_THREADS", &worker_threads)
-            .env("NUMEXPR_NUM_THREADS", &worker_threads)
-            .env("NUMEXPR_MAX_THREADS", &worker_threads)
+            .env("OMP_NUM_THREADS", &blas_threads)
+            .env("OPENBLAS_NUM_THREADS", &blas_threads)
+            .env("OPENBLAS_DEFAULT_NUM_THREADS", &blas_threads)
+            .env("BLIS_NUM_THREADS", &blas_threads)
+            .env("MKL_NUM_THREADS", &blas_threads)
+            .env("NUMEXPR_NUM_THREADS", &blas_threads)
+            .env("NUMEXPR_MAX_THREADS", &blas_threads)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
@@ -2017,6 +2081,14 @@ async fn run_worker(
     state: tauri::State<'_, WorkerExecutionState>,
     resident: tauri::State<'_, ResidentWorkerState>,
 ) -> Result<serde_json::Value, String> {
+    if project_backups::is_method(worker_method(&request)) {
+        return Err("Recovery operations require the native project worker boundary".into());
+    }
+    let recovery_root = app.path().app_data_dir().map_err(|error| error.to_string())?.join("project-recovery-v1");
+    project_backups::enforce_read_only(&request, &recovery_root)?;
+    if project_trust_binding::is_linked_source_method(worker_method(&request)) {
+        return Err("Linked source methods require the native project worker path grant".into());
+    }
     let lifecycle = app.state::<desktop_lifecycle::Lifecycle>().inner().clone();
     let admission = lifecycle.enter()?;
     let update_admission = app_updates::admit_work(&app, worker_method(&request))?;
@@ -2044,7 +2116,7 @@ async fn run_worker(
 #[tauri::command]
 async fn run_project_worker(
     app: tauri::AppHandle,
-    request: serde_json::Value,
+    mut request: serde_json::Value,
     files: tauri::State<'_, ApprovedFileState>,
     workers: tauri::State<'_, WorkerExecutionState>,
     trust: tauri::State<'_, project_trust_binding::ProjectManifestState>,
@@ -2053,7 +2125,16 @@ async fn run_project_worker(
     let admission = lifecycle.enter()?;
     let update_admission = app_updates::admit_work(&app, worker_method(&request))?;
     let method = worker_method(&request).to_string();
-    let requested_paths = project_worker_paths(&request)?;
+    let recovery_root = app.path().app_data_dir().map_err(|error| error.to_string())?.join("project-recovery-v1");
+    project_backups::enforce_read_only(&request, &recovery_root)?;
+    let backup_root = if project_backups::is_method(&method) {
+        Some(recovery_root)
+    } else { None };
+    let requested_paths = if let Some(root) = &backup_root {
+        project_backups::prepare(&mut request, root)?
+    } else {
+        project_worker_paths(&request)?
+    };
     let all_approved = {
         let approved = files
             .0
@@ -2067,10 +2148,9 @@ async fn run_project_worker(
                 .to_string(),
         );
     }
-    let project_path = requested_paths
-        .first()
-        .ok_or_else(|| "Project worker operation has no approved project path".to_string())?
-        .clone();
+    let project_path = requested_paths.first().cloned().or_else(|| backup_root.clone())
+        .ok_or_else(|| "Project worker operation has no approved project path".to_string())?;
+    let backup_request = if backup_root.is_some() { Some(request.clone()) } else { None };
     project_trust_binding::require_targeted_read_binding(&method, &request, &project_path, &trust)?;
     let guard = claim_heavy_worker(workers.0.clone(), &request)?;
     let cancellation = guard.as_ref().map(ActiveWorkerGuard::cancellation);
@@ -2082,7 +2162,13 @@ async fn run_project_worker(
     })
     .await
     .map_err(|error| format!("SPIKE project worker task failed: {error}"))??;
-    project_trust_binding::update_from_worker_response(&method, &project_path, &response, &trust)?;
+    if let (Some(root), Some(original)) = (&backup_root, &backup_request) {
+        if let Some(path) = project_backups::opened_path(original, &response, root)? {
+            register_approved_path(&files, &path)?;
+        }
+    } else {
+        project_trust_binding::update_from_worker_response(&method, &project_path, &response, &trust)?;
+    }
     Ok(response)
 }
 
@@ -2189,6 +2275,17 @@ pub fn run() {
 mod tests {
     use super::*;
     use serde_json::json;
+
+    #[test]
+    fn numerical_thread_override_is_bounded_before_child_creation() {
+        assert_eq!(validated_worker_blas_threads("1", 8), Ok("1".to_string()));
+        assert_eq!(validated_worker_blas_threads("4", 8), Ok("4".to_string()));
+        assert_eq!(validated_worker_blas_threads("256", 256), Ok("256".to_string()));
+        for raw in ["", "0", "01", " 1", "1;bad", "257", "999999", "-1"] {
+            assert!(validated_worker_blas_threads(raw, 256).is_err(), "{raw}");
+        }
+        assert!(validated_worker_blas_threads("4", 2).is_err());
+    }
 
     #[test]
     fn cpu_readings_use_machine_capacity_and_reject_invalid_samples() {
@@ -2435,6 +2532,18 @@ mod tests {
 
     #[test]
     fn heavy_worker_methods_are_explicit() {
+        for method in [
+            "solve_em_network_ac", "run_em_network_resistor_thermal",
+            "run_em_network_resistor_cht", "run_em_spice_coupling",
+            "run_em_body_heating", "run_cfd_tetra_cht", "simulate_si_pam3",
+            "extract_pdn_dielectric_ac", "reduce_pdn_admittance",
+            "run_assembly_tetra_structural", "run_assembly_thermomechanical",
+            "run_pdn_dielectric_thermomechanical", "run_propulsion_pod", "run_propulsion_pod_three_phase",
+        ] {
+            assert!(is_heavy_worker_method(method));
+        }
+        assert!(is_heavy_worker_method("deembed_multiport"));
+        assert!(is_heavy_worker_method("run_propulsion_pod_geometry"));
         assert!(is_heavy_worker_method("run_native_cfd"));
         assert!(is_heavy_worker_method("run_su2_cfd"));
         assert!(is_heavy_worker_method("run_su2_cht"));
@@ -2470,6 +2579,7 @@ mod tests {
         assert!(is_heavy_worker_method("run_sparselizard_case"));
         assert!(is_heavy_worker_method("run_converter_study"));
         assert!(is_heavy_worker_method("run_component_thermal"));
+        assert!(is_heavy_worker_method("validate_component_thermal"));
         assert!(is_heavy_worker_method("run_board_thermal"));
         assert!(is_heavy_worker_method("run_field_circuit_cosimulation"));
         assert!(is_heavy_worker_method("run_cosimulation"));
@@ -2744,6 +2854,30 @@ mod tests {
         assert!(project_worker_paths(&empty_base)
             .unwrap_err()
             .contains("base_package_path"));
+    }
+
+    #[test]
+    fn linked_source_routes_require_project_and_explicit_new_source_grants() {
+        for method in ["linked_source_status", "prepare_linked_source_update", "apply_linked_source_update"] {
+            let request = json!({"method": method, "params": {"project_path": "fixture.spike", "target_kind": "board", "target_id": "board-1"}});
+            assert_eq!(project_worker_paths(&request).unwrap(), vec![normalized_request_path("fixture.spike")]);
+            for field in ["path", "source_path", "source_paths"] {
+                let mut override_request = request.clone();
+                override_request["params"][field] = json!("unapproved.kicad_pcb");
+                assert!(project_worker_paths(&override_request).is_err());
+            }
+        }
+        let link = json!({"method": "link_project_source", "params": {"project_path": "fixture.spike", "path": "chosen.kicad_pcb"}});
+        assert_eq!(project_worker_paths(&link).unwrap(), vec![normalized_request_path("fixture.spike"), normalized_request_path("chosen.kicad_pcb")]);
+        let mut unlink = link.clone();
+        unlink["params"]["unlink"] = json!(true);
+        assert!(project_worker_paths(&unlink).is_err());
+        unlink["params"].as_object_mut().unwrap().remove("path");
+        assert_eq!(project_worker_paths(&unlink).unwrap().len(), 1);
+        unlink["params"]["unlink"] = json!("true");
+        assert!(project_worker_paths(&unlink).is_err());
+        let missing = json!({"method": "link_project_source", "params": {"project_path": "fixture.spike"}});
+        assert!(project_worker_paths(&missing).is_err());
     }
 
     #[test]

@@ -10,7 +10,7 @@ the full 54/74 portfolio or 100 qualified models per requested active category.
   families. Physical pin labels and power declarations are retained. Its
   `bind()` API explicitly uses the Python reference kernel; it does not silently
   invoke the native kernel.
-- `src/spikes/digital_kernel.hpp`: owned C++20 four-state discrete-event SDK.
+- `src/solvers/circuits/spikes/digital_kernel.hpp`: owned C++20 four-state discrete-event SDK.
   Stable transport events, driver conflict resolution, positive-edge DFFs,
   bounded capture, resource/tick checks and fail-closed convergence handling.
   No HDL parser, Python bridge, analog coupling, physical timing qualification

@@ -2,6 +2,7 @@
 import type { VirtualBoardVisual } from "./harnessVisualization";
 import type { AssemblyToolViewportData } from "./assemblyToolWindowModel";
 import type { Viewport2DState, Viewport3DCameraState } from "./workspaceState";
+import type { ZoneDisplayMode } from "./zoneDisplay";
 
 export const MAX_WORKSPACE_VIEWS = 8;
 
@@ -40,6 +41,10 @@ export type WorkspaceViewSnapshot = Readonly<{
   targetBoards: VirtualBoardVisual[];
   sourceDesignId?: string;
   visibility: Record<string, boolean>;
+  showNetNames?: boolean;
+  assemblyNetNameVisibility?: Record<string, boolean>;
+  zoneDisplay?: ZoneDisplayMode;
+  assemblyZoneDisplay?: Record<string, ZoneDisplayMode>;
   layerVisibility: Record<string, Record<string, boolean>>;
   layerOpacity: Record<string, Record<string, number>>;
   layerFocus: Record<string, string>;
@@ -56,12 +61,17 @@ export type WorkspaceViewAction =
   | { type: "select-object"; occurrenceId?: string; partId?: string; sourceObjectId: string }
   | { type: "select-net"; occurrenceId: string; netId: string }
   | { type: "select-component"; occurrenceId: string; componentId: string }
+  | { type: "zone-display"; occurrenceId: string; value: ZoneDisplayMode }
+  | { type: "reset-view"; occurrenceId: string }
+  | { type: "net-names"; occurrenceId: string; value: boolean }
   | { type: "layer-focus"; occurrenceId: string; layer: string }
   | { type: "layer-visibility"; occurrenceId: string; layer: string; value: boolean }
   | { type: "layer-opacity"; occurrenceId: string; layer: string; value: number }
+  | { type: "layer-opacity-all"; occurrenceId: string; value: number }
   | { type: "presentation"; presentation: WorkspaceViewPresentation }
   | { type: "open-analysis"; domain: "pi" | "si" | "em" | "thermal" | "results"; occurrenceId?: string; partId?: string };
 
+const zoneMode = (value: unknown): value is ZoneDisplayMode => value === "filled" || value === "transparent" || value === "outline";
 const text = (value: unknown, maximum = 512): value is string => typeof value === "string" && value.length > 0 && value.length <= maximum;
 const record = (value: unknown): value is Record<string, unknown> => Boolean(value) && typeof value === "object" && !Array.isArray(value);
 
@@ -108,6 +118,10 @@ export function validWorkspaceViewSnapshot(value: unknown): value is WorkspaceVi
   if (!Array.isArray(value.targetBoards) || value.targetBoards.length > 8 || value.targetBoards.some(item => !record(item) || !text(item.id) || !text(item.designId) || !Array.isArray(item.transform) || item.transform.length !== 16 || item.transform.some(entry => typeof entry !== "number" || !Number.isFinite(entry)))) return false;
   if (value.sourceDesignId !== undefined && !text(value.sourceDesignId)) return false;
   if (!record(value.visibility) || Object.keys(value.visibility).length > 30 || Object.values(value.visibility).some(item => typeof item !== "boolean")) return false;
+  if (value.showNetNames !== undefined && typeof value.showNetNames !== "boolean") return false;
+  if (value.assemblyNetNameVisibility !== undefined && (!record(value.assemblyNetNameVisibility) || Object.keys(value.assemblyNetNameVisibility).length > 30 || Object.entries(value.assemblyNetNameVisibility).some(([id, visible]) => !text(id) || typeof visible !== "boolean"))) return false;
+  if (value.zoneDisplay !== undefined && !zoneMode(value.zoneDisplay)) return false;
+  if (value.assemblyZoneDisplay !== undefined && (!record(value.assemblyZoneDisplay) || Object.keys(value.assemblyZoneDisplay).length > 30 || Object.entries(value.assemblyZoneDisplay).some(([id, mode]) => !text(id) || !zoneMode(mode)))) return false;
   if (!validNestedBooleanMap(value.layerVisibility) || !validNestedOpacityMap(value.layerOpacity)) return false;
   if (!record(value.layerFocus) || Object.keys(value.layerFocus).length > 30 || Object.entries(value.layerFocus).some(([id, layer]) => !text(id) || !text(layer, 256))) return false;
   if (!record(value.linkedNets) || Object.keys(value.linkedNets).length > 512 || Object.entries(value.linkedNets).some(([id, nets]) => !text(id) || !Array.isArray(nets) || nets.length > 512 || nets.some(net => !text(net, 512)))) return false;
@@ -127,9 +141,13 @@ export function validWorkspaceViewAction(value: unknown): value is WorkspaceView
   if (value.type === "select-object") return text(value.sourceObjectId) && (value.occurrenceId === undefined || text(value.occurrenceId)) && (value.partId === undefined || text(value.partId));
   if (value.type === "select-net") return text(value.occurrenceId) && text(value.netId);
   if (value.type === "select-component") return text(value.occurrenceId) && text(value.componentId);
+  if (value.type === "zone-display") return text(value.occurrenceId) && zoneMode(value.value);
+  if (value.type === "reset-view") return text(value.occurrenceId);
+  if (value.type === "net-names") return text(value.occurrenceId) && typeof value.value === "boolean";
   if (value.type === "layer-focus") return text(value.occurrenceId) && text(value.layer, 256);
   if (value.type === "layer-visibility") return text(value.occurrenceId) && text(value.layer, 256) && typeof value.value === "boolean";
   if (value.type === "layer-opacity") return text(value.occurrenceId) && text(value.layer, 256) && typeof value.value === "number" && Number.isFinite(value.value) && value.value >= 0 && value.value <= 1;
+  if (value.type === "layer-opacity-all") return text(value.occurrenceId) && typeof value.value === "number" && Number.isFinite(value.value) && value.value >= 0 && value.value <= 1;
   if (value.type === "presentation") return validWorkspaceViewPresentation(value.presentation);
   return value.type === "open-analysis" && ["pi", "si", "em", "thermal", "results"].includes(String(value.domain))
     && (value.occurrenceId === undefined || text(value.occurrenceId)) && (value.partId === undefined || text(value.partId));
