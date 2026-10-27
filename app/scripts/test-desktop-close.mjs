@@ -29,14 +29,55 @@ assert.ok(resolveSource.includes('await finishDesktopClose()'));
 async function resolveChoice(choice, saveWorks = true) {
   const events = [], pending = { actionLabel: "close SPIKE", closeWindow: true, onCancel: () => events.push("cancel") };
   const code = ts.transpileModule(`${resolveSource}\nreturn resolveUnsavedPrompt;`, { compilerOptions: { target: ts.ScriptTarget.ES2020 } }).outputText;
-  const resolve = new Function("unsavedPrompt", "saveProject", "setProjectClean", "setUnsavedPrompt", "setStatus", "finishDesktopClose", code)(
-    pending, async () => { events.push("save"); return saveWorks; }, () => events.push("clean"), value => events.push(value === null ? "dismiss" : "prompt"), () => {}, async () => events.push("close"));
+  const resolve = new Function("unsavedPromptRef", "unsavedResolutionRef", "projectDirtyRef", "saveProject", "setProjectClean", "setUnsavedPrompt", "setStatus", "finishDesktopClose", code)(
+    { current: pending }, { current: null }, { current: false }, async () => { events.push("save"); return saveWorks; }, () => events.push("clean"), value => events.push(value === null ? "dismiss" : "prompt"), () => {}, async () => events.push("close"));
   await resolve(choice); return events;
 }
 assert.deepEqual(await resolveChoice("save", false), ["save"], "failed or canceled save keeps SPIKE and its prompt open");
 assert.deepEqual(await resolveChoice("save"), ["save", "dismiss", "close"], "save finishes before close admission");
 assert.deepEqual(await resolveChoice("discard"), ["clean", "dismiss", "close"]);
 assert.deepEqual(await resolveChoice("cancel"), ["cancel", "dismiss"], "cancel never reaches native shutdown");
+
+// Execute the real decision resolver with a deferred save, including repeated
+// requests, cancellation and edits arriving after the saved snapshot.
+function pendingDecision() {
+  const events = [], prompt = { actionLabel: "close SPIKE", closeWindow: true };
+  const current = { current: prompt }, busy = { current: null }, dirty = { current: false };
+  let finishSave;
+  const saving = new Promise(resolve => { finishSave = resolve; });
+  const code = ts.transpileModule(`${resolveSource}\nreturn resolveUnsavedPrompt;`, { compilerOptions: { target: ts.ScriptTarget.ES2020 } }).outputText;
+  const resolve = new Function("unsavedPromptRef", "unsavedResolutionRef", "projectDirtyRef", "saveProject", "setProjectClean", "setUnsavedPrompt", "setStatus", "finishDesktopClose", code)(
+    current, busy, dirty, () => { events.push("save"); return saving; }, () => events.push("clean"), () => events.push("dismiss"), () => events.push("status"), async () => events.push("close"));
+  return { events, current, dirty, resolve, finishSave };
+}
+{
+  const test = pendingDecision();
+  const saving = test.resolve("save");
+  await test.resolve("save");
+  assert.equal(test.events.filter(x => x === "save").length, 1, "repeated Save starts only one write");
+  await test.resolve("cancel");
+  test.finishSave(true); await saving;
+  assert.ok(!test.events.includes("close"), "a late successful save cannot undo Cancel");
+}
+{
+  const test = pendingDecision();
+  const saving = test.resolve("save"); test.dirty.current = true;
+  test.finishSave(true); await saving;
+  assert.ok(test.current.current, "edits newer than the saved snapshot retain the decision");
+  assert.ok(!test.events.includes("close"), "unsaved newer edits prevent closing");
+  await test.resolve("discard");
+  assert.ok(test.events.includes("close"), "explicit discard can recover after save leaves newer edits");
+}
+{
+  const test = pendingDecision();
+  const saving = test.resolve("save");
+  await test.resolve("cancel");
+  test.current.current = { actionLabel: "close SPIKE", closeWindow: true };
+  await test.resolve("discard");
+  assert.equal(test.events.filter(x => x === "close").length, 1, "a fresh close decision is not locked by an abandoned save");
+  test.finishSave(true); await saving;
+  assert.equal(test.events.filter(x => x === "close").length, 1, "stale save cannot execute another close");
+}
 
 const bridge = read("../src/workerBridge.ts");
 const bridgeClose = bridge.slice(bridge.indexOf("export async function closeDesktopWindow"), bridge.indexOf("export async function runLocalWorker"));

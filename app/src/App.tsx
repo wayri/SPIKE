@@ -1448,6 +1448,9 @@ export default function App() {
     onCancel?: () => void;
     preserveDirtyUntilApplied?: boolean;
   } | null>(null);
+  const unsavedPromptRef = useRef(unsavedPrompt);
+  unsavedPromptRef.current = unsavedPrompt;
+  const unsavedResolutionRef = useRef<typeof unsavedPrompt>(null);
   const [recentProjects, setRecentProjects] = useState<RecentProject[]>(() => {
     try { return JSON.parse(localStorage.getItem("spike.recent-projects.v1") ?? "[]") as RecentProject[]; }
     catch { return []; }
@@ -2804,17 +2807,31 @@ export default function App() {
     }
   };
   const resolveUnsavedPrompt = async (choice: "save" | "discard" | "cancel") => {
-    const pending = unsavedPrompt;
+    const pending = unsavedPromptRef.current;
     if (!pending) return;
-    if (choice === "cancel") { pending.onCancel?.(); setUnsavedPrompt(null); setStatus(`${pending.actionLabel} cancelled; project remains open`); return; }
-    if (choice === "save" && !await saveProject()) return;
-    if (choice === "discard" && !pending.preserveDirtyUntilApplied) setProjectClean();
-    setUnsavedPrompt(null);
-    if (pending.closeWindow) {
-      await finishDesktopClose();
-      return;
+    if (choice === "cancel") {
+      unsavedPromptRef.current = null;
+      pending.onCancel?.(); setUnsavedPrompt(null);
+      setStatus(`${pending.actionLabel} cancelled; project remains open`); return;
     }
-    await pending.action?.();
+    if (unsavedResolutionRef.current === pending) return;
+    unsavedResolutionRef.current = pending;
+    try {
+      if (choice === "save") {
+        const saved = await saveProject();
+        // Cancel or a replacement decision must not be undone by a late save.
+        if (unsavedPromptRef.current !== pending || !saved) return;
+        if (projectDirtyRef.current) {
+          setStatus("The project changed during save. Save again or discard the remaining changes before continuing.");
+          return;
+        }
+      }
+      if (choice === "discard" && !pending.preserveDirtyUntilApplied) setProjectClean();
+      unsavedPromptRef.current = null;
+      setUnsavedPrompt(null);
+      if (pending.closeWindow) { await finishDesktopClose(); return; }
+      await pending.action?.();
+    } finally { if (unsavedResolutionRef.current === pending) unsavedResolutionRef.current = null; }
   };
   useEffect(() => {
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
@@ -2830,7 +2847,7 @@ export default function App() {
       draftOwner: () => assemblyToolDraftOwnerRef.current,
       isDirty: () => projectDirtyRef.current || assistantChatOpenRef.current,
       showDraft: owner => setAssemblyCloseBlocked(owner as AssemblyToolKind),
-      showUnsaved: () => setUnsavedPrompt({ actionLabel: assistantChatOpenRef.current ? "close SPIKE and discard assistant chats" : "close SPIKE", action: null, closeWindow: true }),
+      showUnsaved: () => setUnsavedPrompt(current => current?.closeWindow ? current : { actionLabel: assistantChatOpenRef.current ? "close SPIKE and discard assistant chats" : "close SPIKE", action: null, closeWindow: true }),
       close: () => { void finishDesktopClose(); },
     });
     if (desktopShell) void subscribeDesktopCloseRequested((preventDefault, generation) => {

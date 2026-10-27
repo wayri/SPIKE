@@ -7,7 +7,10 @@ Closing a detached tool alone leaves the main workspace open.
 ## Unsaved work
 
 - If the main project is dirty, choose Save and continue, Discard changes, or
-  Cancel. A canceled or failed save keeps the project open.
+  Cancel. A canceled or failed save keeps the project open. Repeated Save clicks start
+  only one write for that decision. Cancel invalidates any pending save-and-close
+  decision; its eventual completion cannot close the application. Newer unsaved
+  edits also keep the application open until saved or explicitly discarded.
 - If an assembly tool holds a draft, SPIKE shows a review dialog. Review draft
   restores its minimized window. Save or discard there, then close SPIKE again.
   Cancel closing keeps both the application and the draft open.
@@ -20,11 +23,11 @@ workspace remains open and the status message invites another close attempt.
 
 ## Unresponsive workspace
 
-If the renderer cannot acknowledge a close request within three seconds, a
+If the renderer cannot acknowledge a close request within five seconds, a
 native dialog offers to close anyway and warns that unsaved work may be lost.
-Choose No to keep SPIKE open. Choose Yes only when you accept that loss.
+Choose Keep open to retain SPIKE. Choose Force close SPIKE only when you accept that loss.
 Repeated close clicks cannot stack recovery dialogs. If the renderer recovers
-while this dialog is open, its save/draft guard takes ownership and a stale Yes
+while this dialog is open, its save/draft guard takes ownership and a stale Force close
 response cannot bypass that guard.
 
 ## Worker shutdown
@@ -34,8 +37,11 @@ requests and asks running requests to terminate. Resident and one-shot workers,
 including lightweight operations, observe the same shutdown flag. Resident
 cleanup uses a nonblocking mutex attempt outside the UI event loop.
 
-Cleanup has a three-second budget. The host then requests whole-application
-exit; a five-second committed-close fallback exits its own process if the
+Cooperative worker draining has a two-second budget. Descendant retirement runs
+after that drain and normal exit waits for retirement completion, with a total
+four-second cleanup limit. Bridge shutdown runs independently so a locked bridge
+cannot block child retirement. A five-second committed-close fallback exits the
+host process if the
 native event loop is stuck. These deadlines start after save/discard admission,
 not while a user is deciding or saving. Owned worker process termination and
 reaping have bounded waits. No unrelated process is selected for termination.
@@ -54,3 +60,23 @@ a forced cleanup after failure is not acceptance evidence.
 
 These checks do not prove every external engine responds to cancellation. Native
 visual acceptance and the full release gates remain separate evidence.
+
+## 27 October close reliability correction
+
+The old cleanup thread could spend the entire three-second exit timeout draining
+workers, then start descendant retirement just as another thread exited the app.
+It also called bridge shutdown before beginning its drain timer. Cleanup now has
+separate drain and total budgets, and bridge shutdown cannot hold up retirement.
+The renderer also invalidates canceled save decisions and checks for edits made
+after the saved snapshot before admitting close.
+
+Executed checks: desktop-close behavior tests (including deferred-save Cancel,
+newer edits, duplicate Save and fresh decisions after cancellation), all six Rust
+lifecycle tests, TypeScript, architecture, button standard and UI hotfix checks
+pass. The production frontend build passes with the existing large-chunk and
+Plotly import warnings. The full host test run is 83 passed, 1 failed, 1 ignored: the failing
+packaged-worker session test requires the absent packaged worker executable in
+this source checkout. A native debug verification executable builds successfully
+using a test-only empty bundle-resource override; this is not an installer.
+Interactive native Close verification is pending desktop availability. No
+installed-app update or newly qualified release is established by these checks.

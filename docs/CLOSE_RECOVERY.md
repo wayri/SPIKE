@@ -13,7 +13,9 @@ automatically because a solve takes a long time. Recovery begins on a Close pres
 
 After a close decision, assistant cleanup gets at most one second. Its failure
 cannot indefinitely prevent main shutdown. Native shutdown cancels owned work
-and exits the application. An independent two-second fallback terminates the host
+and exits the application. Cooperative draining is limited to two seconds,
+leaving room for descendant retirement within a four-second cleanup deadline.
+A blocked bridge cleanup runs independently of that retirement. An independent five-second fallback terminates the host
 if its event loop or shutdown hooks remain blocked. The fallback never waits for
 worker locks, child windows, or process cleanup.
 
