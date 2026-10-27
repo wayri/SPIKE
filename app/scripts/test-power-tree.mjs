@@ -112,6 +112,100 @@ assert.equal(compiledPaths[0].transitions[0].input_pad_id, "R1.1");
 assert.equal(compiledPaths[0].transitions[0].output_pad_id, "R1.2");
 assert.deepEqual(compiledPaths[0].issues, []);
 
+// Independently authored literal pin-to-net fixture: PSU -> fuse -> PMIC with
+// two output rails, a cascaded LDO, IC loads, decaps and unrelated control pins.
+const supplyParts = [
+  { ref: "J1", value: "INPUT" }, { ref: "F1", value: "Fuse" },
+  { ref: "U1", value: "PMIC" }, { ref: "U2", value: "LDO regulator" },
+  { ref: "U3", value: "MCU" }, { ref: "U4", value: "FPGA" },
+  { ref: "C1", value: "10u" }, { ref: "C2", value: "100n" },
+  { ref: "R9", value: "100k" },
+];
+const supplyPins = [
+  ["J1", "1", "VIN"], ["J1", "2", "GND"],
+  ["F1", "1", "VIN"], ["F1", "2", "VIN_FUSED"],
+  ["U1", "7", "VIN_FUSED", "VIN", "power_in"],
+  ["U1", "3", "CORE", "VOUT1", "power_out"],
+  ["U1", "5", "+3V3", "VOUT2", "power_out"],
+  ["U1", "1", "GND", "GND", "power_in"],
+  ["U1", "2", "VDD_ENABLE", "EN", "input"],
+  ["U2", "1", "+3V3", "VIN", "power_in"],
+  ["U2", "2", "+1V8", "VOUT", "power_out"],
+  ["U2", "3", "GND", "GND", "power_in"],
+  ["U3", "11", "+1V8", "VDD", "power_in"],
+  ["U3", "12", "SPI_CLK", "CLK", "input"],
+  ["U4", "22", "CORE", "VCORE", "power_in"],
+  ["C1", "1", "+3V3"], ["C1", "2", "GND"],
+  ["C2", "1", "CORE"], ["C2", "2", "GND"],
+  ["R9", "1", "VDD_ENABLE"], ["R9", "2", "GND"],
+];
+const fixtureBoard = (parts, pinRows) => ({ nets: {},
+  components: parts.map(item => ({ id: item.ref, ...item })),
+  pads: pinRows.map(([ref, name, net, pin_function, pin_type]) => ({ id: `${ref}.${name}`, ref, name, net, pin_function, pin_type })),
+});
+const supplyBoard = fixtureBoard(supplyParts, supplyPins);
+const inferredTree = powerTree.extractTopologyFromBoard(supplyBoard, "pi");
+const byRef = ref => inferredTree.nodes.find(node => node.ref === ref);
+const feeds = ref => inferredTree.edges.filter(edge => edge.from === byRef(ref)?.id).map(edge => edge.net).sort();
+assert.equal(byRef("J1").kind, "source");
+assert.equal(byRef("F1").orientation, "series");
+assert.deepEqual(feeds("F1"), ["VIN_FUSED"]);
+assert.deepEqual(feeds("U1"), ["+3V3", "CORE"]);
+assert.deepEqual(feeds("U2"), ["+1V8"]);
+assert.equal(byRef("U1").ports.filter(port => port.direction === "output").length, 2);
+assert.ok(byRef("U1").ports.every(port => port.padIds?.length));
+assert.equal(byRef("C1"), undefined, "decaps must not become distribution loads");
+assert.equal(byRef("R9"), undefined, "shunt resistors must not become distribution stages");
+assert.ok(!inferredTree.edges.some(edge => edge.net === "SPI_CLK" || edge.net === "VDD_ENABLE"), "control pins must not become PMIC supply outputs");
+assert.ok(!inferredTree.nodes.some(node => node.net === "VDD_ENABLE"), "explicit signal semantics override power-like net names");
+assert.ok(inferredTree.nodes.every(node => node.voltageV === undefined), "rail names do not assign a verified operating voltage");
+assert.ok(inferredTree.edges.every(edge => edge.inference?.evidence.length));
+assert.equal(powerTree.validateTopologyPorts(inferredTree).filter(issue => issue.severity === "error").length, 0, "multi-output stages need distinct bound ports");
+const reversedTree = powerTree.extractTopologyFromBoard(fixtureBoard([...supplyParts].reverse(), [...supplyPins].reverse()), "pi");
+assert.deepEqual(reversedTree.edges, inferredTree.edges, "pad/component order cannot establish power direction");
+
+const ambiguousTree = powerTree.extractTopologyFromBoard(fixtureBoard([
+  { ref: "U1", value: "PMIC" }, { ref: "U2", value: "LM358" },
+], [["U1", "1", "VIN"], ["U1", "2", "+3V3"], ["U2", "1", "+3V3"]]), "pi");
+const ambiguousStage = ambiguousTree.nodes.find(node => node.ref === "U1");
+assert.equal(ambiguousStage.inference.confidence, "unresolved");
+assert.ok(!ambiguousTree.edges.some(edge => edge.from === ambiguousStage.id || edge.to === ambiguousStage.id));
+assert.equal(ambiguousTree.nodes.find(node => node.ref === "U2").kind, "load", "manufacturer prefix is not regulator evidence");
+assert.ok(!ambiguousTree.nodes.some(node => node.kind === "source"), "no synthetic source from the first rail");
+
+const explicitTree = powerTree.extractTopologyFromBoard(fixtureBoard([
+  { ref: "U1", value: "unknown", properties: { "SPIKE.PowerRole": "regulator", "SPIKE.PinRoles": '{"1":"input","2":"output","3":"output"}' } },
+], [["U1", "1", "N001"], ["U1", "2", "N002"], ["U1", "3", "N003"]]), "pi");
+assert.deepEqual(explicitTree.edges.filter(edge => edge.from.includes("component")).map(edge => edge.net).sort(), ["N002", "N003"]);
+assert.ok(explicitTree.edges.every(edge => edge.inference.confidence === "explicit"));
+const multipleInputs = powerTree.extractTopologyFromBoard(fixtureBoard([
+  { ref: "U1", value: "PMIC" },
+], [["U1", "1", "VIN", "VIN1", "power_in"], ["U1", "2", "VBAT", "VIN2", "power_in"], ["U1", "3", "+3V3", "VOUT", "power_out"]]), "pi");
+assert.equal(multipleInputs.nodes.find(node => node.ref === "U1").inference.confidence, "unresolved");
+assert.equal(multipleInputs.edges.length, 0, "input-to-output channel mapping cannot be inferred across multiple supplies");
+
+const competing = powerTree.extractTopologyFromBoard(fixtureBoard([
+  { ref: "J1", value: "INPUT" }, { ref: "J2", value: "INPUT" }, { ref: "R1", value: "0R" },
+], [["J1", "1", "VIN"], ["J2", "1", "VBAT"], ["R1", "1", "VIN"], ["R1", "2", "VBAT"]]), "pi");
+assert.equal(competing.nodes.find(node => node.ref === "R1").inference.confidence, "unresolved", "two supplies cannot arbitrarily orient their bridge");
+assert.ok(competing.extraction.warnings.some(message => /competing supplies/.test(message)));
+
+const signalOnly = powerTree.extractTopologyFromBoard(fixtureBoard([{ ref: "U1", value: "MCU" }], [["U1", "1", "DATA"], ["U1", "2", "CLK"]]), "pi");
+assert.equal(signalOnly.nodes.length, 0, "signal-only boards must not fall back to arbitrary power rails");
+
+const collidingNames = powerTree.extractTopologyFromBoard(fixtureBoard([
+  { ref: "U1", value: "PMIC" },
+], [["U1", "1", "VIN", "VIN", "power_in"], ["U1", "2", "/3V3", "VOUT1", "power_out"], ["U1", "3", "+3V3", "VOUT2", "power_out"]]), "pi");
+assert.equal(new Set(collidingNames.nodes.map(node => node.id)).size, collidingNames.nodes.length, "different net identities cannot collapse through slug formatting");
+
+const pmicPath = powerTree.extractPowerPathFromBoard(supplyBoard, "J1.1", "U4.22");
+assert.deepEqual(pmicPath.nodes.filter(node => node.orientation === "series" && node.ref).map(node => node.ref), ["F1", "U1"]);
+const reversedPmicPath = powerTree.extractPowerPathFromBoard(supplyBoard, "U4.22", "J1.1");
+assert.ok(reversedPmicPath.extraction.warnings.some(message => /No unambiguous/.test(message)), "browser fallback cannot traverse regulators backwards");
+const signalPmicPath = powerTree.extractPowerPathFromBoard(supplyBoard, "J1.1", "U1.2");
+assert.ok(signalPmicPath.extraction.warnings.some(message => /No unambiguous/.test(message)), "browser fallback cannot traverse supply to enable pins");
+assert.throws(() => powerTree.extractPowerPathFromBoard(supplyBoard, "J1.1", "J1.2"), /non-ground/);
+
 const largeComponentCount = 4_000;
 const largeBoard = {
   nets: Object.fromEntries(Array.from({ length: 32 }, (_, index) => [String(index + 1), `DATA_${index}`])),

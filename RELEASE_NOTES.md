@@ -1,6 +1,13 @@
 # SPIKE Release Notes
 
-## Next: SPIKE 0.4.2 development candidate
+## SPIKE 0.4.3 - UI and power-tree hotfix
+
+Source-only experimental prerelease: centered search, viewport control fixes,
+thermal study routing, clearer power-tree presentation/inference, and a geometry
+handoff to the existing approximate PCB DC solver. No new solver capabilities.
+See [scope and limits](docs/releases/v0.4.3.md). No installer is included;
+numerical human review and installed-app qualification remain incomplete.
+## Historical SPIKE 0.4.2 development candidate
 
 The next release target is **0.4.2**, retaining the **alpha / experimental**
 channel. This candidate includes the accumulated desktop and solver integration,

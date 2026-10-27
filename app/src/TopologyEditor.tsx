@@ -11,6 +11,7 @@ import CircuitSymbol, { paletteSymbol } from "./CircuitSymbol";
 import { schematicWire } from "./schematicGeometry";
 import TopologyGenerator from "./TopologyGenerator";
 import TopologyPreview from "./TopologyPreview";
+import PowerTreeOverview from "./PowerTreeOverview";
 import PdnNetworkPanel from "./PdnNetworkPanel";
 import { appendTopology } from "./topologyGeneration";
 import "./schematic.css";
@@ -131,7 +132,7 @@ export default function TopologyEditor({
   const [query, setQuery] = useState("");
   const [showReturns, setShowReturns] = useState(false);
   const [scenarioId, setScenarioId] = useState(scenarios[0]?.id ?? "typical");
-  const [view, setView] = useState<"diagram" | "text" | "consumption" | "rails">("diagram");
+  const [view, setView] = useState<"overview" | "diagram" | "text" | "consumption" | "rails">(domain === "pi" && model.nodes.length ? "overview" : "diagram");
   const [camera, setCamera] = useState({ x: 30, y: 28, zoom: 1 });
   const [pathWizardOpen, setPathWizardOpen] = useState(false);
   const [generatorOpen, setGeneratorOpen] = useState(false);
@@ -459,6 +460,7 @@ export default function TopologyEditor({
   };
   const autoExtract = () => {
     if (!board) { onStatus("Import a board before extracting topology"); return; }
+    setView("diagram");
     const extracted = extractTopologyFromBoard(board, domain);
     setExtractionPreview(extracted);
     onStatus(`Extraction preview ready: ${extracted.nodes.length} symbols. Review before applying to the sheet.`);
@@ -471,6 +473,7 @@ export default function TopologyEditor({
           : board ? extractTopologyFromBoard(board, domain, source) : emptyTopology(domain);
         if (!board && !file.name.toLowerCase().endsWith(".xml")) extracted.extraction.warnings = ["A KiCad board is required to resolve schematic symbols to routed nets."];
         setExtractionPreview(extracted);
+        setView("diagram");
         onStatus(`${file.name} cross-referenced into the ${domain.toUpperCase()} topology`);
       } catch (error) { onStatus(error instanceof Error ? error.message : "Topology import failed"); }
     });
@@ -497,8 +500,10 @@ export default function TopologyEditor({
   };
 
   useEffect(() => {
-    const view = ownerWindow; if (!view) return;
+    const overviewReadOnly = view === "overview";
+    const windowTarget = ownerWindow; if (!windowTarget) return;
     const onKey = (event: KeyboardEvent) => {
+      if (overviewReadOnly) return;
       if (canvasRef.current?.closest("[hidden]")) return;
       const target = event.target as HTMLElement | null;
       if (target?.closest("input, select, textarea, [contenteditable='true']")) { event.stopPropagation(); return; }
@@ -509,8 +514,8 @@ export default function TopologyEditor({
       if (event.key === "Escape" && target?.closest(".topology-tool-menu")) return;
       if (event.key === "Escape") { setContextMenu(null); setLinkFrom(null); setWirePointer(null); setPendingDestructive(null); selectNodes([]); }
     };
-    view.addEventListener("keydown", onKey, true);
-    return () => view.removeEventListener("keydown", onKey, true);
+    windowTarget.addEventListener("keydown", onKey, true);
+    return () => windowTarget.removeEventListener("keydown", onKey, true);
   });
 
   useEffect(() => {
@@ -520,19 +525,20 @@ export default function TopologyEditor({
   const applyGenerated = (generated: TopologyModel, replace: boolean) => {
     const next = replace ? generated : appendTopology(model, generated);
     setModel(next); selectOnly(next.nodes[replace ? 0 : model.nodes.length]?.id ?? "");
-    setQuery(""); setView("diagram"); setFitPending(true); setLinkFrom(null); setWirePointer(null);
+    setQuery(""); setView(domain === "pi" ? "overview" : "diagram"); setFitPending(true); setLinkFrom(null); setWirePointer(null);
     setGeneratorOpen(false); setExtractionPreview(null);
     onStatus(`${generated.nodes.length} symbols and ${generated.edges.length} connections ${replace ? "replaced the sheet" : "added to the sheet"}. Select a symbol to review its model and terminals.`);
   };
 
   if (acPdnOpen) return <div className="modal-shade topology-shade"><div className="pdn-network-dialog"><PdnNetworkPanel initial={model.acPdnRequest} availableNets={Object.values(board?.nets ?? {})} groundNets={Object.values(board?.nets ?? {}).filter(net => /(?:^|[/_.+-])(gnd|agnd|dgnd|pgnd|vss|0)(?:$|[/_.+-])/i.test(net))} onSave={request => setModel({ ...model, acPdnRequest: request })} onClose={() => setAcPdnOpen(false)} /></div></div>;
-  return <div className="modal-shade topology-shade"><div className={`topology-editor schematic-editor ${domain === "pi" ? "pi" : ""}`}>
+  return <div className="modal-shade topology-shade"><div className={`topology-editor schematic-editor ${domain === "pi" ? "pi" : ""} ${view === "overview" ? "power-overview-mode" : ""}`}>
     <header>
       <div><b>{domain === "pi" ? "POWER SCHEMATIC" : "SIGNAL SCHEMATIC"}</b><small>Define inputs → Review wiring → Assign models → {domain === "pi" ? "Use for analysis" : "Save channel setup"}</small></div>
       <button onClick={onClose} aria-label="Close topology editor" title="Close topology editor"><X size={17} /></button>
     </header>
     <div className="topology-toolbar" aria-label="Schematic tools">
       <button onClick={() => { setGeneratorOpen(true); setView("diagram"); }}><Plus size={14} /> Generate</button>
+      {domain === "pi" && <button type="button" onClick={autoExtract} disabled={!board} title="Infer candidate power paths from retained pin roles and board connectivity; review before applying"><RefreshCw size={14} /> Infer power tree</button>}
       <button onClick={onUndo} disabled={!onUndo} title="Undo (Ctrl+Z)"><Undo2 size={14} /></button>
       <button onClick={onRedo} disabled={!onRedo} title="Redo (Ctrl+Shift+Z)"><Redo2 size={14} /></button>
       <details className="topology-tool-menu" onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); } }} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null)) event.currentTarget.open = false; }}>
@@ -556,6 +562,7 @@ export default function TopologyEditor({
         </div>
       </details>
       <div className="topology-view-switch">
+        {domain === "pi" && <button type="button" className={view === "overview" ? "active" : ""} onClick={() => setView("overview")} title="Power distribution overview" aria-label="Power distribution overview"><Route size={14} /> Overview</button>}
         <button className={view === "diagram" ? "active" : ""} onClick={() => setView("diagram")} title="Block diagram"><GitBranch size={14} /></button>
         <button className={view === "text" ? "active" : ""} onClick={() => setView("text")} title="Synchronized text description"><FileText size={14} /></button>
         {domain === "pi" && <>
@@ -579,7 +586,7 @@ export default function TopologyEditor({
       <div><span>EFFICIENCY</span><b>{budget.efficiencyPercent === undefined ? "-- %" : metric(budget.efficiencyPercent, "%", 1)}</b></div>
       <div className="topology-budget-state"><AlertTriangle size={13} /><span>{plan.status}</span><b>{plan.jobs.length} rail jobs | {plan.warnings.length} notices</b></div>
     </div>}
-    <div className={`topology-layout ${inspectorOpen ? "" : "inspector-closed"}`}>
+    {view === "overview" ? <PowerTreeOverview model={model} budget={budget} query={query} selectedId={selectedId} onSelect={selectOnly} onEdit={() => { setView("diagram"); setInspectorOpen(true); setFitPending(true); }} /> : <div className={`topology-layout ${inspectorOpen ? "" : "inspector-closed"}`}>
       <aside className="topology-palette"><label>ADD ELEMENT</label>{kinds[domain].map(item => {
         return <button key={item.kind} onClick={() => addNode(item.kind)} title={`${item.label}: ${item.help}`} aria-label={`Add ${item.label}. ${item.help}`}>{paletteSymbol(item.kind)}<span>{item.label}</span><Plus size={12} /></button>;
       })}<div className="topology-help"><b>CONNECT</b><p>Click a compatible source port, move the pending wire, then click the exact destination port. Escape cancels. Two selected blocks can also use <strong>Connect selected</strong> when their canonical ports are unambiguous.</p><button onClick={() => setHelpOpen(true)}><CircleHelp size={12} /> Full {treeName} workflow help</button></div></aside>
@@ -642,7 +649,7 @@ export default function TopologyEditor({
           <span><Move size={12} /> {Math.round(camera.zoom * 100)}%</span>
         </div>}
         {generatorOpen && <TopologyGenerator domain={domain} board={board} onApply={applyGenerated} onClose={() => setGeneratorOpen(false)} />}
-        {extractionPreview && <section className="topology-generator" role="dialog" aria-label="Review extracted schematic" onPointerDown={e => e.stopPropagation()}><header><b>Review extracted schematic</b><button onClick={() => setExtractionPreview(null)} aria-label="Close extraction preview">×</button></header><p>{extractionPreview.nodes.length} symbols · {extractionPreview.edges.length} connections. Inferred connections require review.</p><TopologyPreview model={extractionPreview} />{extractionPreview.extraction.warnings.map(w => <p key={w}>{w}</p>)}<button onClick={() => applyGenerated(extractionPreview, false)}>Add to sheet</button><button onClick={() => applyGenerated(extractionPreview, true)}>Replace sheet with preview</button></section>}
+        {extractionPreview && <section className={`topology-generator ${domain === "pi" ? "power-inference-review" : ""}`} role="dialog" aria-label="Review extracted schematic" onPointerDown={e => e.stopPropagation()}><header><b>Review extracted schematic</b><button onClick={() => setExtractionPreview(null)} aria-label="Close extraction preview">×</button></header><p>{extractionPreview.nodes.length} symbols · {extractionPreview.edges.length} connections. Inferred connections require review.</p><TopologyPreview model={extractionPreview} />{extractionPreview.extraction.warnings.map(w => <p key={w}>{w}</p>)}<button onClick={() => applyGenerated(extractionPreview, false)}>Add to sheet</button><button onClick={() => applyGenerated(extractionPreview, true)}>Replace sheet with preview</button></section>}
         {pathWizardOpen && domain === "pi" && <section className="topology-path-wizard">
           <header><div><b>POWER PATH / NET MANAGER</b><span>Build multiple source-to-load chains. Nets become rail segments; intervening parts become series elements; ground remains a shunt return.</span></div><button onClick={() => setPathWizardOpen(false)}><X size={14} /></button></header>
           <div><label>Input pad<select value={pathSourcePadId} onChange={event => setPathSourcePadId(event.target.value)}><option value="">Select input pad</option>{powerPads.map(pad => <option key={pad.id} value={pad.id}>{pad.net} | {pad.ref ?? "?"}.{pad.name} | {pad.layer}</option>)}</select></label>
@@ -784,6 +791,6 @@ export default function TopologyEditor({
         <section className="topology-connection-list"><b>CONNECTIONS</b>{model.edges.filter(edge => edge.from === selected.id || edge.to === selected.id).map(edge => <div key={edge.id}><span>{model.nodes.find(node => node.id === edge.from)?.label} → {model.nodes.find(node => node.id === edge.to)?.label}<small>{edge.fromPort} → {edge.toPort}{edge.net ? ` · ${edge.net}` : ""}</small></span><button title="Remove connection" aria-label={`Remove connection from ${model.nodes.find(node => node.id === edge.from)?.label} to ${model.nodes.find(node => node.id === edge.to)?.label}`} onClick={() => setModel({ ...model, edges: model.edges.filter(item => item.id !== edge.id) })}><X size={13} /></button></div>)}</section>
       </> : <p>Select a topology element to edit it.</p>}
       <div className="topology-stats"><b>MODEL STATUS</b><span>{model.nodes.length} elements</span><span>{model.edges.length} connections</span>{(domain === "pi" ? plan.warnings : model.extraction.warnings).map(warning => <p key={warning}>{warning}</p>)}</div></aside>
-    </div>
+    </div>}
   </div></div>;
 }

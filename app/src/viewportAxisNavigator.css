@@ -1,0 +1,18 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+.viewport-corner-dock { position: absolute; z-index: 11; inset: 0 0 0 auto; width: min(100%, 406px); display: flex; align-items: flex-end; justify-content: flex-end; gap: 8px; padding-left: 8px; box-sizing: border-box; pointer-events: none; }
+.viewport-corner-dock > .viewport-net-viewer { position: static; width: auto; flex: 1 1 250px; min-width: 0; max-height: min(50%, 360px); margin-bottom: 48px; }
+.viewport-axis-navigator { flex: 0 0 128px; height: 128px; pointer-events: none; }
+.viewport-axis-navigator__rotation { display: block; overflow: visible; pointer-events: none; }
+.viewport-axis-navigator__ring { fill: none; outline: none; cursor: grab; touch-action: none; user-select: none; }
+.viewport-axis-navigator__ring[data-axis=x] { color: var(--spike-axis-x, #f36f79); }
+.viewport-axis-navigator__ring[data-axis=y] { color: var(--spike-axis-y, #70c97d); }
+.viewport-axis-navigator__ring[data-axis=z] { color: var(--spike-axis-z, #6e9ef3); }
+.viewport-axis-navigator__ring-edge { stroke: var(--spike-control-surface); stroke-width: 4.5; pointer-events: none; }
+.viewport-axis-navigator__ring-line { stroke: currentColor; stroke-width: 1.8; opacity: .8; pointer-events: none; }
+.viewport-axis-navigator__ring-hit { stroke: transparent; stroke-width: 11; pointer-events: stroke; }
+.viewport-axis-navigator__ring:hover .viewport-axis-navigator__ring-line,
+.viewport-axis-navigator__ring:focus-visible .viewport-axis-navigator__ring-line { stroke-width: 3.5; opacity: 1; }
+.viewport-axis-navigator__ring:focus-visible .viewport-axis-navigator__ring-edge { stroke: var(--spike-control-focus); stroke-width: 7; }
+.viewport-axis-navigator__ring:active { cursor: grabbing; }
+.viewport-corner-dock:not(:has(.viewport-axis-navigator)) { padding-right: 10px; width: min(100%, 270px); }
+.three-host:has(> .viewport-corner-dock) > .view-quality { bottom: 10px; right: 142px; max-width: calc(100% - 156px); }

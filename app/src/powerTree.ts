@@ -1,11 +1,16 @@
 import type { ParsedBoard } from "./boardParser";
 import { normalizeTopologyPorts } from "./topologyPorts";
-import { boardComponents, classifyComponent } from "./topologyExtraction";
+import { boardComponents, classifyComponent, powerReturnNets, powerTransferPairs } from "./topologyExtraction";
 export { extractTopologyFromBoard, extractTopologyFromXmlNetlist } from "./topologyExtraction";
 export { defaultTopologyPorts, normalizeTopologyPorts, topologyPorts, topologyToText, validateTopologyPorts } from "./topologyPorts";
 export type { TopologyValidationIssue } from "./topologyPorts";
 
 export type TopologyDomain = "pi" | "si";
+export type TopologyInference = {
+  confidence: "explicit" | "inferred" | "unresolved";
+  evidence: string[];
+  reviewRequired: boolean;
+};
 export type TopologyOperatingPoint = {
   enabled?: boolean;
   currentA?: number;
@@ -60,6 +65,7 @@ export type TopologyCircuitModel = {
 };
 
 export type TopologyNode = {
+  inference?: TopologyInference;
   id: string;
   kind: TopologyNodeKind;
   label: string;
@@ -151,6 +157,7 @@ export type PowerTreeAnalysisPlan = {
 };
 
 export type TopologyEdge = {
+  inference?: TopologyInference;
   id: string;
   from: string;
   to: string;
@@ -216,16 +223,12 @@ export function extractPowerPathFromBoard(board: ParsedBoard, sourcePadId: strin
   const loadPad = board.pads.find(pad => pad.id === loadPadId);
   if (!sourcePad?.net || !loadPad?.net) throw new Error("Select source and load pads with assigned nets.");
   const components = boardComponents(board);
+  const knownReturnNets = powerReturnNets(components);
+  if (knownReturnNets.has(sourcePad.net) || knownReturnNets.has(loadPad.net)) throw new Error("Source and load must be non-ground power terminals.");
   const componentByRef = new Map(components.map(component => [component.ref, component]));
-  const traversable = components.filter(component => {
-    const nonReturnNets = unique(component.nets.filter(net => !returnName.test(net)));
-    const kind = classifyComponent(component, "pi");
-    return nonReturnNets.length >= 2 && (/^(R|L|FB|F|D|Q|T|XFMR|U|IC)/i.test(component.ref) || kind === "regulator" || kind === "transformer");
-  });
   const adjacency = new Map<string, { net: string; ref: string }[]>();
-  traversable.forEach(component => {
-    const nets = unique(component.nets.filter(net => !returnName.test(net)));
-    nets.forEach(from => nets.filter(to => to !== from).forEach(to => adjacency.set(from, [...(adjacency.get(from) ?? []), { net: to, ref: component.ref }])));
+  [...components].sort((a, b) => a.ref < b.ref ? -1 : a.ref > b.ref ? 1 : 0).forEach(component => {
+    powerTransferPairs(component, knownReturnNets).forEach(([from, to]) => adjacency.set(from, [...(adjacency.get(from) ?? []), { net: to, ref: component.ref }]));
   });
   const queue = [sourcePad.net];
   const previous = new Map<string, { net: string; ref: string }>();
@@ -277,7 +280,7 @@ export function extractPowerPathFromBoard(board: ParsedBoard, sourcePadId: strin
     const outputNet = netPath[index + 1];
     const pinRoles: Record<string, TopologyPinRole> = {};
     board.pads.filter(pad => pad.ref === ref).forEach(pad => {
-      pinRoles[pad.name] = pad.net === inputNet ? "input" : pad.net === outputNet ? "output" : pad.net && returnName.test(pad.net) ? "return" : "unused";
+      pinRoles[pad.name] = pad.net === inputNet ? "input" : pad.net === outputNet ? "output" : pad.net && knownReturnNets.has(pad.net) ? "return" : "unused";
     });
     const componentPads = board.pads.filter(pad => pad.ref === ref);
     const inputPad = componentPads.find(pad => pad.net === inputNet);
@@ -303,12 +306,12 @@ export function extractPowerPathFromBoard(board: ParsedBoard, sourcePadId: strin
   const shunts = components.filter(component => {
     if (pathRefs.has(component.ref)) return false;
     const rails = component.nets.filter(net => netPath.includes(net));
-    const returns = component.nets.filter(net => returnName.test(net));
+    const returns = component.nets.filter(net => knownReturnNets.has(net));
     return rails.length > 0 && returns.length > 0 && /^(C|R|L|FB)/i.test(component.ref);
   });
   const returnNets = unique([
-    ...board.pads.filter(pad => pad.ref && pathRefs.has(pad.ref) && pad.net && returnName.test(pad.net)).map(pad => pad.net!),
-    ...shunts.flatMap(component => component.nets.filter(net => returnName.test(net))),
+    ...board.pads.filter(pad => pad.ref && pathRefs.has(pad.ref) && pad.net && knownReturnNets.has(pad.net)).map(pad => pad.net!),
+    ...shunts.flatMap(component => component.nets.filter(net => knownReturnNets.has(net))),
   ]);
   returnNets.forEach(net => {
     const returnId = `pi-path-return-${slug(net)}`;
@@ -319,7 +322,7 @@ export function extractPowerPathFromBoard(board: ParsedBoard, sourcePadId: strin
   });
   shunts.forEach(component => {
     const railNet = component.nets.find(net => netPath.includes(net));
-    const returnNet = component.nets.find(net => returnName.test(net));
+    const returnNet = component.nets.find(net => knownReturnNets.has(net));
     if (!railNet || !returnNet) return;
     const nodeId = `pi-path-shunt-${slug(component.ref)}`;
     const railPad = board.pads.find(pad => pad.ref === component.ref && pad.net === railNet);

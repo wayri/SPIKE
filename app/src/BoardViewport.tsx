@@ -18,6 +18,8 @@ import { viewportDampingFactor, ViewportFrameClock } from "./viewportFrameCadenc
 import { sectionHitVisible } from "./viewportSection";
 import { applyAssemblyMaterialClipping, applyAssemblyMaterialOpacity, mechanicalPartPresentation, type MechanicalVisual } from "./assemblyMechanicalPresentation";
 import { buildMechanicalMeasurementScene, type MechanicalMeasurement } from "./mechanicalMeasurementScene";
+import ViewportAxisNavigator, { type ViewportAxisNavigatorHandle } from "./ViewportAxisNavigator";
+import { rotateCameraAboutAxis } from "./viewportAxisRotation";
 import ViewportNetViewer from "./ViewportNetViewer";
 import { netViewerBoard, viewportNetRows } from "./viewportNetViewerModel";
 import { applyAssemblySceneVisibility, updateAssemblySceneSelection } from "./assemblySceneVisibility";
@@ -1191,6 +1193,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
   const onAssemblyComponentSelectRef = useRef(onAssemblyComponentSelect);
   onAssemblyComponentSelectRef.current = onAssemblyComponentSelect;
   const onAssemblyNetSelectRef = useRef(onAssemblyNetSelect);
+  const axisNavigatorRef = useRef<ViewportAxisNavigatorHandle>(null);
   const assemblyGizmoRef = useRef<TransformControls>();
   const assemblyGizmoConfigRef = useRef({ partId: "", enabled: false, mode: "translate" as "translate" | "rotate", translationSnapMm: 1, rotationSnapDeg: 15 });
   const syncAssemblyGizmoRef = useRef<() => void>(() => {});
@@ -2568,6 +2571,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         const sectionPlanes = renderer.clippingPlanes;
         renderer.clippingPlanes = [];
         renderer.render(gizmoScene, activeCameraRef.current!);
+        axisNavigatorRef.current?.setOrientation(perspective.quaternion);
         viewHelper.render(renderer);
         renderer.clippingPlanes = sectionPlanes;
       }
@@ -5981,6 +5985,7 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
         onSelect={onSelect}
         onContextMenu={onContextMenu}
       />}
+      <div className="viewport-corner-dock">
       {netViewerNetNames && (viewMode === "3D" || virtualBoards.length > 1) && <ViewportNetViewer
         boardKey={netViewerScope.key} boardName={netViewerScope.label} rows={netViewerRows}
         assembly={virtualBoards.length > 1} available={Boolean(netViewerScope.board)}
@@ -5991,6 +5996,14 @@ function BoardViewportRenderer({ qualityTarget, onEmiScene, viewMode, visibleLay
           else onSelect(row.object);
         }}
       />}
+      {viewMode === "3D" && <ViewportAxisNavigator ref={axisNavigatorRef} onRotate={(axis, radians) => {
+        const camera = activeCameraRef.current, controls = controls3dRef.current;
+        if (!camera || !controls || !rotateCameraAboutAxis(camera, controls.target, axis, radians)) return;
+        if (viewHelperRef.current) viewHelperRef.current.animating = false;
+        controls.update(); viewHelperRef.current?.center.copy(controls.target);
+        requestInteractiveFrameRef.current();
+      }} />}
+      </div>
       {viewMode === "3D" && siCrosstalkDisplay && <aside aria-label="Bound SI crosstalk routes" style={{ position: "absolute", zIndex: 12, left: 10, bottom: 42, width: "min(330px, calc(100% - 20px))", padding: "9px 11px", boxSizing: "border-box", border: "1px solid #8b72ad", borderRadius: 5, background: "rgba(10, 12, 27, 0.95)", color: "#edf3ff", font: "11px/1.42 ui-monospace, SFMono-Regular, Consolas, monospace", pointerEvents: "none" }}>
         <strong style={{ display: "block", color: "#d2b9ff" }}>NEXT / FEXT · GLOBAL CHANNEL METRICS</strong>
         <span style={{ display: "block", color: "#ff86bd" }}>Aggressor · {siCrosstalkDisplay.aggressorNet}</span>

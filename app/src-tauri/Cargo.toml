@@ -1,6 +1,6 @@
 [package]
 name = "spike-desktop"
-version = "0.4.2"
+version = "0.4.3"
 description = "SPIKE PCB-focused multiphysics simulation workbench"
 license = "Apache-2.0"
 authors = ["wayri"]

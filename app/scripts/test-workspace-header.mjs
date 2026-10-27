@@ -147,6 +147,14 @@ workspaceButtons[1].props.onClick();
 assert.deepEqual(calls.workspaces, ["Simulation"], "quick navigation forwards the exact workspace name");
 assert.equal(find(tree, node => node === workspaceSwitcher), workspaceSwitcher);
 assert.equal(find(tree, node => node === utilities), utilities);
+const headerRow = find(tree, node => node.props?.className === "workspace-header-main");
+assert.equal(headerRow.props.children.length, 3, "header has explicit left, centered search and right areas");
+assert.equal(headerRow.props.children[1], searchButton, "search remains in the middle independently of utility count");
+const secondary = headerRow.props.children[2];
+assert.equal(secondary.type, CommandStrip, "secondary actions retain keyboard and edge-arrow overflow access");
+assert.equal(secondary.props.label, "Header utilities");
+assert.equal(find(secondary, node => node === utilities), utilities);
+assert.equal(find(secondary, node => node === workspaceSwitcher), workspaceSwitcher);
 
 tree = render({ showWorkspaceBar: false });
 assert.equal(find(tree, node => node.props?.["aria-label"] === "Workspaces"), null);

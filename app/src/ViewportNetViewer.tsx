@@ -28,7 +28,7 @@ export default function ViewportNetViewer({ boardKey, boardName, rows, assembly,
   if (!expanded) return null;
   return <aside className={`viewport-net-viewer${collapsed ? " viewport-net-viewer--collapsed" : ""}`} aria-label="Board net viewer" onPointerDown={event => event.stopPropagation()} onWheel={event => event.stopPropagation()} onKeyDown={event => event.stopPropagation()}>
     <header><strong title={boardName}>{assembly ? boardName : "BOARD NETS"}</strong><div className="viewport-net-viewer__controls">
-      <button type="button" className="spike-control--icon" aria-expanded={!collapsed} aria-label={collapsed ? "Expand net viewer" : "Collapse net viewer"} title={collapsed ? "Expand net viewer" : "Collapse net viewer"} onClick={() => setCollapsed(value => !value)}>{collapsed ? <ChevronDown size={14}/> : <ChevronUp size={14}/>}</button>
+      <button type="button" className="spike-control--icon" aria-expanded={!collapsed} aria-label={collapsed ? "Expand net viewer" : "Collapse net viewer"} title={collapsed ? "Expand net viewer upward" : "Collapse net viewer downward"} onClick={() => setCollapsed(value => !value)}>{collapsed ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}</button>
       <button type="button" className="spike-control--icon" aria-label="Hide net viewer" title="Hide net viewer; restore with Show hidden tools" onClick={minimize}><EyeOff size={14}/></button>
     </div></header>
     <div className="viewport-net-viewer__body" hidden={collapsed}>

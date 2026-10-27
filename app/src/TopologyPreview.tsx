@@ -1,8 +1,12 @@
 import CircuitSymbol from "./CircuitSymbol";
-import { type TopologyModel, topologyPorts } from "./powerTree";
+import { useState } from "react";
+import PowerTreeOverview from "./PowerTreeOverview";
+import { calculatePowerTree, type TopologyModel, topologyPorts } from "./powerTree";
 import { schematicHeight, schematicWire, schematicPort } from "./schematicGeometry";
 
 export default function TopologyPreview({ model }: { model: TopologyModel }) {
+  const [selectedId, setSelectedId] = useState(model.nodes[0]?.id ?? "");
+  if (model.domain === "pi") return <div className="power-inference-preview"><PowerTreeOverview model={model} budget={calculatePowerTree(model)} selectedId={selectedId} onSelect={setSelectedId} /></div>;
   const width = Math.max(400, ...model.nodes.map(node => node.x + 240));
   const height = Math.max(180, ...model.nodes.map(node => node.y + schematicHeight(node, model.domain) + 25));
   return <div className="topology-preview"><svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label="Generated schematic preview">

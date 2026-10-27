@@ -2,7 +2,7 @@
   "name": "spike-desktop",
   "license": "Apache-2.0",
   "private": true,
-  "version": "0.4.2",
+  "version": "0.4.3",
   "type": "module",
   "scripts": {
     "test:work-examples": "node scripts/test-work-examples.mjs && node scripts/test-work-example-assets.mjs && node scripts/test-si-deployment-workspace.mjs && node scripts/test-si-deployment-integration.mjs && node scripts/test-si-spatial-noise.mjs",
@@ -87,7 +87,7 @@
     "test:pi-series-handoff": "node scripts/test-pi-series-handoff.mjs",
     "test:pi-path-circuit": "node scripts/test-pi-path-circuit.mjs",
     "test:component-bridges": "node scripts/test-component-bridge-results.mjs",
-    "test:power-tree-editor": "node scripts/test-power-tree-editor.mjs",
+    "test:power-tree-editor": "node scripts/test-power-tree-editor.mjs && node scripts/test-power-tree-overview.mjs",
     "test:topology-ports": "node scripts/test-topology-ports.mjs",
     "test:unsaved-project": "node scripts/test-unsaved-project.mjs",
     "test:icons": "node scripts/test-icon-vocabulary.mjs && node scripts/test-workbench-icons.mjs",
@@ -168,7 +168,9 @@
     "test:quick-tools": "node scripts/test-viewport-quick-tools.mjs && node scripts/test-viewport-essential-tools.mjs",
     "test:responsive-managers": "node scripts/test-responsive-managers.mjs",
     "test:panel-layout": "node scripts/test-panel-responsive-layout.mjs",
-    "test:component-theme": "node scripts/test-component-theme-token-migration.mjs"
+    "test:component-theme": "node scripts/test-component-theme-token-migration.mjs",
+    "test:geometry-pi": "node scripts/test-geometry-pi-handler.mjs",
+    "test:ui-hotfix": "node scripts/test-workspace-header.mjs && node scripts/test-viewport-axis-navigator.mjs && node scripts/test-board-viewport-net-legend.mjs && node scripts/test-thermal-study-routing.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",

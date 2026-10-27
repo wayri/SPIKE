@@ -28,6 +28,7 @@ export default function WorkspaceHeader(props: Props) {
   };
   return <header className={`topbar workspace-header ${props.showWorkspaceBar?"has-workspace-shortcuts":""}`}>
     <div className="workspace-header-main">
+      <div className="workspace-header-primary">
       <div className="workspace-header-brand">
         <button type="button" id="focus-menu-toggle" className="focus-menu-toggle spike-control--compact" aria-expanded={props.menuOpen} aria-controls="focus-command-panel" onClick={props.onMenu}><PanelLeft size={15}/> Menu</button>
         <div className="brand-mark"><b>SPIKE</b></div>
@@ -42,11 +43,14 @@ export default function WorkspaceHeader(props: Props) {
         onKeyDown={event=>{if(event.key==="ArrowDown"){event.preventDefault();setFileAnchor(null);props.onFilesOpen();const bounds=event.currentTarget.getBoundingClientRect();setStudyAnchor({x:bounds.left,y:bounds.bottom+4});}}}>
         <ListTree size={16}/><span>Studies</span><ChevronDown size={12}/>
       </button>}
-      <div className="workspace-simulation-actions">{props.simulationActions}</div>
+      </div>
       <button type="button" className={`universal-search-trigger workspace-header-search ${props.searchOpen?"active":""}`} aria-label="Open universal search" title="Search commands, workspaces, parts, nets and settings (Ctrl+K)" aria-keyshortcuts="Control+K Meta+K" aria-expanded={props.searchOpen} onClick={props.onSearch}>
         <Search size={19}/><span>Search commands, parts, nets…</span><kbd>Ctrl K</kbd>
       </button>
-      <div className="workspace-header-utilities">{props.workspaceSwitcher}{props.utilities}</div>
+      <CommandStrip label="Header utilities" className="workspace-header-secondary">
+        <div className="workspace-simulation-actions">{props.simulationActions}</div>
+        <div className="workspace-header-utilities">{props.workspaceSwitcher}{props.utilities}</div>
+      </CommandStrip>
     </div>
     {props.showWorkspaceBar&&<nav className="workspace-header-navigation" aria-label="Workspaces"><CommandStrip label="Workspace shortcuts" className="workspace-quick-switch">
       {props.workspaces.map(item=><button type="button" key={item.name} aria-pressed={props.activeWorkspace===item.name} onClick={()=>props.onWorkspace(item.name)} title={`${item.name} workspace`}><item.icon size={14}/><span>{item.name}</span></button>)}
