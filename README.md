@@ -9,6 +9,7 @@
 <p align="center">
   <a href="https://github.com/wayri/SPIKE/releases/tag/v0.4.0-alpha.1"><img height="32" alt="Release 0.4.0-alpha.1" src="https://img.shields.io/badge/release-0.4.0--alpha.1-16a6a1?style=for-the-badge"></a>
   <a href="https://github.com/wayri/SPIKE/actions/runs/39572252308"><img height="32" alt="Four-platform CI passed" src="https://img.shields.io/badge/4--platform_CI-passed-238636?style=for-the-badge"></a>
+  <a href="https://github.com/wayri/SPIKE/releases"><img height="32" alt="GitHub release asset downloads" src="https://img.shields.io/github/downloads/wayri/SPIKE/total?style=for-the-badge&amp;label=release%20downloads&amp;color=16a6a1"></a>
   <a href="https://discord.gg/UCmeR9ypzQ"><img height="32" alt="Discord community" src="https://img.shields.io/badge/community-Discord-5865F2?style=for-the-badge&amp;logo=discord&amp;logoColor=white"></a>
   <a href="LICENSE"><img height="32" alt="Apache 2.0 license" src="https://img.shields.io/badge/license-Apache_2.0-476582?style=for-the-badge"></a>
 </p>
